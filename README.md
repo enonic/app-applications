@@ -1,4 +1,4 @@
-Enonix XP - Applications App
+Enonic XP - Applications App
 ===
 
 Install and manage applications built on Enonic XP platform.
