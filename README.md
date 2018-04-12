@@ -1,12 +1,10 @@
 Enonic XP - Applications App
 ===
 
-Install and manage applications built on Enonic XP platform.
-
 [![Travis Build Status][travis-image]][travis-url]
 [![License][license-image]][license-url]
 
-Core applications for [Enonic XP](https://github.com/enonic/xp).
+Install and manage applications built on [Enonic XP](https://github.com/enonic/xp) platform.
 
 ## Usage
 
