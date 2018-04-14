@@ -8,7 +8,8 @@ import Application = api.application.Application;
 import i18n = api.util.i18n;
 import DivEl = api.dom.DivEl;
 
-export class InstallAppDialog extends api.ui.dialog.ModalDialog {
+export class InstallAppDialog
+    extends api.ui.dialog.ModalDialog {
 
     private marketAppPanel: MarketAppPanel;
 
@@ -44,11 +45,12 @@ export class InstallAppDialog extends api.ui.dialog.ModalDialog {
             this.notifyResize();
         };
 
-        api.dom.Body.get().appendChild(this);
     }
 
     updateInstallApplications(installApplications: api.application.Application[]) {
-        this.marketAppPanel.updateInstallApplications(installApplications);
+        if (this.marketAppPanel) {
+            this.marketAppPanel.updateInstallApplications(installApplications);
+        }
     }
 
     doRender(): Q.Promise<boolean> {
@@ -87,9 +89,11 @@ export class InstallAppDialog extends api.ui.dialog.ModalDialog {
 
             this.initDragAndDropUploaderEvents();
 
-            if (!this.marketAppPanel) {
-                this.marketAppPanel = new MarketAppPanel(this.applicationInput);
-            }
+            this.marketAppPanel = new MarketAppPanel(this.applicationInput);
+            this.marketAppPanel.getMarketAppsTreeGrid().onLoaded(this.onMarketLoaded);
+            this.marketAppPanel.getMarketAppsTreeGrid().onShown(() => {
+                this.marketAppPanel.loadGrid();
+            });
 
             this.header.appendChildren(...[this.applicationInput, this.statusMessage]);
 
@@ -152,12 +156,10 @@ export class InstallAppDialog extends api.ui.dialog.ModalDialog {
     }
 
     show() {
-        this.marketAppPanel.getMarketAppsTreeGrid().onLoaded(this.onMarketLoaded);
         this.resetFileInputWithUploader();
         this.removeClass('hidden');
 
         super.show();
-        this.marketAppPanel.loadGrid();
 
         this.refreshStatusMessage();
     }
@@ -165,8 +167,7 @@ export class InstallAppDialog extends api.ui.dialog.ModalDialog {
     hide() {
         super.hide();
 
-        this.marketAppPanel.getMarketAppsTreeGrid().unLoaded(this.onMarketLoaded);
-        this.statusMessage.removeClass('loaded');
+        this.refreshStatusMessage();
         this.addClass('hidden');
         this.removeClass('animated');
         this.applicationInput.reset();
@@ -178,11 +179,15 @@ export class InstallAppDialog extends api.ui.dialog.ModalDialog {
     }
 
     private resetFileInputWithUploader() {
-        this.applicationInput.reset();
+        if (this.applicationInput) {
+            this.applicationInput.reset();
+        }
     }
 
     private refreshStatusMessage() {
-        this.statusMessage.removeClass('failed');
-        this.statusMessage.setHtml(i18n('market.loadAppList'));
+        if (this.statusMessage) {
+            this.statusMessage.removeClass('failed loaded');
+            this.statusMessage.setHtml(i18n('market.loadAppList'));
+        }
     }
 }
