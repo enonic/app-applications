@@ -1,4 +1,5 @@
 import i18n = api.util.i18n;
+
 declare const CONFIG;
 api.util.i18nInit(CONFIG.messages);
 
@@ -57,7 +58,13 @@ function startApplication() {
     let installAppDialog = new InstallAppDialog();
 
     InstallAppPromptEvent.on((event) => {
-        installAppDialog.updateInstallApplications(event.getInstalledApplications());
+        if (installAppDialog.isRendered()) {
+            installAppDialog.updateInstallApplications(event.getInstalledApplications());
+        } else {
+            installAppDialog.onRendered(() => {
+                installAppDialog.updateInstallApplications(event.getInstalledApplications());
+            });
+        }
         installAppDialog.open();
     });
 

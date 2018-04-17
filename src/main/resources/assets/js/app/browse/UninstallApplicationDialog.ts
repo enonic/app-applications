@@ -35,7 +35,6 @@ export class UninstallApplicationDialog extends api.ui.dialog.ModalDialog {
     }
 
     show() {
-        api.dom.Body.get().appendChild(this);
         super.show();
     }
 
