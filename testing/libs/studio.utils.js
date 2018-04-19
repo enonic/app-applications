@@ -24,39 +24,39 @@ module.exports = {
         })
     },
 
-    navigateToApplicationsApp: function (browser) {
+    navigateToApplicationsApp: function () {
         return launcherPanel.waitForPanelVisible(appConst.TIMEOUT_1).then((result)=> {
             if (result) {
                 console.log("Launcher Panel is opened, click on the `Applications` link...");
                 return launcherPanel.clickOnApplicationsLink();
             } else {
                 console.log("Login Page is opened, type a password and name...");
-                return this.doLoginAndClickOnApplicationsLink(browser);
+                return this.doLoginAndClickOnApplicationsLink();
             }
         }).then(()=> {
-            return this.doSwitchToApplicationsBrowsePanel(browser);
+            return this.doSwitchToApplicationsBrowsePanel();
         }).catch((err)=> {
             console.log('tried to navigate to applications, but: ' + err);
-            this.saveScreenshot(browser, "err_navigate_to_applications");
+            this.saveScreenshot("err_navigate_to_applications");
         })
     },
-    doSwitchToApplicationsBrowsePanel: function (browser) {
+    doSwitchToApplicationsBrowsePanel: function () {
         console.log('testUtils:switching to Applications app...');
-        return browser.getTitle().then(title=> {
+        return webDriverHelper.browser.getTitle().then(title=> {
             if (title != "Applications - Enonic XP Admin") {
-                return this.switchToApplicationsTabWindow(browser);
+                return this.switchToApplicationsTabWindow();
             }
         })
     },
 
     doSwitchToHome: function (browser) {
         console.log('testUtils:switching to Home page...');
-        return browser.getTabIds().then(tabs => {
+        return webDriverHelper.browser.getTabIds().then(tabs => {
             let prevPromise = Promise.resolve(false);
             tabs.some((tabId)=> {
                 prevPromise = prevPromise.then((isHome) => {
                     if (!isHome) {
-                        return this.switchAndCheckTitle(browser, tabId, "Enonic XP Home");
+                        return this.switchAndCheckTitle(tabId, "Enonic XP Home");
                     }
                     return false;
                 });
@@ -67,15 +67,15 @@ module.exports = {
         });
     },
 
-    switchAndCheckTitle: function (browser, tabId, reqTitle) {
-        return browser.switchTab(tabId).then(()=> {
-            return browser.getTitle().then(title=> {
+    switchAndCheckTitle: function (tabId, reqTitle) {
+        return webDriverHelper.browser.switchTab(tabId).then(()=> {
+            return webDriverHelper.browser.getTitle().then(title=> {
                 return title == reqTitle;
 
             })
         });
     },
-    doLoginAndSwitchToApplications: function (browser) {
+    doLoginAndSwitchToApplications: function () {
         return loginPage.doLogin().pause(1500).then(()=> {
             return homePage.waitForXpTourVisible(appConst.TIMEOUT_3);
         }).then((result)=> {
@@ -85,12 +85,12 @@ module.exports = {
         }).then(()=> {
             return launcherPanel.clickOnApplicationsLink().pause(1000);
         }).then(()=> {
-            return this.doSwitchToApplicationsBrowsePanel(browser);
+            return this.doSwitchToApplicationsBrowsePanel();
         }).catch((err)=> {
             throw new Error(err);
         })
     },
-    doLoginAndClickOnApplicationsLink: function (browser) {
+    doLoginAndClickOnApplicationsLink: function () {
         return loginPage.doLogin().pause(1500).then(()=> {
             return homePage.waitForXpTourVisible(appConst.TIMEOUT_3);
         }).then((result)=> {
@@ -102,13 +102,13 @@ module.exports = {
         })
     },
 
-    switchToApplicationsTabWindow: function (browser) {
-        return browser.getTabIds().then(tabs => {
+    switchToApplicationsTabWindow: function () {
+        return webDriverHelper.browser.getTabIds().then(tabs => {
             let prevPromise = Promise.resolve(false);
             tabs.some((tabId)=> {
                 prevPromise = prevPromise.then((isStudio) => {
                     if (!isStudio) {
-                        return this.switchAndCheckTitle(browser, tabId, "Applications - Enonic XP Admin");
+                        return this.switchAndCheckTitle(tabId, "Applications - Enonic XP Admin");
                     }
                     return false;
                 });
@@ -118,11 +118,10 @@ module.exports = {
             return browsePanel.waitForGridLoaded(appConst.TIMEOUT_3);
         });
     },
-
-    saveScreenshot: function (browser, name) {
+    saveScreenshot: function (name) {
         var path = require('path')
         var screenshotsDir = path.join(__dirname, '/../build/screenshots/');
-        return browser.saveScreenshot(screenshotsDir + name + '.png').then(()=> {
+        return webDriverHelper.browser.saveScreenshot(screenshotsDir + name + '.png').then(()=> {
             return console.log('screenshot saved ' + name);
         }).catch(err=> {
             return console.log('screenshot was not saved ' + screenshotsDir + 'utils  ' + err);

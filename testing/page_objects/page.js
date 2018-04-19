@@ -31,6 +31,10 @@ Page.prototype.getTitle = function () {
     return this.getBrowser().getTitle();
 };
 
+Page.prototype.keys = function (value) {
+    return this.getBrowser().keys(value);
+};
+
 Page.prototype.isVisible = function (selector) {
     return this.getBrowser().isVisible(selector);
 };

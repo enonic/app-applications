@@ -4,6 +4,7 @@
 
 const page = require('../page');
 const elements = require('../../libs/elements');
+const utils = require('../../libs/studio.utils');
 const dialog = {
     container: `//div[contains(@id,'InstallAppDialog')]`,
     grid: `//div[contains(@id,'MarketAppsTreeGrid')]`,
@@ -43,7 +44,7 @@ const installAppDialog = Object.create(page, {
     },
     waitForAppInstalled: {
         value: function (displayName) {
-            return this.waitForVisible(dialog.installedStatusByName(displayName), 20000);
+            return this.waitForVisible(dialog.installedStatusByName(displayName), 25000);
         }
     },
     clickOnCancelButtonTop: {
@@ -98,17 +99,27 @@ const installAppDialog = Object.create(page, {
             return this.waitForVisible(selector, 5000).then(() => {
                 return this.doClick(selector);
             }).catch(e => {
-                throw `Couldn't find install link for app ${displayName}`;
+                throw new Error(`Couldn't find install link for app ${displayName}`);
             });
         }
     },
+    isApplicationInstalled: {
+        value: function (displayName) {
+            const selector = `${elements.slickRowByDisplayName(dialog.container, displayName)}` + "//a[@class='installed']";
+            return this.waitForVisible(selector, 2000).catch(e => {
+                this.saveScreenshot('err_find_installed_status');
+                throw new Error(`Couldn't find installed label for the app ${displayName}`);
+            });
+        }
+    },
+
     clickOnFirstInstallAppLink: {
         value: function () {
             const selector = dialog.firstInstallLink();
             return this.waitForVisible(selector, 5000).then(() => {
                 return this.doClick(selector);
             }).catch(e => {
-                throw `Couldn't find install link for app ${displayName}`;
+                throw new Error(`Couldn't find install link for app ${displayName}`);
             });
         }
     },
@@ -118,7 +129,7 @@ const installAppDialog = Object.create(page, {
             return this.waitForVisible(selector, 5000).then(() => {
                 return this.getText(selector);
             }).catch(e => {
-                throw `Couldn't find install link for app ${displayName}`;
+                throw new Error(`Couldn't find install link for app ${displayName}`);
             });
         }
     },
@@ -131,6 +142,13 @@ const installAppDialog = Object.create(page, {
     typeSearchText: {
         value: function (text) {
             return this.typeTextInInput(this.searchInput, text);
+        }
+    },
+    typeSearchTextAndEnter: {
+        value: function (text) {
+            return this.typeTextInInput(this.searchInput, text).pause(2000).then(()=> {
+                return this.keys('Enter');
+            });
         }
     },
     isApplicationPresent: {
@@ -151,9 +169,34 @@ const installAppDialog = Object.create(page, {
     isCancelButtonTopVisible: {
         value: function () {
             return this.isVisible(this.cancelButton).catch((err)=> {
-                throw new Error('error check the Cancel button on the Insatll dialog');
+                throw new Error('error check the Cancel button on the Install dialog');
             })
         }
     },
+    getErrorValidationMessage: {
+        value: function () {
+            let selector = dialog.container + `//div[contains(@class,'status-message') and contains(@class,'failed')]`;
+            return this.waitForVisible(selector, 3000).then(()=> {
+                this.saveScreenshot('inst_dlg_validation');
+                return this.getText(selector);
+            }).catch(err=> {
+                this.saveScreenshot('err_wait_for_validation_message');
+                throw new Error('Validation message is not visible after the interval  ' + err);
+            })
+        }
+    },
+
+    applicationNotFoundMessage: {
+        value: function () {
+            let selector = dialog.container + `//div[contains(@class,'status-message') and contains(@class,'empty')]`;
+            return this.waitForVisible(selector, 3000).then(()=> {
+                this.saveScreenshot('inst_dlg_message');
+                return this.getText(selector);
+            }).catch(err=> {
+                this.saveScreenshot('err_wait_for_search_message');
+                throw new Error('search message is not visible after the interval  ' + err);
+            })
+        }
+    }
 });
 module.exports = installAppDialog;

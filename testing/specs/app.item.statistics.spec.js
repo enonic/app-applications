@@ -93,6 +93,9 @@ describe('Item Statistics Panel', function () {
             .then(appStatisticPanel.getApplicationName)
             .then(title => assert.strictEqual(title, Apps.firstApp, `Selected application should be "${Apps.firstApp}".`))
     );
-    beforeEach(() => studioUtils.navigateToApplicationsApp(webDriverHelper.browser));
-    afterEach(() => studioUtils.doCloseCurrentBrowserTab(webDriverHelper.browser));
+    beforeEach(() => studioUtils.navigateToApplicationsApp());
+    afterEach(() => studioUtils.doCloseCurrentBrowserTab());
+    before(()=> {
+        return console.log('specification is starting: ' + this.title);
+    });
 });

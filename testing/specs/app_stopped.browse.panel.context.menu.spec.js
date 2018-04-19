@@ -58,7 +58,10 @@ describe(`Applications Grid context menu, application is stopped`, function () {
         })
     });
 
-    beforeEach(() => studioUtils.navigateToApplicationsApp(webDriverHelper.browser));
-    afterEach(() => studioUtils.doCloseCurrentBrowserTab(webDriverHelper.browser));
+    beforeEach(() => studioUtils.navigateToApplicationsApp());
+    afterEach(() => studioUtils.doCloseCurrentBrowserTab());
+    before(()=> {
+        return console.log('specification is starting: ' + this.title);
+    });
 });
 
