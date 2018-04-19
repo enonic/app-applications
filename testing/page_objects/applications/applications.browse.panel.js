@@ -344,5 +344,27 @@ module.exports = Object.create(page, {
                 throw new Error('App-state was not found')
             });
         }
+    },
+    getApplicationDisplayNames: {
+        value: function () {
+            var displayNameXpath = elements.SLICK_ROW + elements.H6_DISPLAY_NAME;
+            return this.getText(displayNameXpath).catch((err) => {
+                throw new Error('Error when get App-display names')
+            });
+        }
+    },
+    pressArrowDownKey: {
+        value: function () {
+            return this.keys('Arrow_Down').pause(1000).catch((err) => {
+                throw new Error('Error when clicking on Arrow Down key')
+            });
+        }
+    },
+    pressArrowUpKey: {
+        value: function () {
+            return this.keys('Arrow_Up').pause(1000).catch((err) => {
+                throw new Error('Error when clicking on Arrow Up key')
+            });
+        }
     }
 });

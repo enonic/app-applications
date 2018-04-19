@@ -1,3 +1,8 @@
+/**
+ * Verifies:
+ * app-applications#8
+ * Install Applications Dialog - incorrect state of application, when the dialog has been opened after the 'Log in'
+ */
 const chai = require('chai');
 const expect = chai.expect;
 const assert = chai.assert;
@@ -10,6 +15,8 @@ const appConst = require('../libs/app_const');
 describe('Install Application Dialog specification', function () {
     this.timeout(appConst.SUITE_TIMEOUT);
     webDriverHelper.setupBrowser();
+
+    const appName = 'Chuck Norris';
 
     it('SHOULD show install app dialog WHEN Install button has been clicked', () => {
         return appBrowsePanel.clickOnInstallButton().then(() => {
@@ -58,8 +65,8 @@ describe('Install Application Dialog specification', function () {
             assert.isTrue(names[0] == 'Chuck Norris', 'application should be with the expected display name');
         })
     });
+
     it('GIVEN dialog is opened WHEN install link has been clicked THEN the app should be installed', () => {
-        const appName = 'Chuck Norris';
         return appBrowsePanel.clickOnInstallButton().then(() => {
             return dialog.waitForOpened();
         }).then(()=> {
@@ -81,9 +88,24 @@ describe('Install Application Dialog specification', function () {
         });
     });
 
-    beforeEach(() => studioUtils.navigateToApplicationsApp(webDriverHelper.browser));
+    //verifies   https://github.com/enonic/app-applications/issues/8
+    it('GIVEN existing installed application WHEN install dialog has been opened THEN `Installed` status should be displayed near the application',
+        () => {
+            return appBrowsePanel.clickOnInstallButton().then(() => {
+                return dialog.waitForOpened();
+            }).then(()=> {
+                return dialog.isApplicationInstalled(appName);
+            }).then(result => {
+                assert.isTrue(result, `'${appName}' should be with Installed status`);
+            });
+        });
+
+    beforeEach(() => studioUtils.navigateToApplicationsApp());
     afterEach(() => {
-        return studioUtils.doCloseCurrentBrowserTab(webDriverHelper.browser)
+        return studioUtils.doCloseCurrentBrowserTab();
+    });
+    before(()=> {
+        return console.log('specification is starting: ' + this.title);
     });
 })
 ;
