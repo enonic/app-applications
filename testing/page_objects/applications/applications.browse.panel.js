@@ -17,6 +17,8 @@ const XPath = {
     appState: "//div[contains(@class,'state')]",
     selectedRows: `//div[@class='slick-viewport']//div[contains(@class,'slick-row') and child::div[contains(@class,'selected')]]`,
     selectionControllerCheckBox: `//div[contains(@id,'SelectionController')]`,
+    selectionPanelToggler: `//button[contains(@id,'SelectionPanelToggler')]`,
+    numberInToggler: `//button[contains(@id,'SelectionPanelToggler')]/span`,
     appStateByName: displayName => `${elements.slickRowByDisplayName(XPath.appGrid, displayName)}${XPath.appState}`,
     enabledContextMenuButton: function (name) {
         return `${XPath.contextMenu}/li[contains(@id,'MenuItem') and not(contains(@class,'disabled')) and contains(.,'${name}')]`;
@@ -41,10 +43,49 @@ module.exports = Object.create(page, {
             return `${XPath.container}${XPath.selectionControllerCheckBox}`;
         }
     },
+    numberInToggler: {
+        get: function () {
+            return `${XPath.container}${XPath.numberInToggler}`;
+        }
+    },
+    selectionPanelToogler: {
+        get: function () {
+            return `${XPath.container}${XPath.selectionPanelToggler}`;
+        }
+    },
     waitForPanelVisible: {
         value: function (ms) {
             return this.waitForVisible(XPath.toolbar, ms).catch(() => {
                 throw new Error(`Content browse panel was not loaded in  ${ms}`);
+            });
+        }
+    },
+    waitForSelectionTogglerVisible: {
+        value: function () {
+            return this.waitForVisible(this.selectionPanelToogler, appConst.TIMEOUT_2).then(()=> {
+                return this.getAttribute(this.selectionPanelToogler, 'class');
+            }).then(result=> {
+                return result.includes('any-selected');
+            }).catch(err => {
+                console.log(`error when check the 'Selection toogler'` + err);
+                return false;
+            });
+        }
+    },
+    getNumberInSelectionToggler: {
+        value: function () {
+            return this.waitForVisible(this.numberInToggler, appConst.TIMEOUT_2).then(()=> {
+                return this.getText(this.numberInToggler);
+            }).catch(err => {
+                this.saveScreenshot('err_number_selection_toggler');
+                throw new Error(`error when getting number in 'Selection toogler'` + err)
+            });
+        }
+    },
+    clickOnSelectionToggler: {
+        value: function () {
+            return this.doClick(this.selectionPanelToogler).catch(err => {
+                throw new Error(`Error when clicking 'Selection toogler' ` + err);
             });
         }
     },
