@@ -12,6 +12,8 @@ const xpath = {
     contentTypes: `//ul[@class='data-list' and descendant::li[text()='Content Types']]//span`,
     applicationDataHeaders: `//div[contains(@class,'application')]//li[@class='list-header']`,
     providerDataHeaders: `//div[contains(@class,'providers')]//li[@class='list-header']`,
+    stopActionMenuItem: `//div[contains(@id,'ActionMenu')]//li[contains(@id,'ActionMenuItem') and text()='Stop']`,
+    startActionMenuItem: `//div[contains(@id,'ActionMenu')]//li[contains(@id,'ActionMenuItem') and text()='Start']`,
     siteDataHeaders: `//div[contains(@id,'ApplicationItemStatisticsPanel')]/div[contains(@class,'application-data-container')]/div[contains(@class,'site')]//li[contains(@class,'list-header')]`,
 };
 
@@ -38,6 +40,50 @@ var applicationItemStatisticsPanel = Object.create(page, {
             })
         }
     },
+    clickOnActionDropDownMenu: {
+        value: function () {
+            let selector = `${xpath.main}${xpath.dropDownButton}`;
+            return this.doClick(selector).catch(err=> {
+                throw new Error('error when clicking on action menu: ' + err);
+            })
+        }
+    },
+    waitForStopMenuItemVisible: {
+        value: function () {
+            return this.waitForVisible(xpath.stopActionMenuItem).catch(err=> {
+                console.log(err);
+                this.saveScreenshot("stop_menu_item_not_visible");
+                return false;
+            })
+        }
+    },
+    waitForStartMenuItemVisible: {
+        value: function () {
+            return this.waitForVisible(xpath.startActionMenuItem).catch(err=> {
+                console.log(err);
+                this.saveScreenshot("stop_menu_item_not_visible");
+                return false;
+            })
+        }
+    },
+    clickOnStopActionMenuItem: {
+        value: function () {
+            this.doClick(xpath.stopActionMenuItem).catch(err=> {
+                console.log(err);
+                throw new Error("Error when clicking on Stop menu item");
+
+            })
+        }
+    },
+    clickOnStartActionMenuItem: {
+        value: function () {
+            this.doClick(xpath.startActionMenuItem).catch(err=> {
+                console.log(err);
+                throw new Error("Error when clicking on Start menu item");
+
+            })
+        }
+    },
     getSiteDataHeaders: {
         value: function () {
             return this.getTextFromElements(xpath.siteDataHeaders);
@@ -50,7 +96,14 @@ var applicationItemStatisticsPanel = Object.create(page, {
     },
     getContentTypes: {
         value: function () {
-            return this.getText(this.contentTypes).catch(err=> {
+            return this.isVisible(this.contentTypes).then(result=> {
+                if (result) {
+                    return this.getText(this.contentTypes);
+                } else {
+                    return [];
+                }
+
+            }).catch(err=> {
                 throw new Error('error while getting names of Content Types: ' + err);
             })
         }
