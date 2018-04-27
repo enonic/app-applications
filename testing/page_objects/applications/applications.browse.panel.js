@@ -3,7 +3,8 @@ const elements = require('../../libs/elements');
 const appConst = require('../../libs/app_const');
 
 const XPath = {
-    container: `//div[contains(@class, 'application-grid')]`,
+    container: `//div[contains(@id,'ApplicationBrowsePanel')]`,
+    appGrid: `//div[contains(@class, 'application-grid')]`,
     toolbar: `//div[contains(@id,'ApplicationBrowseToolbar')]`,
     contextMenu: `//ul[contains(@id,'TreeGridContextMenu')]`,
     treeGridToolbar: `//div[contains(@id,'api.ui.treegrid.TreeGridToolbar')]`,
@@ -14,7 +15,11 @@ const XPath = {
     selectAllCheckbox: `//div[@id='api.ui.treegrid.actions.SelectionController']`,
     checkboxes: `(//div[contains(@class,'slick-cell-checkboxsel')])`,
     appState: "//div[contains(@class,'state')]",
-    appStateByName: displayName => `${elements.slickRowByDisplayName(XPath.container, displayName)}${XPath.appState}`,
+    selectedRows: `//div[@class='slick-viewport']//div[contains(@class,'slick-row') and child::div[contains(@class,'selected')]]`,
+    selectionControllerCheckBox: `//div[contains(@id,'SelectionController')]`,
+    selectionPanelToggler: `//button[contains(@id,'SelectionPanelToggler')]`,
+    numberInToggler: `//button[contains(@id,'SelectionPanelToggler')]/span`,
+    appStateByName: displayName => `${elements.slickRowByDisplayName(XPath.appGrid, displayName)}${XPath.appState}`,
     enabledContextMenuButton: function (name) {
         return `${XPath.contextMenu}/li[contains(@id,'MenuItem') and not(contains(@class,'disabled')) and contains(.,'${name}')]`;
     },
@@ -27,11 +32,27 @@ const XPath = {
     checkboxByDisplayName: displayName => `${elements.itemByDisplayName(
         displayName)}/ancestor::div[contains(@class,'slick-row')]/div[contains(@class,'slick-cell-checkboxsel')]/label`,
     selectedApplicationByName: function (displayName) {
-        return `${elements.slickRowSelectedByDisplayName(XPath.container, displayName)}`;
+        return `${elements.slickRowSelectedByDisplayName(XPath.appGrid, displayName)}`;
     }
 };
 
 module.exports = Object.create(page, {
+
+    selectionControllerCheckBox: {
+        get: function () {
+            return `${XPath.container}${XPath.selectionControllerCheckBox}`;
+        }
+    },
+    numberInToggler: {
+        get: function () {
+            return `${XPath.container}${XPath.numberInToggler}`;
+        }
+    },
+    selectionPanelToogler: {
+        get: function () {
+            return `${XPath.container}${XPath.selectionPanelToggler}`;
+        }
+    },
     waitForPanelVisible: {
         value: function (ms) {
             return this.waitForVisible(XPath.toolbar, ms).catch(() => {
@@ -39,12 +60,57 @@ module.exports = Object.create(page, {
             });
         }
     },
-    isItemDisplayedByDisplayName: {
+    waitForSelectionTogglerVisible: {
+        value: function () {
+            return this.waitForVisible(this.selectionPanelToogler, appConst.TIMEOUT_2).then(()=> {
+                return this.getAttribute(this.selectionPanelToogler, 'class');
+            }).then(result=> {
+                return result.includes('any-selected');
+            }).catch(err => {
+                console.log(`error when check the 'Selection toogler'` + err);
+                return false;
+            });
+        }
+    },
+    getNumberInSelectionToggler: {
+        value: function () {
+            return this.waitForVisible(this.numberInToggler, appConst.TIMEOUT_2).then(()=> {
+                return this.getText(this.numberInToggler);
+            }).catch(err => {
+                this.saveScreenshot('err_number_selection_toggler');
+                throw new Error(`error when getting number in 'Selection toogler'` + err)
+            });
+        }
+    },
+    clickOnSelectionToggler: {
+        value: function () {
+            return this.doClick(this.selectionPanelToogler).catch(err => {
+                throw new Error(`Error when clicking 'Selection toogler' ` + err);
+            });
+        }
+    },
+    getNumberOfSelectedRows: {
+        value: function () {
+            return this.elements(XPath.selectedRows).then((result)=> {
+                return result.value.length;
+            }).catch(err => {
+                throw new Error(`Error when getting selected rows ` + err);
+            });
+        }
+    },
+    isItemByDisplayNameDisplayed: {
         value: function (itemName) {
             return this.waitForVisible(`${XPath.rowByDisplayName(itemName)}`, 1000).catch(() => {
-                console.log("item is not displayed:" + itemName);
                 this.saveScreenshot(`err_find_${itemName}`);
                 throw new Error(`Item was not found! ${itemName}`);
+            });
+        }
+    },
+    isSelectionControllerCheckboxDisplayed: {
+        value: function () {
+            return this.waitForVisible(this.selectionControllerCheckBox, 1000).catch(() => {
+                this.saveScreenshot('err_selection_controller');
+                throw new Error(`Selection controller was not found!`);
             });
         }
     },
@@ -83,6 +149,14 @@ module.exports = Object.create(page, {
             }).catch((err) => {
                 throw new Error(`Install button is not enabled! ${err}`);
             })
+        }
+    },
+    clickOnSelectionControllerCheckbox: {
+        value: function () {
+            return this.doClick(this.selectionControllerCheckBox).catch(() => {
+                this.saveScreenshot('err_click_on_selection_controller');
+                throw new Error(`Error when clicking on Selection controller`);
+            });
         }
     },
     clickOnUninstallButton: {
@@ -310,7 +384,6 @@ module.exports = Object.create(page, {
     waitForContextMenuDisplayed: {
         value: function (name) {
             return this.waitForVisible(`${XPath.contextMenu}`, 1000).catch((err) => {
-                console.log("Context menu is not displayed");
                 throw Error('Context menu is not visible' + err);
             });
         }
@@ -320,7 +393,6 @@ module.exports = Object.create(page, {
         value: function (name, state) {
             var nameXpath = XPath.contextMenuButton(name, state || '');
             return this.waitForVisible(nameXpath, 1000).catch((err) => {
-                console.log("Failed to find context menu button");
                 throw Error('Failed to find context menu button ' + name);
             });
         }

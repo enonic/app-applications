@@ -52,13 +52,7 @@ describe('Item Statistics Panel', function () {
             assert.strictEqual(header, 'Mode');
         })
     );
-    it(`WHEN application is started THEN correct label should be displayed on the drop-down button`,
-        () => appBrowsePanel.clickOnRowByDisplayName(Apps.firstApp).then(()=> {
-            return appStatisticPanel.getDropDownButtonText();
-        }).then(result=> {
-            assert.strictEqual(result, 'Started', 'correct label should be displayed on the drop-down button');
-        })
-    );
+
     it(`WHEN application is selected THEN content types list should not be empty and items should be sorted by a name`,
         () => appBrowsePanel.clickOnRowByDisplayName(Apps.firstApp).then(()=> {
             return appStatisticPanel.getContentTypes();
@@ -75,6 +69,7 @@ describe('Item Statistics Panel', function () {
             .then(()=> {
                 return appStatisticPanel.getSiteDataHeaders();
             }).then(result => {
+                studioUtils.saveScreenshot("application_stopped");
                 assert.strictEqual(result.length, 0, 'Stopped application should not have site data');
             })
     );
@@ -87,11 +82,29 @@ describe('Item Statistics Panel', function () {
         })
     );
 
+    it(`WHEN stopped application is selected THEN content types list should be empty`,
+        () => appBrowsePanel.clickOnRowByDisplayName(Apps.firstApp).then(()=> {
+            return appStatisticPanel.getContentTypes();
+        }).then(contentTypes => {
+            assert.equal(contentTypes.length, 0, 'Content Types list should be empty');
+        })
+    );
+
     it(`should display info of the last selected application`, () =>
         appBrowsePanel.clickCheckboxAndSelectRowByDisplayName(Apps.secondApp)
             .then(() => appBrowsePanel.clickCheckboxAndSelectRowByDisplayName(Apps.firstApp).pause(1000))
             .then(appStatisticPanel.getApplicationName)
             .then(title => assert.strictEqual(title, Apps.firstApp, `Selected application should be "${Apps.firstApp}".`))
+    );
+    it(`GIVEN stopped application is selected WHEN 'Start' button has been pressed THEN content types list should not be empty`,
+        () => appBrowsePanel.clickOnRowByDisplayName(Apps.firstApp).then(()=> {
+            return appBrowsePanel.clickOnStartButton();
+        }).pause(2000).then(()=> {
+            return appStatisticPanel.getContentTypes();
+        }).then(contentTypes => {
+            studioUtils.saveScreenshot("application_started_again");
+            assert.isTrue(contentTypes.length > 0, 'Content Types list should not be empty');
+        })
     );
     beforeEach(() => studioUtils.navigateToApplicationsApp());
     afterEach(() => studioUtils.doCloseCurrentBrowserTab());

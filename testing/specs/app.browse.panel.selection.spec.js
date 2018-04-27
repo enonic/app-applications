@@ -8,9 +8,10 @@ const studioUtils = require('../libs/studio.utils.js');
 const appBrowsePanel = require('../page_objects/applications/applications.browse.panel');
 const appStatisticPanel = require('../page_objects/applications/application.item.statistic.panel');
 
-describe('Open Applications app and verify that grid is loaded and correct title should be displayed', function () {
+describe('Applications Browse panel - selection of items spec', function () {
     this.timeout(appConst.SUITE_TIMEOUT);
     webDriverHelper.setupBrowser();
+    const TOTAL_NUMBER_OF_APPLICATIONS = 5;
 
     it(`GIVEN applications grid is loaded THEN correct page-title should be displayed`, () => {
         return appBrowsePanel.getTitle().then((title)=> {
@@ -18,6 +19,27 @@ describe('Open Applications app and verify that grid is loaded and correct title
             expect(title).to.equal(appConst.APPLICATION_TITLE);
         })
     });
+
+    it(`WHEN 'selection controller'-checkbox has been clicked THEN all rows in grid should be selected`, () => {
+        return appBrowsePanel.clickOnSelectionControllerCheckbox().then(()=> {
+            studioUtils.saveScreenshot("selection_controller_checked");
+            return appBrowsePanel.getNumberOfSelectedRows();
+        }).then(result=> {
+            assert.equal(result, TOTAL_NUMBER_OF_APPLICATIONS, 'all applications should be selected');
+        })
+    });
+
+    it(`GIVEN all applications are selected WHEN 'selection controller'-checkbox has been clicked THEN all rows in grid should be white`,
+        () => {
+            return appBrowsePanel.clickOnSelectionControllerCheckbox().pause(1000).then(()=> {
+                return appBrowsePanel.clickOnSelectionControllerCheckbox();
+            }).then(()=> {
+                studioUtils.saveScreenshot("selection_controller_unchecked");
+                return appBrowsePanel.getNumberOfSelectedRows();
+            }).then(result=> {
+                assert.equal(result, 0, 'all applications should be unselected');
+            })
+        });
 
     it(`WHEN applications grid is loaded THEN rows with applications should be present in the grid`, () => {
         return appBrowsePanel.getApplicationDisplayNames().then(result=> {
