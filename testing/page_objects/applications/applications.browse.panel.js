@@ -383,7 +383,8 @@ module.exports = Object.create(page, {
 
     waitForContextMenuDisplayed: {
         value: function (name) {
-            return this.waitForVisible(`${XPath.contextMenu}`, 1000).catch((err) => {
+            return this.waitForVisible(`${XPath.contextMenu}`, 2000).catch((err) => {
+                this.saveScreenshot('err_open_context_menu');
                 throw Error('Context menu is not visible' + err);
             });
         }
