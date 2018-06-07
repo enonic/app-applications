@@ -1,6 +1,8 @@
 import '../../api.ts';
-import {MarketAppPanel} from './view/MarketAppPanel';
 import {ApplicationInput} from './view/ApplicationInput';
+import {MarketAppsTreeGrid} from './view/MarketAppsTreeGrid';
+import TreeNode = api.ui.treegrid.TreeNode;
+import MarketApplication = api.application.MarketApplication;
 import FileUploadStartedEvent = api.ui.uploader.FileUploadStartedEvent;
 import FileUploadFailedEvent = api.ui.uploader.FileUploadFailedEvent;
 import ApplicationUploaderEl = api.application.ApplicationUploaderEl;
@@ -11,17 +13,15 @@ import DivEl = api.dom.DivEl;
 export class InstallAppDialog
     extends api.ui.dialog.ModalDialog {
 
-    private marketAppPanel: MarketAppPanel;
-
     private dropzoneContainer: api.ui.uploader.DropzoneContainer;
-
-    private onMarketLoaded: () => void;
 
     private applicationInput: ApplicationInput;
 
     private statusMessage: api.dom.DivEl;
 
     private clearButton: api.dom.ButtonEl;
+
+    private marketAppsTreeGrid: MarketAppsTreeGrid;
 
     constructor() {
         super({title: i18n('dialog.install')});
@@ -30,12 +30,56 @@ export class InstallAppDialog
 
         this.getBody().addClass('mask-wrapper');
 
+        this.initElements();
+        this.setupListeners();
+    }
+
+    private initElements() {
         this.statusMessage = new api.dom.DivEl('status-message');
 
-        this.onMarketLoaded = () => {
+        this.applicationInput = new ApplicationInput(this.getCancelAction(), 'large').setPlaceholder(i18n('dialog.install.search'));
+
+        this.clearButton = this.createClearFilterButton();
+
+        this.dropzoneContainer = new api.ui.uploader.DropzoneContainer(true);
+
+        this.marketAppsTreeGrid = new MarketAppsTreeGrid();
+        this.marketAppsTreeGrid.setNodesFilter(this.filterNodes.bind(this));
+    }
+
+    private setupListeners() {
+        this.applicationInput.onTextValueChanged(() => {
+            this.clearButton.toggleClass('hidden', api.util.StringHelper.isEmpty(this.applicationInput.getValue()));
+            this.marketAppsTreeGrid.refresh();
+        });
+
+        const showMask = api.util.AppHelper.debounce(this.marketAppsTreeGrid.mask.bind(this.marketAppsTreeGrid), 300, false);
+        this.applicationInput.getTextInput().onValueChanged(() => {
+            if (!this.applicationInput.isUrlTyped()) {
+                showMask();
+            }
+        });
+
+        this.applicationInput.onAppInstallFinished(() => {
+            this.clearButton.toggleClass('hidden', api.util.StringHelper.isEmpty(this.applicationInput.getValue()));
+            this.marketAppsTreeGrid.unmask();
+        });
+
+        this.applicationInput.onAppInstallFailed((message: string) => {
+            this.clearButton.toggleClass('hidden', api.util.StringHelper.isEmpty(this.applicationInput.getValue()));
+
+            this.marketAppsTreeGrid.invalidate();
+            this.marketAppsTreeGrid.initData([]);
+            this.marketAppsTreeGrid.unmask();
+
+            this.statusMessage.addClass('empty failed');
+            this.statusMessage.setHtml(message);
+        });
+
+        this.marketAppsTreeGrid.onLoaded(() => {
             this.refreshStatusMessage();
 
-            if (this.marketAppPanel.getMarketAppsTreeGrid().getGrid().getDataView().getLength() === 0) {
+            if (this.marketAppsTreeGrid.getGrid().getDataView().getLength() === 0) {
                 this.statusMessage.addClass('empty');
                 this.statusMessage.setHtml(i18n('market.noAppsFound'));
             } else {
@@ -43,74 +87,45 @@ export class InstallAppDialog
             }
             this.statusMessage.addClass('loaded');
             this.notifyResize();
-        };
+        });
 
+        this.initUploaderListeners();
+        this.initDragAndDropUploaderEvents();
+
+        this.onShown(() => {
+            this.applicationInput.giveFocus();
+            this.clearButton.addClass('hidden');
+        });
     }
 
     updateInstallApplications(installApplications: api.application.Application[]) {
-        if (this.marketAppPanel) {
-            this.marketAppPanel.updateInstallApplications(installApplications);
-        }
+        this.marketAppsTreeGrid.updateInstallApplications(installApplications);
     }
 
     doRender(): Q.Promise<boolean> {
         return super.doRender().then((rendered) => {
-
-            this.applicationInput =
-                new ApplicationInput(this.getCancelAction(), 'large').setPlaceholder(i18n('dialog.install.search'));
-            this.onShown(() => {
-                this.applicationInput.giveFocus();
-                this.clearButton.addClass('hidden');
-            });
-
-            this.applicationInput.onTextValueChanged(() => {
-                this.clearButton.toggleClass('hidden', api.util.StringHelper.isEmpty(this.applicationInput.getValue()));
-            });
-
-            this.applicationInput.onAppInstallFinished(() => {
-                this.clearButton.toggleClass('hidden', api.util.StringHelper.isEmpty(this.applicationInput.getValue()));
-            });
-
-            this.applicationInput.onAppInstallFailed((message: string) => {
-                this.clearButton.toggleClass('hidden', api.util.StringHelper.isEmpty(this.applicationInput.getValue()));
-
-                this.statusMessage.addClass('empty failed');
-                this.statusMessage.setHtml(message);
-            });
-
-            this.initUploaderListeners();
-
-            this.dropzoneContainer = new api.ui.uploader.DropzoneContainer(true);
             this.dropzoneContainer.hide();
             this.appendChild(this.dropzoneContainer);
 
-            this.applicationInput.appendChild(this.clearButton = this.createClearFilterButton());
+            this.applicationInput.appendChild(this.clearButton);
             this.applicationInput.getUploader().addDropzone(this.dropzoneContainer.getDropzone().getId());
-
-            this.initDragAndDropUploaderEvents();
-
-            this.marketAppPanel = new MarketAppPanel(this.applicationInput);
-            this.marketAppPanel.getMarketAppsTreeGrid().onLoaded(this.onMarketLoaded);
-            this.marketAppPanel.getMarketAppsTreeGrid().onShown(() => {
-                this.marketAppPanel.loadGrid();
-            });
 
             this.header.appendChildren(...[this.applicationInput, this.statusMessage]);
 
-            const marketAppPanelWrapper: DivEl = new DivEl('market-app-panel-wrapper');
-            marketAppPanelWrapper.appendChild(this.marketAppPanel);
-            this.appendChildToContentPanel(marketAppPanelWrapper);
+            const marketAppsDiv: DivEl = new DivEl('market-apps');
+            marketAppsDiv.appendChild(this.marketAppsTreeGrid);
+            this.appendChildToContentPanel(marketAppsDiv);
 
             return rendered;
         });
     }
 
     public createClearFilterButton(): api.dom.ButtonEl {
-        let clearButton = new api.dom.ButtonEl();
+        const clearButton = new api.dom.ButtonEl();
         clearButton.addClass('clear-button hidden');
         clearButton.onClicked(() => {
             this.applicationInput.reset();
-            this.marketAppPanel.getMarketAppsTreeGrid().refresh();
+            this.marketAppsTreeGrid.refresh();
             clearButton.addClass('hidden');
             this.applicationInput.getTextInput().giveFocus();
         });
@@ -123,7 +138,7 @@ export class InstallAppDialog
     private initDragAndDropUploaderEvents() {
         let dragOverEl;
         this.onDragEnter((event: DragEvent) => {
-            let target = <HTMLElement> event.target;
+            const target = <HTMLElement> event.target;
 
             if (!!dragOverEl || dragOverEl === this.getHTMLElement()) {
                 this.dropzoneContainer.show();
@@ -137,7 +152,7 @@ export class InstallAppDialog
 
     private initUploaderListeners() {
 
-        let uploadFailedHandler = (event: FileUploadFailedEvent<Application>, uploader: ApplicationUploaderEl) => {
+        const uploadFailedHandler = (event: FileUploadFailedEvent<Application>, uploader: ApplicationUploaderEl) => {
             api.notify.NotifyManager.get().showWarning(uploader.getFailure());
 
             this.resetFileInputWithUploader();
@@ -147,7 +162,7 @@ export class InstallAppDialog
             uploadFailedHandler(event, this.applicationInput.getUploader());
         });
 
-        let uploadStartedHandler = (event: FileUploadStartedEvent<Application>) => {
+        const uploadStartedHandler = (event: FileUploadStartedEvent<Application>) => {
             new api.application.ApplicationUploadStartedEvent(event.getUploadItems()).fire();
             this.close();
         };
@@ -189,5 +204,27 @@ export class InstallAppDialog
             this.statusMessage.removeClass('failed loaded');
             this.statusMessage.setHtml(i18n('market.loadAppList'));
         }
+    }
+
+    private filterNodes(nodes: TreeNode<MarketApplication>[]): TreeNode<MarketApplication>[] {
+        let items = nodes;
+        if (this.applicationInput && !api.util.StringHelper.isEmpty(this.applicationInput.getValue())) {
+            items = nodes.filter((node: TreeNode<MarketApplication>) => {
+                return this.nodePassesFilterCondition(node);
+            });
+        }
+
+        return items;
+    }
+
+    private nodePassesFilterCondition(node: TreeNode<MarketApplication>): boolean {
+        const app: MarketApplication = node.getData();
+        // true for empty app because empty app is empty node that triggers loading
+        return app.isEmpty() ? true : this.appHasFilterEntry(app);
+    }
+
+    private appHasFilterEntry(app: MarketApplication): boolean {
+        return this.applicationInput.hasMatchInEntry(app.getDisplayName()) ||
+               this.applicationInput.hasMatchInEntry(app.getDescription());
     }
 }
