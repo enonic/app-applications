@@ -11,7 +11,7 @@ import {InstallAppDialog} from './app/installation/InstallAppDialog';
 import {InstallAppPromptEvent} from './app/installation/InstallAppPromptEvent';
 
 function getApplication(): api.app.Application {
-    let application = new api.app.Application('applications', 'Applications', 'AM', CONFIG.appIconUrl);
+    const application = new api.app.Application('applications', 'Applications', 'AM', CONFIG.appIconUrl);
     application.setPath(api.rest.Path.fromString('/'));
     application.setWindow(window);
 
@@ -20,7 +20,7 @@ function getApplication(): api.app.Application {
 
 function startLostConnectionDetector() {
     let messageId;
-    let lostConnectionDetector = new api.system.ConnectionDetector();
+    const lostConnectionDetector = new api.system.ConnectionDetector();
     lostConnectionDetector.setAuthenticated(true);
     lostConnectionDetector.onConnectionLost(() => {
         api.notify.NotifyManager.get().hide(messageId);
@@ -39,9 +39,9 @@ function startLostConnectionDetector() {
 
 function startApplication() {
 
-    let application: api.app.Application = getApplication();
-    let appBar = new api.app.bar.AppBar(application);
-    let appPanel = new ApplicationAppPanel(application.getPath());
+    const application: api.app.Application = getApplication();
+    const appBar = new api.app.bar.AppBar(application);
+    const appPanel = new ApplicationAppPanel(application.getPath());
 
     body.appendChild(appBar);
     body.appendChild(appPanel);
@@ -50,21 +50,15 @@ function startApplication() {
 
     application.setLoaded(true);
 
-    let serverEventsListener = new api.app.ServerEventsListener([application]);
+    const serverEventsListener = new api.app.ServerEventsListener([application]);
     serverEventsListener.start();
 
     startLostConnectionDetector();
 
-    let installAppDialog = new InstallAppDialog();
+    const installAppDialog = new InstallAppDialog();
 
     InstallAppPromptEvent.on((event) => {
-        if (installAppDialog.isRendered()) {
-            installAppDialog.updateInstallApplications(event.getInstalledApplications());
-        } else {
-            installAppDialog.onRendered(() => {
-                installAppDialog.updateInstallApplications(event.getInstalledApplications());
-            });
-        }
+        installAppDialog.updateInstallApplications(event.getInstalledApplications());
         installAppDialog.open();
     });
 
