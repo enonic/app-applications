@@ -26,7 +26,6 @@ Page.prototype.getDisplayedElements = function (selector) {
         })
     })
 };
-
 Page.prototype.getTitle = function () {
     return this.getBrowser().getTitle();
 };

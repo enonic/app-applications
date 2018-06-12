@@ -49,7 +49,7 @@ describe('Install Application Dialog specification', function () {
             return dialog.getApplicationNames();
         }).then(names => {
             assert.isAbove(names.length, 0, 'There should be apps in the grid');
-            assert.isTrue(names[0] == 'Auth0 ID Provider')
+            assert.isTrue(names[1] == 'Auth0 ID Provider')
         });
     });
 

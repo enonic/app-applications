@@ -48,7 +48,7 @@ module.exports = Object.create(page, {
             return `${XPath.container}${XPath.numberInToggler}`;
         }
     },
-    selectionPanelToogler: {
+    selectionPanelToggler: {
         get: function () {
             return `${XPath.container}${XPath.selectionPanelToggler}`;
         }
@@ -62,8 +62,8 @@ module.exports = Object.create(page, {
     },
     waitForSelectionTogglerVisible: {
         value: function () {
-            return this.waitForVisible(this.selectionPanelToogler, appConst.TIMEOUT_2).then(()=> {
-                return this.getAttribute(this.selectionPanelToogler, 'class');
+            return this.waitForVisible(this.selectionPanelToggler, appConst.TIMEOUT_2).then(() => {
+                return this.getAttribute(this.selectionPanelToggler, 'class');
             }).then(result=> {
                 return result.includes('any-selected');
             }).catch(err => {
