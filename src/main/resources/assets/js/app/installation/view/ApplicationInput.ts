@@ -1,5 +1,4 @@
 import '../../../api.ts';
-
 import ApplicationUploaderEl = api.application.ApplicationUploaderEl;
 import InputEl = api.dom.InputEl;
 import FileUploadStartedEvent = api.ui.uploader.FileUploadStartedEvent;
@@ -16,6 +15,8 @@ export class ApplicationInput extends api.dom.CompositeFormInputEl {
     private cancelAction: Action;
 
     private textValueChangedListeners: {(): void}[] = [];
+
+    private appInstallStartedListeners: { (): void }[] = [];
 
     private appInstallFinishedListeners: {(): void}[] = [];
 
@@ -92,31 +93,13 @@ export class ApplicationInput extends api.dom.CompositeFormInputEl {
         return api.util.StringHelper.testRegex(ApplicationInput.APPLICATION_ADDRESS_MASK, value);
     }
 
-    private startInstall() {
-        if (!api.util.StringHelper.isEmpty(this.textInput.getValue())) {
-            if (!this.isUrlTyped()) {
-                this.notifyTextValueChanged();
-            }
-        } else {
-            this.notifyTextValueChanged();
-        }
+    onAppInstallStarted(listener: () => void) {
+        this.appInstallStartedListeners.push(listener);
     }
 
-    private installWithUrl(url: string) {
-        new api.application.InstallUrlApplicationRequest(url).sendAndParse().then((result: api.application.ApplicationInstallResult) => {
-
-            let failure = result.getFailure();
-
-            if (!failure) {
-                this.notifyAppInstallFinished();
-                this.cancelAction.execute();
-
-            } else {
-                this.notifyAppInstallFailed(failure);
-            }
-
-        }).catch((reason: any) => {
-            api.DefaultErrorHandler.handle(reason);
+    unAppInstallStarted(listener: () => void) {
+        this.appInstallStartedListeners = this.appInstallStartedListeners.filter((curr) => {
+            return listener !== curr;
         });
     }
 
@@ -176,6 +159,44 @@ export class ApplicationInput extends api.dom.CompositeFormInputEl {
 
     private notifyTextValueChanged() {
         this.textValueChangedListeners.forEach((listener) => {
+            listener();
+        });
+    }
+
+    private startInstall() {
+        if (!api.util.StringHelper.isEmpty(this.textInput.getValue())) {
+            if (!this.isUrlTyped()) {
+                this.notifyTextValueChanged();
+            } else {
+                this.notifyAppInstallFinished();
+            }
+        } else {
+            this.notifyTextValueChanged();
+        }
+    }
+
+    private installWithUrl(url: string) {
+        this.notifyAppInstallStarted();
+        new api.application.InstallUrlApplicationRequest(url).sendAndParse().then((result: api.application.ApplicationInstallResult) => {
+
+            let failure = result.getFailure();
+
+            if (!failure) {
+                this.notifyAppInstallFinished();
+                this.cancelAction.execute();
+
+            } else {
+                this.notifyAppInstallFailed(failure);
+            }
+
+        }).catch((reason: any) => {
+            api.DefaultErrorHandler.handle(reason);
+            this.notifyAppInstallFailed(reason);
+        });
+    }
+
+    private notifyAppInstallStarted() {
+        this.appInstallStartedListeners.forEach((listener) => {
             listener();
         });
     }
