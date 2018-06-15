@@ -84,7 +84,7 @@ module.exports = Object.create(page, {
     },
     clickOnSelectionToggler: {
         value: function () {
-            return this.doClick(this.selectionPanelToogler).catch(err => {
+            return this.doClick(this.selectionPanelToggler).catch(err => {
                 throw new Error(`Error when clicking 'Selection toogler' ` + err);
             });
         }
