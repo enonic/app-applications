@@ -44,7 +44,10 @@ const installAppDialog = Object.create(page, {
     },
     waitForAppInstalled: {
         value: function (displayName) {
-            return this.waitForVisible(dialog.installedStatusByName(displayName), 25000);
+            return this.waitForVisible(dialog.installedStatusByName(displayName), 25000).catch(err => {
+                this.saveScreenshot('err_installed_status');
+                return false;
+            })
         }
     },
     clickOnCancelButtonTop: {
@@ -146,7 +149,7 @@ const installAppDialog = Object.create(page, {
     },
     typeSearchTextAndEnter: {
         value: function (text) {
-            return this.typeTextInInput(this.searchInput, text).pause(2000).then(()=> {
+            return this.typeTextInInput(this.searchInput, text).pause(2000).then(() => {
                 return this.keys('Enter');
             });
         }
@@ -161,14 +164,14 @@ const installAppDialog = Object.create(page, {
     clickOnInstallLink: {
         value: function (displayName) {
             let selector = `${dialog.appByDisplayName(displayName)}`;
-            return this.waitForVisible(selector, 1000).then(()=> {
+            return this.waitForVisible(selector, 1000).then(() => {
                 return this.doClick()
             })
         }
     },
     isCancelButtonTopVisible: {
         value: function () {
-            return this.isVisible(this.cancelButton).catch((err)=> {
+            return this.isVisible(this.cancelButton).catch((err) => {
                 throw new Error('error check the Cancel button on the Install dialog');
             })
         }
@@ -176,10 +179,10 @@ const installAppDialog = Object.create(page, {
     getErrorValidationMessage: {
         value: function () {
             let selector = dialog.container + `//div[contains(@class,'status-message') and contains(@class,'failed')]`;
-            return this.waitForVisible(selector, 3000).then(()=> {
+            return this.waitForVisible(selector, 3000).then(() => {
                 this.saveScreenshot('inst_dlg_validation');
                 return this.getText(selector);
-            }).catch(err=> {
+            }).catch(err => {
                 this.saveScreenshot('err_wait_for_validation_message');
                 throw new Error('Validation message is not visible after the interval  ' + err);
             })
@@ -189,10 +192,10 @@ const installAppDialog = Object.create(page, {
     applicationNotFoundMessage: {
         value: function () {
             let selector = dialog.container + `//div[contains(@class,'status-message') and contains(@class,'empty')]`;
-            return this.waitForVisible(selector, 3000).then(()=> {
+            return this.waitForVisible(selector, 3000).then(() => {
                 this.saveScreenshot('inst_dlg_message');
                 return this.getText(selector);
-            }).catch(err=> {
+            }).catch(err => {
                 this.saveScreenshot('err_wait_for_search_message');
                 throw new Error('search message is not visible after the interval  ' + err);
             })
