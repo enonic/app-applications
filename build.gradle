@@ -17,9 +17,9 @@ app {
 }
 
 dependencies {
-    include "${group}:lib-admin:${version}"
-    include "${group}:lib-mustache:${version}"
-    include "${group}:lib-portal:${version}"
+    include "${group}:lib-admin:${xpVersion}"
+    include "${group}:lib-mustache:${xpVersion}"
+    include "${group}:lib-portal:${xpVersion}"
     include "com.enonic.lib:lib-admin-ui:${libAdminUiVersion}"
 }
 
