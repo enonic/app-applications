@@ -59,6 +59,9 @@ export class InstallAppDialog
                 showMask();
             }
         });
+        this.applicationInput.onAppInstallStarted(() => {
+            this.marketAppsTreeGrid.mask();
+        });
 
         this.applicationInput.onAppInstallFinished(() => {
             this.clearButton.toggleClass('hidden', api.util.StringHelper.isEmpty(this.applicationInput.getValue()));
