@@ -3,6 +3,13 @@
     "module": "commonjs",
     "sourceMap": true
   },
+  "files": [
+    "./src/main/resources/assets/js/main.ts"
+  ],
+  "include": [
+    "src/**/*",
+    "../lib-admin-ui/src/main/resources/assets/admin/common/js/_module.ts"
+  ],
   "exclude": [
     "build/**/*",
     "out/**/*",
