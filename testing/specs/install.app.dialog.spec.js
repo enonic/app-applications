@@ -48,8 +48,9 @@ describe('Install Application Dialog specification', function () {
         }).pause(5000).then(()=> {
             return dialog.getApplicationNames();
         }).then(names => {
+            studioUtils.saveScreenshot("install_dlg_sorted");
             assert.isAbove(names.length, 0, 'There should be apps in the grid');
-            assert.isTrue(names[1] == 'Auth0 ID Provider')
+            assert.isTrue(names[1] == 'Auth0 ID Provider', 'Auth0 ID Provider this application should be second');
         });
     });
 

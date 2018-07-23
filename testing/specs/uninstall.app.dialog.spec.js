@@ -53,8 +53,7 @@ describe('Uninstall Application Dialog specification', function () {
         return console.log('specification is starting: ' + this.title);
     });
 
-})
-;
+});
 
 function openUninstallDialog() {
     const chuckName = 'A Chuck Norris fact widget';
