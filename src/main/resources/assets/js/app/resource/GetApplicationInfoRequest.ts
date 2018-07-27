@@ -1,6 +1,5 @@
-import '../../api.ts';
-
 import ApplicationResourceRequest = api.application.ApplicationResourceRequest;
+import ApplicationKey = api.application.ApplicationKey;
 import {ApplicationInfoJson} from './json/ApplicationInfoJson';
 import {ApplicationInfo} from './ApplicationInfo';
 

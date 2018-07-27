@@ -1,8 +1,8 @@
 import '../../api.ts';
 import {ApplicationInput} from './view/ApplicationInput';
 import {MarketAppsTreeGrid} from './view/MarketAppsTreeGrid';
+import {MarketApplication} from '../market/MarketApplication';
 import TreeNode = api.ui.treegrid.TreeNode;
-import MarketApplication = api.application.MarketApplication;
 import FileUploadStartedEvent = api.ui.uploader.FileUploadStartedEvent;
 import FileUploadFailedEvent = api.ui.uploader.FileUploadFailedEvent;
 import ApplicationUploaderEl = api.application.ApplicationUploaderEl;
