@@ -6,13 +6,14 @@ import {ApplicationBrowseItemPanel} from './ApplicationBrowseItemPanel';
 import {StopApplicationEvent} from './StopApplicationEvent';
 import {StartApplicationEvent} from './StartApplicationEvent';
 import {UninstallApplicationEvent} from './UninstallApplicationEvent';
+import {ApplicationUploadStartedEvent} from './ApplicationUploadStartedEvent';
+import {UninstallApplicationRequest} from '../resource/UninstallApplicationRequest';
+import {StopApplicationRequest} from '../resource/StopApplicationRequest';
+import {StartApplicationRequest} from '../resource/StartApplicationRequest';
 import ApplicationKey = api.application.ApplicationKey;
 import Application = api.application.Application;
 import TreeNode = api.ui.treegrid.TreeNode;
 import BrowseItem = api.app.browse.BrowseItem;
-import StartApplicationRequest = api.application.StartApplicationRequest;
-import StopApplicationRequest = api.application.StopApplicationRequest;
-import UninstallApplicationRequest = api.application.UninstallApplicationRequest;
 import ApplicationEvent = api.application.ApplicationEvent;
 import ApplicationEventType = api.application.ApplicationEventType;
 import i18n = api.util.i18n;
@@ -121,13 +122,13 @@ export class ApplicationBrowsePanel extends api.app.browse.BrowsePanel<Applicati
             }
         });
 
-        api.application.ApplicationUploadStartedEvent.on((event) => {
+        ApplicationUploadStartedEvent.on((event) => {
             this.handleNewAppUpload(event);
         });
 
     }
 
-    private handleNewAppUpload(event: api.application.ApplicationUploadStartedEvent) {
+    private handleNewAppUpload(event: ApplicationUploadStartedEvent) {
         event.getUploadItems().forEach((item: api.ui.uploader.UploadItem<Application>) => {
             this.treeGrid.appendUploadNode(item);
         });

@@ -1,5 +1,6 @@
-import '../../../api.ts';
-import ApplicationUploaderEl = api.application.ApplicationUploaderEl;
+import {ApplicationUploaderEl} from '../ApplicationUploaderEl';
+import {InstallUrlApplicationRequest} from '../../resource/InstallUrlApplicationRequest';
+import {ApplicationInstallResult} from '../../resource/ApplicationInstallResult';
 import InputEl = api.dom.InputEl;
 import FileUploadStartedEvent = api.ui.uploader.FileUploadStartedEvent;
 import FileUploadFailedEvent = api.ui.uploader.FileUploadFailedEvent;
@@ -177,7 +178,7 @@ export class ApplicationInput extends api.dom.CompositeFormInputEl {
 
     private installWithUrl(url: string) {
         this.notifyAppInstallStarted();
-        new api.application.InstallUrlApplicationRequest(url).sendAndParse().then((result: api.application.ApplicationInstallResult) => {
+        new InstallUrlApplicationRequest(url).sendAndParse().then((result: ApplicationInstallResult) => {
 
             let failure = result.getFailure();
 

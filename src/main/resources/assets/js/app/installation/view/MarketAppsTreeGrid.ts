@@ -2,6 +2,8 @@ import {MarketAppViewer} from './MarketAppViewer';
 import {MarketApplication, MarketApplicationBuilder, MarketAppStatus, MarketAppStatusFormatter} from '../../market/MarketApplication';
 import {MarketApplicationsFetcher} from '../../resource/MarketApplicationFetcher';
 import {MarketApplicationResponse} from '../../resource/MarketApplicationResponse';
+import {InstallUrlApplicationRequest} from '../../resource/InstallUrlApplicationRequest';
+import {ApplicationInstallResult} from '../../resource/ApplicationInstallResult';
 import Element = api.dom.Element;
 import ElementHelper = api.dom.ElementHelper;
 import ElementFromHelperBuilder = api.dom.ElementFromHelperBuilder;
@@ -229,8 +231,8 @@ export class MarketAppsTreeGrid extends TreeGrid<MarketApplication> {
                     console.debug('MarketAppsTreeGrid: starting install', url, elem);
                 }
 
-                new api.application.InstallUrlApplicationRequest(url)
-                    .sendAndParse().then((result: api.application.ApplicationInstallResult)=> {
+                new InstallUrlApplicationRequest(url)
+                    .sendAndParse().then((result: ApplicationInstallResult) => {
                     // api.application.ApplicationEvent.un(progressHandler);
                     if (!result.getFailure()) {
 
