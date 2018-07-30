@@ -1,5 +1,6 @@
 import DescriptorKey = api.content.page.DescriptorKey;
 import AdminToolDescriptorJson = api.content.json.AdminToolDescriptorJson;
+import ApplicationKey = api.application.ApplicationKey;
 
 export class AdminToolDescriptor {
 

@@ -1,5 +1,9 @@
-import '../../../api.ts';
 import {MarketAppViewer} from './MarketAppViewer';
+import {MarketApplication, MarketApplicationBuilder, MarketAppStatus, MarketAppStatusFormatter} from '../../market/MarketApplication';
+import {MarketApplicationsFetcher} from '../../resource/MarketApplicationFetcher';
+import {MarketApplicationResponse} from '../../resource/MarketApplicationResponse';
+import {InstallUrlApplicationRequest} from '../../resource/InstallUrlApplicationRequest';
+import {ApplicationInstallResult} from '../../resource/ApplicationInstallResult';
 import Element = api.dom.Element;
 import ElementHelper = api.dom.ElementHelper;
 import ElementFromHelperBuilder = api.dom.ElementFromHelperBuilder;
@@ -7,15 +11,9 @@ import GridColumnBuilder = api.ui.grid.GridColumnBuilder;
 import TreeGrid = api.ui.treegrid.TreeGrid;
 import TreeNode = api.ui.treegrid.TreeNode;
 import TreeGridBuilder = api.ui.treegrid.TreeGridBuilder;
-import MarketApplication = api.application.MarketApplication;
 import Application = api.application.Application;
-import MarketAppStatus = api.application.MarketAppStatus;
-import MarketAppStatusFormatter = api.application.MarketAppStatusFormatter;
 import ApplicationEvent = api.application.ApplicationEvent;
 import ApplicationEventType = api.application.ApplicationEventType;
-import MarketApplicationsFetcher = api.application.MarketApplicationsFetcher;
-import MarketApplicationResponse = api.application.MarketApplicationResponse;
-import MarketApplicationBuilder = api.application.MarketApplicationBuilder;
 import i18n = api.util.i18n;
 
 declare var CONFIG;
@@ -233,8 +231,8 @@ export class MarketAppsTreeGrid extends TreeGrid<MarketApplication> {
                     console.debug('MarketAppsTreeGrid: starting install', url, elem);
                 }
 
-                new api.application.InstallUrlApplicationRequest(url)
-                    .sendAndParse().then((result: api.application.ApplicationInstallResult)=> {
+                new InstallUrlApplicationRequest(url)
+                    .sendAndParse().then((result: ApplicationInstallResult) => {
                     // api.application.ApplicationEvent.un(progressHandler);
                     if (!result.getFailure()) {
 

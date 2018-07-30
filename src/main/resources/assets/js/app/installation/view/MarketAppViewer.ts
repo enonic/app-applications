@@ -1,7 +1,5 @@
-import '../../../api.ts';
-
-import MarketApplication = api.application.MarketApplication;
 import NamesAndIconViewSize = api.app.NamesAndIconViewSize;
+import {MarketApplication} from '../../market/MarketApplication';
 
 export class MarketAppViewer extends api.ui.Viewer<MarketApplication> {
 

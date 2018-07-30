@@ -1,11 +1,12 @@
 import '../../api.ts';
 import {ApplicationInput} from './view/ApplicationInput';
 import {MarketAppsTreeGrid} from './view/MarketAppsTreeGrid';
+import {MarketApplication} from '../market/MarketApplication';
+import {ApplicationUploaderEl} from './ApplicationUploaderEl';
+import {ApplicationUploadStartedEvent} from '../browse/ApplicationUploadStartedEvent';
 import TreeNode = api.ui.treegrid.TreeNode;
-import MarketApplication = api.application.MarketApplication;
 import FileUploadStartedEvent = api.ui.uploader.FileUploadStartedEvent;
 import FileUploadFailedEvent = api.ui.uploader.FileUploadFailedEvent;
-import ApplicationUploaderEl = api.application.ApplicationUploaderEl;
 import Application = api.application.Application;
 import i18n = api.util.i18n;
 import DivEl = api.dom.DivEl;
@@ -166,7 +167,7 @@ export class InstallAppDialog
         });
 
         const uploadStartedHandler = (event: FileUploadStartedEvent<Application>) => {
-            new api.application.ApplicationUploadStartedEvent(event.getUploadItems()).fire();
+            new ApplicationUploadStartedEvent(event.getUploadItems()).fire();
             this.close();
         };
 
