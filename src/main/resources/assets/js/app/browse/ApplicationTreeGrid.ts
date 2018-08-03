@@ -1,6 +1,7 @@
 import '../../api.ts';
 import {ApplicationBrowseActions} from './ApplicationBrowseActions';
 import {ApplicationRowFormatter} from './ApplicationRowFormatter';
+import {ListApplicationKeysRequest} from '../resource/ListApplicationKeysRequest';
 import Application = api.application.Application;
 import ApplicationUploadMock = api.application.ApplicationUploadMock;
 import TreeGrid = api.ui.treegrid.TreeGrid;
@@ -100,7 +101,7 @@ export class ApplicationTreeGrid extends TreeGrid<Application> {
     }
 
     fetchRootKeys(): wemQ.Promise<ApplicationKey[]> {
-        return new api.application.ListApplicationKeysRequest().sendAndParse();
+        return new ListApplicationKeysRequest().sendAndParse();
     }
 
     placeNode(data: Application, stashedParentNode?: TreeNode<Application>): wemQ.Promise<void> {
