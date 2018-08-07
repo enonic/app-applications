@@ -43,6 +43,10 @@ export class MarketApplication {
         return !this.displayName && !this.url;
     }
 
+    public isToUpdate(): boolean {
+        return this.status === MarketAppStatus.OLDER_VERSION_INSTALLED;
+    }
+
     public getDisplayName(): string {
         return this.displayName;
     }
