@@ -415,16 +415,16 @@ export class MarketAppsTreeGrid extends TreeGrid<MarketApplication> {
     }
 
     private getVersion(): string {
-        // let version: string = CONFIG.xpVersion;
-        // if (!version) {
-        //     return '';
-        // }
-        // let parts = version.split('.');
-        // if (parts.length > 3) {
-        //     parts.pop(); // remove '.snapshot'
-        //     return parts.join('.');
-        // }
-        return '6.15.0';
+        let version: string = CONFIG.xpVersion;
+        if (!version) {
+            return '';
+        }
+        let parts = version.split('.');
+        if (parts.length > 3) {
+            parts.pop(); // remove '.snapshot'
+            return parts.join('.');
+        }
+        return version;
     }
 
     getDataId(data: MarketApplication): string {
