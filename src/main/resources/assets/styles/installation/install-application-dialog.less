@@ -120,6 +120,35 @@
           }
 
         }
+
+        .slick-row.maximized {
+          height: auto;
+
+          .slick-cell.app-name-and-icon {
+            height: auto;
+
+            .@{_COMMON_PREFIX}sub-name {
+              overflow: visible;
+              white-space: normal;
+              text-overflow: clip;
+            }
+
+            .app-more {
+              padding-top: 2px;
+
+              a {
+                cursor: pointer;
+                text-decoration: none;
+                font-size: 14px;
+                color: @admin-dark-gray;
+
+                &:hover {
+                  text-decoration: underline;
+                }
+              }
+            }
+          }
+        }
       }
 
       .version {
