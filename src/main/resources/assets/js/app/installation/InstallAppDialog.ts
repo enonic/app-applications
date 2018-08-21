@@ -174,25 +174,19 @@ export class InstallAppDialog
         this.applicationInput.onUploadStarted(uploadStartedHandler);
     }
 
-    show() {
+    open() {
         this.resetFileInputWithUploader();
         this.removeClass('hidden');
 
-        super.show();
+        super.open();
 
         this.refreshStatusMessage();
-    }
-
-    hide() {
-        super.hide();
-
-        this.refreshStatusMessage();
-        this.addClass('hidden');
-        this.removeClass('animated');
-        this.applicationInput.reset();
     }
 
     close() {
+        this.refreshStatusMessage();
+        this.addClass('hidden');
+        this.removeClass('animated');
         this.applicationInput.reset();
         super.close();
     }
