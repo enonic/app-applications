@@ -1,4 +1,5 @@
 import NamesAndIconViewSize = api.app.NamesAndIconViewSize;
+import i18n = api.util.i18n;
 import {MarketApplication} from '../../market/MarketApplication';
 
 export class MarketAppViewer extends api.ui.Viewer<MarketApplication> {
@@ -25,7 +26,7 @@ export class MarketAppViewer extends api.ui.Viewer<MarketApplication> {
     }
 
     resolveDisplayName(object: MarketApplication): string {
-        let appLink = new api.dom.AEl().setUrl(object.getUrl(), '_blank').setHtml(object.getDisplayName(), false);
+        const appLink = new api.dom.AEl('app-name').setUrl('#').setHtml(object.getDisplayName(), false);
         return appLink.toString();
     }
 
@@ -58,10 +59,10 @@ export class MarketAppViewer extends api.ui.Viewer<MarketApplication> {
         }
 
         if (object) {
-            let displayName = this.resolveDisplayName(object);
-            let subName = this.resolveSubName(object, this.relativePath);
-            let subTitle = this.resolveSubTitle(object);
-            let iconUrl = this.resolveIconUrl(object);
+            const displayName = this.resolveDisplayName(object);
+            const subName = this.resolveSubName(object, this.relativePath);
+            const subTitle = this.resolveSubTitle(object);
+            const iconUrl = this.resolveIconUrl(object);
 
             this.namesAndIconView.getNamesView().setMainName(displayName, false).setSubName(subName, subTitle);
             if (!!subTitle) {
@@ -76,6 +77,14 @@ export class MarketAppViewer extends api.ui.Viewer<MarketApplication> {
                 this.namesAndIconView.setIconClass('icon-puzzle icon-large');
                 this.namesAndIconView.getIconImageEl().setSrc('');
             });
+
+            const isReadMoreSectionAdded: boolean = this.namesAndIconView.getNamesView().getChildren().length > 2;
+            if (!isReadMoreSectionAdded) {
+                const readMoreSection: api.dom.Element = new api.dom.DivEl('app-more');
+                readMoreSection.appendChild(
+                    new api.dom.AEl().setUrl(object.getUrl(), '_blank').setHtml(i18n('market.app.readmore'), false));
+                this.namesAndIconView.getNamesView().appendChild(readMoreSection);
+            }
         }
     }
 }
