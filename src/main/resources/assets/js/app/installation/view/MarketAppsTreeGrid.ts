@@ -4,6 +4,7 @@ import {MarketApplicationsFetcher} from '../../resource/MarketApplicationFetcher
 import {MarketApplicationResponse} from '../../resource/MarketApplicationResponse';
 import {InstallUrlApplicationRequest} from '../../resource/InstallUrlApplicationRequest';
 import {ApplicationInstallResult} from '../../resource/ApplicationInstallResult';
+import {MarketApplicationMetadata} from '../../market/MarketApplicationMetadata';
 import Element = api.dom.Element;
 import ElementHelper = api.dom.ElementHelper;
 import ElementFromHelperBuilder = api.dom.ElementFromHelperBuilder;
@@ -22,7 +23,7 @@ export class MarketAppsTreeGrid extends TreeGrid<MarketApplication> {
 
     static MAX_FETCH_SIZE: number = 20;
 
-    private installApplications: Application[];
+    private installedApplications: Application[];
 
     public static debug: boolean = false;
 
@@ -74,7 +75,7 @@ export class MarketAppsTreeGrid extends TreeGrid<MarketApplication> {
             .setAutoLoad(false)
         );
 
-        this.installApplications = [];
+        this.installedApplications = [];
         this.gridDataLoaded = false;
 
         this.subscribeAndManageInstallClick();
@@ -184,15 +185,15 @@ export class MarketAppsTreeGrid extends TreeGrid<MarketApplication> {
                         console.debug('MarketAppsTreeGrid: installed', event.getApplicationUrl(), event.getProgress());
                     }
 
-                    let app = <MarketApplication>nodeToUpdate.getData();
+                    const app = <MarketApplication>nodeToUpdate.getData();
                     app.setStatus(MarketAppStatus.INSTALLED);
 
                     new api.application.GetApplicationRequest(event.getApplicationKey(), true).sendAndParse()
                         .then((application: api.application.Application)=> {
                             if (!!application) {
-                                let marketApplication: MarketApplication = <MarketApplication>nodeToUpdate.getData();
+                                const marketApplication: MarketApplication = <MarketApplication>nodeToUpdate.getData();
 
-                                if (MarketApplicationsFetcher.installedAppCanBeUpdated(marketApplication, application)) {
+                                if (this.installedAppCanBeUpdated(marketApplication, application)) {
                                     marketApplication.setStatus(MarketAppStatus.OLDER_VERSION_INSTALLED);
                                 } else {
                                     marketApplication.setStatus(MarketAppStatus.INSTALLED);
@@ -298,42 +299,112 @@ export class MarketAppsTreeGrid extends TreeGrid<MarketApplication> {
     }
 
     updateInstallApplications(installApplications: api.application.Application[]) {
-        this.installApplications = installApplications;
+        this.installedApplications = installApplications;
     }
 
     fetchChildren(): wemQ.Promise<MarketApplication[]> {
-        let root = this.getRoot().getCurrentRoot();
-        let children = root.getChildren();
-        let from = root.getChildren().length;
-        if (from > 0 && !children[from - 1].getData().getAppKey()) {
-            children.pop();
-            from--;
-        }
+        const root = this.getRoot().getCurrentRoot();
+        const children = root.getChildren()
+            .map(item => item.getData())
+            .filter(item => !item.isToUpdate())
+            .filter(item => !item.isEmpty());
+        const from = children.length;
 
+        this.hideErrorPanelIfVisible();
+
+        const getAppsPromise: wemQ.Promise<MarketApplicationResponse> = MarketApplicationsFetcher.fetchApps(this.getVersion(), from,
+            MarketAppsTreeGrid.MAX_FETCH_SIZE);
+
+        const getInstalledAppsPromise: wemQ.Promise<MarketApplication[]> = MarketApplicationsFetcher.fetchInstalledApps(this.getVersion(),
+            this.installedApplications);
+
+        return wemQ.all([getAppsPromise, getInstalledAppsPromise]).spread(
+            (data: MarketApplicationResponse, installedApps: MarketApplication[]) => {
+                const result: MarketApplication[] = this.makeAppsList(children, data.getApplications(), installedApps);
+                const meta: MarketApplicationMetadata = data.getMetadata();
+                const moreAppsToLoad: boolean = from + meta.getHits() < meta.getTotalHits();
+                root.setMaxChildren(meta.getTotalHits());
+
+                if (moreAppsToLoad) {
+                    const emptyApplication = new MarketApplicationBuilder().setLatestVersion('').build();
+                    result.push(emptyApplication);
+                }
+
+                return result;
+            }).catch((reason: any) => {
+            const status500Message = i18n('market.error.500');
+            const defaultErrorMessage = i18n('market.error.default');
+            this.handleError(reason, reason.getStatusCode() === 500 ? status500Message : defaultErrorMessage);
+            return [];
+        });
+    }
+
+    private hideErrorPanelIfVisible() {
         if (this.getErrorPanel().isVisible()) {
             this.hideErrorPanel();
             this.mask();
         }
+    }
 
-        return MarketApplicationsFetcher.fetchChildren(this.getVersion(), this.installApplications, from,
-            MarketAppsTreeGrid.MAX_FETCH_SIZE).then(
-            (data: MarketApplicationResponse) => {
-                let meta = data.getMetadata();
-                let applications = children.map((el) => {
-                    return el.getData();
-                }).slice(0, from).concat(data.getApplications());
-                root.setMaxChildren(meta.getTotalHits());
-                if (from + meta.getHits() < meta.getTotalHits()) {
-                    let emptyApplication = new MarketApplicationBuilder().setLatestVersion('').build();
-                    applications.push(emptyApplication);
+    private makeAppsList(currentApps: MarketApplication[], loadedApps: MarketApplication[],
+                         installedApps: MarketApplication[]): MarketApplication[] {
+        this.updateAppsStatuses(loadedApps);
+        this.updateAppsStatuses(installedApps);
+
+        const installedAppsToUpdate: MarketApplication[] = installedApps.filter(installedApp => installedApp.isToUpdate());
+        const loadedAppsNoUpdate: MarketApplication[] = loadedApps.filter(item => !item.isToUpdate());
+
+        return installedAppsToUpdate.concat(currentApps).concat(loadedAppsNoUpdate);
+    }
+
+    private updateAppsStatuses(applications: MarketApplication[]) {
+        applications.filter(app => !!app.getLatestVersion()).forEach(this.updateAppStatus.bind(this));
+    }
+
+    private updateAppStatus(marketApp: MarketApplication) {
+        for (let i = 0; i < this.installedApplications.length; i++) {
+            if (marketApp.getAppKey().equals(this.installedApplications[i].getApplicationKey())) {
+                if (this.installedAppCanBeUpdated(marketApp, this.installedApplications[i])) {
+                    marketApp.setStatus(MarketAppStatus.OLDER_VERSION_INSTALLED);
+                } else {
+                    marketApp.setStatus(MarketAppStatus.INSTALLED);
                 }
-                return applications;
-            }).catch((reason: any) => {
-            let status500Message = i18n('market.error.500');
-            let defaultErrorMessage = i18n('market.error.default');
-            this.handleError(reason, reason.getStatusCode() === 500 ? status500Message : defaultErrorMessage);
-            return [];
+                break;
+            }
+        }
+    }
+
+    private installedAppCanBeUpdated(marketApp: MarketApplication, installedApp: Application): boolean {
+        return this.compareVersionNumbers(marketApp.getLatestVersion(), installedApp.getVersion()) > 0;
+    }
+
+    private compareVersionNumbers(v1: string, v2: string): number {
+        const v1parts = v1.split('.').map((el) => {
+            return parseInt(el, 10);
         });
+        const v2parts = v2.split('.').map((el) => {
+            return parseInt(el, 10);
+        });
+
+        for (let i = 0; i < v1parts.length; ++i) {
+            if (v2parts.length === i) {
+                return 1;
+            }
+
+            if (v1parts[i] === v2parts[i]) {
+                continue;
+            }
+            if (v1parts[i] > v2parts[i]) {
+                return 1;
+            }
+            return -1;
+        }
+
+        if (v1parts.length !== v2parts.length) {
+            return -1;
+        }
+
+        return 0;
     }
 
     initData(nodes: TreeNode<MarketApplication>[]) {
