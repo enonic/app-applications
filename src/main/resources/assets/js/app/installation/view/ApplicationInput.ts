@@ -11,7 +11,6 @@ export class ApplicationInput extends api.dom.CompositeFormInputEl {
 
     private textInput: InputEl;
     private applicationUploaderEl: ApplicationUploaderEl;
-    private lastTimeKeyPressedTimer: number;
     private LAST_KEY_PRESS_TIMEOUT: number;
     private cancelAction: Action;
 
@@ -67,23 +66,21 @@ export class ApplicationInput extends api.dom.CompositeFormInputEl {
     }
 
     private initUrlEnteredHandler() {
-        this.onKeyDown((event) => {
-            clearTimeout(this.lastTimeKeyPressedTimer);
+        const keyDownHandler: () => void = api.util.AppHelper.debounce(this.startInstall.bind(this), this.LAST_KEY_PRESS_TIMEOUT);
 
+        this.onKeyDown((event) => {
             switch (event.keyCode) {
             case 13:
                 if (this.isUrlTyped()) {
                     this.installWithUrl(this.textInput.getValue());
+                } else {
+                    keyDownHandler();
                 }
                 break;
             case 27: //esc
                 break;
-            case 9: //tab
-                break;
             default :
-                this.lastTimeKeyPressedTimer = setTimeout(() => {
-                    this.startInstall();
-                }, this.LAST_KEY_PRESS_TIMEOUT);
+                keyDownHandler();
                 break;
             }
         });
