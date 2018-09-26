@@ -3,6 +3,7 @@ Enonic XP - Applications App
 
 [![Travis Build Status][travis-image]][travis-url]
 [![License][license-image]][license-url]
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/85183c43117642708e7f3af2db5fcdb2)](https://www.codacy.com/app/enonic/app-applications?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=enonic/app-applications&amp;utm_campaign=Badge_Grade)
 
 Install and manage applications built on [Enonic XP](https://github.com/enonic/xp) platform.
 
