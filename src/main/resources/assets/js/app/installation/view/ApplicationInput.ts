@@ -1,11 +1,11 @@
 import {ApplicationUploaderEl} from '../ApplicationUploaderEl';
-import {InstallUrlApplicationRequest} from '../../resource/InstallUrlApplicationRequest';
-import {ApplicationInstallResult} from '../../resource/ApplicationInstallResult';
 import InputEl = api.dom.InputEl;
 import FileUploadStartedEvent = api.ui.uploader.FileUploadStartedEvent;
 import FileUploadFailedEvent = api.ui.uploader.FileUploadFailedEvent;
 import Action = api.ui.Action;
 import Application = api.application.Application;
+import InstallUrlApplicationRequest = api.application.InstallUrlApplicationRequest;
+import ApplicationInstallResult = api.application.ApplicationInstallResult;
 
 export class ApplicationInput extends api.dom.CompositeFormInputEl {
 

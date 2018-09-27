@@ -1,9 +1,9 @@
 import Application = api.application.Application;
-import {MarketApplication} from '../market/MarketApplication';
-import {MarketApplicationResponse} from './MarketApplicationResponse';
-import {ListMarketApplicationsRequest} from './ListMarketApplicationsRequest';
+import MarketApplication = api.application.MarketApplication;
+import ListMarketApplicationsRequest = api.application.ListMarketApplicationsRequest;
+import MarketApplicationResponse = api.application.MarketApplicationResponse;
 
-export class MarketApplicationsFetcher {
+export class MarketApplicationFetcher {
 
     static fetchApps(version: string, from: number = 0, size: number = -1): wemQ.Promise<MarketApplicationResponse> {
         return new ListMarketApplicationsRequest()

@@ -1,7 +1,6 @@
 import '../../api.ts';
 import {ApplicationInput} from './view/ApplicationInput';
 import {MarketAppsTreeGrid} from './view/MarketAppsTreeGrid';
-import {MarketApplication} from '../market/MarketApplication';
 import {ApplicationUploaderEl} from './ApplicationUploaderEl';
 import {ApplicationUploadStartedEvent} from '../browse/ApplicationUploadStartedEvent';
 import TreeNode = api.ui.treegrid.TreeNode;
@@ -10,6 +9,7 @@ import FileUploadFailedEvent = api.ui.uploader.FileUploadFailedEvent;
 import Application = api.application.Application;
 import i18n = api.util.i18n;
 import DivEl = api.dom.DivEl;
+import MarketApplication = api.application.MarketApplication;
 
 export class InstallAppDialog
     extends api.ui.dialog.ModalDialog {
