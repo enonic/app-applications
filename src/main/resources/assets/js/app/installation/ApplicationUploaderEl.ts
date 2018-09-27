@@ -1,6 +1,6 @@
 import Application = api.application.Application;
-import {ApplicationInstallResult} from '../resource/ApplicationInstallResult';
-import {ApplicationInstallResultJson} from '../resource/json/ApplicationInstallResultJson';
+import ApplicationInstallResult = api.application.ApplicationInstallResult;
+import ApplicationInstallResultJson = api.application.json.ApplicationInstallResultJson;
 
 export class ApplicationUploaderEl
     extends api.ui.uploader.UploaderEl<Application> {

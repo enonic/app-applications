@@ -1,5 +1,6 @@
 const ErrorLoggerPlugin = require('error-logger-webpack-plugin');
 const ExtractTextPlugin = require("extract-text-webpack-plugin");
+const CircularDependencyPlugin = require('circular-dependency-plugin');
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 
 const path = require('path');
@@ -49,6 +50,10 @@ module.exports = {
             filename: '[name].css',
             allChunks: true,
             disable: false
+        }),
+        new CircularDependencyPlugin({
+            exclude: /a\.js|node_modules/,
+            failOnError: true
         }),
         ...(isProd ? [
             new UglifyJsPlugin({

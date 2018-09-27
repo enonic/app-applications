@@ -1,10 +1,5 @@
 import {MarketAppViewer} from './MarketAppViewer';
-import {MarketApplication, MarketApplicationBuilder, MarketAppStatus, MarketAppStatusFormatter} from '../../market/MarketApplication';
-import {MarketApplicationsFetcher} from '../../resource/MarketApplicationFetcher';
-import {MarketApplicationResponse} from '../../resource/MarketApplicationResponse';
-import {InstallUrlApplicationRequest} from '../../resource/InstallUrlApplicationRequest';
-import {ApplicationInstallResult} from '../../resource/ApplicationInstallResult';
-import {MarketApplicationMetadata} from '../../market/MarketApplicationMetadata';
+import {MarketApplicationFetcher} from '../../resource/MarketApplicationFetcher';
 import Element = api.dom.Element;
 import ElementHelper = api.dom.ElementHelper;
 import ElementFromHelperBuilder = api.dom.ElementFromHelperBuilder;
@@ -15,6 +10,15 @@ import TreeGridBuilder = api.ui.treegrid.TreeGridBuilder;
 import Application = api.application.Application;
 import ApplicationEvent = api.application.ApplicationEvent;
 import ApplicationEventType = api.application.ApplicationEventType;
+import MarketApplication = api.application.MarketApplication;
+import MarketAppStatus = api.application.MarketAppStatus;
+import MarketAppStatusFormatter = api.application.MarketAppStatusFormatter;
+import MarketApplicationResponse = api.application.MarketApplicationResponse;
+import MarketApplicationMetadata = api.application.MarketApplicationMetadata;
+import MarketApplicationBuilder = api.application.MarketApplicationBuilder;
+import MarketHelper = api.application.MarketHelper;
+import InstallUrlApplicationRequest = api.application.InstallUrlApplicationRequest;
+import ApplicationInstallResult = api.application.ApplicationInstallResult;
 import i18n = api.util.i18n;
 
 declare var CONFIG;
@@ -190,10 +194,10 @@ export class MarketAppsTreeGrid extends TreeGrid<MarketApplication> {
 
                     new api.application.GetApplicationRequest(event.getApplicationKey(), true).sendAndParse()
                         .then((application: api.application.Application)=> {
-                            if (!!application) {
+                            if (application) {
                                 const marketApplication: MarketApplication = <MarketApplication>nodeToUpdate.getData();
 
-                                if (this.installedAppCanBeUpdated(marketApplication, application)) {
+                                if (MarketHelper.installedAppCanBeUpdated(marketApplication, application)) {
                                     marketApplication.setStatus(MarketAppStatus.OLDER_VERSION_INSTALLED);
                                 } else {
                                     marketApplication.setStatus(MarketAppStatus.INSTALLED);
@@ -312,10 +316,10 @@ export class MarketAppsTreeGrid extends TreeGrid<MarketApplication> {
 
         this.hideErrorPanelIfVisible();
 
-        const getAppsPromise: wemQ.Promise<MarketApplicationResponse> = MarketApplicationsFetcher.fetchApps(this.getVersion(), from,
+        const getAppsPromise: wemQ.Promise<MarketApplicationResponse> = MarketApplicationFetcher.fetchApps(this.getVersion(), from,
             MarketAppsTreeGrid.MAX_FETCH_SIZE);
 
-        const getInstalledAppsPromise: wemQ.Promise<MarketApplication[]> = MarketApplicationsFetcher.fetchInstalledApps(this.getVersion(),
+        const getInstalledAppsPromise: wemQ.Promise<MarketApplication[]> = MarketApplicationFetcher.fetchInstalledApps(this.getVersion(),
             this.installedApplications);
 
         return wemQ.all([getAppsPromise, getInstalledAppsPromise]).spread(
@@ -364,7 +368,7 @@ export class MarketAppsTreeGrid extends TreeGrid<MarketApplication> {
     private updateAppStatus(marketApp: MarketApplication) {
         for (let i = 0; i < this.installedApplications.length; i++) {
             if (marketApp.getAppKey().equals(this.installedApplications[i].getApplicationKey())) {
-                if (this.installedAppCanBeUpdated(marketApp, this.installedApplications[i])) {
+                if (MarketHelper.installedAppCanBeUpdated(marketApp, this.installedApplications[i])) {
                     marketApp.setStatus(MarketAppStatus.OLDER_VERSION_INSTALLED);
                 } else {
                     marketApp.setStatus(MarketAppStatus.INSTALLED);
@@ -372,39 +376,6 @@ export class MarketAppsTreeGrid extends TreeGrid<MarketApplication> {
                 break;
             }
         }
-    }
-
-    private installedAppCanBeUpdated(marketApp: MarketApplication, installedApp: Application): boolean {
-        return this.compareVersionNumbers(marketApp.getLatestVersion(), installedApp.getVersion()) > 0;
-    }
-
-    private compareVersionNumbers(v1: string, v2: string): number {
-        const v1parts = v1.split('.').map((el) => {
-            return parseInt(el, 10);
-        });
-        const v2parts = v2.split('.').map((el) => {
-            return parseInt(el, 10);
-        });
-
-        for (let i = 0; i < v1parts.length; ++i) {
-            if (v2parts.length === i) {
-                return 1;
-            }
-
-            if (v1parts[i] === v2parts[i]) {
-                continue;
-            }
-            if (v1parts[i] > v2parts[i]) {
-                return 1;
-            }
-            return -1;
-        }
-
-        if (v1parts.length !== v2parts.length) {
-            return -1;
-        }
-
-        return 0;
     }
 
     initData(nodes: TreeNode<MarketApplication>[]) {
