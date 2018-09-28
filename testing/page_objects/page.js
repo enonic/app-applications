@@ -209,4 +209,7 @@ Page.prototype.doCatch = function (screenshotName, errString) {
     })
 
 };
+Page.prototype.hasFocus = function (selector) {
+    return this.getBrowser().hasFocus(selector);
+};
 module.exports = new Page();
