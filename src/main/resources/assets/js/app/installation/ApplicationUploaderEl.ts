@@ -19,7 +19,7 @@ export class ApplicationUploaderEl
 
         super(config);
 
-        this.addClass('media-uploader-el');
+        this.addClass('application-uploader-el');
     }
 
     createModel(serverResponse: ApplicationInstallResultJson): Application {
