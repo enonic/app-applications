@@ -1,4 +1,3 @@
-import '../../api.ts';
 import {ApplicationBrowseToolbar} from './ApplicationBrowseToolbar';
 import {ApplicationBrowseActions} from './ApplicationBrowseActions';
 import {ApplicationTreeGrid} from './ApplicationTreeGrid';
@@ -16,6 +15,7 @@ import TreeNode = api.ui.treegrid.TreeNode;
 import BrowseItem = api.app.browse.BrowseItem;
 import ApplicationEvent = api.application.ApplicationEvent;
 import ApplicationEventType = api.application.ApplicationEventType;
+import ServerEventsConnection = api.event.ServerEventsConnection;
 import i18n = api.util.i18n;
 
 export class ApplicationBrowsePanel extends api.app.browse.BrowsePanel<Application> {
@@ -113,7 +113,7 @@ export class ApplicationBrowsePanel extends api.app.browse.BrowsePanel<Applicati
                 setTimeout(() => { // as uninstall usually follows stop event, lets wait to check if app still exists
                     let stoppedApp = this.treeGrid.getByApplicationKey(event.getApplicationKey());
                     // seems to be present in the grid and xp is running
-                    if (stoppedApp && api.app.ServerEventsConnection.getInstance().isConnected()) {
+                    if (stoppedApp && ServerEventsConnection.getInstance().isConnected()) {
                         this.treeGrid.updateApplicationNode(event.getApplicationKey());
                     }
                 }, 400);

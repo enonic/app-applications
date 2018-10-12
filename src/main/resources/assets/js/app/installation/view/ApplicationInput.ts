@@ -1,11 +1,12 @@
 import {ApplicationUploaderEl} from '../ApplicationUploaderEl';
 import InputEl = api.dom.InputEl;
-import FileUploadStartedEvent = api.ui.uploader.FileUploadStartedEvent;
-import FileUploadFailedEvent = api.ui.uploader.FileUploadFailedEvent;
 import Action = api.ui.Action;
 import Application = api.application.Application;
 import InstallUrlApplicationRequest = api.application.InstallUrlApplicationRequest;
 import ApplicationInstallResult = api.application.ApplicationInstallResult;
+import UploadStartedEvent = api.ui.uploader.UploadStartedEvent;
+import UploadItem = api.ui.uploader.UploadItem;
+import UploadFailedEvent = api.ui.uploader.UploadFailedEvent;
 
 export class ApplicationInput extends api.dom.CompositeFormInputEl {
 
@@ -42,8 +43,8 @@ export class ApplicationInput extends api.dom.CompositeFormInputEl {
         this.LAST_KEY_PRESS_TIMEOUT = 750;
         this.cancelAction = cancelAction;
 
-        this.applicationUploaderEl.onUploadStarted((event: api.ui.uploader.FileUploadStartedEvent<Application>) => {
-            let names = event.getUploadItems().map((uploadItem: api.ui.uploader.UploadItem<Application>) => {
+        this.applicationUploaderEl.onUploadStarted((event: UploadStartedEvent<Application>) => {
+            let names = event.getUploadItems().map((uploadItem: UploadItem<Application>) => {
                 return uploadItem.getName();
             });
             this.textInput.setValue(names.join(', '));
@@ -129,19 +130,19 @@ export class ApplicationInput extends api.dom.CompositeFormInputEl {
         return this.applicationUploaderEl;
     }
 
-    onUploadStarted(listener: (event: FileUploadStartedEvent<Application>) => void) {
+    onUploadStarted(listener: (event: UploadStartedEvent<Application>) => void) {
         this.applicationUploaderEl.onUploadStarted(listener);
     }
 
-    unUploadStarted(listener: (event: FileUploadStartedEvent<Application>) => void) {
+    unUploadStarted(listener: (event: UploadStartedEvent<Application>) => void) {
         this.applicationUploaderEl.unUploadStarted(listener);
     }
 
-    onUploadFailed(listener: (event: FileUploadFailedEvent<Application>) => void) {
+    onUploadFailed(listener: (event: UploadFailedEvent<Application>) => void) {
         this.applicationUploaderEl.onUploadFailed(listener);
     }
 
-    unUploadFailed(listener: (event: FileUploadFailedEvent<Application>) => void) {
+    unUploadFailed(listener: (event: UploadFailedEvent<Application>) => void) {
         this.applicationUploaderEl.unUploadFailed(listener);
     }
 

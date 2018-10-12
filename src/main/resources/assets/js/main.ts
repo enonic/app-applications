@@ -50,7 +50,7 @@ function startApplication() {
 
     application.setLoaded(true);
 
-    const serverEventsListener = new api.app.ServerEventsListener([application]);
+    const serverEventsListener = new api.event.ServerEventsListener([application]);
     serverEventsListener.start();
 
     startLostConnectionDetector();

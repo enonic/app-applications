@@ -4,12 +4,12 @@ import {MarketAppsTreeGrid} from './view/MarketAppsTreeGrid';
 import {ApplicationUploaderEl} from './ApplicationUploaderEl';
 import {ApplicationUploadStartedEvent} from '../browse/ApplicationUploadStartedEvent';
 import TreeNode = api.ui.treegrid.TreeNode;
-import FileUploadStartedEvent = api.ui.uploader.FileUploadStartedEvent;
-import FileUploadFailedEvent = api.ui.uploader.FileUploadFailedEvent;
 import Application = api.application.Application;
 import i18n = api.util.i18n;
 import DivEl = api.dom.DivEl;
 import MarketApplication = api.application.MarketApplication;
+import UploadFailedEvent = api.ui.uploader.UploadFailedEvent;
+import UploadStartedEvent = api.ui.uploader.UploadStartedEvent;
 
 export class InstallAppDialog
     extends api.ui.dialog.ModalDialog {
@@ -156,7 +156,7 @@ export class InstallAppDialog
 
     private initUploaderListeners() {
 
-        const uploadFailedHandler = (event: FileUploadFailedEvent<Application>, uploader: ApplicationUploaderEl) => {
+        const uploadFailedHandler = (event: UploadFailedEvent<Application>, uploader: ApplicationUploaderEl) => {
             api.notify.NotifyManager.get().showWarning(uploader.getFailure());
 
             this.resetFileInputWithUploader();
@@ -166,7 +166,7 @@ export class InstallAppDialog
             uploadFailedHandler(event, this.applicationInput.getUploader());
         });
 
-        const uploadStartedHandler = (event: FileUploadStartedEvent<Application>) => {
+        const uploadStartedHandler = (event: UploadStartedEvent<Application>) => {
             new ApplicationUploadStartedEvent(event.getUploadItems()).fire();
             this.close();
         };
