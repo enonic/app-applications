@@ -1,11 +1,10 @@
-import '../../api.ts';
 import {ApplicationBrowseActions} from '../browse/ApplicationBrowseActions';
 import {GetApplicationInfoRequest} from '../resource/GetApplicationInfoRequest';
 import {ApplicationInfo} from '../resource/ApplicationInfo';
 import {ContentReference} from '../resource/ContentReference';
 import {AdminToolDescriptor} from '../resource/AdminToolDescriptor';
+import {RelationshipType} from '../relationshiptype/RelationshipType';
 import ContentTypeSummary = api.schema.content.ContentTypeSummary;
-import RelationshipType = api.schema.relationshiptype.RelationshipType;
 import PageDescriptor = api.content.page.PageDescriptor;
 import PartDescriptor = api.content.page.region.PartDescriptor;
 import LayoutDescriptor = api.content.page.region.LayoutDescriptor;
