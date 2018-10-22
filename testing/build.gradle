@@ -20,6 +20,7 @@ plugins {
     id 'com.enonic.defaults' version '1.0.3'
     id 'com.moowork.node' version '0.13'
     id 'com.moowork.gulp' version '0.13'
+    id 'com.github.psxpaul.execfork' version '0.1.8'
 
 }
 
@@ -35,7 +36,7 @@ apply plugin: 'com.moowork.node'
 apply plugin: 'com.moowork.gulp'
 
 ext.extProgram = new Properties()
-extProgram.load(new FileInputStream("../gradle.properties"))
+extProgram.load( new FileInputStream( "../gradle.properties" ) )
 extProgram['xpVersion']
 
 enonic {
@@ -50,6 +51,7 @@ ext {
     distroDir = "$unpackDir${File.separator}enonic-xp-$xpVersion"
     deployDir = "$distroDir${File.separator}home${File.separator}deploy"
     appDir = "$projectDir${File.separator}test-applications"
+    seleniumDir = "$projectDir${File.separator}test-applications${File.separator}selenium"
     xpHome = "$distroDir${File.separator}home"
     allureResultsDir = "allure-results"
     configDir = "$xpHome${File.separator}config"
@@ -131,16 +133,25 @@ tasks.withType( Test ) {
         displayGranularity = 0
     }
 }
+
+task startSeleniumDaemon( type: com.github.psxpaul.task.ExecFork ) {
+    println '###############################################################Selenium server is starting!'
+   // println "${seleniumDir}${File.separator}selenium-server.bat"
+    commandLine = "${seleniumDir}${File.separator}selenium-server.sh"
+    standardOutput = "${buildDir}${File.separator}selenium-daemon.log"
+    errorOutput = "${buildDir}${File.separator}selenium-daemon-error.log"
+}
 //run the tusk in the gulpfile.js. Name of the task is 'test'
-task testApplicationsApp( type: GulpTask, dependsOn: [npmInstall, startServer, copyApps,] ) {
+task testApplicationsApp( type: GulpTask, dependsOn: [npmInstall, startServer, copyApps, startSeleniumDaemon] ) {
     inputs.files fileTree( dir: '.' )
     args = ['test']
     //npmInstall.mustRunAfter buildApplications
     startServer.mustRunAfter npmInstall
     copyApps.mustRunAfter startServer
+    startSeleniumDaemon.mustRunAfter copyApps
 }
 
-task testApplicationsAppLocally( type: GulpTask, dependsOn: [npmInstall] ) {
+task testApplicationsAppLocally( type: GulpTask, dependsOn: [npmInstall,startSeleniumDaemon] ) {
     inputs.files fileTree( dir: '.' )
     args = ['test']
 }

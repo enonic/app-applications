@@ -8,7 +8,7 @@ const installAppDialog = require('../page_objects/applications/install.app.dialo
 const uninstallAppDialog = require('../page_objects/applications/uninstall.app.dialog');
 const studioUtils = require('../libs/studio.utils.js');
 
-describe('Application Browse Panel,  check buttons on the toolbar', function () {
+describe('Application Browse Panel, check buttons on the toolbar', function () {
     this.timeout(70000);
     webDriverHelper.setupBrowser();
 
@@ -18,15 +18,15 @@ describe('Application Browse Panel,  check buttons on the toolbar', function () 
     const appDescription2 = 'Add full-featured chat';
 
     it('WHEN app browse panel is loaded  AND no selections THEN only `Install` button should be enabled', () => {
-        return appBrowsePanel.waitForInstallButtonEnabled().then((result)=> {
+        return appBrowsePanel.waitForInstallButtonEnabled().then(result => {
             assert.isTrue(result, 'Install button should be enabled');
-        }).then(()=> {
+        }).then(() => {
             return assert.eventually.isFalse(appBrowsePanel.isStartButtonEnabled(),
                 "`Start` button should be disabled");
-        }).then(()=> {
+        }).then(() => {
             return assert.eventually.isFalse(appBrowsePanel.isStopButtonEnabled(),
                 "`Stop` button should be disabled");
-        }).then(()=> {
+        }).then(() => {
             return assert.eventually.isFalse(appBrowsePanel.isUninstallButtonEnabled(),
                 "`Uninstall` button should be disabled");
         })
@@ -65,13 +65,13 @@ describe('Application Browse Panel,  check buttons on the toolbar', function () 
     });
 
     it('Uninstall installed applications', () => {
-        return appBrowsePanel.isItemDisplayed(appDescription1).then(result=> {
+        return appBrowsePanel.isItemDisplayed(appDescription1).then(result => {
             if (result) {
                 return uninstallIfPresent(appDescription1);
             }
-        }).then(()=> {
+        }).then(() => {
             return appBrowsePanel.isItemDisplayed(appDescription2)
-        }).then(result=> {
+        }).then(result => {
             if (result) {
                 return uninstallIfPresent(appDescription2);
             }
@@ -80,7 +80,7 @@ describe('Application Browse Panel,  check buttons on the toolbar', function () 
 
     beforeEach(() => studioUtils.navigateToApplicationsApp());
     afterEach(() => studioUtils.doCloseCurrentBrowserTab());
-    before(()=> {
+    before(() => {
         return console.log('specification is starting: ' + this.title);
     });
 });
