@@ -1,15 +1,14 @@
-import '../../api.ts';
 import {ApplicationInfoJson} from './json/ApplicationInfoJson';
 import {ContentReference} from './ContentReference';
 import {ApplicationDeployment} from './json/ApplicationDeployment';
 import {ApplicationTask} from './ApplicationTask';
 import {ApplicationIdProvider} from './ApplicationIdProvider';
 import {AdminToolDescriptor} from './AdminToolDescriptor';
+import {RelationshipType} from '../relationshiptype/RelationshipType';
 import ContentTypeSummary = api.schema.content.ContentTypeSummary;
 import PageDescriptor = api.content.page.PageDescriptor;
 import PartDescriptor = api.content.page.region.PartDescriptor;
 import LayoutDescriptor = api.content.page.region.LayoutDescriptor;
-import RelationshipType = api.schema.relationshiptype.RelationshipType;
 import MacroDescriptor = api.macro.MacroDescriptor;
 import Widget = api.content.Widget;
 
@@ -104,7 +103,7 @@ export class ApplicationInfo {
         return this.layouts;
     }
 
-    getRelations(): api.schema.relationshiptype.RelationshipType[] {
+    getRelations(): RelationshipType[] {
         return this.relations;
     }
 

@@ -1,4 +1,3 @@
-import '../../api.ts';
 import {ApplicationTaskJson} from './json/ApplicationTasksJson';
 import DescriptorKey = api.content.page.DescriptorKey;
 
