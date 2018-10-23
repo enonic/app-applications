@@ -34,7 +34,7 @@ describe('Application Browse Panel, check buttons on the toolbar', function () {
 
     it('GIVEN Install App dialog is opened WHEN Install button has been clicked for two applications THEN two new applications should be present in the grid',
         () => {
-            this.bail(1);
+            //this.bail(1);
             return appBrowsePanel.clickOnInstallButton()
                 .then(() => installAppDialog.waitForInstallLink(appDisplayName1))
                 .then(() => installAppDialog.clickOnInstallAppLink(appDisplayName1))

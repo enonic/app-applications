@@ -11,7 +11,7 @@ describe(`Applications Grid context menu, application is stopped`, function () {
     webDriverHelper.setupBrowser();
 
     it(`GIVEN existing an application is selected WHEN 'Stop' button has been clicked THEN the application should be stopped`, () => {
-        this.bail(1);
+        //this.bail(1);
         return appBrowsePanel.clickOnRowByDisplayName(appConst.TEST_APPLICATIONS.SECOND_APP).then(()=> {
             return appBrowsePanel.getApplicationState(appConst.TEST_APPLICATIONS.SECOND_APP);
         }).then((state)=> {
