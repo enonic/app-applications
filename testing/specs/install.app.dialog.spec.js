@@ -26,6 +26,11 @@ describe('Install Application Dialog specification', function () {
         }).then(placeholder => {
             assert.isTrue(placeholder == 'Search Enonic Market, paste url or upload directly',
                 'Correct message should be in the placeholder');
+        }).then(() => {
+            return dialog.hasDefaultFocus();
+        }).then(result => {
+            //TODO
+           // assert.isTrue(result, 'Focus should be in the `filter input` by default');
         })
     });
     it('SHOULD contain all controls WHEN opened', () => {
@@ -35,9 +40,9 @@ describe('Install Application Dialog specification', function () {
             return dialog.waitForVisible(dialog.searchInput, 1000);
         }).then(visible => {
             assert.isTrue(visible, 'Filter input should be present in dialog');
-        }).then(()=> {
+        }).then(() => {
             return dialog.isCancelButtonTopVisible();
-        }).then(result=> {
+        }).then(result => {
             assert.isTrue(result, 'Cancel button top should be present');
         })
     });
@@ -45,7 +50,7 @@ describe('Install Application Dialog specification', function () {
     it('WHEN dialog is opened THEN applications should be present in the grid AND applications are sorted by a name', () => {
         return appBrowsePanel.clickOnInstallButton().then(() => {
             return dialog.waitForOpened();
-        }).pause(5000).then(()=> {
+        }).pause(5000).then(() => {
             return dialog.getApplicationNames();
         }).then(names => {
             studioUtils.saveScreenshot("install_dlg_sorted");
@@ -71,7 +76,7 @@ describe('Install Application Dialog specification', function () {
     it('GIVEN dialog is opened WHEN install link has been clicked THEN the app should be installed', () => {
         return appBrowsePanel.clickOnInstallButton().then(() => {
             return dialog.waitForOpened();
-        }).then(()=> {
+        }).then(() => {
             return dialog.clickOnInstallAppLink(appName);
         }).then(() => {
             return dialog.waitForAppInstalled(appName);
@@ -95,7 +100,7 @@ describe('Install Application Dialog specification', function () {
         () => {
             return appBrowsePanel.clickOnInstallButton().then(() => {
                 return dialog.waitForOpened();
-            }).then(()=> {
+            }).then(() => {
                 return dialog.isApplicationInstalled(appName);
             }).then(result => {
                 assert.isTrue(result, `'${appName}' should be with Installed status`);
@@ -106,7 +111,7 @@ describe('Install Application Dialog specification', function () {
     afterEach(() => {
         return studioUtils.doCloseCurrentBrowserTab();
     });
-    before(()=> {
+    before(() => {
         return console.log('specification is starting: ' + this.title);
     });
 })

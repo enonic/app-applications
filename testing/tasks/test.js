@@ -31,7 +31,7 @@ function stopSelenuim() {
 const mocha = new Mocha({
     reporter: 'mocha-multi-reporters',
     reporterOptions: {
-        reporterEnabled: 'mocha-allure-reporter, list'
+        reporterEnabled: 'mocha-allure-reporter, json'
     }
 });
 
