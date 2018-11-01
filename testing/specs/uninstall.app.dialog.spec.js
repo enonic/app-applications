@@ -43,7 +43,7 @@ describe('Uninstall Application Dialog specification', function () {
             return appBrowsePanel.waitForNotificationMessage();
         }).then(result => {
             const text = result instanceof Array ? result[result.length - 1] : result;
-            assert.equal(text, 'Application \'Chucknorris\' uninstalled successfully', `Incorrect notification message [${text}]`)
+            assert.equal(text, 'Application \'Chuck Norris\' uninstalled successfully', `Incorrect notification message [${text}]`)
         });
     });
 

@@ -200,6 +200,11 @@ const installAppDialog = Object.create(page, {
                 throw new Error('search message is not visible after the interval  ' + err);
             })
         }
+    },
+    hasDefaultFocus: {
+        value: function () {
+            return this.hasFocus(dialog.filterInput);
+        }
     }
 });
 module.exports = installAppDialog;

@@ -29,8 +29,7 @@ describe('Install Application Dialog specification', function () {
         }).then(() => {
             return dialog.hasDefaultFocus();
         }).then(result => {
-            //TODO
-           // assert.isTrue(result, 'Focus should be in the `filter input` by default');
+            assert.isTrue(result, 'Focus should be in the `filter input` by default');
         })
     });
     it('SHOULD contain all controls WHEN opened', () => {
@@ -69,7 +68,7 @@ describe('Install Application Dialog specification', function () {
             return dialog.getApplicationNames();
         }).then(names => {
             assert.isTrue(names.length == 1, 'only one application should be displayed');
-            assert.isTrue(names[0] == 'Chuck Norris', 'application should be with the expected display name');
+            assert.isTrue(names[0] == appName, 'application should be with the expected display name');
         })
     });
 
@@ -91,7 +90,7 @@ describe('Install Application Dialog specification', function () {
             assert.isTrue(visible, `'${appName}' application should've been present in the grid`);
             return appBrowsePanel.waitForNotificationMessage();
         }).then(text => {
-            assert.equal(text, 'Application \'Chucknorris\' installed successfully', `Incorrect notification message [${text}]`)
+            assert.equal(text, 'Application \'Chuck Norris\' installed successfully', `Incorrect notification message [${text}]`)
         });
     });
 
