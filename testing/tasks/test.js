@@ -44,7 +44,10 @@ fs.readdirSync(testDir).filter(file => {
         path.join(testDir, file)
     );
 });
-mocha.run(result => {
-    console.log("Tests are finished");
+
+mocha.run(exitCode => {
     // stopSelenuim();
+    if (exitCode !== 0) {
+        process.exit(exitCode);
+    }
 });
