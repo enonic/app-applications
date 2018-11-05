@@ -46,6 +46,8 @@ export class InstallAppDialog
 
         this.marketAppsTreeGrid = new MarketAppsTreeGrid();
         this.marketAppsTreeGrid.setNodesFilter(this.filterNodes.bind(this));
+
+        this.onRendered(() => this.applicationInput.giveFocus());
     }
 
     private setupListeners() {
