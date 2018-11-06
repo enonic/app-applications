@@ -25,6 +25,7 @@ describe('Install app dialog, search input spec.', function () {
             }).then(() => {
                 return dialog.getErrorValidationMessage();
             }).then(message => {
+                console.log("Install app Dialog########### notification message :" + message)
                 studioUtils.saveScreenshot("url_not_exist");
                 assert.isTrue(message.includes('Failed to process application from'), 'correct notification message should appear');
             });

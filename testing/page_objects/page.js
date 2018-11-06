@@ -177,7 +177,7 @@ Page.prototype.getAttribute = function (selector, attributeName) {
 };
 
 Page.prototype.waitForNotificationMessage = function () {
-    return this.getBrowser().waitForVisible(`//div[@class='notification-content']/span`, appConst.TIMEOUT_3).then(()=> {
+    return this.getBrowser().waitForVisible(`//div[@class='notification-content']/span`, appConst.TIMEOUT_7).then(()=> {
         return this.getBrowser().getText(`//div[@class='notification-content']/span`);
     })
 };
