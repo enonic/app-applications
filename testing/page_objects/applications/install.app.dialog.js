@@ -149,9 +149,9 @@ const installAppDialog = Object.create(page, {
     },
     typeSearchTextAndEnter: {
         value: function (text) {
-            return this.typeTextInInput(this.searchInput, text).pause(2000).then(() => {
+            return this.typeTextInInput(this.searchInput, text).pause(500).then(() => {
                 return this.keys('Enter');
-            });
+            }).pause(1000);
         }
     },
     isApplicationPresent: {
