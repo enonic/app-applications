@@ -12,10 +12,10 @@ describe('Application Browse Panel, check buttons on the toolbar', function () {
     this.timeout(70000);
     webDriverHelper.setupBrowser();
 
-    const appDisplayName1 = 'Auth0 ID Provider';
-    const appDisplayName2 = 'Chatrify app';
-    const appDescription1 = 'Add Auth0 authentication';
-    const appDescription2 = 'Add full-featured chat';
+    const appDisplayName1 = 'xpDoctor';
+    const appDisplayName2 = 'Chuck Norris';
+    const appDescription1 = 'Analyze and repair data';
+    const appDescription2 = 'A Chuck Norris fact widget';
 
     it('WHEN app browse panel is loaded  AND no selections THEN only `Install` button should be enabled', () => {
         return appBrowsePanel.waitForInstallButtonEnabled().then(result => {

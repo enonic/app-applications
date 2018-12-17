@@ -50,7 +50,7 @@ describe('Install app dialog, search input spec.', function () {
                 return dialog.waitForOpened();
             }).then(() => {
                 return dialog.typeSearchTextAndEnter(correct_url);
-            }).pause(7000).then(()=>{
+            }).pause(5000).then(()=>{
                return appBrowsePanel.waitForSpinnerNotVisible(7000);
             }).then(() => {
                 return dialog.waitForNotificationMessage();
