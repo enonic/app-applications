@@ -20,7 +20,7 @@ describe('Install app dialog, search input spec.', function () {
         () => {
             return appBrowsePanel.clickOnInstallButton().then(() => {
                 return dialog.waitForOpened();
-            }).then(() => {
+            }).pause(1000).then(() => {
                 return dialog.typeSearchTextAndEnter(not_existing);
             }).then(() => {
                 return dialog.getErrorValidationMessage();
@@ -48,10 +48,10 @@ describe('Install app dialog, search input spec.', function () {
         () => {
             return appBrowsePanel.clickOnInstallButton().then(() => {
                 return dialog.waitForOpened();
-            }).then(() => {
+            }).pause(1000).then(() => {
                 return dialog.typeSearchTextAndEnter(correct_url);
             }).then(() => {
-                return dialog.waitForClosed(90000);
+                return dialog.waitForClosed(20000);
             }).then(() => {
                 return dialog.waitForNotificationMessage();
             }).then(message => {
