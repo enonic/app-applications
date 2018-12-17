@@ -75,8 +75,8 @@ const installAppDialog = Object.create(page, {
         }
     },
     waitForClosed: {
-        value: function () {
-            return this.waitForNotVisible(`${dialog.container}`, 3000).catch(error => {
+        value: function (ms) {
+            return this.waitForNotVisible(`${dialog.container}`, ms).catch(error => {
                 this.saveScreenshot('err_install_dialog_close');
                 throw new Error('Install Dialog was not closed');
             });

@@ -43,7 +43,7 @@ describe('Application Browse Panel, check buttons on the toolbar', function () {
                 .then(() => installAppDialog.clickOnInstallAppLink(appDisplayName2))
                 .then(() => installAppDialog.waitForAppInstalled(appDisplayName2))
                 .then(() => installAppDialog.clickOnCancelButtonTop())
-                .then(() => installAppDialog.waitForClosed).pause(1000)
+                .then(() => installAppDialog.waitForClosed(2000)).pause(500)
                 .then(
                     () => Promise.all([appBrowsePanel.isItemDisplayed(appDescription1), appBrowsePanel.isItemDisplayed(appDescription2)]));
         });
