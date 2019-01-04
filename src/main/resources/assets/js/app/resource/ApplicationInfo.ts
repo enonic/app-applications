@@ -2,7 +2,7 @@ import {ApplicationInfoJson} from './json/ApplicationInfoJson';
 import {ContentReference} from './ContentReference';
 import {ApplicationDeployment} from './json/ApplicationDeployment';
 import {ApplicationTask} from './ApplicationTask';
-import {ApplicationIdProvider} from './ApplicationIdProvider';
+import {IdProviderApplication} from './IdProviderApplication';
 import {AdminToolDescriptor} from './AdminToolDescriptor';
 import {RelationshipType} from '../relationshiptype/RelationshipType';
 import ContentTypeSummary = api.schema.content.ContentTypeSummary;
@@ -34,7 +34,7 @@ export class ApplicationInfo {
 
     private tools: AdminToolDescriptor[];
 
-    private idProvider: ApplicationIdProvider;
+    private idProviderApplication: IdProviderApplication;
 
     private deployment: ApplicationDeployment;
 
@@ -80,7 +80,7 @@ export class ApplicationInfo {
             return AdminToolDescriptor.fromJson(toolJson);
         }) : [];
 
-        result.idProvider = json.idProvider ? ApplicationIdProvider.fromJson(json.idProvider) : null;
+        result.idProviderApplication = json.idProviderApplication ? IdProviderApplication.fromJson(json.idProviderApplication) : null;
 
         result.deployment = json.deployment;
 
@@ -127,8 +127,8 @@ export class ApplicationInfo {
         return this.tools;
     }
 
-    getIdProvider(): ApplicationIdProvider {
-        return this.idProvider;
+    getIdProviderApplication(): IdProviderApplication {
+        return this.idProviderApplication;
     }
 
     getDeployment(): ApplicationDeployment {

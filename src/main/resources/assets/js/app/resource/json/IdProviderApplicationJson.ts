@@ -1,6 +1,6 @@
 import '../../../api.ts';
 
-export class ApplicationIdProviderJson {
+export class IdProviderApplicationJson {
 
     mode: string;
 

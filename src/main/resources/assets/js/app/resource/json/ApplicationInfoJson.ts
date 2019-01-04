@@ -1,7 +1,7 @@
 import {ContentReferencesJson} from './ContentReferencesJson';
 import {ApplicationDeployment} from './ApplicationDeployment';
 import {ApplicationTasksJson} from './ApplicationTasksJson';
-import {ApplicationIdProviderJson} from './ApplicationIdProviderJson';
+import {IdProviderApplicationJson} from './IdProviderApplicationJson';
 import {WidgetDescriptorsJson} from './WidgetDescriptorsJson';
 import {RelationshipTypeListJson} from '../../relationshiptype/RelationshipTypeListJson';
 import ContentTypeSummaryListJson = api.schema.content.ContentTypeSummaryListJson;
@@ -29,7 +29,7 @@ export interface ApplicationInfoJson {
 
     tasks: ApplicationTasksJson;
 
-    idProvider: ApplicationIdProviderJson;
+    idProviderApplication: IdProviderApplicationJson;
 
     deployment: ApplicationDeployment;
 
