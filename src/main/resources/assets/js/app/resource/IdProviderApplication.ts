@@ -1,18 +1,18 @@
 import '../../api.ts';
 import IdProviderMode = api.security.IdProviderMode;
-import {IdProviderApplicationJson, ApplicationUserStoreJson} from './json/IdProviderApplicationJson';
+import {IdProviderApplicationJson, ApplicationIdProviderJson} from './json/IdProviderApplicationJson';
 
 export class IdProviderApplication {
 
     private mode: IdProviderMode;
 
-    private userStores: ApplicationUserStore[];
+    private idProviders: ApplicationIdProvider[];
 
     public static fromJson(json: IdProviderApplicationJson) {
         const result = new IdProviderApplication();
 
         result.mode = IdProviderMode[json.mode];
-        result.userStores = json.userStores ? json.userStores.map(userStoreJson => ApplicationUserStore.fromJson(userStoreJson)) : [];
+        result.idProviders = json.idProviders ? json.idProviders.map(idProviderJson => ApplicationIdProvider.fromJson(idProviderJson)) : [];
         return result;
     }
 
@@ -20,19 +20,19 @@ export class IdProviderApplication {
         return this.mode;
     }
 
-    getUserStores(): ApplicationUserStore[] {
-        return this.userStores;
+    getIdProviders(): ApplicationIdProvider[] {
+        return this.idProviders;
     }
 }
 
-export class ApplicationUserStore {
+export class ApplicationIdProvider {
 
     private displayName: string;
 
     private path: string;
 
-    public static fromJson(json: ApplicationUserStoreJson) {
-        const result = new ApplicationUserStore();
+    public static fromJson(json: ApplicationIdProviderJson) {
+        const result = new ApplicationIdProvider();
 
         result.displayName = json.displayName;
         result.path = json.path;

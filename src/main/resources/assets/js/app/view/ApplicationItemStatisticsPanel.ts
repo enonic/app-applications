@@ -200,7 +200,7 @@ export class ApplicationItemStatisticsPanel
 
             applicationsGroup.addDataList(i18n('field.mode'), IdProviderMode[applicationInfo.getIdProviderApplication().getMode()]);
             applicationsGroup.addDataArray(i18n('field.usedBy'),
-                applicationInfo.getIdProviderApplication().getUserStores().map(userStore => userStore.getPath().toString()));
+                applicationInfo.getIdProviderApplication().getIdProviders().map(idProvider => idProvider.getPath().toString()));
 
             return applicationsGroup;
         }

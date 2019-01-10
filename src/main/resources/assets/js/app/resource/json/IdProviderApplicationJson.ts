@@ -4,11 +4,11 @@ export class IdProviderApplicationJson {
 
     mode: string;
 
-    userStores: ApplicationUserStoreJson[];
+    idProviders: ApplicationIdProviderJson[];
 
 }
 
-export class ApplicationUserStoreJson {
+export class ApplicationIdProviderJson {
     displayName: string;
 
     path: string;
