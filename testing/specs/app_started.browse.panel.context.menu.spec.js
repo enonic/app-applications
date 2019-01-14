@@ -25,7 +25,7 @@ describe(`Applications Grid context menu`, function () {
         }).then(() => {
             return appBrowsePanel.waitForContextMenuDisplayed();
         }).then(result => {
-            studioUtils.saveScreenshot(webDriverHelper.browser, "app_context_menu_blue");
+            studioUtils.saveScreenshot("app_context_menu_blue");
             assert.isTrue(result, 'context menu should be visible');
         })
     });
@@ -34,7 +34,7 @@ describe(`Applications Grid context menu`, function () {
         return appBrowsePanel.rightClickOnRowByDisplayName(appConst.TEST_APPLICATIONS.THIRD_APP).then(() => {
             return appBrowsePanel.waitForContextMenuDisplayed();
         }).then(result => {
-            studioUtils.saveScreenshot(webDriverHelper.browser, "app_context_menu");
+            studioUtils.saveScreenshot("app_context_menu");
             assert.isTrue(result, 'context menu should be visible');
         })
     });
@@ -44,7 +44,7 @@ describe(`Applications Grid context menu`, function () {
         }).then(() => {
             return appBrowsePanel.waitForContextButtonVisible('Start', 'disabled');
         }).then(result => {
-            studioUtils.saveScreenshot(webDriverHelper.browser, "start_menu_item");
+            studioUtils.saveScreenshot("start_menu_item");
             assert.isTrue(result, 'Start menu item should be disabled');
         })
     });
@@ -55,7 +55,7 @@ describe(`Applications Grid context menu`, function () {
         }).then(() => {
             return appBrowsePanel.waitForContextButtonEnabled('Stop');
         }).then(result => {
-            studioUtils.saveScreenshot(webDriverHelper.browser, "stop_menu_item");
+            studioUtils.saveScreenshot("stop_menu_item");
             assert.isTrue(result, 'Stop menu item should be enabled');
         })
     });
@@ -66,7 +66,7 @@ describe(`Applications Grid context menu`, function () {
         }).then(() => {
             return appBrowsePanel.waitForContextButtonVisible('Uninstall', 'disabled');
         }).then(result => {
-            studioUtils.saveScreenshot(webDriverHelper.browser, "uninstall_menu_item");
+            studioUtils.saveScreenshot("uninstall_menu_item");
             assert.isTrue(result, 'Uninstall menu item should be disabled');
         })
     });

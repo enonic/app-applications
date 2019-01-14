@@ -42,7 +42,7 @@ describe(`Applications Grid context menu, application is stopped`, function () {
         }).then(() => {
             return appBrowsePanel.waitForContextButtonVisible('Stop', 'disabled');
         }).then(result => {
-            studioUtils.saveScreenshot(webDriverHelper.browser, "stop_menu_item");
+            studioUtils.saveScreenshot("stop_menu_item");
             assert.isTrue(result, 'Stop menu item should be disabled');
         })
     });
