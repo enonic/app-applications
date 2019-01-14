@@ -195,14 +195,14 @@ export class ApplicationItemStatisticsPanel
 
     private initProviders(applicationInfo: ApplicationInfo): ItemDataGroup {
 
-        if (applicationInfo.getIdProvider().getMode() != null) {
-            const providersGroup = new ItemDataGroup(i18n('field.idProviders'), 'providers');
+        if (applicationInfo.getIdProviderApplication().getMode() != null) {
+            const applicationsGroup = new ItemDataGroup(i18n('field.idProviderApplications'), 'applications');
 
-            providersGroup.addDataList(i18n('field.mode'), IdProviderMode[applicationInfo.getIdProvider().getMode()]);
-            providersGroup.addDataArray(i18n('field.usedBy'),
-                applicationInfo.getIdProvider().getUserStores().map(userStore => userStore.getPath().toString()));
+            applicationsGroup.addDataList(i18n('field.mode'), IdProviderMode[applicationInfo.getIdProviderApplication().getMode()]);
+            applicationsGroup.addDataArray(i18n('field.usedBy'),
+                applicationInfo.getIdProviderApplication().getIdProviders().map(idProvider => idProvider.getPath().toString()));
 
-            return providersGroup;
+            return applicationsGroup;
         }
         return null;
     }
