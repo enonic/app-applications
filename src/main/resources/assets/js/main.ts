@@ -1,7 +1,6 @@
 import i18n = api.util.i18n;
 
 declare const CONFIG;
-api.util.i18nInit(CONFIG.messages);
 
 const body = api.dom.Body.get();
 
@@ -65,7 +64,7 @@ function startApplication() {
 }
 
 const renderListener = () => {
-    startApplication();
+    api.util.i18nInit(CONFIG.messages).then(() => startApplication());
     body.unRendered(renderListener);
 };
 if (body.isRendered()) {
