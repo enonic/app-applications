@@ -1,6 +1,6 @@
-var page = require('../page');
-var elements = require('../../libs/elements');
-var dialog = {
+const page = require('../page');
+const elements = require('../../libs/elements');
+const dialog = {
     container: `//div[contains(@id,'NewContentDialog')]`,
 };
 
@@ -11,7 +11,7 @@ const xpath = {
     dataContainer: `//div[contains(@class,'application-data-container')]`,
     contentTypes: `//ul[@class='data-list' and descendant::li[text()='Content Types']]//span`,
     applicationDataHeaders: `//div[contains(@class,'application')]//li[@class='list-header']`,
-    providerDataHeaders: `//div[contains(@class,'providers')]//li[@class='list-header']`,
+    idProviderApplicationsHeaders: `//div[contains(@id,'ItemDataGroup') and descendant::h2[text()='ID Provider Applications']]//li[@class='list-header']`,
     stopActionMenuItem: `//div[contains(@id,'ActionMenu')]//li[contains(@id,'ActionMenuItem') and text()='Stop']`,
     startActionMenuItem: `//div[contains(@id,'ActionMenu')]//li[contains(@id,'ActionMenuItem') and text()='Start']`,
     siteDataHeaders: `//div[contains(@id,'ApplicationItemStatisticsPanel')]/div[contains(@class,'application-data-container')]/div[contains(@class,'site')]//li[contains(@class,'list-header')]`,
@@ -27,7 +27,7 @@ var applicationItemStatisticsPanel = Object.create(page, {
     getApplicationDataHeaders: {
         value: function () {
             let selector = `${xpath.main}${xpath.dataContainer}${xpath.applicationDataHeaders}`;
-            return this.getText(selector).catch(err=> {
+            return this.getText(selector).catch(err => {
                 throw new Error('Error while getting application-data-headers: ' + err);
             })
         }
@@ -35,7 +35,7 @@ var applicationItemStatisticsPanel = Object.create(page, {
     getDropDownButtonText: {
         value: function () {
             let selector = `${xpath.main}${xpath.dropDownButton}`;
-            return this.getText(selector).catch(err=> {
+            return this.getText(selector).catch(err => {
                 throw new Error('error while getting text from the button: ' + err);
             })
         }
@@ -43,14 +43,14 @@ var applicationItemStatisticsPanel = Object.create(page, {
     clickOnActionDropDownMenu: {
         value: function () {
             let selector = `${xpath.main}${xpath.dropDownButton}`;
-            return this.doClick(selector).catch(err=> {
+            return this.doClick(selector).catch(err => {
                 throw new Error('error when clicking on action menu: ' + err);
             })
         }
     },
     waitForStopMenuItemVisible: {
         value: function () {
-            return this.waitForVisible(xpath.stopActionMenuItem).catch(err=> {
+            return this.waitForVisible(xpath.stopActionMenuItem).catch(err => {
                 console.log(err);
                 this.saveScreenshot("stop_menu_item_not_visible");
                 return false;
@@ -59,7 +59,7 @@ var applicationItemStatisticsPanel = Object.create(page, {
     },
     waitForStartMenuItemVisible: {
         value: function () {
-            return this.waitForVisible(xpath.startActionMenuItem).catch(err=> {
+            return this.waitForVisible(xpath.startActionMenuItem).catch(err => {
                 console.log(err);
                 this.saveScreenshot("stop_menu_item_not_visible");
                 return false;
@@ -68,7 +68,7 @@ var applicationItemStatisticsPanel = Object.create(page, {
     },
     clickOnStopActionMenuItem: {
         value: function () {
-            this.doClick(xpath.stopActionMenuItem).catch(err=> {
+            this.doClick(xpath.stopActionMenuItem).catch(err => {
                 console.log(err);
                 throw new Error("Error when clicking on Stop menu item");
 
@@ -77,7 +77,7 @@ var applicationItemStatisticsPanel = Object.create(page, {
     },
     clickOnStartActionMenuItem: {
         value: function () {
-            this.doClick(xpath.startActionMenuItem).catch(err=> {
+            this.doClick(xpath.startActionMenuItem).catch(err => {
                 console.log(err);
                 throw new Error("Error when clicking on Start menu item");
 
@@ -91,19 +91,19 @@ var applicationItemStatisticsPanel = Object.create(page, {
     },
     getProviderDataHeaders: {
         value: function () {
-            return this.getText(xpath.providerDataHeaders);
+            return this.getText(xpath.idProviderApplicationsHeaders);
         }
     },
     getContentTypes: {
         value: function () {
-            return this.isVisible(this.contentTypes).then(result=> {
+            return this.isVisible(this.contentTypes).then(result => {
                 if (result) {
                     return this.getText(this.contentTypes);
                 } else {
                     return [];
                 }
 
-            }).catch(err=> {
+            }).catch(err => {
                 throw new Error('error while getting names of Content Types: ' + err);
             })
         }

@@ -1,12 +1,12 @@
 /**
  * Created by on 6/26/2017.
  */
-var page = require('./page');
-var panel = {
+const page = require('./page');
+const panel = {
     container: `div[class^='launcher-main-container']`
 };
 
-var launcherPanel = Object.create(page, {
+const launcherPanel = Object.create(page, {
     /**
      * define elements
      */
@@ -48,7 +48,7 @@ var launcherPanel = Object.create(page, {
     },
     waitForPanelVisible: {
         value: function (ms) {
-            return this.waitForVisible(`${panel.container}`, ms).catch((err)=> {
+            return this.waitForVisible(`${panel.container}`, ms).catch(err => {
                 console.log('launcher panel is not shown')
                 return false;
             })

@@ -52,7 +52,7 @@ const installAppDialog = Object.create(page, {
     },
     clickOnCancelButtonTop: {
         value: function () {
-            return this.doClick(this.cancelButton).catch((err) => {
+            return this.doClick(this.cancelButton).catch(err => {
                 this.saveScreenshot('err_install_dialog_cancel');
                 throw new Error('Error when try click on cancel button ' + err);
             })
@@ -171,7 +171,7 @@ const installAppDialog = Object.create(page, {
     },
     isCancelButtonTopVisible: {
         value: function () {
-            return this.isVisible(this.cancelButton).catch((err) => {
+            return this.isVisible(this.cancelButton).catch(err => {
                 throw new Error('error check the Cancel button on the Install dialog');
             })
         }

@@ -20,7 +20,7 @@ describe(`Applications Grid context menu, application is stopped`, function () {
             }
         }).then(() => {
             return appBrowsePanel.getApplicationState(appConst.TEST_APPLICATIONS.SECOND_APP);
-        }).then((state) => {
+        }).then(state => {
             assert.isTrue(state == 'stopped', 'state should be `stopped`');
         })
     });
