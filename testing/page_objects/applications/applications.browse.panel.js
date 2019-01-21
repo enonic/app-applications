@@ -64,7 +64,7 @@ module.exports = Object.create(page, {
         value: function () {
             return this.waitForVisible(this.selectionPanelToggler, appConst.TIMEOUT_2).then(() => {
                 return this.getAttribute(this.selectionPanelToggler, 'class');
-            }).then(result=> {
+            }).then(result => {
                 return result.includes('any-selected');
             }).catch(err => {
                 console.log(`error when check the 'Selection toogler'` + err);
@@ -74,7 +74,7 @@ module.exports = Object.create(page, {
     },
     getNumberInSelectionToggler: {
         value: function () {
-            return this.waitForVisible(this.numberInToggler, appConst.TIMEOUT_2).then(()=> {
+            return this.waitForVisible(this.numberInToggler, appConst.TIMEOUT_2).then(() => {
                 return this.getText(this.numberInToggler);
             }).catch(err => {
                 this.saveScreenshot('err_number_selection_toggler');
@@ -91,7 +91,7 @@ module.exports = Object.create(page, {
     },
     getNumberOfSelectedRows: {
         value: function () {
-            return this.elements(XPath.selectedRows).then((result)=> {
+            return this.elements(XPath.selectedRows).then((result) => {
                 return result.value.length;
             }).catch(err => {
                 throw new Error(`Error when getting selected rows ` + err);
@@ -180,7 +180,7 @@ module.exports = Object.create(page, {
     },
     clickOnStopButton: {
         value: function () {
-            return this.waitForEnabled(XPath.stopButton, 1000).then(()=> {
+            return this.waitForEnabled(XPath.stopButton, 1000).then(() => {
                 return this.doClick(XPath.stopButton);
             }).pause(1000).catch(() => {
                 this.saveScreenshot('err_browsepanel_stop');
@@ -190,49 +190,49 @@ module.exports = Object.create(page, {
     },
     waitForInstallButtonEnabled: {
         value: function () {
-            return this.waitForEnabled(XPath.installButton, 3000).catch(err=> {
+            return this.waitForEnabled(XPath.installButton, 3000).catch(err => {
                 return this.doCatch('err_install_button_state', 'Button Install-app should be enabled ' + err);
             });
         }
     },
     waitForStartButtonEnabled: {
         value: function () {
-            return this.waitForEnabled(XPath.startButton, 2000).catch(err=> {
+            return this.waitForEnabled(XPath.startButton, 2000).catch(err => {
                 return this.doCatch('err_start_button_state', 'Button Start-app should be enabled ' + err);
             });
         }
     },
     waitForStartButtonDisabled: {
         value: function () {
-            return this.waitForEnabled(XPath.startButton, 3000, true).catch(err=> {
+            return this.waitForEnabled(XPath.startButton, 3000, true).catch(err => {
                 return this.doCatch('err_start_button', 'Button Start-app should be disabled ' + err);
             });
         }
     },
     waitForStopButtonEnabled: {
         value: function () {
-            return this.waitForEnabled(XPath.stopButton, 2000).catch(err=> {
+            return this.waitForEnabled(XPath.stopButton, 2000).catch(err => {
                 return this.doCatch('err_stop_button', 'Button Stop-app should be enabled ' + err);
             });
         }
     },
     waitForStopButtonDisabled: {
         value: function () {
-            return this.waitForEnabled(XPath.stopButton, 2000, true).catch(err=> {
+            return this.waitForEnabled(XPath.stopButton, 2000, true).catch(err => {
                 return this.doCatch('err_stop_button', 'Button Stop-app should be disabled');
             });
         }
     },
     waitForUninstallButtonEnabled: {
         value: function () {
-            return this.waitForEnabled(XPath.unInstallButton, 3000).catch(err=> {
+            return this.waitForEnabled(XPath.unInstallButton, 3000).catch(err => {
                 return this.doCatch('err_uninstall_button', err);
             });
         }
     },
     waitForUninstallButtonDisabled: {
         value: function () {
-            return this.waitForEnabled(XPath.unInstallButton, 3000, true).catch(err=> {
+            return this.waitForEnabled(XPath.unInstallButton, 3000, true).catch(err => {
                 return this.doCatch('err_uninstall_button', 'Uninstall button should be disabled ' + err);
             });
         }
@@ -268,7 +268,7 @@ module.exports = Object.create(page, {
             var checkboxXpath = `${XPath.treeGridToolbar}` + `${XPath.selectAllCheckbox}`;
             return this.waitForVisible(checkboxXpath, 3000).then(() => {
                 return this.doClick(checkboxXpath);
-            }).pause(400).catch((err) => {
+            }).pause(400).catch(err => {
                 this.saveScreenshot('err_find_selectall_checkbox');
                 throw Error('Select all checkbox was not found')
             })
@@ -290,7 +290,7 @@ module.exports = Object.create(page, {
             var nameXpath = XPath.rowByDisplayName(name);
             return this.waitForVisible(nameXpath, 3000).then(() => {
                 return this.doClick(nameXpath);
-            }).pause(400).catch((err) => {
+            }).pause(400).catch(err => {
                 this.saveScreenshot('err_find_' + name);
                 throw Error('Row with the name ' + name + ' was not found')
             })
@@ -372,9 +372,9 @@ module.exports = Object.create(page, {
 
     waitForContextMenuNotDisplayed: {
         value: function () {
-            return this.waitForNotVisible(`${XPath.contextMenu}`, 1000).catch((err) => {
+            return this.waitForNotVisible(`${XPath.contextMenu}`, 1000).catch(err => {
                 console.log("Context menu is still displayed");
-                return this.isVisible(`${XPath.contextMenu}`).then(result=> {
+                return this.isVisible(`${XPath.contextMenu}`).then(result => {
                     return false;
                 })
             });
@@ -383,7 +383,7 @@ module.exports = Object.create(page, {
 
     waitForContextMenuDisplayed: {
         value: function (name) {
-            return this.waitForVisible(`${XPath.contextMenu}`, 2000).catch((err) => {
+            return this.waitForVisible(`${XPath.contextMenu}`, 2000).catch(err => {
                 this.saveScreenshot('err_open_context_menu');
                 throw Error('Context menu is not visible' + err);
             });
@@ -393,7 +393,7 @@ module.exports = Object.create(page, {
     waitForContextButtonVisible: {
         value: function (name, state) {
             var nameXpath = XPath.contextMenuButton(name, state || '');
-            return this.waitForVisible(nameXpath, 1000).catch((err) => {
+            return this.waitForVisible(nameXpath, 1000).catch(err => {
                 throw Error('Failed to find context menu button ' + name);
             });
         }
@@ -402,7 +402,7 @@ module.exports = Object.create(page, {
     waitForContextButtonEnabled: {
         value: function (name) {
             var nameXpath = XPath.enabledContextMenuButton(name);
-            return this.waitForVisible(nameXpath, 1000).catch((err) => {
+            return this.waitForVisible(nameXpath, 1000).catch(err => {
                 console.log("Failed to find context menu button" + err);
                 return false;
             });
@@ -412,7 +412,7 @@ module.exports = Object.create(page, {
     getApplicationState: {
         value: function (appDisplayName) {
             var stateXpath = XPath.appStateByName(appDisplayName);
-            return this.getText(stateXpath).catch((err) => {
+            return this.getText(stateXpath).catch(err => {
                 console.log("Failed to get app-state " + appDisplayName + '  ' + err);
                 throw new Error('App-state was not found')
             });
@@ -428,14 +428,14 @@ module.exports = Object.create(page, {
     },
     pressArrowDownKey: {
         value: function () {
-            return this.keys('Arrow_Down').pause(1000).catch((err) => {
+            return this.keys('Arrow_Down').pause(1000).catch(err => {
                 throw new Error('Error when clicking on Arrow Down key')
             });
         }
     },
     pressArrowUpKey: {
         value: function () {
-            return this.keys('Arrow_Up').pause(1000).catch((err) => {
+            return this.keys('Arrow_Up').pause(1000).catch(err => {
                 throw new Error('Error when clicking on Arrow Up key')
             });
         }

@@ -11,7 +11,8 @@ const appStatisticPanel = require('../page_objects/applications/application.item
 describe('Applications Browse panel - selection of items spec', function () {
     this.timeout(appConst.SUITE_TIMEOUT);
     webDriverHelper.setupBrowser();
-    const TOTAL_NUMBER_OF_APPLICATIONS = 6;
+    //Content Studio should not be installed!
+    const TOTAL_NUMBER_OF_APPLICATIONS = 5;
 
     it(`GIVEN applications grid is loaded THEN correct page-title should be displayed`, () => {
         return appBrowsePanel.getTitle().then((title)=> {

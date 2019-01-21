@@ -1,24 +1,24 @@
-var page = require('../page');
-var elements = require('../../libs/elements');
-var dialog = {
+const page = require('../page');
+const elements = require('../../libs/elements');
+const dialog = {
     container: `//div[contains(@id,'UninstallApplicationDialog')]`,
     content: `//div[contains(@id,'ModalDialogContentPanel')]/h6`,
     yesButton: `//button[contains(@id,'DialogButton')]/span[text()='Yes']`,
-    noButton:  `//button[contains(@id,'DialogButton')]/span[text()='No']`
+    noButton: `//button[contains(@id,'DialogButton')]/span[text()='No']`
 };
-var uninstallAppDialog = Object.create(page, {
+const uninstallAppDialog = Object.create(page, {
 
-    cancelButtonTop:        {
+    cancelButtonTop: {
         get: function () {
             return `${dialog.container}${elements.CANCEL_BUTTON_TOP}`;
         }
     },
-    yesButton:              {
+    yesButton: {
         get: function () {
             return `${dialog.container}${dialog.yesButton}`;
         }
     },
-    noButton:               {
+    noButton: {
         get: function () {
             return `${dialog.container}${dialog.noButton}`;
         }
@@ -30,27 +30,27 @@ var uninstallAppDialog = Object.create(page, {
     },
     clickOnYesButton: {
         value: function () {
-            return this.doClick(this.yesButton).catch((err)=> {
+            return this.doClick(this.yesButton).catch(err => {
                 throw new Error('Error when try click on no button ' + err);
             })
         }
     },
     clickOnCancelButtonTop: {
         value: function () {
-            return this.doClick(this.cancelButtonTop).catch((err) => {
+            return this.doClick(this.cancelButtonTop).catch(err => {
                 this.saveScreenshot('err_uninstall_dialog_cancel');
                 throw new Error('Error when try click on cancel button ' + err);
             })
         }
     },
-    clickOnYesButton:       {
+    clickOnYesButton: {
         value: function () {
-            return this.doClick(this.yesButton).catch((err) => {
+            return this.doClick(this.yesButton).catch(err => {
                 throw new Error('Error when try click on no button ' + err);
             })
         }
     },
-    waitForOpened:          {
+    waitForOpened: {
         value: function () {
             return this.waitForVisible(`${dialog.container}`, 3000).catch(err => {
                 this.saveScreenshot('err_uninstall_dialog_load');
@@ -58,7 +58,7 @@ var uninstallAppDialog = Object.create(page, {
             });
         }
     },
-    waitForClosed:          {
+    waitForClosed: {
         value: function () {
             return this.waitForNotVisible(`${dialog.container}`, 3000).catch(error => {
                 this.saveScreenshot('err_uninstall_dialog_close');
