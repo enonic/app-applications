@@ -16,7 +16,8 @@ function handleGet() {
         xpVersion: app.version,
         messages: admin.getPhrases(),
         launcherPath: admin.getLauncherPath(),
-        launcherUrl: admin.getLauncherUrl()
+        launcherUrl: admin.getLauncherUrl(),
+        i18nUrl: portal.serviceUrl({service: 'i18n'})
     };
 
     return {
