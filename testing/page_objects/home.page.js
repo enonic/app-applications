@@ -9,7 +9,7 @@ const xpTourDialog = {
 const home = {
     container: `div[class*='home-main-container']`
 };
-var homePage = Object.create(page, {
+const homePage = Object.create(page, {
 
     closeXpTourButton: {
         get: function () {

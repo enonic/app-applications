@@ -2,7 +2,7 @@ const chai = require('chai');
 const expect = chai.expect;
 const assert = chai.assert;
 chai.use(require('chai-as-promised'));
-var webDriverHelper = require('../libs/WebDriverHelper');
+const webDriverHelper = require('../libs/WebDriverHelper');
 const appBrowsePanel = require('../page_objects/applications/applications.browse.panel');
 const installAppDialog = require('../page_objects/applications/install.app.dialog');
 const uninstallAppDialog = require('../page_objects/applications/uninstall.app.dialog');

@@ -2,7 +2,7 @@ const path = require('path');
 const fs = require('fs');
 const Mocha = require('mocha');
 const selenium = require('selenium-standalone');
-const testDir = './specs'
+const testDir = './specs';
 const multi = require('mocha-multi-reporters');
 
 function runSelenium() {

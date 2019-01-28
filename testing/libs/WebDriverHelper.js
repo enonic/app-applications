@@ -9,7 +9,7 @@ function WebDriverHelper() {
 
 WebDriverHelper.prototype.getBrowser = function () {
     return this.browser;
-}
+};
 
 const makeChromeOptions = headless => ({
     "args": [
@@ -28,7 +28,7 @@ WebDriverHelper.prototype.setupBrowser = function setupBrowser() {
     var _this = this;
     before(function () {
         var PropertiesReader = require('properties-reader');
-        var path = require('path')
+        var path = require('path');
         var webdriverio = require('webdriverio');
         var file = path.join(__dirname, '/../browser.properties');
         var properties = PropertiesReader(file);
