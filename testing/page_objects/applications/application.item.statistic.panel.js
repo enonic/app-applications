@@ -17,7 +17,7 @@ const xpath = {
     siteDataHeaders: `//div[contains(@id,'ApplicationItemStatisticsPanel')]/div[contains(@class,'application-data-container')]/div[contains(@class,'site')]//li[contains(@class,'list-header')]`,
 };
 
-var applicationItemStatisticsPanel = Object.create(page, {
+const applicationItemStatisticsPanel = Object.create(page, {
 
     contentTypes: {
         get: function () {

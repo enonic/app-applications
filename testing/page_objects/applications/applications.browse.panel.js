@@ -146,7 +146,7 @@ module.exports = Object.create(page, {
         value: function () {
             return this.waitForEnabled(XPath.installButton, 1000).then(() => {
                 return this.doClick(XPath.installButton);
-            }).catch((err) => {
+            }).catch(err => {
                 throw new Error(`Install button is not enabled! ${err}`);
             })
         }
@@ -265,7 +265,7 @@ module.exports = Object.create(page, {
     },
     clickOnSelectAll: {
         value: function () {
-            var checkboxXpath = `${XPath.treeGridToolbar}` + `${XPath.selectAllCheckbox}`;
+            let checkboxXpath = `${XPath.treeGridToolbar}` + `${XPath.selectAllCheckbox}`;
             return this.waitForVisible(checkboxXpath, 3000).then(() => {
                 return this.doClick(checkboxXpath);
             }).pause(400).catch(err => {
@@ -287,7 +287,7 @@ module.exports = Object.create(page, {
     },
     clickOnRowByDisplayName: {
         value: function (name) {
-            var nameXpath = XPath.rowByDisplayName(name);
+            let nameXpath = XPath.rowByDisplayName(name);
             return this.waitForVisible(nameXpath, 3000).then(() => {
                 return this.doClick(nameXpath);
             }).pause(400).catch(err => {
@@ -362,7 +362,7 @@ module.exports = Object.create(page, {
 
     getSelectedRowByDisplayName: {
         value: function (displayName) {
-            var displayNameXpath = XPath.selectedApplicationByName(displayName);
+            let displayNameXpath = XPath.selectedApplicationByName(displayName);
             return this.waitForVisible(displayNameXpath, 2000)
                 .catch((err) => {
                     throw Error('Row with the displayName ' + displayName + ' was not found')
@@ -392,7 +392,7 @@ module.exports = Object.create(page, {
 
     waitForContextButtonVisible: {
         value: function (name, state) {
-            var nameXpath = XPath.contextMenuButton(name, state || '');
+            let nameXpath = XPath.contextMenuButton(name, state || '');
             return this.waitForVisible(nameXpath, 1000).catch(err => {
                 throw Error('Failed to find context menu button ' + name);
             });
@@ -401,7 +401,7 @@ module.exports = Object.create(page, {
 
     waitForContextButtonEnabled: {
         value: function (name) {
-            var nameXpath = XPath.enabledContextMenuButton(name);
+            let nameXpath = XPath.enabledContextMenuButton(name);
             return this.waitForVisible(nameXpath, 1000).catch(err => {
                 console.log("Failed to find context menu button" + err);
                 return false;
@@ -411,7 +411,7 @@ module.exports = Object.create(page, {
 
     getApplicationState: {
         value: function (appDisplayName) {
-            var stateXpath = XPath.appStateByName(appDisplayName);
+            let stateXpath = XPath.appStateByName(appDisplayName);
             return this.getText(stateXpath).catch(err => {
                 console.log("Failed to get app-state " + appDisplayName + '  ' + err);
                 throw new Error('App-state was not found')
@@ -420,7 +420,7 @@ module.exports = Object.create(page, {
     },
     getApplicationDisplayNames: {
         value: function () {
-            var displayNameXpath = elements.SLICK_ROW + elements.H6_DISPLAY_NAME;
+            let displayNameXpath = elements.SLICK_ROW + elements.H6_DISPLAY_NAME;
             return this.getText(displayNameXpath).catch((err) => {
                 throw new Error('Error when get App-display names')
             });
