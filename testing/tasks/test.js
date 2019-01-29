@@ -2,8 +2,8 @@ const path = require('path');
 const fs = require('fs');
 const Mocha = require('mocha');
 const selenium = require('selenium-standalone');
-const testDir = './specs';
-const multi = require('mocha-multi-reporters');
+const globby = require('globby');
+const testFilesGlob = './specs/**/*.js';
 
 function runSelenium() {
     selenium.install(
@@ -29,25 +29,25 @@ function stopSelenuim() {
 // runSelenium();
 
 const mocha = new Mocha({
-    reporter: 'mocha-multi-reporters',
+    reporter: 'mochawesome',
     reporterOptions: {
-        reporterEnabled: 'mocha-allure-reporter, list'
+        reportFilename: 'results',
+        quiet: true
     }
 });
 
-fs.readdirSync(testDir).filter(file => {
-    // Only keep the .js files
-    return file.substr(-3) === '.js';
+(async () => {
+    const paths = await globby([testFilesGlob]);
 
-}).forEach(function (file) {
-    mocha.addFile(
-        path.join(testDir, file)
-    );
-});
+    paths.forEach(function(filePath){
+        console.log(filePath);
+        mocha.addFile(filePath);
+    });
 
-mocha.run(exitCode => {
-    // stopSelenuim();
-    if (exitCode !== 0) {
-        process.exit(exitCode);
-    }
-});
+    mocha.run(exitCode => {
+        // stopSelenuim();
+        if (exitCode !== 0) {
+            process.exit(exitCode);
+        }
+    });
+})();
