@@ -22,6 +22,8 @@ describe('Install Application Dialog specification', function () {
         return appBrowsePanel.clickOnInstallButton().then(() => {
             return dialog.waitForOpened();
         }).then(() => {
+            return dialog.waitForSpinnerNotVisible(3000);
+        }).then(() => {
             return dialog.getPlaceholderMessage();
         }).then(placeholder => {
             assert.isTrue(placeholder == 'Search Enonic Market, paste url or upload directly',

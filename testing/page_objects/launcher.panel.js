@@ -49,7 +49,7 @@ const launcherPanel = Object.create(page, {
     waitForPanelVisible: {
         value: function (ms) {
             return this.waitForVisible(`${panel.container}`, ms).catch(err => {
-                console.log('launcher panel is not shown')
+                console.log('launcher panel is not shown');
                 return false;
             })
         }
