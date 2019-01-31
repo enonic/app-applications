@@ -19,7 +19,7 @@ describe('Install Application Dialog specification', function () {
     const appName = 'Chuck Norris';
 
     it('SHOULD show install app dialog WHEN Install button has been clicked', () => {
-        return appBrowsePanel.clickOnInstallButton().then(() => {
+        return appBrowsePanel.clickOnInstallButton().pause(1500).then(() => {
             return dialog.waitForOpened();
         }).then(() => {
             return dialog.waitForSpinnerNotVisible(3000);
