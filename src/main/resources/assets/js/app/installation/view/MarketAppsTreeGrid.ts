@@ -317,7 +317,7 @@ export class MarketAppsTreeGrid extends TreeGrid<MarketApplication> {
             this.mask();
         }
 
-        return MarketApplicationsFetcher.fetchChildren(this.getVersion(), this.installApplications, from,
+        return MarketApplicationsFetcher.fetchChildren(CONFIG.xpVersion, this.installApplications, from,
             MarketAppsTreeGrid.MAX_FETCH_SIZE).then(
             (data: MarketApplicationResponse) => {
                 let meta = data.getMetadata();
@@ -343,19 +343,6 @@ export class MarketAppsTreeGrid extends TreeGrid<MarketApplication> {
         super.initData(items);
         this.getGrid().getCanvasNode().style.height = (70 * items.length + 'px');
         this.getGrid().resizeCanvas();
-    }
-
-    private getVersion(): string {
-        let version: string = CONFIG.xpVersion;
-        if (!version) {
-            return '';
-        }
-        let parts = version.split('.');
-        if (parts.length > 3) {
-            parts.pop(); // remove '.snapshot'
-            return parts.join('.');
-        }
-        return version;
     }
 
     getDataId(data: MarketApplication): string {
