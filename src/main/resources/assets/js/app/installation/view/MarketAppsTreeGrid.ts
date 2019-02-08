@@ -316,10 +316,10 @@ export class MarketAppsTreeGrid extends TreeGrid<MarketApplication> {
 
         this.hideErrorPanelIfVisible();
 
-        const getAppsPromise: wemQ.Promise<MarketApplicationResponse> = MarketApplicationFetcher.fetchApps(this.getVersion(), from,
+        const getAppsPromise: wemQ.Promise<MarketApplicationResponse> = MarketApplicationFetcher.fetchApps(CONFIG.xpVersion, from,
             MarketAppsTreeGrid.MAX_FETCH_SIZE);
 
-        const getInstalledAppsPromise: wemQ.Promise<MarketApplication[]> = MarketApplicationFetcher.fetchInstalledApps(this.getVersion(),
+        const getInstalledAppsPromise: wemQ.Promise<MarketApplication[]> = MarketApplicationFetcher.fetchInstalledApps(CONFIG.xpVersion,
             this.installedApplications);
 
         return wemQ.all([getAppsPromise, getInstalledAppsPromise]).spread(
@@ -383,19 +383,6 @@ export class MarketAppsTreeGrid extends TreeGrid<MarketApplication> {
         super.initData(items);
         this.getGrid().getCanvasNode().style.height = (70 * items.length + 'px');
         this.getGrid().resizeCanvas();
-    }
-
-    private getVersion(): string {
-        let version: string = CONFIG.xpVersion;
-        if (!version) {
-            return '';
-        }
-        let parts = version.split('.');
-        if (parts.length > 3) {
-            parts.pop(); // remove '.snapshot'
-            return parts.join('.');
-        }
-        return version;
     }
 
     getDataId(data: MarketApplication): string {
