@@ -22,7 +22,7 @@ dependencies {
         force = true
     }
     include "com.enonic.lib:lib-admin-ui:${libAdminUiVersion}"
-    include "com.enonic.lib:lib-mustache:2.0.0-A1"
+    include "com.enonic.lib:lib-mustache:2.0.0-SNAPSHOT"
 }
 
 configurations.all {
