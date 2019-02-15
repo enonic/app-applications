@@ -71,6 +71,8 @@ export class ApplicationInput extends api.dom.CompositeFormInputEl {
 
         this.onKeyDown((event) => {
             switch (event.keyCode) {
+            case 9: //TAB
+                break;
             case 13:
                 if (this.isUrlTyped()) {
                     this.installWithUrl(this.textInput.getValue());

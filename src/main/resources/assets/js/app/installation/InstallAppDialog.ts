@@ -10,6 +10,7 @@ import DivEl = api.dom.DivEl;
 import MarketApplication = api.application.MarketApplication;
 import UploadFailedEvent = api.ui.uploader.UploadFailedEvent;
 import UploadStartedEvent = api.ui.uploader.UploadStartedEvent;
+import ButtonEl = api.dom.ButtonEl;
 
 export class InstallAppDialog
     extends api.ui.dialog.ModalDialog {
@@ -20,37 +21,42 @@ export class InstallAppDialog
 
     private statusMessage: api.dom.DivEl;
 
-    private clearButton: api.dom.ButtonEl;
+    private clearButton: ButtonEl;
 
     private marketAppsTreeGrid: MarketAppsTreeGrid;
 
     constructor() {
-        super({title: i18n('dialog.install')});
-
-        this.addClass('install-application-dialog hidden');
-
-        this.getBody().addClass('mask-wrapper');
-
-        this.initElements();
-        this.setupListeners();
+        super({
+            title: i18n('dialog.install'),
+            class: 'install-application-dialog hidden'
+        });
     }
 
-    private initElements() {
+    protected initElements() {
+        super.initElements();
+
         this.statusMessage = new api.dom.DivEl('status-message');
 
         this.applicationInput = new ApplicationInput(this.getCancelAction(), 'large').setPlaceholder(i18n('dialog.install.search'));
 
-        this.clearButton = this.createClearFilterButton();
+        this.clearButton = new api.dom.ButtonEl();
 
         this.dropzoneContainer = new api.ui.uploader.DropzoneContainer(true);
 
         this.marketAppsTreeGrid = new MarketAppsTreeGrid();
-        this.marketAppsTreeGrid.setNodesFilter(this.filterNodes.bind(this));
 
-        this.onRendered(() => this.applicationInput.giveFocus());
     }
 
-    private setupListeners() {
+    protected postInitElements() {
+        super.postInitElements();
+
+        this.setElementToFocusOnShow(this.applicationInput);
+        this.marketAppsTreeGrid.setNodesFilter(this.filterNodes.bind(this));
+    }
+
+    protected initListeners() {
+        super.initListeners();
+
         this.applicationInput.onTextValueChanged(() => {
             this.clearButton.toggleClass('hidden', api.util.StringHelper.isEmpty(this.applicationInput.getValue()));
             this.marketAppsTreeGrid.refresh();
@@ -95,11 +101,17 @@ export class InstallAppDialog
             this.notifyResize();
         });
 
+        this.clearButton.onClicked(() => {
+            this.applicationInput.reset();
+            this.marketAppsTreeGrid.refresh();
+            this.clearButton.addClass('hidden');
+            this.applicationInput.getTextInput().giveFocus();
+        });
+
         this.initUploaderListeners();
         this.initDragAndDropUploaderEvents();
 
         this.onShown(() => {
-            this.applicationInput.giveFocus();
             this.clearButton.addClass('hidden');
         });
     }
@@ -113,6 +125,9 @@ export class InstallAppDialog
             this.dropzoneContainer.hide();
             this.appendChild(this.dropzoneContainer);
 
+            this.getBody().addClass('mask-wrapper');
+
+            this.clearButton.addClass('clear-button hidden');
             this.applicationInput.appendChild(this.clearButton);
             this.applicationInput.getUploader().addDropzone(this.dropzoneContainer.getDropzone().getId());
 
@@ -124,18 +139,6 @@ export class InstallAppDialog
 
             return rendered;
         });
-    }
-
-    public createClearFilterButton(): api.dom.ButtonEl {
-        const clearButton = new api.dom.ButtonEl();
-        clearButton.addClass('clear-button hidden');
-        clearButton.onClicked(() => {
-            this.applicationInput.reset();
-            this.marketAppsTreeGrid.refresh();
-            clearButton.addClass('hidden');
-            this.applicationInput.getTextInput().giveFocus();
-        });
-        return clearButton;
     }
 
     // in order to toggle appropriate handlers during drag event
