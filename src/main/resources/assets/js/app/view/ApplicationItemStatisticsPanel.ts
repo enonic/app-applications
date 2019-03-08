@@ -78,7 +78,7 @@ export class ApplicationItemStatisticsPanel
         const modifiedTime = currentApplication.getModifiedTime();
 
         if (modifiedTime) {
-            infoGroup.addDataList(i18n('field.installed'), DateTimeFormatter.createHtml(modifiedTime));
+            infoGroup.addDataList(i18n('status.installed'), DateTimeFormatter.createHtml(modifiedTime));
         }
         infoGroup.addDataList(i18n('field.version'), currentApplication.getVersion());
         infoGroup.addDataList(i18n('field.key'), currentApplication.getApplicationKey().toString());
