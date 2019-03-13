@@ -1,19 +1,21 @@
 import ApplicationResourceRequest = api.application.ApplicationResourceRequest;
 import ApplicationKey = api.application.ApplicationKey;
 
-export class StartApplicationRequest
+export class ApplicationActionRequest
     extends ApplicationResourceRequest<void, void> {
 
     private applicationKeys: ApplicationKey[];
+    private action: string;
 
-    constructor(applicationKeys: ApplicationKey[]) {
+    constructor(applicationKeys: ApplicationKey[], action: string) {
         super();
         super.setMethod('POST');
         this.applicationKeys = applicationKeys;
+        this.action = action;
     }
 
     getRequestPath(): api.rest.Path {
-        return api.rest.Path.fromParent(super.getResourcePath(), 'start');
+        return api.rest.Path.fromParent(super.getResourcePath(), this.action);
     }
 
     getParams(): Object {
@@ -23,8 +25,11 @@ export class StartApplicationRequest
     }
 
     sendAndParse(): wemQ.Promise<void> {
-        this.send();
 
-        return wemQ<void>(null);
+        const result = wemQ.defer<void>();
+
+        this.send().catch(e => result.reject(e));
+
+        return result.promise;
     }
 }

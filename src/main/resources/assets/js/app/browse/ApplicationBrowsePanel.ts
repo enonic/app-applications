@@ -6,9 +6,7 @@ import {StopApplicationEvent} from './StopApplicationEvent';
 import {StartApplicationEvent} from './StartApplicationEvent';
 import {UninstallApplicationEvent} from './UninstallApplicationEvent';
 import {ApplicationUploadStartedEvent} from './ApplicationUploadStartedEvent';
-import {UninstallApplicationRequest} from '../resource/UninstallApplicationRequest';
-import {StopApplicationRequest} from '../resource/StopApplicationRequest';
-import {StartApplicationRequest} from '../resource/StartApplicationRequest';
+import {ApplicationActionRequest} from '../resource/ApplicationActionRequest';
 import ApplicationKey = api.application.ApplicationKey;
 import Application = api.application.Application;
 import TreeNode = api.ui.treegrid.TreeNode;
@@ -72,21 +70,20 @@ export class ApplicationBrowsePanel extends api.app.browse.BrowsePanel<Applicati
         return browseItems;
     }
 
+    private sendApplicationActionRequest(action: string, applications: Application[]) {
+        const applicationKeys = ApplicationKey.fromApplications(applications);
+        new ApplicationActionRequest(applicationKeys, action)
+            .sendAndParse()
+            .catch(error => api.DefaultErrorHandler.handle(error)).done();
+    }
+
     private registerEvents() {
-        StopApplicationEvent.on((event: StopApplicationEvent) => {
-            let applicationKeys = ApplicationKey.fromApplications(event.getApplications());
-            new StopApplicationRequest(applicationKeys).sendAndParse().done();
-        });
-
-        StartApplicationEvent.on((event: StartApplicationEvent) => {
-            let applicationKeys = ApplicationKey.fromApplications(event.getApplications());
-            new StartApplicationRequest(applicationKeys).sendAndParse().done();
-        });
-
-        UninstallApplicationEvent.on((event: UninstallApplicationEvent) => {
-            let applicationKeys = ApplicationKey.fromClusterApplications(event.getApplications());
-            new UninstallApplicationRequest(applicationKeys).sendAndParse().done();
-        });
+        StopApplicationEvent.on((event: StopApplicationEvent) =>
+            this.sendApplicationActionRequest('stop', event.getApplications()));
+        StartApplicationEvent.on((event: StartApplicationEvent) =>
+            this.sendApplicationActionRequest('start', event.getApplications()));
+        UninstallApplicationEvent.on((event: UninstallApplicationEvent) =>
+            this.sendApplicationActionRequest('uninstall', event.getApplications()));
 
         ApplicationEvent.on((event: ApplicationEvent) => {
             if (event.isSystemApplication()) {
