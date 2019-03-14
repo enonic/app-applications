@@ -14,6 +14,8 @@ import ResponsiveRanges = api.ui.responsive.ResponsiveRanges;
 
 export class ApplicationTreeGrid extends TreeGrid<Application> {
 
+    private uploadCounter: number;
+
     constructor() {
         const builder = new TreeGridBuilder<Application>().setColumnConfig([{
                 name: i18n('field.name'),
@@ -74,6 +76,8 @@ export class ApplicationTreeGrid extends TreeGrid<Application> {
         super(builder);
 
         this.setContextMenu(new TreeGridContextMenu(ApplicationBrowseActions.init(this)));
+
+        this.uploadCounter = 0;
     }
 
     getDataId(data: Application): string {
@@ -158,7 +162,12 @@ export class ApplicationTreeGrid extends TreeGrid<Application> {
     placeApplicationNode(applicationKey: api.application.ApplicationKey): wemQ.Promise<void> {
         return this.fetchByKey(applicationKey)
             .then((data: api.application.Application) => {
-                return this.placeNode(data);
+                const nodePromise = this.placeNode(data);
+
+                const node = this.getRoot().getCurrentRoot().findNode(data.getId());
+                this.getRowByNode(node).addClass('uploaded');
+
+                return nodePromise;
             });
     }
 
@@ -170,19 +179,31 @@ export class ApplicationTreeGrid extends TreeGrid<Application> {
         });
     }
 
+    private toggleUploadClass() {
+        this.getGrid().toggleClass('uploading', this.uploadCounter > 0);
+    }
+
     appendUploadNode(item: api.ui.uploader.UploadItem<Application>) {
 
         let appMock: ApplicationUploadMock = new ApplicationUploadMock(item);
+        let appMockNode;
 
-        this.appendNode(<any>appMock, false).done();
+        this.appendNode(<any>appMock, false).then(() => {
+            appMockNode = this.getRoot().getCurrentRoot().findNode(item.getId());
+        }).done();
+
+        this.uploadCounter++;
+        this.toggleUploadClass();
 
         let deleteUploadedNodeHandler = () => {
-            let nodeToRemove = this.getRoot().getCurrentRoot().findNode(item.getId());
-            if (nodeToRemove) {
-                this.deleteNode(nodeToRemove.getData());
+            //let nodeToRemove = this.getRoot().getCurrentRoot().findNode(item.getId());
+            if (appMockNode) {
+                this.deleteNode(appMockNode.getData());
                 this.invalidate();
                 this.triggerSelectionChangedListeners();
             }
+            this.uploadCounter--;
+            this.toggleUploadClass();
         };
 
         item.onProgress(() => {
@@ -193,10 +214,7 @@ export class ApplicationTreeGrid extends TreeGrid<Application> {
 
         item.onUploadStopped(deleteUploadedNodeHandler);
 
-        item.onFailed(() => {
-            this.deleteNode(<any>appMock);
-            this.triggerSelectionChangedListeners();
-        });
+        item.onFailed(deleteUploadedNodeHandler);
     }
 
 }

@@ -14,6 +14,7 @@ import BrowseItem = api.app.browse.BrowseItem;
 import ApplicationEvent = api.application.ApplicationEvent;
 import ApplicationEventType = api.application.ApplicationEventType;
 import ServerEventsConnection = api.event.ServerEventsConnection;
+import ApplicationUploadMock = api.application.ApplicationUploadMock;
 import i18n = api.util.i18n;
 
 export class ApplicationBrowsePanel extends api.app.browse.BrowsePanel<Application> {
@@ -41,12 +42,23 @@ export class ApplicationBrowsePanel extends api.app.browse.BrowsePanel<Applicati
     }
 
     treeNodeToBrowseItem(node: TreeNode<Application>): BrowseItem<Application>|null {
-        const data = node ? node.getData() : null;
-        return !data ? null : <BrowseItem<Application>>new BrowseItem<Application>(data)
-            .setId(data.getId())
-            .setDisplayName(data.getDisplayName())
-            .setPath(data.getName())
-            .setIconUrl(data.getIconUrl());
+
+        if (!node || !node.getData()) {
+            return null;
+        }
+
+        const nodeData = node.getData();
+        const browseItem =
+            <BrowseItem<Application>>new BrowseItem<Application>(nodeData)
+            .setId(nodeData.getId())
+            .setDisplayName(nodeData.getDisplayName())
+            .setPath(nodeData.getName());
+
+        if (!api.ObjectHelper.iFrameSafeInstanceOf(nodeData, ApplicationUploadMock)) {
+            browseItem.setIconUrl(nodeData.getIconUrl());
+        }
+
+        return browseItem;
     }
 
     treeNodesToBrowseItems(nodes: TreeNode<Application>[]): BrowseItem<Application>[] {
