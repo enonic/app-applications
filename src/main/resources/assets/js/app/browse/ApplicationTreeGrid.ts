@@ -16,22 +16,22 @@ export class ApplicationTreeGrid extends TreeGrid<Application> {
 
     constructor() {
         const builder = new TreeGridBuilder<Application>().setColumnConfig([{
-                name: i18n('field.name'),
-                id: 'displayName',
-                field: 'displayName',
-                formatter: ApplicationRowFormatter.nameFormatter,
-                style: {minWidth: 250}
-            }, {
-                name: i18n('field.version'),
-                id: 'version',
-                field: 'version',
-                style: {cssClass: 'version', minWidth: 50, maxWidth: 130}
-            }, {
-                name: i18n('field.state'),
-                id: 'state',
-                field: 'state',
-                formatter: ApplicationRowFormatter.stateFormatter,
-                style: {cssClass: 'state', minWidth: 80, maxWidth: 100}
+            name: i18n('field.name'),
+            id: 'displayName',
+            field: 'displayName',
+            formatter: ApplicationRowFormatter.nameFormatter,
+            style: {minWidth: 250}
+        }, {
+            name: i18n('field.version'),
+            id: 'version',
+            field: 'version',
+            style: {cssClass: 'version', minWidth: 50, maxWidth: 130}
+        }, {
+            name: i18n('field.state'),
+            id: 'state',
+            field: 'state',
+            formatter: ApplicationRowFormatter.stateFormatter,
+            style: {cssClass: 'state', minWidth: 80, maxWidth: 100}
         }]).prependClasses('application-grid');
 
         const columns = builder.getColumns().slice(0);
@@ -185,11 +185,12 @@ export class ApplicationTreeGrid extends TreeGrid<Application> {
             }
         };
 
-        item.onProgress(() => {
+        item.onProgress((progress: number) => {
             this.invalidate();
+            if (progress === 100) {
+                deleteUploadedNodeHandler();
+            }
         });
-
-        item.onUploaded(deleteUploadedNodeHandler);
 
         item.onUploadStopped(deleteUploadedNodeHandler);
 
