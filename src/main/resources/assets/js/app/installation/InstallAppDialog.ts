@@ -98,6 +98,7 @@ export class InstallAppDialog
                 this.statusMessage.removeClass('empty');
             }
             this.statusMessage.addClass('loaded');
+            this.removeClass('loading');
             this.notifyResize();
         });
 
@@ -212,6 +213,7 @@ export class InstallAppDialog
         if (this.statusMessage) {
             this.statusMessage.removeClass('failed loaded');
             this.statusMessage.setHtml(i18n('market.loadAppList'));
+            this.addClass('loading');
         }
     }
 
