@@ -20,14 +20,14 @@ describe('Install app dialog, search input spec.', function () {
         () => {
             return appBrowsePanel.clickOnInstallButton().then(() => {
                 return dialog.waitForOpened();
-            }).pause(1000).then(() => {
+            }).then(() => {
                 return dialog.typeSearchTextAndEnter(not_existing);
             }).then(() => {
                 return dialog.getErrorValidationMessage();
             }).then(message => {
                 console.log("Install app Dialog########### notification message :" + message);
                 studioUtils.saveScreenshot("url_not_exist");
-                assert.isTrue(message.includes('Failed to process application from'), 'correct notification message should appear');
+                assert.isTrue(message.includes('Failed to process application from'), 'expected notification message should appear');
             });
         });
 
@@ -48,7 +48,7 @@ describe('Install app dialog, search input spec.', function () {
         () => {
             return appBrowsePanel.clickOnInstallButton().then(() => {
                 return dialog.waitForOpened();
-            }).pause(1000).then(() => {
+            }).then(() => {
                 return dialog.typeSearchTextAndEnter(correct_url);
             }).then(() => {
                 return dialog.waitForClosed(20000);

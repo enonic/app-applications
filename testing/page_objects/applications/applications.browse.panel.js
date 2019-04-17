@@ -279,7 +279,7 @@ module.exports = Object.create(page, {
             const nameXpath = XPath.rowByName(name);
             return this.waitForVisible(nameXpath, 2000).then(() => {
                 return this.doClick(nameXpath);
-            }).pause(400).catch(() => {
+            }).pause(500).catch(() => {
                 this.saveScreenshot(`err_find_${name}`);
                 throw Error(`Row with the name ${name} was not found.`)
             })

@@ -1,10 +1,11 @@
 const page = require('../page');
 const elements = require('../../libs/elements');
+const appConst = require('../../libs/app_const');
 const dialog = {
     container: `//div[contains(@id,'UninstallApplicationDialog')]`,
     content: `//div[contains(@id,'ModalDialogContentPanel')]/h6`,
     yesButton: `//button[contains(@id,'DialogButton')]/span[text()='Yes']`,
-    noButton: `//button[contains(@id,'DialogButton')]/span[text()='No']`
+    noButton: `//button[contains(@id,'DialogButton')]/span[text()='No']`,
 };
 const uninstallAppDialog = Object.create(page, {
 
@@ -66,5 +67,22 @@ const uninstallAppDialog = Object.create(page, {
             });
         }
     },
+    isYesButtonDisplayed: {
+        value: function () {
+            return this.isVisible(this.yesButton, appConst.TIMEOUT_2).catch(err => {
+                this.saveScreenshot('err_uninstall_dialog_yes_button');
+                throw new Error('Uninstall Dialog Yes button is not visible ' + err);
+            });
+        }
+    },
+    isNoButtonDisplayed: {
+        value: function () {
+            return this.isVisible(this.noButton, appConst.TIMEOUT_2).catch(err => {
+                this.saveScreenshot('err_uninstall_dialog_no_button');
+                throw new Error('Uninstall Dialog No button is not visible ' + err);
+            });
+        }
+    },
+
 });
 module.exports = uninstallAppDialog;

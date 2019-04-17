@@ -16,23 +16,27 @@ describe('Uninstall Application Dialog specification', function () {
             return uninstallAppDialog.getDialogMessage();
         }).then(dialogMessage => {
             assert.isTrue(dialogMessage == 'Are you sure you want to uninstall selected application(s)?',
-                'Correct message should be in the dialog message');
+                'Expected message should be in the dialog message');
         });
     });
 
-    it(`'Yes' button should be enabled`, () => {
+    it(`'Yes' and 'No' and Cancel-top buttons should be visible`, () => {
         return openUninstallDialog().then(() => {
-            appBrowsePanel.isVisible(uninstallAppDialog.yesButton).then((result) => {
-                assert.isTrue(result);
-            });
+            return uninstallAppDialog.isYesButtonDisplayed();
+        }).then(result => {
+            assert.isTrue(result, "Yes button should be visible");
+        }).then(() => {
+            return uninstallAppDialog.isNoButtonDisplayed();
+        }).then(result => {
+            assert.isTrue(result, "No button should be visible");
         });
     });
 
-    it(`'No' button should be enabled`, () => {
+    it(`'GIVEN uninstall dialog is opened WHEN Cancel-top button has been pressed THEN modal dialog closes`, () => {
         return openUninstallDialog().then(() => {
-            appBrowsePanel.isVisible(uninstallAppDialog.noButton).then((result) => {
-                assert.isTrue(result);
-            });
+            return uninstallAppDialog.clickOnCancelButtonTop();
+        }).then(() => {
+            return uninstallAppDialog.waitForClosed();
         });
     });
 
@@ -49,10 +53,9 @@ describe('Uninstall Application Dialog specification', function () {
 
     beforeEach(() => studioUtils.navigateToApplicationsApp());
     afterEach(() => studioUtils.doCloseCurrentBrowserTab());
-    before(()=> {
+    before(() => {
         return console.log('specification is starting: ' + this.title);
-    });
-
+    })
 });
 
 function openUninstallDialog() {
@@ -66,7 +69,7 @@ function openUninstallDialog() {
             }
         }).then(() => {
             return appBrowsePanel.clickOnRowByName(chuckName);
-        }).pause(1000).then(() => {
+        }).then(() => {
             return appBrowsePanel.clickOnUninstallButton();
         }).then(() => {
             return uninstallAppDialog.waitForOpened();

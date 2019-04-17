@@ -12,9 +12,9 @@ describe('Application Browse Panel, check buttons on the toolbar', function () {
     this.timeout(70000);
     webDriverHelper.setupBrowser();
 
-    const appDisplayName1 = 'xpDoctor';
+    const appDisplayName1 = 'Live Trace';
     const appDisplayName2 = 'Chuck Norris';
-    const appDescription1 = 'Analyze and repair data';
+    const appDescription1 = 'Live Trace application for Enonic XP';
     const appDescription2 = 'A Chuck Norris fact widget';
 
     it('WHEN app browse panel is loaded  AND no selections THEN only `Install` button should be enabled', () => {

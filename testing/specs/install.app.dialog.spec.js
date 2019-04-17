@@ -19,15 +19,15 @@ describe('Install Application Dialog specification', function () {
     const appName = 'Chuck Norris';
 
     it('SHOULD show install app dialog WHEN Install button has been clicked', () => {
-        return appBrowsePanel.clickOnInstallButton().pause(2000).then(() => {
+        return appBrowsePanel.clickOnInstallButton().then(() => {
             return dialog.waitForOpened();
         }).then(() => {
             return dialog.waitForSpinnerNotVisible(3000);
         }).then(() => {
             return dialog.getPlaceholderMessage();
         }).then(placeholder => {
-            assert.isTrue(placeholder == 'Search Enonic Market, paste url or upload directly',
-                'Correct message should be in the placeholder');
+            assert.equal(placeholder, 'Search Enonic Market, paste url or upload directly',
+                'expected message should be in the placeholder');
         }).then(() => {
             studioUtils.saveScreenshot("install_dialog_default_focus");
             return dialog.hasDefaultFocus();
