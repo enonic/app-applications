@@ -80,7 +80,13 @@ Page.prototype.doRightClick = function (selector) {
 };
 
 Page.prototype.typeTextInInput = function (selector, text) {
-    return this.getBrowser().setValue(selector, text).catch((err) => {
+    return this.getBrowser().setValue(selector, text).then(() => {
+        return this.getTextFromInput(selector).then(result => {
+            if (result !== text) {
+                return this.getBrowser().setValue(selector, text);
+            }
+        })
+    }).catch(err => {
         throw new Error('text was not set in the input ' + err);
     })
 };
