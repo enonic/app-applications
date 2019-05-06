@@ -12,7 +12,7 @@ describe('Install app dialog, search input spec.', function () {
     this.timeout(appConst.SUITE_TIMEOUT);
     webDriverHelper.setupBrowser();
     const not_existing = 'http://test.com';
-    const correct_url = 'http://repo.enonic.com/public/com/enonic/app/contentviewer/1.4.0/contentviewer-1.4.0.jar';
+    const correct_url = 'https://repo.enonic.com/public/com/enonic/app/contentviewer/1.4.0/contentviewer-1.4.0.jar';
 
     const local_file = "file:c:/";
 
