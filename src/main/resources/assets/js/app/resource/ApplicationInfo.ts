@@ -134,4 +134,9 @@ export class ApplicationInfo {
     getDeployment(): ApplicationDeployment {
         return this.deployment;
     }
+
+    getDeploymentUrl(): string {
+        const url = this.deployment.url;
+        return url.substr(-1) === '/' ? url : url + '/';
+    }
 }

@@ -212,7 +212,7 @@ export class ApplicationItemStatisticsPanel
         if (!StringHelper.isBlank(applicationInfo.getDeployment().url)) {
             const deploymentGroup = new ItemDataGroup(i18n('field.webApp'), 'deployment');
             deploymentGroup.addDataElements(i18n('field.deployment'),
-                [new AEl().setUrl(applicationInfo.getDeployment().url, '_blank').setHtml(applicationInfo.getDeployment().url)]);
+                [new AEl().setUrl(applicationInfo.getDeploymentUrl(), '_blank').setHtml(applicationInfo.getDeploymentUrl())]);
 
             return deploymentGroup;
         }
