@@ -11,6 +11,7 @@ import MarketApplication = api.application.MarketApplication;
 import UploadFailedEvent = api.ui.uploader.UploadFailedEvent;
 import UploadStartedEvent = api.ui.uploader.UploadStartedEvent;
 import ButtonEl = api.dom.ButtonEl;
+import StringHelper = api.util.StringHelper;
 
 export class InstallAppDialog
     extends api.ui.dialog.ModalDialog {
@@ -19,7 +20,7 @@ export class InstallAppDialog
 
     private applicationInput: ApplicationInput;
 
-    private statusMessage: api.dom.DivEl;
+    private statusMessage: StatusMessage;
 
     private clearButton: ButtonEl;
 
@@ -28,14 +29,14 @@ export class InstallAppDialog
     constructor() {
         super({
             title: i18n('dialog.install'),
-            class: 'install-application-dialog hidden'
+            class: 'install-application-dialog'
         });
     }
 
     protected initElements() {
         super.initElements();
 
-        this.statusMessage = new api.dom.DivEl('status-message');
+        this.statusMessage = new StatusMessage();
 
         this.applicationInput = new ApplicationInput(this.getCancelAction(), 'large').setPlaceholder(i18n('dialog.install.search'));
 
@@ -44,7 +45,6 @@ export class InstallAppDialog
         this.dropzoneContainer = new api.ui.uploader.DropzoneContainer(true);
 
         this.marketAppsTreeGrid = new MarketAppsTreeGrid();
-
     }
 
     protected postInitElements() {
@@ -58,7 +58,7 @@ export class InstallAppDialog
         super.initListeners();
 
         this.applicationInput.onTextValueChanged(() => {
-            this.clearButton.toggleClass('hidden', api.util.StringHelper.isEmpty(this.applicationInput.getValue()));
+            this.clearButton.setVisible(!StringHelper.isEmpty(this.applicationInput.getValue()));
             this.marketAppsTreeGrid.refresh();
         });
 
@@ -70,42 +70,45 @@ export class InstallAppDialog
         });
         this.applicationInput.onAppInstallStarted(() => {
             this.marketAppsTreeGrid.mask();
+            this.statusMessage.showInstalling();
         });
 
         this.applicationInput.onAppInstallFinished(() => {
-            this.clearButton.toggleClass('hidden', api.util.StringHelper.isEmpty(this.applicationInput.getValue()));
+            this.clearButton.setVisible(!StringHelper.isEmpty(this.applicationInput.getValue()));
             this.marketAppsTreeGrid.unmask();
         });
 
         this.applicationInput.onAppInstallFailed((message: string) => {
-            this.clearButton.toggleClass('hidden', api.util.StringHelper.isEmpty(this.applicationInput.getValue()));
+            this.clearButton.setVisible(!StringHelper.isEmpty(this.applicationInput.getValue()));
 
             this.marketAppsTreeGrid.invalidate();
             this.marketAppsTreeGrid.initData([]);
             this.marketAppsTreeGrid.unmask();
 
-            this.statusMessage.addClass('empty failed');
-            this.statusMessage.setHtml(message);
+            this.statusMessage.showFailed(message);
         });
 
         this.marketAppsTreeGrid.onLoaded(() => {
-            this.refreshStatusMessage();
+            this.statusMessage.reset();
 
-            if (this.marketAppsTreeGrid.getGrid().getDataView().getLength() === 0) {
-                this.statusMessage.addClass('empty');
-                this.statusMessage.setHtml(i18n('market.noAppsFound'));
+            if (this.marketAppsTreeGrid.isDataViewEmpty()) {
+                this.statusMessage.showNoResult();
             } else {
-                this.statusMessage.removeClass('empty');
+                this.statusMessage.hide();
             }
-            this.statusMessage.addClass('loaded');
             this.removeClass('loading');
             this.notifyResize();
+        });
+
+        this.marketAppsTreeGrid.onLoadingStarted(() => {
+            this.addClass('loading');
+            this.statusMessage.showLoading();
         });
 
         this.clearButton.onClicked(() => {
             this.applicationInput.reset();
             this.marketAppsTreeGrid.refresh();
-            this.clearButton.addClass('hidden');
+            this.clearButton.hide();
             this.applicationInput.getTextInput().giveFocus();
         });
 
@@ -113,7 +116,7 @@ export class InstallAppDialog
         this.initDragAndDropUploaderEvents();
 
         this.onShown(() => {
-            this.clearButton.addClass('hidden');
+            this.clearButton.hide();
         });
     }
 
@@ -128,7 +131,7 @@ export class InstallAppDialog
 
             this.getBody().addClass('mask-wrapper');
 
-            this.clearButton.addClass('clear-button hidden');
+            this.clearButton.addClass('clear-button');
             this.applicationInput.appendChild(this.clearButton);
             this.applicationInput.getUploader().addDropzone(this.dropzoneContainer.getDropzone().getId());
 
@@ -182,19 +185,13 @@ export class InstallAppDialog
 
     show() {
         this.resetFileInputWithUploader();
-        this.removeClass('hidden');
-
         super.show();
-
-        this.refreshStatusMessage();
+        this.statusMessage.reset();
     }
 
     hide() {
         super.hide();
-
-        this.refreshStatusMessage();
-        this.addClass('hidden');
-        this.removeClass('animated');
+        this.statusMessage.reset();
         this.applicationInput.reset();
     }
 
@@ -206,14 +203,6 @@ export class InstallAppDialog
     private resetFileInputWithUploader() {
         if (this.applicationInput) {
             this.applicationInput.reset();
-        }
-    }
-
-    private refreshStatusMessage() {
-        if (this.statusMessage) {
-            this.statusMessage.removeClass('failed loaded');
-            this.statusMessage.setHtml(i18n('market.loadAppList'));
-            this.addClass('loading');
         }
     }
 
@@ -237,5 +226,38 @@ export class InstallAppDialog
     private appHasFilterEntry(app: MarketApplication): boolean {
         return this.applicationInput.hasMatchInEntry(app.getDisplayName()) ||
                this.applicationInput.hasMatchInEntry(app.getDescription());
+    }
+}
+
+class StatusMessage
+    extends DivEl {
+
+    constructor() {
+        super('status-message');
+    }
+
+    showLoading() {
+        this.show();
+        this.setHtml(i18n('market.loadAppList'));
+    }
+
+    showInstalling() {
+        this.removeClass('failed');
+        this.setHtml(i18n('market.installingApp'));
+    }
+
+    showNoResult() {
+        this.show();
+        this.setHtml(i18n('market.noAppsFound'));
+    }
+
+    showFailed(message: string) {
+        this.show();
+        this.addClass('failed');
+        this.setHtml(message);
+    }
+
+    reset() {
+        this.removeClass('failed');
     }
 }

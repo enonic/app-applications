@@ -31,6 +31,8 @@ export class MarketAppsTreeGrid extends TreeGrid<MarketApplication> {
 
     private nodesFilter: (nodes: TreeNode<MarketApplication>[]) => TreeNode<MarketApplication>[];
 
+    private loadingStartedListeners: { (): void; }[];
+
     constructor() {
 
         let nameColumn = new GridColumnBuilder<TreeNode<MarketApplication>>()
@@ -76,6 +78,7 @@ export class MarketAppsTreeGrid extends TreeGrid<MarketApplication> {
         );
 
         this.installedApplications = [];
+        this.loadingStartedListeners = [];
         this.gridDataLoaded = false;
 
         this.subscribeAndManageInstallClick();
@@ -308,6 +311,7 @@ export class MarketAppsTreeGrid extends TreeGrid<MarketApplication> {
     }
 
     fetchChildren(): wemQ.Promise<MarketApplication[]> {
+        this.notifyLoadingStarted();
         this.hideErrorPanelIfVisible();
 
         return MarketApplicationFetcher.fetchApps(CONFIG.xpVersion).then((data: MarketApplicationResponse) => {
@@ -376,5 +380,25 @@ export class MarketAppsTreeGrid extends TreeGrid<MarketApplication> {
 
     setNodesFilter(filterFunc: (nodes: TreeNode<MarketApplication>[]) => TreeNode<MarketApplication>[]) {
         this.nodesFilter = filterFunc;
+    }
+
+    isDataViewEmpty(): boolean {
+        return this.getGrid().getDataView().getLength() === 0;
+    }
+
+    onLoadingStarted(listener: () => void) {
+        this.loadingStartedListeners.push(listener);
+    }
+
+    unLoadingStarted(listener: () => void) {
+        this.loadingStartedListeners = this.loadingStartedListeners.filter((curr) => {
+            return listener !== curr;
+        });
+    }
+
+    private notifyLoadingStarted() {
+        this.loadingStartedListeners.forEach((listener) => {
+            listener();
+        });
     }
 }
