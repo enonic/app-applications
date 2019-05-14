@@ -1,7 +1,6 @@
 /**
  * Created on 02.12.2017.
  */
-
 module.exports = Object.freeze({
     FORM_VIEW:`//div[contains(@id,'FormView')]`,
     CONTENT_SELECTOR:"//div[contains(@id,'ContentSelector')]",
@@ -14,17 +13,15 @@ module.exports = Object.freeze({
     TEXT_INPUT: "//input[contains(@id,'TextInput')]",
     DROP_DOWN_HANDLE: "//button[contains(@id,'DropdownHandle')]",
     GRID_CANVAS: `//div[@class='grid-canvas']`,
-    slickRowSelectedByDisplayName: function (container, displayName) {
-        return `${container}//div[@class='slick-viewport']//div[contains(@class,'slick-row') and contains(@class,'selected') and descendant::h6[contains(@class,'main-name') and contains(.,'${displayName}')]]`;
-    },
+
     slickRowByDisplayName: function (container, displayName) {
         return `${container}//div[@class='slick-viewport']//div[contains(@class,'slick-row') and descendant::h6[contains(@class,'main-name') and contains(.,'${displayName}')]]`;
     },
     itemByDisplayName: function (displayName) {
         return `//div[contains(@id,'NamesView') and child::h6[contains(@class,'main-name') and contains(.,'${displayName}')]]`
     },
-    itemByName: function (name) {
-        return ` //div[contains(@id,'NamesView') and child::p[contains(@class,'sub-name') and contains(.,'${name}')]]`
+    appByDescription: function (description) {
+        return ` //div[contains(@id,'NamesView') and child::p[contains(@class,'sub-name') and contains(.,'${description}')]]`
     },
     tabItemByDisplayName: function (displayName) {
         return `//li[contains(@id,'AppBarTabMenuItem') and descendant::a[contains(.,'${displayName}')]]`

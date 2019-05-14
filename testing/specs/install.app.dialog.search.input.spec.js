@@ -2,8 +2,8 @@ const chai = require('chai');
 const expect = chai.expect;
 const assert = chai.assert;
 const webDriverHelper = require('../libs/WebDriverHelper');
-const appBrowsePanel = require('../page_objects/applications/applications.browse.panel');
-const dialog = require('../page_objects/applications/install.app.dialog');
+const AppBrowsePanel = require('../page_objects/applications/applications.browse.panel');
+const InstallDialog = require('../page_objects/applications/install.app.dialog');
 const studioUtils = require('../libs/studio.utils.js');
 const appConst = require('../libs/app_const');
 
@@ -18,14 +18,15 @@ describe('Install app dialog, search input spec.', function () {
 
     it(`GIVEN 'install app' dialog is opened WHEN not existing URL has been typed THEN correct validation message should appear`,
         () => {
+            let appBrowsePanel = new AppBrowsePanel();
+            let installDialog = new InstallDialog();
             return appBrowsePanel.clickOnInstallButton().then(() => {
-                return dialog.waitForOpened();
+                return installDialog.waitForOpened();
             }).then(() => {
-                return dialog.typeSearchTextAndEnter(not_existing);
+                return installDialog.typeSearchTextAndEnter(not_existing);
             }).then(() => {
-                return dialog.getErrorValidationMessage();
+                return installDialog.getErrorValidationMessage();
             }).then(message => {
-                console.log("Install app Dialog########### notification message :" + message);
                 studioUtils.saveScreenshot("url_not_exist");
                 assert.isTrue(message.includes('Failed to process application from'), 'expected notification message should appear');
             });
@@ -33,12 +34,14 @@ describe('Install app dialog, search input spec.', function () {
 
     it(`GIVEN 'install app' dialog is opened WHEN path to local file has been typed THEN correct search-status message should appear`,
         () => {
+            let appBrowsePanel = new AppBrowsePanel();
+            let installDialog = new InstallDialog();
             return appBrowsePanel.clickOnInstallButton().then(() => {
-                return dialog.waitForOpened();
+                return installDialog.waitForOpened();
             }).then(() => {
-                return dialog.typeSearchTextAndEnter(local_file);
+                return installDialog.typeSearchTextAndEnter(local_file);
             }).then(() => {
-                return dialog.applicationNotFoundMessage();
+                return installDialog.applicationNotFoundMessage();
             }).then(message => {
                 studioUtils.saveScreenshot("app_not_found");
                 assert.isTrue(message.includes('No applications found'), 'correct search-status message should appear');
@@ -46,18 +49,20 @@ describe('Install app dialog, search input spec.', function () {
         });
     it(`GIVEN 'install app' dialog is opened WHEN actual URL has been typed and 'Enter' key pressed THEN application should be installed`,
         () => {
+            let appBrowsePanel = new AppBrowsePanel();
+            let installDialog = new InstallDialog();
             return appBrowsePanel.clickOnInstallButton().then(() => {
-                return dialog.waitForOpened();
+                return installDialog.waitForOpened();
             }).then(() => {
-                return dialog.typeSearchTextAndEnter(correct_url);
+                return installDialog.typeSearchTextAndEnter(correct_url);
             }).then(() => {
-                return dialog.waitForClosed(20000);
+                return installDialog.waitForClosed(25000);
             }).then(() => {
-                return dialog.waitForNotificationMessage();
+                return installDialog.waitForNotificationMessage();
             }).then(message => {
                 studioUtils.saveScreenshot("app_url_installed");
                 assert.isTrue(message.includes('Application \'Content Viewer App\' installed successfully'),
-                    'correct notification message should appear');
+                    'expected notification message should appear');
             });
         });
 

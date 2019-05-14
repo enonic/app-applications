@@ -5,8 +5,8 @@ const assert = chai.assert;
 const webDriverHelper = require('../libs/WebDriverHelper');
 const appConst = require('../libs/app_const');
 const studioUtils = require('../libs/studio.utils.js');
-const appBrowsePanel = require('../page_objects/applications/applications.browse.panel');
-const appStatisticPanel = require('../page_objects/applications/application.item.statistic.panel');
+const AppBrowsePanel = require('../page_objects/applications/applications.browse.panel');
+const AppStatisticPanel = require('../page_objects/applications/application.item.statistic.panel');
 
 describe('Applications Browse panel - selection of items spec', function () {
     this.timeout(appConst.SUITE_TIMEOUT);
@@ -14,36 +14,39 @@ describe('Applications Browse panel - selection of items spec', function () {
     //Content Studio should not be installed!
     const TOTAL_NUMBER_OF_APPLICATIONS = 5;
 
-    it(`GIVEN applications grid is loaded THEN correct page-title should be displayed`, () => {
-        return appBrowsePanel.getTitle().then((title)=> {
-            studioUtils.saveScreenshot("app_browse_title");
+    it(`GIVEN applications grid is loaded THEN expected page-title should be displayed`, () => {
+        let appBrowsePanel = new AppBrowsePanel();
+        return appBrowsePanel.getTitle().then(title => {
             expect(title).to.equal(appConst.APPLICATION_TITLE);
         })
     });
 
     it(`WHEN 'selection controller'-checkbox has been clicked THEN all rows in grid should be selected`, () => {
-        return appBrowsePanel.clickOnSelectionControllerCheckbox().then(()=> {
+        let appBrowsePanel = new AppBrowsePanel();
+        return appBrowsePanel.clickOnSelectionControllerCheckbox().then(() => {
             studioUtils.saveScreenshot("selection_controller_checked");
             return appBrowsePanel.getNumberOfSelectedRows();
-        }).then(result=> {
+        }).then(result => {
             assert.equal(result, TOTAL_NUMBER_OF_APPLICATIONS, 'all applications should be selected');
         })
     });
 
     it(`GIVEN all applications are selected WHEN 'selection controller'-checkbox has been clicked THEN all rows in grid should be white`,
         () => {
-            return appBrowsePanel.clickOnSelectionControllerCheckbox().pause(1000).then(()=> {
+            let appBrowsePanel = new AppBrowsePanel();
+            return appBrowsePanel.clickOnSelectionControllerCheckbox().then(() => {
                 return appBrowsePanel.clickOnSelectionControllerCheckbox();
-            }).then(()=> {
+            }).then(() => {
                 studioUtils.saveScreenshot("selection_controller_unchecked");
                 return appBrowsePanel.getNumberOfSelectedRows();
-            }).then(result=> {
+            }).then(result => {
                 assert.equal(result, 0, 'all applications should be unselected');
             })
         });
 
     it(`WHEN applications grid is loaded THEN rows with applications should be present in the grid`, () => {
-        return appBrowsePanel.getApplicationDisplayNames().then(result=> {
+        let appBrowsePanel = new AppBrowsePanel();
+        return appBrowsePanel.getApplicationDisplayNames().then(result => {
             studioUtils.saveScreenshot("app_browse_application");
             assert.isTrue(result.length > 0, 'rows with applications should be present in the grid')
         })
@@ -51,36 +54,39 @@ describe('Applications Browse panel - selection of items spec', function () {
 
     it(`GIVEN existing application is selected WHEN Arrow Down key has been pressed THEN the next application should be selected`,
         () => {
-            return appBrowsePanel.clickCheckboxAndSelectRowByDisplayName(appConst.TEST_APPLICATIONS.FIRST_APP).pause(1000).then(()=> {
+            let appBrowsePanel = new AppBrowsePanel();
+            let appStatisticPanel = new AppStatisticPanel();
+            return appBrowsePanel.clickCheckboxAndSelectRowByDisplayName(appConst.TEST_APPLICATIONS.FIRST_APP).then(() => {
                 return appBrowsePanel.pressArrowDownKey();
-            }).then(()=> {
+            }).then(() => {
                 return appStatisticPanel.getApplicationName();
-            }).then(result=> {
-                assert.isTrue(result == appConst.TEST_APPLICATIONS.FOURTH_APP,
-                    'the next application should be selected');
+            }).then(result => {
+                assert.isTrue(result == appConst.TEST_APPLICATIONS.FOURTH_APP, 'the next application should be selected');
             })
         });
 
     it(`GIVEN existing application is selected WHEN Arrow Down key has been pressed THEN the next application should be selected`,
         () => {
-            return appBrowsePanel.clickCheckboxAndSelectRowByDisplayName(appConst.TEST_APPLICATIONS.FOURTH_APP).pause(1000).then(()=> {
+            let appBrowsePanel = new AppBrowsePanel();
+            let appStatisticPanel = new AppStatisticPanel();
+            return appBrowsePanel.clickCheckboxAndSelectRowByDisplayName(appConst.TEST_APPLICATIONS.FOURTH_APP).then(() => {
                 return appBrowsePanel.pressArrowUpKey();
-            }).then(()=> {
+            }).then(() => {
                 return appStatisticPanel.getApplicationName();
-            }).then(result=> {
-                assert.isTrue(result == appConst.TEST_APPLICATIONS.FIRST_APP,
-                    'previous application should be selected');
+            }).then(result => {
+                assert.isTrue(result == appConst.TEST_APPLICATIONS.FIRST_APP, 'previous application should be selected');
             })
         });
 
-
     it(`GIVEN existing application is selected WHEN selecting one more THEN last selected application should be displayed on the Selection Panel`,
         () => {
-            return appBrowsePanel.clickCheckboxAndSelectRowByDisplayName(appConst.TEST_APPLICATIONS.FIRST_APP).then(()=> {
+            let appStatisticPanel = new AppStatisticPanel();
+            let appBrowsePanel = new AppBrowsePanel();
+            return appBrowsePanel.clickCheckboxAndSelectRowByDisplayName(appConst.TEST_APPLICATIONS.FIRST_APP).then(() => {
                 return appBrowsePanel.clickCheckboxAndSelectRowByDisplayName(appConst.TEST_APPLICATIONS.SECOND_APP);
-            }).pause(1000).then(()=> {
+            }).then(() => {
                 return appStatisticPanel.getApplicationName();
-            }).then(result=> {
+            }).then(result => {
                 assert.isTrue(result == appConst.TEST_APPLICATIONS.SECOND_APP,
                     'last selected application should be displayed on the Selection Panel');
             })
@@ -88,15 +94,17 @@ describe('Applications Browse panel - selection of items spec', function () {
 
     it(`GIVEN three application are selected WHEN deselecting one THEN second application should be displayed on the Statistic Panel`,
         () => {
-            return appBrowsePanel.clickCheckboxAndSelectRowByDisplayName(appConst.TEST_APPLICATIONS.FIRST_APP).then(()=> {
+            let appBrowsePanel = new AppBrowsePanel();
+            let appStatisticPanel = new AppStatisticPanel();
+            return appBrowsePanel.clickCheckboxAndSelectRowByDisplayName(appConst.TEST_APPLICATIONS.FIRST_APP).then(() => {
                 return appBrowsePanel.clickCheckboxAndSelectRowByDisplayName(appConst.TEST_APPLICATIONS.SECOND_APP);
-            }).pause(1000).then(()=> {
+            }).then(() => {
                 return appBrowsePanel.clickCheckboxAndSelectRowByDisplayName(appConst.TEST_APPLICATIONS.THIRD_APP);
-            }).then(()=> {
+            }).then(() => {
                 return appBrowsePanel.clickCheckboxAndSelectRowByDisplayName(appConst.TEST_APPLICATIONS.THIRD_APP);
-            }).pause(1000).then(()=> {
+            }).then(() => {
                 return appStatisticPanel.getApplicationName();
-            }).then(result=> {
+            }).then(result => {
                 assert.isTrue(result == appConst.TEST_APPLICATIONS.SECOND_APP,
                     'last selected application should be displayed on the Selection Panel');
             })
@@ -104,7 +112,7 @@ describe('Applications Browse panel - selection of items spec', function () {
 
     beforeEach(() => studioUtils.navigateToApplicationsApp());
     afterEach(() => studioUtils.doCloseCurrentBrowserTab());
-    before(()=> {
+    before(() => {
         return console.log('specification is starting: ' + this.title);
     });
 });
