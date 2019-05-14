@@ -1,51 +1,24 @@
 /**
  * Created on 12/12/2017.
  */
+const Page = require('./page');
+const appConst = require('../libs/app_const');
 
-const page = require('./page');
 const xpTourDialog = {
-    container: `//div[contains(@id,'ModalDialog') and descendant::h2[contains(.,'Welcome Tour - Step 1 of 5')]]`
+    container: `//div[contains(@id,'ModalDialog') and descendant::h2[contains(.,'Welcome Tour')]]`
 };
-const home = {
+const XPATH = {
     container: `div[class*='home-main-container']`
 };
-const homePage = Object.create(page, {
 
-    closeXpTourButton: {
-        get: function () {
-            return `${xpTourDialog.container}//div[@class='cancel-button-top']`
-        }
-    },
-    waitForXpTourVisible: {
-        value: function (ms) {
-            return this.waitForVisible(`${xpTourDialog.container}`, ms).catch(err=> {
-                return false;
-            })
-        }
-    },
-    isXpTourVisible: {
-        value: function () {
-            return this.isVisible(`${xpTourDialog.container}`);
-        }
-    },
-    waitForXpTourClosed: {
-        value: function () {
-            return this.waitForNotVisible(`${xpTourDialog.container}`, 3000).catch(error=> {
-                this.saveScreenshot('err_xp_tour_dialog_not_closed');
-                throw new Error('Xp-tour dialog not closed');
-            });
-        }
-    },
-   
-    waitForLoaded: {
-        value: function (ms) {
-            return this.waitForVisible(`${home.container}`, ms);
-        }
-    },
-    doCloseXpTourDialog: {
-        value: function () {
-            return this.doClick(this.closeXpTourButton);
-        }
-    },
-});
-module.exports = homePage;
+class HomePage extends Page {
+
+    get closeXpTourButton() {
+        return XPATH.container + "//div[@class='cancel-button-top']";
+    }
+
+    waitForLoaded() {
+        return this.waitForElementDisplayed(XPATH.container, appConst.TIMEOUT_3);
+    }
+};
+module.exports = HomePage;

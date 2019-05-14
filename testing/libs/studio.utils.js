@@ -1,129 +1,110 @@
-const launcherPanel = require('../page_objects/launcher.panel');
-const homePage = require('../page_objects/home.page');
-const loginPage = require('../page_objects/login.page');
+const LauncherPanel = require('../page_objects/launcher.panel');
+const HomePage = require('../page_objects/home.page');
+const LoginPage = require('../page_objects/login.page');
 const appConst = require("./app_const");
 const webDriverHelper = require("./WebDriverHelper");
-const browsePanel = require('../page_objects/applications/applications.browse.panel');
-
+const BrowsePanel = require('../page_objects/applications/applications.browse.panel');
 
 module.exports = {
-    xpTabs: {},
 
-    doCloseCurrentBrowserTab: function () {
-        return webDriverHelper.browser.getTitle().then(title=> {
-            if (title != 'Enonic XP Home') {
-                return webDriverHelper.browser.close();
+    async doCloseCurrentBrowserTab() {
+        let title = await webDriverHelper.browser.getTitle();
+        if (title != 'Enonic XP Home') {
+            await webDriverHelper.browser.closeWindow();
+            return await this.doSwitchToHome();
+        }
+    },
+    startSelectedApp(appName) {
+        let appBrowsePanel = new BrowsePanel();
+        return appBrowsePanel.getApplicationState(appName).then(result => {
+            if (result === 'stopped') {
+                return appBrowsePanel.clickOnStartButton();
             }
-        })
+        }).then(() => {
+            return appBrowsePanel.pause(500);
+        });
+    },
+    stopSelectedApp(appName) {
+        let appBrowsePanel = new BrowsePanel();
+        return appBrowsePanel.getApplicationState(appName).then(result=>{
+            if (result === 'started') {
+                return appBrowsePanel.clickOnStopButton();
+            }
+        }).then(() => {
+            return appBrowsePanel.pause(500);
+        });
     },
     findAndSelectItem: function (name) {
-        return browsePanel.waitForRowByNameVisible(name).then(()=> {
+        let browsePanel = new BrowsePanel();
+        return browsePanel.waitForRowByNameVisible(name).then(() => {
             return browsePanel.clickOnRowByName(name);
-        }).catch(err=> {
+        }).catch(err => {
             throw new Error('Application with the name:' + ' not found')
         })
     },
-
-    navigateToApplicationsApp: function () {
-        return launcherPanel.waitForPanelVisible(appConst.TIMEOUT_1).then((result)=> {
+    navigateToApplicationsApp: function (userName, password) {
+        let launcherPanel = new LauncherPanel();
+        return launcherPanel.waitForPanelDisplayed(appConst.TIMEOUT_3).then(result => {
             if (result) {
                 console.log("Launcher Panel is opened, click on the `Applications` link...");
                 return launcherPanel.clickOnApplicationsLink();
             } else {
                 console.log("Login Page is opened, type a password and name...");
-                return this.doLoginAndClickOnApplicationsLink();
+                return this.doLoginAndClickOnApplicationsLink(userName, password);
             }
-        }).then(()=> {
+        }).then(() => {
             return this.doSwitchToApplicationsBrowsePanel();
-        }).catch((err)=> {
-            console.log('tried to navigate to applications, but: ' + err);
+        }).catch(err => {
+            console.log('tried to navigate to applications app, but: ' + err);
             this.saveScreenshot("err_navigate_to_applications");
-        })
+            throw new Error('error when navigate to Applications app ' + err);
+        });
     },
+
     doSwitchToApplicationsBrowsePanel: function () {
+        let browsePanel = new BrowsePanel();
         console.log('testUtils:switching to Applications app...');
-        return webDriverHelper.browser.getTitle().then(title=> {
-            if (title != "Applications - Enonic XP Admin") {
-                return this.switchToApplicationsTabWindow();
-            }
+        return webDriverHelper.browser.switchWindow("Applications - Enonic XP Admin").then(() => {
+            console.log("switched to Applications app...");
+            return browsePanel.waitForSpinnerNotVisible();
+        }).then(() => {
+            return browsePanel.waitForGridLoaded(appConst.TIMEOUT_3);
         })
     },
 
-    doSwitchToHome: function (browser) {
+    doSwitchToHome: function () {
         console.log('testUtils:switching to Home page...');
-        return webDriverHelper.browser.getTabIds().then(tabs => {
-            let prevPromise = Promise.resolve(false);
-            tabs.some((tabId)=> {
-                prevPromise = prevPromise.then((isHome) => {
-                    if (!isHome) {
-                        return this.switchAndCheckTitle(tabId, "Enonic XP Home");
-                    }
-                    return false;
-                });
-            });
-            return prevPromise;
-        }).then(()=> {
+        return webDriverHelper.browser.switchWindow("Enonic XP Home").then(() => {
+            console.log("switched to Home Page...");
+        }).then(() => {
+            let homePage = new HomePage();
             return homePage.waitForLoaded(appConst.TIMEOUT_3);
         });
     },
-
-    switchAndCheckTitle: function (tabId, reqTitle) {
-        return webDriverHelper.browser.switchTab(tabId).then(()=> {
-            return webDriverHelper.browser.getTitle().then(title=> {
+    switchAndCheckTitle: function (handle, reqTitle) {
+        return webDriverHelper.browser.switchWindow(handle).then(() => {
+            return webDriverHelper.browser.getTitle().then(title => {
                 return title == reqTitle;
-
             })
         });
     },
-    doLoginAndSwitchToApplications: function () {
-        return loginPage.doLogin().pause(1500).then(()=> {
-            return homePage.waitForXpTourVisible(appConst.TIMEOUT_3);
-        }).then((result)=> {
-            if (result) {
-                return homePage.doCloseXpTourDialog();
-            }
-        }).then(()=> {
-            return launcherPanel.clickOnApplicationsLink().pause(1000);
-        }).then(()=> {
-            return this.doSwitchToApplicationsBrowsePanel();
-        }).catch((err)=> {
-            throw new Error(err);
-        })
-    },
-    doLoginAndClickOnApplicationsLink: function () {
-        return loginPage.doLogin().pause(1500).then(()=> {
-            return homePage.waitForXpTourVisible(appConst.TIMEOUT_3);
-        }).then((result)=> {
-            if (result) {
-                return homePage.doCloseXpTourDialog();
-            }
-        }).then(()=> {
-            return launcherPanel.clickOnApplicationsLink().pause(1000);
+
+    doLoginAndClickOnApplicationsLink: function (userName, password) {
+        let loginPage = new LoginPage();
+        return loginPage.doLogin(userName, password).then(() => {
+            let launcherPanel = new LauncherPanel();
+            return launcherPanel.clickOnApplicationsLink();
+        }).then(() => {
+            return loginPage.pause(1000);
         })
     },
 
-    switchToApplicationsTabWindow: function () {
-        return webDriverHelper.browser.getTabIds().then(tabs => {
-            let prevPromise = Promise.resolve(false);
-            tabs.some((tabId)=> {
-                prevPromise = prevPromise.then((isStudio) => {
-                    if (!isStudio) {
-                        return this.switchAndCheckTitle(tabId, "Applications - Enonic XP Admin");
-                    }
-                    return false;
-                });
-            });
-            return prevPromise;
-        }).then(()=> {
-            return browsePanel.waitForGridLoaded(appConst.TIMEOUT_3);
-        });
-    },
     saveScreenshot: function (name) {
         let path = require('path');
         let screenshotsDir = path.join(__dirname, '/../build/screenshots/');
-        return webDriverHelper.browser.saveScreenshot(screenshotsDir + name + '.png').then(()=> {
+        return webDriverHelper.browser.saveScreenshot(screenshotsDir + name + '.png').then(() => {
             return console.log('screenshot saved ' + name);
-        }).catch(err=> {
+        }).catch(err => {
             return console.log('screenshot was not saved ' + screenshotsDir + 'utils  ' + err);
         })
     }

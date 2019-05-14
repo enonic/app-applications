@@ -1,118 +1,94 @@
-const page = require('../page');
-const elements = require('../../libs/elements');
-const dialog = {
-    container: `//div[contains(@id,'NewContentDialog')]`,
-};
+const Page = require('../page');
+const appConst = require('../../libs/app_const');
 
 const xpath = {
     main: `//div[contains(@id,'ApplicationItemStatisticsPanel')]`,
     title: `//div[contains(@id,'ItemStatisticsHeader')]/h1[contains(@class,'title')]`,
     dropDownButton: `//div[contains(@id,'ActionMenu')]//div[contains(@class,'drop-down-button')]`,
     dataContainer: `//div[contains(@class,'application-data-container')]`,
+    siteItemDataGroup: `//div[contains(@id,'ItemDataGroup') and child::h2[text()='Site']]`,
+    applicationItemDataGroup: `//div[contains(@id,'ItemDataGroup') and child::h2[text()='Application']]`,
     contentTypes: `//ul[@class='data-list' and descendant::li[text()='Content Types']]//span`,
-    applicationDataHeaders: `//div[contains(@class,'application')]//li[@class='list-header']`,
+    applicationDataHeaders: `//li[@class='list-header']`,
     idProviderApplicationsHeaders: `//div[contains(@id,'ItemDataGroup') and descendant::h2[text()='ID Provider Applications']]//li[@class='list-header']`,
     stopActionMenuItem: `//div[contains(@id,'ActionMenu')]//li[contains(@id,'ActionMenuItem') and text()='Stop']`,
     startActionMenuItem: `//div[contains(@id,'ActionMenu')]//li[contains(@id,'ActionMenuItem') and text()='Start']`,
     siteDataHeaders: `//div[contains(@id,'ApplicationItemStatisticsPanel')]/div[contains(@class,'application-data-container')]/div[contains(@class,'site')]//li[contains(@class,'list-header')]`,
 };
+class ApplicationItemStatisticsPanel extends Page {
 
-const applicationItemStatisticsPanel = Object.create(page, {
+    //Site data-group, content types list
+    get contentTypes() {
+        return xpath.main + xpath.dataContainer + xpath.siteItemDataGroup + xpath.contentTypes;
+    }
 
-    contentTypes: {
-        get: function () {
-            return `${xpath.main}${xpath.dataContainer}${xpath.contentTypes}`;
-        }
-    },
-    getApplicationDataHeaders: {
-        value: function () {
-            let selector = `${xpath.main}${xpath.dataContainer}${xpath.applicationDataHeaders}`;
-            return this.getText(selector).catch(err => {
-                throw new Error('Error while getting application-data-headers: ' + err);
-            })
-        }
-    },
-    getDropDownButtonText: {
-        value: function () {
-            let selector = `${xpath.main}${xpath.dropDownButton}`;
-            return this.getText(selector).catch(err => {
-                throw new Error('error while getting text from the button: ' + err);
-            })
-        }
-    },
-    clickOnActionDropDownMenu: {
-        value: function () {
-            let selector = `${xpath.main}${xpath.dropDownButton}`;
-            return this.doClick(selector).catch(err => {
-                throw new Error('error when clicking on action menu: ' + err);
-            })
-        }
-    },
-    waitForStopMenuItemVisible: {
-        value: function () {
-            return this.waitForVisible(xpath.stopActionMenuItem).catch(err => {
-                console.log(err);
-                this.saveScreenshot("stop_menu_item_not_visible");
-                return false;
-            })
-        }
-    },
-    waitForStartMenuItemVisible: {
-        value: function () {
-            return this.waitForVisible(xpath.startActionMenuItem).catch(err => {
-                console.log(err);
-                this.saveScreenshot("stop_menu_item_not_visible");
-                return false;
-            })
-        }
-    },
-    clickOnStopActionMenuItem: {
-        value: function () {
-            this.doClick(xpath.stopActionMenuItem).catch(err => {
-                console.log(err);
-                throw new Error("Error when clicking on Stop menu item");
+    //Application data-group(Installed,Version,Key,System Required)
+    getApplicationDataHeaders() {
+        let selector = xpath.main + xpath.dataContainer + xpath.applicationItemDataGroup + xpath.applicationDataHeaders;
+        return this.getTextInElements(selector).catch(err => {
+            throw new Error('Error while getting application-data-headers: ' + err);
+        })
+    }
 
-            })
-        }
-    },
-    clickOnStartActionMenuItem: {
-        value: function () {
-            this.doClick(xpath.startActionMenuItem).catch(err => {
-                console.log(err);
-                throw new Error("Error when clicking on Start menu item");
+    //return the application's name
+    getApplicationName() {
+        return this.getText(xpath.title);
+    }
 
-            })
-        }
-    },
-    getSiteDataHeaders: {
-        value: function () {
-            return this.getTextFromElements(xpath.siteDataHeaders);
-        }
-    },
-    getProviderDataHeaders: {
-        value: function () {
-            return this.getText(xpath.idProviderApplicationsHeaders);
-        }
-    },
-    getContentTypes: {
-        value: function () {
-            return this.isVisible(this.contentTypes).then(result => {
-                if (result) {
-                    return this.getText(this.contentTypes);
-                } else {
-                    return [];
-                }
+    //return list of names of content types
+    getContentTypes() {
+        return this.getTextInElements(this.contentTypes).catch(err => {
+            throw new Error('error while getting Content Types: ' + err);
+        })
+    }
 
-            }).catch(err => {
-                throw new Error('error while getting names of Content Types: ' + err);
-            })
-        }
-    },
-    getApplicationName: {
-        value: function () {
-            return this.getText(xpath.title);
-        }
-    },
-});
+    getProviderDataHeaders() {
+        return this.getText(xpath.idProviderApplicationsHeaders);
+    }
 
-module.exports = applicationItemStatisticsPanel;
+    // Expected list of headers: Content Types, Page, Part, Layout,Relationship Types
+    getSiteDataHeaders() {
+        return this.getTextInElements(xpath.siteDataHeaders);
+    }
+
+    clickOnStopActionMenuItem() {
+        return this.clickOnElement(xpath.stopActionMenuItem).catch(err => {
+            throw new Error("Error when clicking on Stop menu item");
+        })
+    }
+
+    clickOnStartActionMenuItem() {
+        return this.clickOnElement(xpath.startActionMenuItem).catch(err => {
+            throw new Error("Error when clicking on Start menu item");
+        })
+    }
+
+    getDropDownButtonText() {
+        let selector = xpath.main + xpath.dropDownButton;
+        return this.getText(selector).catch(err => {
+            throw new Error('error while getting text from the button: ' + err);
+        })
+    }
+
+    clickOnActionDropDownMenu() {
+        let selector = xpath.main + xpath.dropDownButton;
+        return this.clickOnElement(selector).catch(err => {
+            throw new Error('error when clicking on action menu: ' + err);
+        })
+    }
+
+    waitForStopMenuItemVisible() {
+        return this.waitForElementDisplayed(xpath.stopActionMenuItem, appConst.TIMEOUT_2).catch(err => {
+            this.saveScreenshot("stop_menu_item_not_visible");
+            return false;
+        })
+    }
+
+    waitForStartMenuItemVisible() {
+        return this.waitForElementDisplayed(xpath.startActionMenuItem, appConst.TIMEOUT_2).catch(err => {
+            this.saveScreenshot("stop_menu_item_not_visible");
+            return false;
+        })
+    }
+};
+module.exports = ApplicationItemStatisticsPanel;

@@ -1,224 +1,196 @@
-const webDriverHelper = require('./../libs/WebDriverHelper');
-const appConst = require('./../libs/app_const');
+const webDriverHelper = require('../libs/WebDriverHelper');
+const appConst = require('../libs/app_const');
 const path = require('path');
 
-function Page() {
-}
+class Page {
+    constructor() {
+        this.browser = webDriverHelper.browser;
+    }
 
-Page.prototype.getBrowser = function () {
-    return webDriverHelper.browser;
-};
+    getBrowser() {
+        return this.browser;
+    }
 
-Page.prototype.numberOfDisplayedElements = function (selector) {
-    return this.getBrowser().elements(selector).then(res => {
-        return res.value.filter(el => {
-            return this.getBrowser().elementIdDisplayed(el.ELEMENT);
-        })
-    }).then(result => {
-        return Object.keys(result).length;
-    });
-};
-Page.prototype.getDisplayedElements = function (selector) {
-    return this.getBrowser().elements(selector).then(elems => {
-        let pr = elems.value.map(el => this.getBrowser().elementIdDisplayed(el.ELEMENT));
-        return Promise.all(pr).then(result => elems.value.filter((el, i) => result[i].value));
-    })
-};
+    // value: string | string[]
+    keys(value) {
+        return this.browser.keys(value);
+    }
 
-Page.prototype.getTitle = function () {
-    return this.getBrowser().getTitle();
-};
+    findElement(selector) {
+        return this.browser.$(selector);
+    }
 
-Page.prototype.keys = function (value) {
-    return this.getBrowser().keys(value);
-};
+    findElements(selector) {
+        return this.browser.$$(selector);
+    }
 
-Page.prototype.isVisible = function (selector) {
-    return this.getBrowser().isVisible(selector);
-};
+    getTitle() {
+        return this.browser.getTitle();
+    }
 
-Page.prototype.isEnabled = function (selector) {
-    return this.getBrowser().isEnabled(selector);
-};
+    async getDisplayedElements(selector) {
+        let elements = await this.findElements(selector);
+        let pr = elements.map(el => el.isDisplayed());
+        return Promise.all(pr).then(result => {
+            return elements.filter((el, i) => result[i]);
+        });
+    }
 
-Page.prototype.waitForVisible = function (selector, ms) {
-    return this.getBrowser().waitForVisible(selector, ms);
-};
+    pause(ms) {
+        return this.browser.pause(ms);
+    }
 
-Page.prototype.waitForNotVisible = function (selector, ms) {
-    return this.getBrowser().waitForVisible(selector, ms, true);
-};
-Page.prototype.waitForSpinnerNotVisible = function (ms) {
-    let message = "Spinner still displayed! timeout is " + ms;
-    return this.getBrowser().waitUntil(() => {
-        return this.isElementNotDisplayed(`//div[@class='spinner']`);
-    }, ms, message);
-};
-Page.prototype.isElementNotDisplayed = function (selector) {
-    return this.getDisplayedElements(selector).then(result => {
-        return result.length == 0;
-    })
-};
-Page.prototype.isSpinnerVisible = function () {
-    return this.getBrowser().isVisible(`//div[@class='spinner']`);
-};
+    async clickOnElement(selector) {
+        let element = await this.findElement(selector);
+        await element.waitForDisplayed(1500);
+        return await element.click();
+    }
 
-Page.prototype.doClick = function (selector) {
-    return this.getBrowser().element(selector).then((result) => {
-        return this.getBrowser().click(selector);
-    }).catch(function (err) {
-        throw Error(err.message + ` ` + selector);
-    })
-};
+    async getText(selector) {
+        let element = await this.findElement(selector);
+        return await element.getText();
+    }
 
-Page.prototype.doRightClick = function (selector) {
-    return this.getBrowser().element(selector).then((result) => {
-        return this.getBrowser().rightClick(selector, 0, 0);
-    }).catch(function (err) {
-        throw Error(err.message + ` ` + selector);
-    })
-};
+    async getTextInElements(selector) {
+        let strings = [];
+        let elements = await this.findElements(selector);
+        elements.forEach(el => {
+            strings.push(el.getText());
+        });
+        return Promise.all(strings);
+    }
 
-Page.prototype.typeTextInInput = function (selector, text) {
-    return this.getBrowser().setValue(selector, text).then(() => {
-        return this.getTextFromInput(selector).then(result => {
-            if (result !== text) {
-                return this.getBrowser().setValue(selector, text);
-            }
-        })
-    }).catch(err => {
-        throw new Error('text was not set in the input ' + err);
-    })
-};
+    async getTextInDisplayedElements(selector) {
+        let strings = [];
+        let elements = await this.getDisplayedElements(selector);
+        elements.forEach(el => {
+            strings.push(el.getText());
+        });
+        return Promise.all(strings);
+    }
 
-Page.prototype.clearElement = function (selector) {
-    return this.getBrowser().clearElement(selector);
-};
+    async typeTextInInput(selector, text) {
+        let inputElement = await this.findElement(selector);
 
-Page.prototype.getText = function (selector) {
-    return this.getBrowser().getText(selector);
-};
-Page.prototype.waitForExist = function (selector, ms) {
-    return this.getBrowser().waitForExist(selector, ms);
-};
-
-Page.prototype.waitForEnabled = function (selector, ms, reverse) {
-    return this.getBrowser().waitForEnabled(selector, ms, reverse);
-};
-
-Page.prototype.waitForDisabled = function (selector, ms) {
-    return this.getBrowser().waitForEnabled(selector, ms, true);
-};
-
-Page.prototype.getText = function (selector) {
-    return this.getBrowser().getText(selector);
-};
-Page.prototype.element = function (selector) {
-    return this.getBrowser().element(selector);
-};
-Page.prototype.elements = function (selector) {
-    return this.getBrowser().elements(selector);
-};
-Page.prototype.getElementId = function (ele) {
-    return ele.value.ELEMENT;
-};
-Page.prototype.isAttributePresent = function (selector, atrName) {
-    return this.getBrowser().getAttribute(selector, atrName).then(result => {
-        if (result == null) {
-            return false;
-        } else {
-            return true;
+        await inputElement.setValue(text);
+        let value = await inputElement.getValue();
+        //workaround for issue in WebdriverIO
+        if (value == "") {
+            await inputElement.setValue(text);
         }
-    })
-};
+        return await inputElement.pause(300);
+    }
 
-Page.prototype.getTextFromElements = function (selector) {
-    let elements = [];
-    return this.getBrowser().elements(selector).then((result) => {
-        result.value.forEach((val) => {
-            elements.push(this.getBrowser().elementIdText(val.ELEMENT));
-        });
-        return Promise.all(elements).then((p) => {
-            return p;
-        });
-    }).then(responses => {
-        let res = [];
-        responses.forEach((str) => {
-            return res.push(str.value);
-        });
-        return res;
-    });
-};
+    async getTextInInput(selector) {
+        let inputElement = await this.findElement(selector);
+        return await inputElement.getValue(selector);
+    }
 
-Page.prototype.getTextFromDisplayedElements = function (selector) {
-    let elements = [];
-    return this.getDisplayedElements(selector).then((result) => {
-        result.forEach((val) => {
-            elements.push(this.getBrowser().elementIdText(val.ELEMENT));
-        });
-        return Promise.all(elements).then((p) => {
-            return p;
-        });
-    }).then(responses => {
-        let res = [];
-        responses.forEach((str) => {
-            return res.push(str.value);
-        });
-        return res;
-    });
-};
+    async clearInputText(selector) {
+        let inputElement = await this.findElement(selector);
+        await inputElement.waitForDisplayed(1000);
+        await inputElement.clearValue();
+        return await inputElement.pause(300);
 
-Page.prototype.getTextFromInput = function (selector) {
-    return this.getBrowser().getAttribute(selector, 'value');
-};
+    }
 
-Page.prototype.saveScreenshot = function (name) {
-    let screenshotsDir = path.join(__dirname, '/../build/screenshots/');
-    return this.getBrowser().saveScreenshot(screenshotsDir + name + '.png').then(() => {
-        console.log('screenshot is saved ' + name);
-    }).catch(err => {
-        console.log('screenshot was not saved ' + screenshotsDir + ' ' + err);
-    })
-};
+    saveScreenshot(name) {
+        let screenshotsDir = path.join(__dirname, '/../build/screenshots/');
+        return this.browser.saveScreenshot(screenshotsDir + name + '.png').then(() => {
+            console.log('screenshot is saved ' + name);
+        }).catch(err => {
+            console.log('screenshot was not saved ' + screenshotsDir + ' ' + err);
+        })
+    }
 
-Page.prototype.getAttribute = function (selector, attributeName) {
-    return this.getBrowser().getAttribute(selector, attributeName);
-};
+    async isElementDisplayed(selector) {
+        let element = await this.findElement(selector);
+        return element.isDisplayed();
+    }
 
-Page.prototype.waitForNotificationMessage = function () {
-    return this.getBrowser().waitForVisible(`//div[@class='notification-content']/span`, appConst.TIMEOUT_10).then(() => {
-        return this.getBrowser().getText(`//div[@class='notification-content']/span`);
-    })
-};
+    async isElementEnabled(selector) {
+        let element = await this.findElement(selector);
+        return element.isEnabled();
+    }
 
-Page.prototype.waitForExpectedNotificationMessage = function (expectedMessage) {
-    let selector = `//div[contains(@id,'NotificationMessage')]//div[contains(@class,'notification-content')]//span[contains(.,'${expectedMessage}')]`;
-    return this.getBrowser().waitForVisible(selector, appConst.TIMEOUT_3).catch((err) => {
-        this.saveScreenshot('err_notification_mess');
-        throw new Error('expected notification message was not shown! ' + err);
-    })
-};
+    async waitForElementEnabled(selector, ms) {
+        let element = await this.findElement(selector);
+        return element.waitForEnabled(ms);
+    }
 
-Page.prototype.waitForErrorNotificationMessage = function () {
-    let selector = `//div[contains(@id,'NotificationMessage') and @class='notification error']//div[contains(@class,'notification-content')]/span`;
-    return this.getBrowser().waitForVisible(selector, appConst.TIMEOUT_3).then(() => {
-        return this.getBrowser().getText(selector);
-    })
-};
+    async waitForElementDisabled(selector, ms) {
+        let element = await this.findElement(selector);
+        return element.waitForEnabled(ms, true);
+    }
 
-Page.prototype.waitForNotificationWarning = function () {
-    let selector = `//div[contains(@id,'NotificationMessage') and @class='notification warning']//div[contains(@class,'notification-content')]/span`;
-    return this.getBrowser().waitForVisible(selector, appConst.TIMEOUT_3).then(() => {
-        return this.getBrowser().getText(selector);
-    })
-};
-Page.prototype.doCatch = function (screenshotName, errString) {
-    return this.saveScreenshot(screenshotName).then(() => {
-        throw new Error(errString);
-    })
+    async waitForElementNotDisplayed(selector, ms) {
+        let element = await this.findElement(selector);
+        return element.waitForDisplayed(ms, true);
+    }
 
-};
-Page.prototype.hasFocus = function (selector) {
-    return this.getBrowser().hasFocus(selector);
-};
-module.exports = new Page();
+    async waitForElementDisplayed(selector, ms) {
+        let element = await this.findElement(selector);
+        return element.waitForDisplayed(ms);
+    }
+
+    waitForSpinnerNotVisible() {
+        let message = "Spinner still displayed! timeout is " + appConst.TIMEOUT_7;
+        return this.browser.waitUntil(() => {
+            return this.isElementNotDisplayed(`//div[@class='spinner']`);
+        }, appConst.TIMEOUT_7, message);
+    }
+
+    waitUntilElementNotVisible(selector, timeout) {
+        let message = "Element still displayed! timeout is " + appConst.TIMEOUT_7 + "  " + selector;
+        return this.browser.waitUntil(() => {
+            return this.isElementNotDisplayed(selector);
+        }, timeout, message);
+    }
+
+    isElementNotDisplayed(selector) {
+        return this.getDisplayedElements(selector).then(result => {
+            return result.length == 0;
+        })
+    }
+
+    async getAttribute(selector, attributeName) {
+        let element = await this.findElement(selector);
+        return element.getAttribute(attributeName);
+    }
+
+    waitForNotificationMessage() {
+        return this.waitForElementDisplayed(`//div[@class='notification-content']/span`, appConst.TIMEOUT_3).catch(err => {
+            throw new Error('Error when wait for notification message: ' + err);
+        }).then(() => {
+            return this.getText(`//div[@class='notification-content']/span`);
+        })
+    }
+
+    waitForExpectedNotificationMessage(expectedMessage) {
+        let selector = `//div[contains(@id,'NotificationMessage')]//div[contains(@class,'notification-content')]//span[contains(.,'${expectedMessage}')]`;
+        return this.waitForElementDisplayed(selector, appConst.TIMEOUT_3).catch(err => {
+            this.saveScreenshot('err_notification_mess');
+            throw new Error('expected notification message was not shown! ' + err);
+        })
+    }
+
+    waitForErrorNotificationMessage() {
+        let selector = `//div[contains(@id,'NotificationMessage') and @class='notification error']//div[contains(@class,'notification-content')]/span`;
+        return this.waitForElementDisplayed(selector, appConst.TIMEOUT_3).then(() => {
+            return this.getText(selector);
+        })
+    }
+
+    async doRightClick(selector) {
+        let el = await this.findElement(selector);
+        await el.moveTo();
+        return await this.browser.positionClick(2);
+    }
+
+    async isFocused(selctor) {
+        let el = await this.findElement(selctor);
+        return await el.isFocused();
+
+    }
+}
+module.exports = Page;

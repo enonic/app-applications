@@ -1,14 +1,11 @@
 /**
- * Verifies:
- * app-applications#8
- * Install Applications Dialog - incorrect state of application, when the dialog has been opened after the 'Log in'
  */
 const chai = require('chai');
 const expect = chai.expect;
 const assert = chai.assert;
 const webDriverHelper = require('../libs/WebDriverHelper');
-const appBrowsePanel = require('../page_objects/applications/applications.browse.panel');
-const dialog = require('../page_objects/applications/install.app.dialog');
+const AppBrowsePanel = require('../page_objects/applications/applications.browse.panel');
+const InstallDialog = require('../page_objects/applications/install.app.dialog');
 const studioUtils = require('../libs/studio.utils.js');
 const appConst = require('../libs/app_const');
 
@@ -19,6 +16,8 @@ describe('Install Application Dialog specification', function () {
     const appName = 'Chuck Norris';
 
     it('SHOULD show install app dialog WHEN Install button has been clicked', () => {
+        let appBrowsePanel = new AppBrowsePanel();
+        let dialog = new InstallDialog();
         return appBrowsePanel.clickOnInstallButton().then(() => {
             return dialog.waitForOpened();
         }).then(() => {
@@ -30,30 +29,34 @@ describe('Install Application Dialog specification', function () {
                 'expected message should be in the placeholder');
         }).then(() => {
             studioUtils.saveScreenshot("install_dialog_default_focus");
-            return dialog.hasDefaultFocus();
+            return dialog.isDefaultFocused();
         }).then(result => {
             //assert.isTrue(result, 'Focus should be in the `filter input` by default');
         })
     });
 
-    it('SHOULD contain all controls WHEN opened', () => {
+    it('GIVEN install dialog is opened WHEN Esc key has been pressed THEN dialog closes', () => {
+        let appBrowsePanel = new AppBrowsePanel();
+        let dialog = new InstallDialog();
         return appBrowsePanel.clickOnInstallButton().then(() => {
             return dialog.waitForOpened();
         }).then(() => {
-            return dialog.waitForVisible(dialog.searchInput, 1000);
+            return dialog.waitForOpened();
         }).then(visible => {
-            assert.isTrue(visible, 'Filter input should be present in dialog');
+            return appBrowsePanel.pressEscKey();
         }).then(() => {
-            return dialog.isCancelButtonTopVisible();
-        }).then(result => {
-            assert.isTrue(result, 'Cancel button top should be present');
-        })
+            return dialog.waitForClosed();
+        });
     });
 
     it('WHEN dialog is opened THEN applications should be present in the grid AND applications are sorted by a name', () => {
+        let appBrowsePanel = new AppBrowsePanel();
+        let dialog = new InstallDialog();
         return appBrowsePanel.clickOnInstallButton().then(() => {
-            return dialog.waitForOpened();
-        }).pause(5000).then(() => {
+            return dialog.waitForGridLoaded();
+        }).then(() => {
+            return dialog.pause(1000);
+        }).then(() => {
             return dialog.getApplicationNames();
         }).then(names => {
             studioUtils.saveScreenshot("install_dlg_sorted");
@@ -64,11 +67,15 @@ describe('Install Application Dialog specification', function () {
     });
 
     it('GIVEN dialog is opened WHEN search text has been typed THEN apps should be filtered ', () => {
+        let appBrowsePanel = new AppBrowsePanel();
+        let dialog = new InstallDialog();
         return appBrowsePanel.clickOnInstallButton().then(() => {
             return dialog.waitForOpened();
         }).then(() => {
             return dialog.typeSearchText('Chuck Norris');
-        }).pause(1500).then(() => {
+        }).then(() => {
+            return dialog.pause(1500);
+        }).then(() => {
             return dialog.getApplicationNames();
         }).then(names => {
             assert.isTrue(names.length == 1, 'only one application should be displayed');
@@ -77,6 +84,8 @@ describe('Install Application Dialog specification', function () {
     });
 
     it('GIVEN dialog is opened WHEN install link has been clicked THEN the app should be installed', () => {
+        let appBrowsePanel = new AppBrowsePanel();
+        let dialog = new InstallDialog();
         return appBrowsePanel.clickOnInstallButton().then(() => {
             return dialog.waitForOpened();
         }).then(() => {
@@ -98,9 +107,11 @@ describe('Install Application Dialog specification', function () {
         });
     });
 
-    //verifies   https://github.com/enonic/app-applications/issues/8
+    //verifies  https://github.com/enonic/app-applications/issues/8
     it('GIVEN existing installed application WHEN install dialog has been opened THEN `Installed` status should be displayed near the application',
         () => {
+            let appBrowsePanel = new AppBrowsePanel();
+            let dialog = new InstallDialog();
             return appBrowsePanel.clickOnInstallButton().then(() => {
                 return dialog.waitForOpened();
             }).then(() => {

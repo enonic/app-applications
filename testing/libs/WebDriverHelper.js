@@ -25,42 +25,40 @@ const makeChromeOptions = headless => ({
  * that initialize and terminate the webdriverio session.
  */
 WebDriverHelper.prototype.setupBrowser = function setupBrowser() {
-    var _this = this;
-    before(function () {
-        var PropertiesReader = require('properties-reader');
-        var path = require('path');
-        var webdriverio = require('webdriverio');
-        var file = path.join(__dirname, '/../browser.properties');
-        var properties = PropertiesReader(file);
-        var browser_name = properties.get('browser.name');
-        var platform_name = properties.get('platform');
-        var baseUrl = properties.get('base.url');
-        var chromeBinPath = properties.get('chrome.bin.path');
-        var isHeadless = properties.get('is.headless');
+    let _this = this;
+    before(async function () {
+        let PropertiesReader = require('properties-reader');
+        let path = require('path');
+        let webdriverio = require('webdriverio');
+        let file = path.join(__dirname, '/../browser.properties');
+        let properties = PropertiesReader(file);
+        let browser_name = properties.get('browser.name');
+        let platform_name = properties.get('platform');
+        let baseUrl = properties.get('base.url');
+        let chromeBinPath = properties.get('chrome.bin.path');
+        let isHeadless = properties.get('is.headless');
         console.log('is Headless ##################### ' + isHeadless);
         console.log('browser name ##################### ' + browser_name);
-        var options = {
-            desiredCapabilities: {
+        let options = {
+            logLevel: "error",
+            capabilities: {
                 browserName: browser_name,
                 platform: platform_name,
                 binary: chromeBinPath,
                 chromeOptions: makeChromeOptions(isHeadless)
             }
         };
-        _this.browser = webdriverio
-            .remote(options)
-            .init().url(baseUrl);
+        _this.browser = await webdriverio.remote(options);
+        await _this.browser.url(baseUrl);
         console.log('webdriverio #####################  ' + 'is  initialized!');
         return _this.browser;
     });
-    after(function () {
-        return _this.browser.end();
+    after(async function () {
+        await _this.browser.deleteSession();
     });
     afterEach(function () {
         let state = this.currentTest.state ? this.currentTest.state.toString().toUpperCase() : 'FAILED';
         return console.log('Test:', this.currentTest.title, ' is  ' + state);
-
     });
 };
-
 module.exports = new WebDriverHelper();
