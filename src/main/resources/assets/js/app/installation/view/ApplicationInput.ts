@@ -178,21 +178,23 @@ export class ApplicationInput extends api.dom.CompositeFormInputEl {
 
     private installWithUrl(url: string) {
         this.notifyAppInstallStarted();
-        new InstallUrlApplicationRequest(url).sendAndParse().then((result: ApplicationInstallResult) => {
+        this.disable();
 
-            let failure = result.getFailure();
+        new InstallUrlApplicationRequest(url).sendAndParse().then((result: ApplicationInstallResult) => {
+            const failure: string = result.getFailure();
 
             if (!failure) {
                 this.notifyAppInstallFinished();
                 this.cancelAction.execute();
-
             } else {
                 this.notifyAppInstallFailed(failure);
             }
 
+            this.enable();
         }).catch((reason: any) => {
             api.DefaultErrorHandler.handle(reason);
             this.notifyAppInstallFailed(reason);
+            this.enable();
         });
     }
 
@@ -232,5 +234,15 @@ export class ApplicationInput extends api.dom.CompositeFormInputEl {
         this.appInstallFailedListeners.forEach((listener) => {
             listener(message);
         });
+    }
+
+    private disable() {
+        this.addClass('disabled');
+        this.textInput.getEl().setDisabled(true);
+    }
+
+    private enable() {
+        this.removeClass('disabled');
+        this.textInput.getEl().setDisabled(false);
     }
 }
