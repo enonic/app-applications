@@ -31,7 +31,7 @@ describe('Application Browse Panel, multiple selection in grid', function () {
             });
         });
 
-    it('GIVEN two stopped applications are checked WHEN Start button has been pressed THEN Start gets disabled AND Stop gets disabled',
+    it('GIVEN two stopped applications are checked WHEN Start button has been pressed THEN Start gets disabled AND Stop gets enabled',
         () => {
             let appBrowsePanel = new AppBrowsePanel();
             return appBrowsePanel.clickCheckboxAndSelectRowByDisplayName(appConst.TEST_APPLICATIONS.THIRD_APP).then(() => {
@@ -41,7 +41,7 @@ describe('Application Browse Panel, multiple selection in grid', function () {
             }).then(() => {
                 return assert.eventually.isTrue(appBrowsePanel.waitForStartButtonDisabled(), "`Start` button should be disabled");
             }).then(() => {
-                return assert.eventually.isFalse(appBrowsePanel.isStopButtonEnabled(), "`Stop` button should be disabled");
+                return assert.eventually.isTrue(appBrowsePanel.isStopButtonEnabled(), "`Stop` button should be enabled");
             }).then(() => {
                 let statisticPanel = new StatisticPanel();
                 //Started status should be displayed on  Statistic Panel
