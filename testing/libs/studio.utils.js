@@ -14,6 +14,15 @@ module.exports = {
             return await this.doSwitchToHome();
         }
     },
+    async doLogout() {
+        let launcherPanel = new LauncherPanel();
+        let appBrowsePanel = new BrowsePanel();
+        await appBrowsePanel.doOpenLauncherPanel();
+        await launcherPanel.clickOnLogoutLink();
+        await launcherPanel.pause(1000);
+        return await this.doSwitchToLoginPage();
+
+    },
     startSelectedApp(appName) {
         let appBrowsePanel = new BrowsePanel();
         return appBrowsePanel.getApplicationState(appName).then(result => {
@@ -26,7 +35,7 @@ module.exports = {
     },
     stopSelectedApp(appName) {
         let appBrowsePanel = new BrowsePanel();
-        return appBrowsePanel.getApplicationState(appName).then(result=>{
+        return appBrowsePanel.getApplicationState(appName).then(result => {
             if (result === 'started') {
                 return appBrowsePanel.clickOnStopButton();
             }
@@ -79,6 +88,15 @@ module.exports = {
         }).then(() => {
             let homePage = new HomePage();
             return homePage.waitForLoaded(appConst.TIMEOUT_3);
+        });
+    },
+    doSwitchToLoginPage: function () {
+        console.log('testUtils:switching to Home page...');
+        return webDriverHelper.browser.switchWindow("Enonic XP - Login").then(() => {
+            console.log("switched to Login Page...");
+        }).then(() => {
+            let loginPage = new LoginPage();
+            return loginPage.waitForPageLoaded(appConst.TIMEOUT_3);
         });
     },
     switchAndCheckTitle: function (handle, reqTitle) {

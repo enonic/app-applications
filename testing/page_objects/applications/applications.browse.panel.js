@@ -1,9 +1,11 @@
 const Page = require('../page');
 const lib = require('../../libs/elements');
 const appConst = require('../../libs/app_const');
+const LauncherPanel = require('../launcher.panel');
 
 const XPATH = {
     container: `//div[contains(@id,'ApplicationBrowsePanel')]`,
+    launcherButton:"//button[contains(@class,'launcher-button')]",
     appGrid: `//div[contains(@class, 'application-grid')]`,
     toolbar: `//div[contains(@id,'ApplicationBrowseToolbar')]`,
     contextMenu: `//ul[contains(@id,'TreeGridContextMenu')]`,
@@ -368,6 +370,18 @@ class AppBrowsePanel extends Page {
         return this.getTextInDisplayedElements(displayNameXpath).catch(err => {
             throw new Error('Error when get App-display names')
         });
+    }
+    doOpenLauncherPanel(){
+        return this.waitForElementDisplayed(XPATH.launcherButton,appConst.TIMEOUT_2).then(()=>{
+            return this.clickOnElement(XPATH.launcherButton);
+        }).then(()=>{
+            let launcherPanel = new LauncherPanel();
+            return launcherPanel.waitForPanelDisplayed(appConst.TIMEOUT_2);
+        }).then(result=>{
+            if(!result){
+                throw new Error("Launcher Panel was not loaded");
+            }
+        })
     }
 };
 module.exports = AppBrowsePanel;
