@@ -70,6 +70,15 @@ class ApplicationItemStatisticsPanel extends Page {
         })
     }
 
+    waitForApplicationStatus(state) {
+        let selector = xpath.main + xpath.dropDownButton;
+        return this.getBrowser().waitUntil(() => {
+            return this.getText(selector).then(text => {
+                return text === state;
+            });
+        }, 3000, "Expected sate should be " + state);
+    }
+
     clickOnActionDropDownMenu() {
         let selector = xpath.main + xpath.dropDownButton;
         return this.clickOnElement(selector).catch(err => {

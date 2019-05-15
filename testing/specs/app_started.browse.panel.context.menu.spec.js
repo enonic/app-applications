@@ -21,7 +21,7 @@ describe(`Applications Grid context menu`, function () {
     it(`GIVEN one row is selected WHEN right click on the row THEN context menu should appear`, () => {
         let appBrowsePanel = new AppBrowsePanel();
         return appBrowsePanel.clickOnRowByDisplayName(appConst.TEST_APPLICATIONS.THIRD_APP).then(() => {
-            appBrowsePanel.rightClickOnRowByDisplayName(appConst.TEST_APPLICATIONS.THIRD_APP);
+           return appBrowsePanel.rightClickOnRowByDisplayName(appConst.TEST_APPLICATIONS.THIRD_APP);
         }).then(() => {
             return appBrowsePanel.waitForContextMenuDisplayed();
         }).then(result => {
