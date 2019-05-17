@@ -30,7 +30,7 @@ describe(`Applications Grid context menu, application is stopped`, function () {
         return appBrowsePanel.rightClickOnRowByDisplayName(appConst.TEST_APPLICATIONS.SECOND_APP).then(() => {
             return appBrowsePanel.waitForContextMenuDisplayed();
         }).then(() => {
-            return appBrowsePanel.waitForContextButtonEnabled('Start');
+            return appBrowsePanel.waitForContextMenuItemEnabled('Start');
         }).then(result => {
             studioUtils.saveScreenshot("start_menu_item2");
             assert.isTrue(result, 'Start menu item should be enabled');
