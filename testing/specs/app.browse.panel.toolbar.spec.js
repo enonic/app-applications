@@ -38,7 +38,9 @@ describe('Application Browse Panel, check buttons on the toolbar', function () {
             let appBrowsePanel = new AppBrowsePanel();
             let installAppDialog = new InstallAppDialog();
             return appBrowsePanel.clickOnInstallButton()
+                .then(()=> installAppDialog.waitForGridLoaded())
                 .then(() => installAppDialog.waitForInstallLink(appDisplayName1))
+                .then(()=> installAppDialog.pause(500))
                 .then(() => installAppDialog.clickOnInstallAppLink(appDisplayName1))
                 .then(() => installAppDialog.waitForAppInstalled(appDisplayName1))
                 .then(() => installAppDialog.waitForInstallLink(appDisplayName2))
@@ -47,6 +49,7 @@ describe('Application Browse Panel, check buttons on the toolbar', function () {
                 .then(() => installAppDialog.clickOnCancelButtonTop())
                 .then(() => installAppDialog.waitForClosed(2000))
                 .then(() => {
+                    studioUtils.saveScreenshot("chuck_norris_installed");
                     return assert.eventually.isTrue(appBrowsePanel.isItemDisplayed(appDescription1),
                         appDescription1 + "  application should be present");
 
@@ -60,6 +63,7 @@ describe('Application Browse Panel, check buttons on the toolbar', function () {
         let appBrowsePanel = new AppBrowsePanel();
         //select the application:
         return appBrowsePanel.clickOnRowByName(appDescription1).then(() => {
+            studioUtils.saveScreenshot("chuck_norris_selected");
             return assert.eventually.isTrue(appBrowsePanel.waitForUninstallButtonEnabled(), "Uninstall button gets enabled")
         }).then(() => {
             return appBrowsePanel.waitForStopButtonEnabled();
@@ -81,14 +85,14 @@ describe('Application Browse Panel, check buttons on the toolbar', function () {
         let appBrowsePanel = new AppBrowsePanel();
         return appBrowsePanel.clickOnSelectAll().then(() => {
             return assert.eventually.isTrue(appBrowsePanel.isRowByIndexSelected(0), "First row should be selected(blue)");
-        }).then(()=>{
+        }).then(() => {
             return assert.eventually.isTrue(appBrowsePanel.isRowByIndexSelected(1), "Second row should be selected(blue)");
         }).then(() => {
             //click on 'Select all/Unselect all' checkbox
             return appBrowsePanel.clickOnSelectAll();
         }).then(() => {
             return assert.eventually.isFalse(appBrowsePanel.isRowByIndexSelected(0), "First row should be unselected");
-        }).then(()=>{
+        }).then(() => {
             return assert.eventually.isFalse(appBrowsePanel.isRowByIndexSelected(1), "Second row should be unselected");
         });
     });

@@ -348,6 +348,9 @@ class AppBrowsePanel extends Page {
                     return result.includes("disabled");
                 })
             }, appConst.TIMEOUT_3, "context menu item is not disabled in 3000 ms");
+        }).catch(err => {
+            this.saveScreenshot("err_context_menu");
+            throw new Error(err);
         })
     }
 

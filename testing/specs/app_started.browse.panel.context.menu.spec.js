@@ -35,7 +35,7 @@ describe(`Applications Grid context menu`, function () {
         return appBrowsePanel.rightClickOnRowByDisplayName(appConst.TEST_APPLICATIONS.THIRD_APP).then(() => {
             return appBrowsePanel.waitForContextMenuDisplayed();
         }).then(result => {
-            studioUtils.saveScreenshot("app_context_menu");
+            studioUtils.saveScreenshot("app_context_menu1");
             assert.isTrue(result, 'context menu should be visible');
         })
     });
@@ -45,6 +45,7 @@ describe(`Applications Grid context menu`, function () {
         return appBrowsePanel.rightClickOnRowByDisplayName(appConst.TEST_APPLICATIONS.THIRD_APP).then(() => {
             return appBrowsePanel.waitForContextMenuDisplayed();
         }).then(() => {
+            studioUtils.saveScreenshot("app_context_menu2");
             return appBrowsePanel.waitForContextMenuItemDisabled('Start');
         }).then(() => {
             //'Stop menu item should be enabled'
