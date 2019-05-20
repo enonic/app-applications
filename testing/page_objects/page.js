@@ -184,6 +184,7 @@ class Page {
     async doRightClick(selector) {
         let el = await this.findElement(selector);
         await el.moveTo();
+        await this.pause(400);
         return await this.browser.positionClick(2);
     }
 

@@ -56,7 +56,7 @@ describe('Install app dialog, search input spec.', function () {
             }).then(() => {
                 return installDialog.typeSearchTextAndEnter(correct_url);
             }).then(() => {
-                return installDialog.waitForClosed(25000);
+                return installDialog.waitForClosed(35000);
             }).then(() => {
                 return installDialog.waitForNotificationMessage();
             }).then(message => {
