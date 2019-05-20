@@ -54,7 +54,6 @@ describe('Application Browse Panel, check buttons on the toolbar', function () {
                     return assert.eventually.isTrue(appBrowsePanel.isItemDisplayed(appDescription2),
                         appDescription2 + "  application should be present");
                 })
-
         });
 
     it('WHEN An installed application is selected or unselected THEN the toolbar buttons must be updated', () => {

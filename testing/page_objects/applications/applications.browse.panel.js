@@ -5,7 +5,7 @@ const LauncherPanel = require('../launcher.panel');
 
 const XPATH = {
     container: `//div[contains(@id,'ApplicationBrowsePanel')]`,
-    launcherButton:"//button[contains(@class,'launcher-button')]",
+    launcherButton: "//button[contains(@class,'launcher-button')]",
     appGrid: `//div[contains(@class, 'application-grid')]`,
     toolbar: `//div[contains(@id,'ApplicationBrowseToolbar')]`,
     contextMenu: `//ul[contains(@id,'TreeGridContextMenu')]`,
@@ -45,7 +45,7 @@ class AppBrowsePanel extends Page {
     }
 
     get selectionPanelToggler() {
-        return `${XPATH.container}${XPATH.selectionPanelToggler}`;
+        return XPATH.container + XPATH.selectionPanelToggler;
     }
 
     waitForGridLoaded(ms) {
@@ -308,6 +308,7 @@ class AppBrowsePanel extends Page {
             throw new Error('Error when clicking on Arrow Up key ' + err);
         });
     }
+
     pressEscKey() {
         return this.keys('Escape').then(() => {
             return this.pause(500);
@@ -350,7 +351,7 @@ class AppBrowsePanel extends Page {
         })
     }
 
-    waitForContextButtonEnabled(menuItem) {
+    waitForContextMenuItemEnabled(menuItem) {
         let nameXpath = XPATH.enabledContextMenuButton(menuItem);
         return this.waitForElementDisplayed(nameXpath, appConst.TIMEOUT_2).catch(err => {
             throw new Error("Menu item is not enabled! " + menuItem)
@@ -361,7 +362,7 @@ class AppBrowsePanel extends Page {
         let stateXpath = XPATH.appStateByName(appName);
         return this.getText(stateXpath).catch(err => {
             console.log("Failed to get app-state " + appName + '  ' + err);
-            throw new Error('App-state was not found')
+            throw new Error('App-state was not found' + err);
         });
     }
 
@@ -371,14 +372,15 @@ class AppBrowsePanel extends Page {
             throw new Error('Error when get App-display names')
         });
     }
-    doOpenLauncherPanel(){
-        return this.waitForElementDisplayed(XPATH.launcherButton,appConst.TIMEOUT_2).then(()=>{
+
+    doOpenLauncherPanel() {
+        return this.waitForElementDisplayed(XPATH.launcherButton, appConst.TIMEOUT_2).then(() => {
             return this.clickOnElement(XPATH.launcherButton);
-        }).then(()=>{
+        }).then(() => {
             let launcherPanel = new LauncherPanel();
             return launcherPanel.waitForPanelDisplayed(appConst.TIMEOUT_2);
-        }).then(result=>{
-            if(!result){
+        }).then(result => {
+            if (!result) {
                 throw new Error("Launcher Panel was not loaded");
             }
         })

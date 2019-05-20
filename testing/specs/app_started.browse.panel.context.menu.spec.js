@@ -48,7 +48,7 @@ describe(`Applications Grid context menu`, function () {
             return appBrowsePanel.waitForContextMenuItemDisabled('Start');
         }).then(() => {
             //'Stop menu item should be enabled'
-            return appBrowsePanel.waitForContextButtonEnabled('Stop');
+            return appBrowsePanel.waitForContextMenuItemEnabled('Stop');
         }).then(() => {
             //Uninstall menu item should be disabled, because the application is local.
             return appBrowsePanel.waitForContextMenuItemDisabled('Uninstall');
