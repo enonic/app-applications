@@ -21,7 +21,7 @@ describe(`Applications Grid context menu`, function () {
     it(`GIVEN one row is selected WHEN right click on the row THEN context menu should appear`, () => {
         let appBrowsePanel = new AppBrowsePanel();
         return appBrowsePanel.clickOnRowByDisplayName(appConst.TEST_APPLICATIONS.THIRD_APP).then(() => {
-           return appBrowsePanel.rightClickOnRowByDisplayName(appConst.TEST_APPLICATIONS.THIRD_APP);
+            return appBrowsePanel.rightClickOnRowByDisplayName(appConst.TEST_APPLICATIONS.THIRD_APP);
         }).then(() => {
             return appBrowsePanel.waitForContextMenuDisplayed();
         }).then(result => {
@@ -40,20 +40,30 @@ describe(`Applications Grid context menu`, function () {
         })
     });
 
-    it(`WHEN right click an an application THEN 'Start' menu item should be disabled, because the application is started`, () => {
+    it(`WHEN right click on a started application THEN 'Start' menu item should be disabled, because the application is started`, () => {
         let appBrowsePanel = new AppBrowsePanel();
-        return appBrowsePanel.rightClickOnRowByDisplayName(appConst.TEST_APPLICATIONS.THIRD_APP).then(() => {
-            return appBrowsePanel.waitForContextMenuDisplayed();
+        return appBrowsePanel.getApplicationState(appConst.TEST_APPLICATIONS.THIRD_APP).then(state => {
+            if (state == 'stopped') {
+                return appBrowsePanel.clickOnRowByDisplayName(appConst.TEST_APPLICATIONS.THIRD_APP).then(() => {
+                    return appBrowsePanel.clickOnStartButton();
+                }).then(() => {
+                    return appBrowsePanel.pause(2000);
+                })
+            }
         }).then(() => {
-            studioUtils.saveScreenshot("app_context_menu2");
-            return appBrowsePanel.waitForContextMenuItemDisabled('Start');
-        }).then(() => {
-            //'Stop menu item should be enabled'
-            return appBrowsePanel.waitForContextMenuItemEnabled('Stop');
-        }).then(() => {
-            //Uninstall menu item should be disabled, because the application is local.
-            return appBrowsePanel.waitForContextMenuItemDisabled('Uninstall');
-        })
+            return appBrowsePanel.rightClickOnRowByDisplayName(appConst.TEST_APPLICATIONS.THIRD_APP).then(() => {
+                return appBrowsePanel.waitForContextMenuDisplayed();
+            }).then(() => {
+                studioUtils.saveScreenshot("app_context_menu2");
+                return appBrowsePanel.waitForContextMenuItemDisabled('Start');
+            }).then(() => {
+                //'Stop menu item should be enabled'
+                return appBrowsePanel.waitForContextMenuItemEnabled('Stop');
+            }).then(() => {
+                //Uninstall menu item should be disabled, because the application is local.
+                return appBrowsePanel.waitForContextMenuItemDisabled('Uninstall');
+            })
+        });
     });
 
     it(`should close the context menu after clicking on the same row`, () => {
