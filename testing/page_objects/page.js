@@ -73,12 +73,14 @@ class Page {
         let inputElement = await this.findElement(selector);
 
         await inputElement.setValue(text);
+        await this.pause(300);
         let value = await inputElement.getValue();
         //workaround for issue in WebdriverIO
-        if (value == "") {
+        if (value !== text) {
             await inputElement.setValue(text);
+            await this.pause(300);
         }
-        return await inputElement.pause(300);
+        return await this.pause(300);
     }
 
     async getTextInInput(selector) {
