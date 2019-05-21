@@ -163,9 +163,8 @@ task testApplicationsAppLocally( type: NpmTask, dependsOn: [npmInstall, startSel
 
 
 repositories {
-    mavenLocal()
-    mavenCentral()
     maven {
         url 'https://repo.enonic.com/public'
     }
+    mavenCentral()
 }
