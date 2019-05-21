@@ -31,10 +31,6 @@ configurations {
     distro
 }
 
-apply plugin: 'com.enonic.defaults'
-apply plugin: 'com.moowork.node'
-apply plugin: 'com.moowork.gulp'
-
 ext.extProgram = new Properties()
 extProgram.load( new FileInputStream( "../gradle.properties" ) )
 extProgram['xpVersion']
