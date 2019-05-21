@@ -113,7 +113,7 @@ module.exports = {
             let launcherPanel = new LauncherPanel();
             return launcherPanel.clickOnApplicationsLink();
         }).then(() => {
-            return loginPage.pause(1000);
+            return loginPage.pause(1500);
         })
     },
 
