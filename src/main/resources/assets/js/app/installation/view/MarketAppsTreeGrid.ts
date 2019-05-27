@@ -247,6 +247,11 @@ export class MarketAppsTreeGrid extends TreeGrid<MarketApplication> {
 
                     } else {
                         elem.setHtml(MarketAppStatusFormatter.formatStatus(status));
+                        app.setStatus(status);
+                        if (row > -1) {
+                            this.getGrid().updateCell(row, this.getGrid().getColumnIndex('appStatus'));
+                        }
+                        api.DefaultErrorHandler.handle(result.getFailure());
                     }
 
                 }).catch((reason: any) => {
