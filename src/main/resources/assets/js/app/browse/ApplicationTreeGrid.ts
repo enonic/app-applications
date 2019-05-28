@@ -117,13 +117,11 @@ export class ApplicationTreeGrid extends TreeGrid<Application> {
     }
 
     updateApplicationNode(applicationKey: api.application.ApplicationKey) {
-        let root = this.getRoot().getCurrentRoot();
-        root.getChildren().forEach((child: TreeNode<Application>) => {
-            let curApplication: Application = child.getData();
-            if (curApplication.getApplicationKey().toString() === applicationKey.toString()) {
-                this.updateNode(curApplication);
-            }
-        });
+        const root: TreeNode<Application> = this.getRoot().getCurrentRoot();
+        root.getChildren()
+            .map((child: TreeNode<Application>) => child.getData())
+            .filter((app: Application) => app.getApplicationKey().toString() === applicationKey.toString())
+            .map(this.updateNode.bind(this));
     }
 
     getByApplicationKey(applicationKey: api.application.ApplicationKey): Application {
