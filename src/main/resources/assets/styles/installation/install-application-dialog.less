@@ -45,6 +45,11 @@
     @media screen and (max-height: 950px) {
       margin-right: 10px;
     }
+
+    &.disabled {
+      opacity: 0.5;
+      pointer-events: none;
+    }
   }
 
   .uploader-el {
@@ -180,10 +185,6 @@
     margin: 15px 0;
     font-size: 14px;
 
-    &.loaded:not(.empty) {
-      display: none;
-    }
-
     &.failed {
       color: @admin-red;
     }
@@ -206,10 +207,6 @@
     }
     @media screen and (max-width: 540px) {
       right: 56px;
-    }
-
-    &.hidden {
-      display: none;
     }
   }
 }
