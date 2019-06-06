@@ -110,9 +110,9 @@ class InstallAppDialog extends Page {
     }
 
     applicationNotFoundMessage() {
-        let selector = XPATH.container + `//div[contains(@class,'status-message') and contains(@class,'empty')]`;
+        let selector = XPATH.container + `//div[@class='status-message']`;
         return this.waitForElementDisplayed(selector, appConst.TIMEOUT_3).then(() => {
-            return this.getText(selector);
+            return this.getTextInDisplayedElements(selector);
         }).catch(err => {
             this.saveScreenshot('err_app_not_found_message');
             throw new Error('Application not found message is not visible  ' + err);

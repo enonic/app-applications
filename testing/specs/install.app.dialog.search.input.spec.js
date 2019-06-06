@@ -12,7 +12,7 @@ describe('Install app dialog, search input spec.', function () {
     this.timeout(appConst.SUITE_TIMEOUT);
     webDriverHelper.setupBrowser();
     const not_existing = 'http://test.com';
-    const correct_url = 'https://repo.enonic.com/public/com/enonic/app/contentviewer/1.4.0/contentviewer-1.4.0.jar';
+    const CONTENT_VIEWER_APP = 'https://repo.enonic.com/public/com/enonic/app/contentviewer/1.5.1/contentviewer-1.5.1.jar';
 
     const local_file = "file:c:/";
 
@@ -44,7 +44,7 @@ describe('Install app dialog, search input spec.', function () {
                 return installDialog.applicationNotFoundMessage();
             }).then(message => {
                 studioUtils.saveScreenshot("app_not_found");
-                assert.isTrue(message.includes('No applications found'), 'correct search-status message should appear');
+                assert.isTrue(message.includes('No applications found'), '`No applications found` - message should appear');
             });
         });
     it(`GIVEN 'install app' dialog is opened WHEN actual URL has been typed and 'Enter' key pressed THEN application should be installed`,
@@ -54,7 +54,7 @@ describe('Install app dialog, search input spec.', function () {
             return appBrowsePanel.clickOnInstallButton().then(() => {
                 return installDialog.waitForOpened();
             }).then(() => {
-                return installDialog.typeSearchTextAndEnter(correct_url);
+                return installDialog.typeSearchTextAndEnter(CONTENT_VIEWER_APP);
             }).then(() => {
                 return installDialog.waitForClosed(45000);
             }).then(() => {
