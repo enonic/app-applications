@@ -17,7 +17,7 @@ const XPATH = {
     selectAllCheckbox: `//div[@id='api.ui.treegrid.actions.SelectionController']`,
     checkboxes: `(//div[contains(@class,'slick-cell-checkboxsel')])`,
     appState: "//div[contains(@class,'state')]",
-    selectedRows: `//div[@class='slick-viewport']//div[contains(@class,'slick-row') and child::div[contains(@class,'selected')]]`,
+    selectedRows: `//div[contains(@class,'slick-viewport')]//div[contains(@class,'slick-row') and child::div[contains(@class,'selected')]]`,
     selectionControllerCheckBox: `//div[contains(@id,'SelectionController')]`,
     selectionPanelToggler: `//button[contains(@id,'SelectionPanelToggler')]`,
     numberInToggler: `//button[contains(@id,'SelectionPanelToggler')]/span`,
