@@ -72,6 +72,8 @@ class InstallAppDialog extends Page {
         return this.waitForElementDisplayed(selector, appConst.TIMEOUT_3).catch(err => {
             this.saveScreenshot('err_install_link_load');
             throw new Error('Install link was not loaded! ' + err);
+        }).then(()=>{
+            return this.pause(300);
         });
     }
 
