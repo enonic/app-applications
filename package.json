@@ -35,12 +35,12 @@
     "postcss-loader": "^2.1.6",
     "postcss-normalize": "^4.0.0",
     "prettier": "^1.18.2",
+    "terser-webpack-plugin": "^1.2.3",
     "ts-loader": "^4.1.0",
     "tslint": "5.9.1",
     "typescript": "^2.9.2",
-    "terser-webpack-plugin": "^1.2.3",
-    "webpack": "^4.30.0",
-    "webpack-cli": "^3.3.2"
+    "webpack": "^4.35.3",
+    "webpack-cli": "^3.3.5"
   },
   "browserslist": [
     "extends browserslist-config-enonic"
