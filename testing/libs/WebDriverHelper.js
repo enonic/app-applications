@@ -16,7 +16,7 @@ const makeChromeOptions = headless => ({
         ...(headless ? ["--headless", "--disable-gpu", "--no-sandbox"] : []),
         "--lang=en",
         '--disable-extensions',
-        'window-size=1920,1100'
+        'window-size=1970,1100'
     ]
 });
 
@@ -43,9 +43,8 @@ WebDriverHelper.prototype.setupBrowser = function setupBrowser() {
             logLevel: "error",
             capabilities: {
                 browserName: browser_name,
-                platform: platform_name,
-                binary: chromeBinPath,
-                chromeOptions: makeChromeOptions(isHeadless)
+                platformName:platform_name,
+                'goog:chromeOptions': makeChromeOptions(isHeadless)
             }
         };
         _this.browser = await webdriverio.remote(options);
