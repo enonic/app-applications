@@ -231,9 +231,8 @@ class AppBrowsePanel extends Page {
         const nameXpath = XPATH.rowByDisplayName(name);
         return this.waitForElementDisplayed(nameXpath, appConst.TIMEOUT_3).then(() => {
             return this.doRightClick(nameXpath);
-        }).catch(() => {
-            this.saveScreenshot(`err_find_${name}`);
-            throw Error(`Row with the name ${name} was not found`);
+        }).catch(err => {
+            throw Error(`Error when do right click on the row:` + err);
         })
     }
 
@@ -288,8 +287,8 @@ class AppBrowsePanel extends Page {
             return this.clickOnElement(displayNameXpath);
         }).then(() => {
             return this.pause(500);
-        }).catch(() => {
-            throw Error(`Row with the displayName ${displayName} was not found.`)
+        }).catch(err => {
+            throw Error(`Row with the displayName ${displayName} was not found.` + err)
         })
     }
 

@@ -132,7 +132,7 @@ class Page {
 
     async waitForElementDisplayed(selector, ms) {
         let element = await this.findElement(selector);
-        return element.waitForDisplayed(ms);
+        return await element.waitForDisplayed(ms);
     }
 
     waitForSpinnerNotVisible() {
@@ -183,11 +183,30 @@ class Page {
         })
     }
 
+    // async doRightClick(selector) {
+    //     let el = await this.findElement(selector);
+    //     await el.moveTo();
+    //     await this.pause(400);
+    //     return await this.browser.positionClick(2);
+    // }
     async doRightClick(selector) {
         let el = await this.findElement(selector);
         await el.moveTo();
-        await this.pause(400);
-        return await this.browser.positionClick(2);
+        return await this.browser.performActions([{
+            type: 'pointer',
+            id: 'pointer1',
+            parameters: {
+                pointerType: 'mouse'
+            },
+            actions: [{
+                type: 'pointerDown',
+                button: 2
+            },  {
+                type: 'pointerUp',
+                button: 2
+            }]
+        }]);
+        //return await this.browser.positionClick(2);
     }
 
     async isFocused(selctor) {

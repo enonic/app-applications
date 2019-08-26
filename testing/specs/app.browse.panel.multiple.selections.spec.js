@@ -13,21 +13,22 @@ describe('Application Browse Panel, multiple selection in grid', function () {
     webDriverHelper.setupBrowser();
 
     it(`GIVEN two started applications are checked WHEN Stop button has been pressed THEN Stop gets disabled AND Start gets enabled`,
-        () => {
+        async () => {
+            //preconditions:
+            //await restartApps();
             let appBrowsePanel = new AppBrowsePanel();
-            return appBrowsePanel.clickCheckboxAndSelectRowByDisplayName(appConst.TEST_APPLICATIONS.THIRD_APP).then(() => {
-                return appBrowsePanel.clickCheckboxAndSelectRowByDisplayName(appConst.TEST_APPLICATIONS.FIRST_APP);
-            }).then(() => {
-                return appBrowsePanel.clickOnStopButton();
-            }).then(() => {
-                return assert.eventually.isTrue(appBrowsePanel.waitForStartButtonEnabled(), "`Start` button should be enabled");
-            }).then(() => {
-                return assert.eventually.isFalse(appBrowsePanel.isStopButtonEnabled(), "`Stop` button should be disabled");
-            }).then(() => {
-                let statisticPanel = new StatisticPanel();
-                //Stopped status should be displayed on  Statistic Panel
-                return statisticPanel.waitForApplicationStatus("Stopped");
-            });
+            await appBrowsePanel.clickCheckboxAndSelectRowByDisplayName(appConst.TEST_APPLICATIONS.THIRD_APP)
+            await appBrowsePanel.clickCheckboxAndSelectRowByDisplayName(appConst.TEST_APPLICATIONS.FIRST_APP);
+
+            await appBrowsePanel.clickOnStopButton();
+            await appBrowsePanel.waitForStartButtonEnabled();
+            let result = await appBrowsePanel.isStopButtonEnabled();
+            assert.isFalse(result, "`Stop` button should be disabled");
+
+            let statisticPanel = new StatisticPanel();
+            //Stopped status should be displayed on  Statistic Panel
+            await statisticPanel.waitForApplicationStatus("Stopped");
+
         });
 
     it(`GIVEN two stopped applications are checked WHEN right click on selected apps THEN only Start menu item should be enabled in the opened context menu`,
@@ -109,15 +110,6 @@ describe('Application Browse Panel, multiple selection in grid', function () {
 
     beforeEach(() => studioUtils.navigateToApplicationsApp());
     afterEach(() => studioUtils.doCloseCurrentBrowserTab());
-    before(() => {
-        return studioUtils.navigateToApplicationsApp().then(() => {
-            return restartApps();
-        }).then(() => {
-            return studioUtils.doLogout();
-        }).then(() => {
-            return console.log('specification is starting: ' + this.title);
-        })
-    });
 });
 
 function restartApps() {
@@ -136,7 +128,9 @@ function restartApps() {
                 })
             }
         });
-    });
+    }).then(()=>{
+        //return appBrowsePanel.
+    })
 }
 
 
