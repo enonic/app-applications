@@ -103,6 +103,7 @@ export class InstallAppDialog
         this.marketAppsTreeGrid.onLoadingStarted(() => {
             this.addClass('loading');
             this.statusMessage.showLoading();
+            this.marketAppsTreeGrid.mask();
         });
 
         this.clearButton.onClicked(() => {
