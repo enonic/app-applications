@@ -93,7 +93,6 @@ class Page {
         await inputElement.waitForDisplayed(1000);
         await inputElement.clearValue();
         return await inputElement.pause(300);
-
     }
 
     saveScreenshot(name) {
@@ -183,36 +182,33 @@ class Page {
         })
     }
 
-    // async doRightClick(selector) {
-    //     let el = await this.findElement(selector);
-    //     await el.moveTo();
-    //     await this.pause(400);
-    //     return await this.browser.positionClick(2);
-    // }
     async doRightClick(selector) {
         let el = await this.findElement(selector);
         await el.moveTo();
+        let x = await el.getLocation('x');
+        let y = await el.getLocation('y');
+        console.log("X:" + x + "Y " + y);
         return await this.browser.performActions([{
             type: 'pointer',
             id: 'pointer1',
             parameters: {
                 pointerType: 'mouse'
             },
-            actions: [{
-                type: 'pointerDown',
-                button: 2
-            },  {
-                type: 'pointerUp',
-                button: 2
-            }]
+            actions: [
+                {type: "pointerMove", origin: "pointer", "x": x, "y": y},
+                {
+                    type: 'pointerDown',
+                    button: 2
+                }, {
+                    type: 'pointerUp',
+                    button: 2
+                }]
         }]);
-        //return await this.browser.positionClick(2);
     }
 
-    async isFocused(selctor) {
-        let el = await this.findElement(selctor);
+    async isFocused(selector) {
+        let el = await this.findElement(selector);
         return await el.isFocused();
-
     }
 }
 module.exports = Page;
