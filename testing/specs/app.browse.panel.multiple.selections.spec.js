@@ -28,7 +28,6 @@ describe('Application Browse Panel, multiple selection in grid', function () {
             let statisticPanel = new StatisticPanel();
             //Stopped status should be displayed on  Statistic Panel
             await statisticPanel.waitForApplicationStatus("Stopped");
-
         });
 
     it(`GIVEN two stopped applications are checked WHEN right click on selected apps THEN only Start menu item should be enabled in the opened context menu`,
