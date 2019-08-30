@@ -43,7 +43,7 @@ describe('Uninstall Application Dialog specification', function () {
         });
     });
 
-    it(`should display correct notification message`, () => {
+    it(`should display expected notification message`, () => {
         let uninstallAppDialog = new UninstallAppDialog();
         let appBrowsePanel = new AppBrowsePanel();
         return openUninstallDialog().then(() => {
@@ -51,6 +51,7 @@ describe('Uninstall Application Dialog specification', function () {
         }).then(() => {
             return appBrowsePanel.waitForNotificationMessage();
         }).then(result => {
+            studioUtils.saveScreenshot("chuck_norris_uninstalled_message");
             const text = result instanceof Array ? result[result.length - 1] : result;
             assert.equal(text, 'Application \'Chuck Norris\' uninstalled successfully', `Incorrect notification message [${text}]`)
         });

@@ -159,12 +159,18 @@ class Page {
         return element.getAttribute(attributeName);
     }
 
-    waitForNotificationMessage() {
-        return this.waitForElementDisplayed(`//div[@class='notification-content']/span`, appConst.TIMEOUT_3).catch(err => {
+    async waitForNotificationMessage() {
+        try {
+            let notificationXpath = `//div[contains(@id,'NotificationContainer')]//div[@class='notification-content']/span`;
+            await this.getBrowser().waitUntil(async () => {
+                return await this.isElementDisplayed(notificationXpath);
+            })
+            await this.pause(300);
+            let result = await this.getTextInElements(notificationXpath);
+            return result[0];
+        } catch (err) {
             throw new Error('Error when wait for notification message: ' + err);
-        }).then(() => {
-            return this.getText(`//div[@class='notification-content']/span`);
-        })
+        }
     }
 
     waitForExpectedNotificationMessage(expectedMessage) {

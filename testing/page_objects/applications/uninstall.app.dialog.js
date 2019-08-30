@@ -35,6 +35,8 @@ class UninstallAppDialog extends Page {
     clickOnYesButton() {
         return this.clickOnElement(this.yesButton).catch(err => {
             throw new Error('Error when try click on Yes button ' + err);
+        }).then(()=>{
+            return this.pause(300);
         })
     }
 
