@@ -10,9 +10,12 @@ import UploadFailedEvent = api.ui.uploader.UploadFailedEvent;
 
 export class ApplicationInput extends api.dom.CompositeFormInputEl {
 
+    private static LAST_KEY_PRESS_TIMEOUT: number = 300;
+
     private textInput: InputEl;
+
     private applicationUploaderEl: ApplicationUploaderEl;
-    private LAST_KEY_PRESS_TIMEOUT: number;
+
     private cancelAction: Action;
 
     private textValueChangedListeners: {(): void}[] = [];
@@ -40,7 +43,6 @@ export class ApplicationInput extends api.dom.CompositeFormInputEl {
             showCancel: false
         }));
 
-        this.LAST_KEY_PRESS_TIMEOUT = 750;
         this.cancelAction = cancelAction;
 
         this.applicationUploaderEl.onUploadStarted((event: UploadStartedEvent<Application>) => {
@@ -67,7 +69,7 @@ export class ApplicationInput extends api.dom.CompositeFormInputEl {
     }
 
     private initUrlEnteredHandler() {
-        const keyDownHandler: () => void = api.util.AppHelper.debounce(this.startInstall.bind(this), this.LAST_KEY_PRESS_TIMEOUT);
+        const keyDownHandler: () => void = api.util.AppHelper.debounce(() => this.startInstall(), ApplicationInput.LAST_KEY_PRESS_TIMEOUT);
 
         this.onKeyDown((event) => {
             switch (event.keyCode) {
