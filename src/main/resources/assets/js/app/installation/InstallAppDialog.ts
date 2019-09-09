@@ -1,17 +1,16 @@
-import '../../api.ts';
 import {ApplicationInput} from './view/ApplicationInput';
 import {MarketAppsTreeGrid} from './view/MarketAppsTreeGrid';
 import {ApplicationUploaderEl} from './ApplicationUploaderEl';
 import {ApplicationUploadStartedEvent} from '../browse/ApplicationUploadStartedEvent';
 import TreeNode = api.ui.treegrid.TreeNode;
 import Application = api.application.Application;
-import i18n = api.util.i18n;
 import DivEl = api.dom.DivEl;
 import MarketApplication = api.application.MarketApplication;
 import UploadFailedEvent = api.ui.uploader.UploadFailedEvent;
 import UploadStartedEvent = api.ui.uploader.UploadStartedEvent;
 import ButtonEl = api.dom.ButtonEl;
 import StringHelper = api.util.StringHelper;
+import i18n = api.util.i18n;
 
 export class InstallAppDialog
     extends api.ui.dialog.ModalDialog {
@@ -59,15 +58,10 @@ export class InstallAppDialog
 
         this.applicationInput.onTextValueChanged(() => {
             this.clearButton.setVisible(!StringHelper.isEmpty(this.applicationInput.getValue()));
+            this.marketAppsTreeGrid.mask();
             this.marketAppsTreeGrid.refresh();
         });
 
-        const showMask = api.util.AppHelper.debounce(this.marketAppsTreeGrid.mask.bind(this.marketAppsTreeGrid), 300, false);
-        this.applicationInput.getTextInput().onValueChanged(() => {
-            if (!this.applicationInput.isUrlTyped()) {
-                showMask();
-            }
-        });
         this.applicationInput.onAppInstallStarted(() => {
             this.marketAppsTreeGrid.mask();
             this.statusMessage.showInstalling();
