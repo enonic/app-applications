@@ -50,7 +50,7 @@ describe('Install Application Dialog specification', function () {
         let names = await dialog.getApplicationNames();
         studioUtils.saveScreenshot("install_dlg_sorted");
         assert.isAbove(names.length, 0, 'There should be apps in the grid');
-        assert.equal(names[1], 'Auth0 ID Provider', 'Auth0 ID Provider this application should be second');
+        assert.isTrue(names.includes( 'ADFS ID Provider'), 'Auth0 ID Provider this application should be second');
     });
 
     it('GIVEN install dialog is opened WHEN search text has been typed THEN apps should be filtered ', async () => {
@@ -62,8 +62,8 @@ describe('Install Application Dialog specification', function () {
         await dialog.typeSearchText('Chuck Norris');
         await dialog.pause(1500);
         let names = await dialog.getApplicationNames();
-        assert.isTrue(names.length == 1, 'only one application should be displayed');
-        assert.isTrue(names[0] == appName, 'application should be with the expected display name');
+        assert.isTrue(names.length === 1, 'only one application should be displayed');
+        assert.equal(names[0], appName, 'Chuck Norris app should be filtered');
     });
 
     it('GIVEN dialog is opened WHEN install link has been clicked THEN the app should be installed', () => {
