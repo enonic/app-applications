@@ -15,72 +15,55 @@ describe('Install Application Dialog specification', function () {
 
     const appName = 'Chuck Norris';
 
-    it('SHOULD show install app dialog WHEN Install button has been clicked', () => {
+    it('SHOULD show install app dialog WHEN Install button has been clicked', async () => {
         let appBrowsePanel = new AppBrowsePanel();
         let dialog = new InstallDialog();
-        return appBrowsePanel.clickOnInstallButton().then(() => {
-            return dialog.waitForOpened();
-        }).then(() => {
-            return dialog.waitForSpinnerNotVisible(3000);
-        }).then(() => {
-            return dialog.getPlaceholderMessage();
-        }).then(placeholder => {
-            assert.equal(placeholder, 'Search Enonic Market, paste url or upload directly',
-                'expected message should be in the placeholder');
-        }).then(() => {
-            studioUtils.saveScreenshot("install_dialog_default_focus");
-            return dialog.isDefaultFocused();
-        }).then(result => {
-            //assert.isTrue(result, 'Focus should be in the `filter input` by default');
-        })
+        await appBrowsePanel.clickOnInstallButton();
+        await dialog.waitForSpinnerNotVisible();
+        await dialog.waitForOpened();
+        let actualMessage = await dialog.getPlaceholderMessage();
+        assert.equal(actualMessage, 'Search Enonic Market, paste url or upload directly',
+            'expected message should be in the placeholder');
+        studioUtils.saveScreenshot("install_dialog_default_focus");
+        let isFocused = await dialog.isDefaultFocused();
+        //assert.isTrue(result, 'Focus should be in the `filter input` by default');
     });
 
-    it('GIVEN install dialog is opened WHEN Esc key has been pressed THEN dialog closes', () => {
+    it('GIVEN install dialog is opened WHEN Esc key has been pressed THEN dialog closes', async () => {
         let appBrowsePanel = new AppBrowsePanel();
         let dialog = new InstallDialog();
-        return appBrowsePanel.clickOnInstallButton().then(() => {
-            return dialog.waitForOpened();
-        }).then(() => {
-            return dialog.waitForOpened();
-        }).then(visible => {
-            return appBrowsePanel.pressEscKey();
-        }).then(() => {
-            return dialog.waitForClosed();
-        });
+        await appBrowsePanel.clickOnInstallButton()
+        await dialog.waitForOpened();
+        studioUtils.saveScreenshot("install_esc_key_test1");
+        await appBrowsePanel.pressEscKey();
+        studioUtils.saveScreenshot("install_esc_key_test2");
+        await dialog.waitForClosed(2000);
     });
 
-    it('WHEN dialog is opened THEN applications should be present in the grid AND applications are sorted by a name', () => {
+    it('WHEN dialog is opened THEN applications should be present in the grid AND applications are sorted by a name', async () => {
         let appBrowsePanel = new AppBrowsePanel();
         let dialog = new InstallDialog();
-        return appBrowsePanel.clickOnInstallButton().then(() => {
-            return dialog.waitForGridLoaded();
-        }).then(() => {
-            return dialog.pause(1000);
-        }).then(() => {
-            return dialog.getApplicationNames();
-        }).then(names => {
-            studioUtils.saveScreenshot("install_dlg_sorted");
-            assert.isAbove(names.length, 0, 'There should be apps in the grid');
-            //TODO uncomment it
-            //assert.isTrue(names[1] == 'Auth0 ID Provider', 'Auth0 ID Provider this application should be second');
-        });
+        await appBrowsePanel.clickOnInstallButton();
+        await dialog.waitForGridLoaded();
+
+        await dialog.pause(1000);
+        let names = await dialog.getApplicationNames();
+        studioUtils.saveScreenshot("install_dlg_sorted");
+        assert.isAbove(names.length, 0, 'There should be apps in the grid');
+        assert.equal(names[1], 'Auth0 ID Provider', 'Auth0 ID Provider this application should be second');
     });
 
-    it('GIVEN dialog is opened WHEN search text has been typed THEN apps should be filtered ', () => {
+    it('GIVEN install dialog is opened WHEN search text has been typed THEN apps should be filtered ', async () => {
         let appBrowsePanel = new AppBrowsePanel();
         let dialog = new InstallDialog();
-        return appBrowsePanel.clickOnInstallButton().then(() => {
-            return dialog.waitForOpened();
-        }).then(() => {
-            return dialog.typeSearchText('Chuck Norris');
-        }).then(() => {
-            return dialog.pause(1500);
-        }).then(() => {
-            return dialog.getApplicationNames();
-        }).then(names => {
-            assert.isTrue(names.length == 1, 'only one application should be displayed');
-            assert.isTrue(names[0] == appName, 'application should be with the expected display name');
-        })
+        await appBrowsePanel.clickOnInstallButton();
+        await dialog.waitForOpened();
+        //Type a name in the search input:
+        await dialog.typeSearchText('Chuck Norris');
+        await dialog.pause(1500);
+        let names = await dialog.getApplicationNames();
+        assert.isTrue(names.length == 1, 'only one application should be displayed');
+        assert.isTrue(names[0] == appName, 'application should be with the expected display name');
     });
 
     it('GIVEN dialog is opened WHEN install link has been clicked THEN the app should be installed', () => {
@@ -109,16 +92,13 @@ describe('Install Application Dialog specification', function () {
 
     //verifies  https://github.com/enonic/app-applications/issues/8
     it('GIVEN existing installed application WHEN install dialog has been opened THEN `Installed` status should be displayed near the application',
-        () => {
+        async () => {
             let appBrowsePanel = new AppBrowsePanel();
             let dialog = new InstallDialog();
-            return appBrowsePanel.clickOnInstallButton().then(() => {
-                return dialog.waitForOpened();
-            }).then(() => {
-                return dialog.isApplicationInstalled(appName);
-            }).then(result => {
-                assert.isTrue(result, `'${appName}' should be with Installed status`);
-            });
+            await appBrowsePanel.clickOnInstallButton();
+            await dialog.waitForOpened();
+            let result = await dialog.isApplicationInstalled(appName);
+            assert.isTrue(result, `'${appName}' should be with Installed status`);
         });
 
     beforeEach(() => studioUtils.navigateToApplicationsApp());
@@ -128,4 +108,5 @@ describe('Install Application Dialog specification', function () {
     before(() => {
         return console.log('specification is starting: ' + this.title);
     });
-});
+})
+;

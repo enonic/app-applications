@@ -42,7 +42,7 @@ class InstallAppDialog extends Page {
     waitForOpened() {
         return this.waitForElementDisplayed(this.searchInput, appConst.TIMEOUT_3).catch(err => {
             this.saveScreenshot('err_load_install_dialog');
-            throw new Error('New Content dialog was not loaded! ' + err);
+            throw new Error('Install App dialog was not loaded! ' + err);
         });
     }
 

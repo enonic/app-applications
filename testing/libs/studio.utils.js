@@ -40,7 +40,7 @@ module.exports = {
                 return appBrowsePanel.clickOnStopButton();
             }
         }).then(() => {
-            return appBrowsePanel.pause(500);
+            return appBrowsePanel.pause(700);
         });
     },
     findAndSelectItem: function (name) {

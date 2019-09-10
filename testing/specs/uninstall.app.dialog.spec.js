@@ -11,50 +11,37 @@ describe('Uninstall Application Dialog specification', function () {
     this.timeout(70000);
     webDriverHelper.setupBrowser();
 
-    it(`should display Uninstall Dialog with right content when Uninstall Button has been clicked`, () => {
+    it(`should display Uninstall Dialog with right content when Uninstall Button has been clicked`, async () => {
         let uninstallAppDialog = new UninstallAppDialog();
-        return openUninstallDialog().then(() => {
-            return uninstallAppDialog.getHeader();
-        }).then(dialogMessage => {
-            assert.isTrue(dialogMessage == 'Are you sure you want to uninstall selected application(s)?',
-                'Expected message should be in the dialog message');
-        });
+        //1. Select 'Chuck Norris app and click on Uninstall button:'
+        await openUninstallDialog();
+        let dialogMessage = await uninstallAppDialog.getHeader();
+        assert.equal(dialogMessage, 'Are you sure you want to uninstall selected application(s)?',
+            'Expected message should be in the dialog message');
+        //"Yes button should be visible"
+        await uninstallAppDialog.isYesButtonDisplayed();
+        // "No button should be visible"
+        await uninstallAppDialog.isNoButtonDisplayed();
     });
 
-    it(`'Yes' and 'No' and Cancel-top buttons should be visible`, () => {
+    it(`'GIVEN uninstall dialog is opened WHEN Cancel-top button has been pressed THEN modal dialog closes`, async () => {
         let uninstallAppDialog = new UninstallAppDialog();
-        return openUninstallDialog().then(() => {
-            return uninstallAppDialog.isYesButtonDisplayed();
-        }).then(result => {
-            assert.isTrue(result, "Yes button should be visible");
-        }).then(() => {
-            return uninstallAppDialog.isNoButtonDisplayed();
-        }).then(result => {
-            assert.isTrue(result, "No button should be visible");
-        });
+        //1. Select 'Chuck Norris app and click on Uninstall button:'
+        await openUninstallDialog();
+        await uninstallAppDialog.clickOnCancelButtonTop();
+        await uninstallAppDialog.waitForClosed();
     });
 
-    it(`'GIVEN uninstall dialog is opened WHEN Cancel-top button has been pressed THEN modal dialog closes`, () => {
-        let uninstallAppDialog = new UninstallAppDialog();
-        return openUninstallDialog().then(() => {
-            return uninstallAppDialog.clickOnCancelButtonTop();
-        }).then(() => {
-            return uninstallAppDialog.waitForClosed();
-        });
-    });
-
-    it(`should display expected notification message`, () => {
+    it(`should display expected notification message`, async () => {
         let uninstallAppDialog = new UninstallAppDialog();
         let appBrowsePanel = new AppBrowsePanel();
-        return openUninstallDialog().then(() => {
-            return uninstallAppDialog.clickOnYesButton();
-        }).then(() => {
-            return appBrowsePanel.waitForNotificationMessage();
-        }).then(result => {
-            studioUtils.saveScreenshot("chuck_norris_uninstalled_message");
-            const text = result instanceof Array ? result[result.length - 1] : result;
-            assert.equal(text, 'Application \'Chuck Norris\' uninstalled successfully', `Incorrect notification message [${text}]`)
-        });
+        //1. Select 'Chuck Norris app and click on Uninstall button:'
+        await openUninstallDialog();
+        await uninstallAppDialog.clickOnYesButton();
+        let result = await appBrowsePanel.waitForNotificationMessage();
+        studioUtils.saveScreenshot("chuck_norris_uninstalled_message");
+        const text = result instanceof Array ? result[result.length - 1] : result;
+        assert.equal(text, 'Application \'Chuck Norris\' uninstalled successfully', `Incorrect notification message [${text}]`);
     });
 
     beforeEach(() => studioUtils.navigateToApplicationsApp());
