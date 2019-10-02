@@ -11,7 +11,7 @@ module.exports = {
     context: path.join(__dirname, '/src/main/resources/assets'),
     entry: {
         'js/bundle': './js/main.ts',
-        'styles/_all': './styles/main.less',
+        'styles/main': './styles/main.less',
     },
     output: {
         path: path.join(__dirname, '/build/resources/main/assets'),
