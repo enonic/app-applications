@@ -1,6 +1,6 @@
-import DescriptorKey = api.content.page.DescriptorKey;
-import AdminToolDescriptorJson = api.content.json.AdminToolDescriptorJson;
-import ApplicationKey = api.application.ApplicationKey;
+import {DescriptorKey} from 'lib-admin-ui/content/page/DescriptorKey';
+import {ApplicationKey} from 'lib-admin-ui/application/ApplicationKey';
+import {AdminToolDescriptorJson} from './json/AdminToolDescriptorJson';
 
 export class AdminToolDescriptor {
 

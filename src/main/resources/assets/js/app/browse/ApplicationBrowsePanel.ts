@@ -7,19 +7,22 @@ import {StartApplicationEvent} from './StartApplicationEvent';
 import {UninstallApplicationEvent} from './UninstallApplicationEvent';
 import {ApplicationUploadStartedEvent} from './ApplicationUploadStartedEvent';
 import {ApplicationActionRequest} from '../resource/ApplicationActionRequest';
-import ApplicationKey = api.application.ApplicationKey;
-import Application = api.application.Application;
-import TreeNode = api.ui.treegrid.TreeNode;
-import BrowseItem = api.app.browse.BrowseItem;
-import ApplicationEvent = api.application.ApplicationEvent;
-import ApplicationEventType = api.application.ApplicationEventType;
-import ServerEventsConnection = api.event.ServerEventsConnection;
-import ApplicationUploadMock = api.application.ApplicationUploadMock;
-import i18n = api.util.i18n;
-import DataChangedType = api.ui.treegrid.DataChangedType;
-import DataChangedEvent = api.ui.treegrid.DataChangedEvent;
+import {BrowsePanel} from 'lib-admin-ui/app/browse/BrowsePanel';
+import {TreeNode} from 'lib-admin-ui/ui/treegrid/TreeNode';
+import {BrowseItem} from 'lib-admin-ui/app/browse/BrowseItem';
+import {Application, ApplicationUploadMock} from 'lib-admin-ui/application/Application';
+import {ObjectHelper} from 'lib-admin-ui/ObjectHelper';
+import {DefaultErrorHandler} from 'lib-admin-ui/DefaultErrorHandler';
+import {ApplicationKey} from 'lib-admin-ui/application/ApplicationKey';
+import {DataChangedEvent, DataChangedType} from 'lib-admin-ui/ui/treegrid/DataChangedEvent';
+import {ApplicationEvent, ApplicationEventType} from 'lib-admin-ui/application/ApplicationEvent';
+import {showFeedback} from 'lib-admin-ui/notify/MessageBus';
+import {i18n} from 'lib-admin-ui/util/Messages';
+import {ServerEventsConnection} from 'lib-admin-ui/event/ServerEventsConnection';
+import {UploadItem} from 'lib-admin-ui/ui/uploader/UploadItem';
 
-export class ApplicationBrowsePanel extends api.app.browse.BrowsePanel<Application> {
+export class ApplicationBrowsePanel
+    extends BrowsePanel<Application> {
 
     protected treeGrid: ApplicationTreeGrid;
 
@@ -56,7 +59,7 @@ export class ApplicationBrowsePanel extends api.app.browse.BrowsePanel<Applicati
             .setDisplayName(nodeData.getDisplayName())
             .setPath(nodeData.getName());
 
-        if (!api.ObjectHelper.iFrameSafeInstanceOf(nodeData, ApplicationUploadMock)) {
+        if (!ObjectHelper.iFrameSafeInstanceOf(nodeData, ApplicationUploadMock)) {
             browseItem.setIconUrl(nodeData.getIconUrl());
         }
 
@@ -88,7 +91,7 @@ export class ApplicationBrowsePanel extends api.app.browse.BrowsePanel<Applicati
         const applicationKeys: ApplicationKey[] = ApplicationKey.fromApplications(applications);
         new ApplicationActionRequest(applicationKeys, action)
             .sendAndParse()
-            .catch(api.DefaultErrorHandler.handle).done();
+            .catch(DefaultErrorHandler.handle).done();
     }
 
     private registerEvents() {
@@ -143,7 +146,7 @@ export class ApplicationBrowsePanel extends api.app.browse.BrowsePanel<Applicati
                 this.treeGrid.triggerSelectionChangedListeners();
                 const installedApp: Application = this.treeGrid.getByApplicationKey(event.getApplicationKey());
                 const installedAppName: string = installedApp ? installedApp.getDisplayName() : event.getApplicationKey().toString();
-                api.notify.showFeedback(i18n('notify.installed', installedAppName));
+                showFeedback(i18n('notify.installed', installedAppName));
                 this.treeGrid.refresh();
             }, 200);
         });
@@ -152,7 +155,7 @@ export class ApplicationBrowsePanel extends api.app.browse.BrowsePanel<Applicati
     private handleAppUninstalledEvent(event: ApplicationEvent) {
         const uninstalledApp: Application = this.treeGrid.getByApplicationKey(event.getApplicationKey());
         const uninstalledAppName: string = uninstalledApp ? uninstalledApp.getDisplayName() : event.getApplicationKey().toString();
-        api.notify.showFeedback(i18n('notify.uninstalled', uninstalledAppName));
+        showFeedback(i18n('notify.uninstalled', uninstalledAppName));
         this.treeGrid.deleteApplicationNode(event.getApplicationKey());
     }
 
@@ -167,7 +170,7 @@ export class ApplicationBrowsePanel extends api.app.browse.BrowsePanel<Applicati
     }
 
     private handleNewAppUpload(event: ApplicationUploadStartedEvent) {
-        event.getUploadItems().forEach((item: api.ui.uploader.UploadItem<Application>) => {
+        event.getUploadItems().forEach((item: UploadItem<Application>) => {
             this.treeGrid.appendUploadNode(item);
         });
     }

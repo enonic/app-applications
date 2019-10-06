@@ -1,10 +1,12 @@
-import ApplicationEvent = api.application.ApplicationEvent;
-import ApplicationEventType = api.application.ApplicationEventType;
 import {RelationshipType, RelationshipTypeBuilder} from './RelationshipType';
 import {RelationshipTypeName} from './RelationshipTypeName';
+import {ApplicationEvent, ApplicationEventType} from 'lib-admin-ui/application/ApplicationEvent';
+import {ApplicationKey} from 'lib-admin-ui/application/ApplicationKey';
+import {ClassHelper} from 'lib-admin-ui/ClassHelper';
+import {Cache} from 'lib-admin-ui/cache/Cache';
 
 export class RelationshipTypeCache
-    extends api.cache.Cache<RelationshipType, RelationshipTypeName> {
+    extends Cache<RelationshipType, RelationshipTypeName> {
 
     private static instance: RelationshipTypeCache;
 
@@ -14,7 +16,7 @@ export class RelationshipTypeCache
             if (ApplicationEventType.STARTED === event.getEventType()
                 || ApplicationEventType.STOPPED === event.getEventType()
                 || ApplicationEventType.UPDATED === event.getEventType()) {
-                console.log(api.ClassHelper.getClassName(this) + ' received ApplicationEvent - removing cached content types... ' +
+                console.log(ClassHelper.getClassName(this) + ' received ApplicationEvent - removing cached content types... ' +
                             event.getApplicationKey().toString());
                 this.getCachedByApplicationKey(event.getApplicationKey()).forEach((relationshipType: RelationshipType) => {
                     this.deleteByKey(this.getKeyFromObject(relationshipType));
@@ -36,7 +38,7 @@ export class RelationshipTypeCache
         return key.toString();
     }
 
-    private getCachedByApplicationKey(applicationKey: api.application.ApplicationKey): RelationshipType[] {
+    private getCachedByApplicationKey(applicationKey: ApplicationKey): RelationshipType[] {
         let result: RelationshipType[] = [];
         this.getAll().forEach((relationshipType: RelationshipType) => {
             if (applicationKey.equals(this.getKeyFromObject(relationshipType).getApplicationKey())) {

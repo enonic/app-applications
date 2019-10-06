@@ -1,7 +1,9 @@
-import ApplicationResourceRequest = api.application.ApplicationResourceRequest;
-import ApplicationKey = api.application.ApplicationKey;
 import {ApplicationInfoJson} from './json/ApplicationInfoJson';
 import {ApplicationInfo} from './ApplicationInfo';
+import {ApplicationResourceRequest} from 'lib-admin-ui/application/ApplicationResourceRequest';
+import {ApplicationKey} from 'lib-admin-ui/application/ApplicationKey';
+import {Path} from 'lib-admin-ui/rest/Path';
+import {JsonResponse} from 'lib-admin-ui/rest/JsonResponse';
 
 export class GetApplicationInfoRequest
     extends ApplicationResourceRequest<ApplicationInfoJson, ApplicationInfo> {
@@ -20,17 +22,17 @@ export class GetApplicationInfoRequest
         };
     }
 
-    getRequestPath(): api.rest.Path {
-        return api.rest.Path.fromParent(super.getResourcePath(), 'info');
+    getRequestPath(): Path {
+        return Path.fromParent(super.getResourcePath(), 'info');
     }
 
     fromJson(json: ApplicationInfoJson): ApplicationInfo {
         return ApplicationInfo.fromJson(json);
     }
 
-    sendAndParse(): wemQ.Promise<ApplicationInfo> {
+    sendAndParse(): Q.Promise<ApplicationInfo> {
 
-        return this.send().then((response: api.rest.JsonResponse<ApplicationInfoJson>) => {
+        return this.send().then((response: JsonResponse<ApplicationInfoJson>) => {
             return this.fromJson(response.getResult());
         });
     }

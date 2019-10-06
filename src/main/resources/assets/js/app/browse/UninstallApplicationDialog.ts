@@ -1,10 +1,12 @@
-import '../../api.ts';
 import {UninstallApplicationEvent} from './UninstallApplicationEvent';
-import Application = api.application.Application;
-import Action = api.ui.Action;
-import i18n = api.util.i18n;
+import {i18n} from 'lib-admin-ui/util/Messages';
+import {Application} from 'lib-admin-ui/application/Application';
+import {Action} from 'lib-admin-ui/ui/Action';
+import {ModalDialog} from 'lib-admin-ui/ui/dialog/ModalDialog';
+import {H6El} from 'lib-admin-ui/dom/H6El';
 
-export class UninstallApplicationDialog extends api.ui.dialog.ModalDialog {
+export class UninstallApplicationDialog
+    extends ModalDialog {
 
     private applications: Application[];
 
@@ -18,7 +20,7 @@ export class UninstallApplicationDialog extends api.ui.dialog.ModalDialog {
         this.applications = applications;
         this.addClass('uninstall-dialog');
 
-        let message = new api.dom.H6El();
+        let message = new H6El();
         message.getEl().setInnerHtml(i18n('dialog.uninstall.question'));
         this.appendChildToContentPanel(message);
 

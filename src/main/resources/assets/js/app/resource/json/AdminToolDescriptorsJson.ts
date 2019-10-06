@@ -1,7 +1,5 @@
-module api.content.json {
+import {AdminToolDescriptorJson} from './AdminToolDescriptorJson';
 
-    export interface AdminToolDescriptorsJson {
-
-        descriptors: AdminToolDescriptorJson[];
-    }
+export interface AdminToolDescriptorsJson {
+    descriptors: AdminToolDescriptorJson[];
 }

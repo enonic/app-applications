@@ -1,8 +1,10 @@
-import UploadItem = api.ui.uploader.UploadItem;
-import Application = api.application.Application;
+import {UploadItem} from 'lib-admin-ui/ui/uploader/UploadItem';
+import {ClassHelper} from 'lib-admin-ui/ClassHelper';
+import {Application} from 'lib-admin-ui/application/Application';
+import {Event} from 'lib-admin-ui/event/Event';
 
 export class ApplicationUploadStartedEvent
-    extends api.event.Event {
+    extends Event {
 
     private uploadItems: UploadItem<Application>[];
 
@@ -16,10 +18,10 @@ export class ApplicationUploadStartedEvent
     }
 
     static on(handler: (event: ApplicationUploadStartedEvent) => void) {
-        api.event.Event.bind(api.ClassHelper.getFullName(this), handler);
+        Event.bind(ClassHelper.getFullName(this), handler);
     }
 
     static un(handler?: (event: ApplicationUploadStartedEvent) => void) {
-        api.event.Event.unbind(api.ClassHelper.getFullName(this), handler);
+        Event.unbind(ClassHelper.getFullName(this), handler);
     }
 }

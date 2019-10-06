@@ -1,5 +1,7 @@
-import ApplicationKey = api.application.ApplicationKey;
-import ApplicationResourceRequest = api.application.ApplicationResourceRequest;
+import {ApplicationResourceRequest} from 'lib-admin-ui/application/ApplicationResourceRequest';
+import {ApplicationKey} from 'lib-admin-ui/application/ApplicationKey';
+import {Path} from 'lib-admin-ui/rest/Path';
+import {JsonResponse} from 'lib-admin-ui/rest/JsonResponse';
 
 export class ListApplicationKeysRequest
     extends ApplicationResourceRequest<string[], ApplicationKey[]> {
@@ -25,13 +27,13 @@ export class ListApplicationKeysRequest
         return this;
     }
 
-    getRequestPath(): api.rest.Path {
-        return api.rest.Path.fromParent(super.getResourcePath(), this.apiName);
+    getRequestPath(): Path {
+        return Path.fromParent(super.getResourcePath(), this.apiName);
     }
 
-    sendAndParse(): wemQ.Promise<ApplicationKey[]> {
+    sendAndParse(): Q.Promise<ApplicationKey[]> {
 
-        return this.send().then((response: api.rest.JsonResponse<string[]>) => {
+        return this.send().then((response: JsonResponse<string[]>) => {
             return response.getResult().map(application => ApplicationKey.fromString(application));
         });
     }

@@ -1,5 +1,3 @@
-import '../../../api.ts';
-
 export class ContentReferenceJson {
 
     type: string;

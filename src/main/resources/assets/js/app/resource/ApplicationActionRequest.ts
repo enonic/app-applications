@@ -1,5 +1,7 @@
-import ApplicationResourceRequest = api.application.ApplicationResourceRequest;
-import ApplicationKey = api.application.ApplicationKey;
+import * as Q from 'q';
+import {ApplicationResourceRequest} from 'lib-admin-ui/application/ApplicationResourceRequest';
+import {ApplicationKey} from 'lib-admin-ui/application/ApplicationKey';
+import {Path} from 'lib-admin-ui/rest/Path';
 
 export class ApplicationActionRequest
     extends ApplicationResourceRequest<void, void> {
@@ -14,8 +16,8 @@ export class ApplicationActionRequest
         this.action = action;
     }
 
-    getRequestPath(): api.rest.Path {
-        return api.rest.Path.fromParent(super.getResourcePath(), this.action);
+    getRequestPath(): Path {
+        return Path.fromParent(super.getResourcePath(), this.action);
     }
 
     getParams(): Object {
@@ -24,9 +26,9 @@ export class ApplicationActionRequest
         };
     }
 
-    sendAndParse(): wemQ.Promise<void> {
+    sendAndParse(): Q.Promise<void> {
 
-        const result = wemQ.defer<void>();
+        const result = Q.defer<void>();
 
         this.send().catch(e => result.reject(e));
 

@@ -1,18 +1,15 @@
-module api.content.json {
+export interface AdminToolDescriptorJson {
+    key: string;
 
-    export interface AdminToolDescriptorJson {
-        key: string;
+    application: string;
 
-        application: string;
+    name: string;
 
-        name: string;
+    displayName: string;
 
-        displayName: string;
+    description: string;
 
-        description: string;
+    icon: string;
 
-        icon: string;
-
-        toolUrl: string;
-    }
+    toolUrl: string;
 }

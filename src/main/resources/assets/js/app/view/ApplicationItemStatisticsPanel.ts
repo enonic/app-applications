@@ -2,16 +2,19 @@ import {ApplicationBrowseActions} from '../browse/ApplicationBrowseActions';
 import {GetApplicationInfoRequest} from '../resource/GetApplicationInfoRequest';
 import {ApplicationInfo} from '../resource/ApplicationInfo';
 import {ApplicationDataContainer} from './ApplicationDataContainer';
-import Application = api.application.Application;
-import i18n = api.util.i18n;
-import DivEl = api.dom.DivEl;
-import ViewItem = api.app.view.ViewItem;
+import {ItemStatisticsPanel} from 'lib-admin-ui/app/view/ItemStatisticsPanel';
+import {ActionMenu} from 'lib-admin-ui/ui/menu/ActionMenu';
+import {i18n} from 'lib-admin-ui/util/Messages';
+import {DivEl} from 'lib-admin-ui/dom/DivEl';
+import {ViewItem} from 'lib-admin-ui/app/view/ViewItem';
+import {Application} from 'lib-admin-ui/application/Application';
+import {DefaultErrorHandler} from 'lib-admin-ui/DefaultErrorHandler';
 
 export class ApplicationItemStatisticsPanel
-    extends api.app.view.ItemStatisticsPanel<api.application.Application> {
+    extends ItemStatisticsPanel<Application> {
 
     private applicationDataContainer: ApplicationDataContainer;
-    private actionMenu: api.ui.menu.ActionMenu;
+    private actionMenu: ActionMenu;
 
     constructor() {
         super('application-item-statistics-panel');
@@ -22,7 +25,7 @@ export class ApplicationItemStatisticsPanel
 
     private addActionMenu() {
         this.actionMenu =
-            new api.ui.menu.ActionMenu(i18n('application.state.stopped'), ApplicationBrowseActions.get().START_APPLICATION,
+            new ActionMenu(i18n('application.state.stopped'), ApplicationBrowseActions.get().START_APPLICATION,
                 ApplicationBrowseActions.get().STOP_APPLICATION);
 
         const actionMenuWrapper: DivEl = new DivEl('action-menu-wrapper');
@@ -77,7 +80,7 @@ export class ApplicationItemStatisticsPanel
     private updateApplicationDataContainer() {
         const application: Application = this.getItem().getModel();
         new GetApplicationInfoRequest(application.getApplicationKey()).sendAndParse().then(
-            (appInfo: ApplicationInfo) => this.applicationDataContainer.update(application, appInfo)).catch(api.DefaultErrorHandler.handle);
+            (appInfo: ApplicationInfo) => this.applicationDataContainer.update(application, appInfo)).catch(DefaultErrorHandler.handle);
     }
 
     private getLocalizedState(state: string): string {

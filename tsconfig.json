@@ -8,8 +8,8 @@
   ],
   "include": [
     "src/**/*",
-    ".xp/**/*",
-    "../lib-admin-ui/src/main/resources/assets/admin/common/js/main.ts"
+    "../lib-admin-ui/src/main/resources/assets/admin/common/js/_**/*.ts",
+    ".xp/dev/lib-admin-ui/**/*.ts"
   ],
   "exclude": [
     "build/**/*",

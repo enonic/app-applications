@@ -1,10 +1,12 @@
 import {RelationshipTypeName} from './RelationshipTypeName';
 import {RelationshipTypeJson} from './RelationshipTypeJson';
-import ObjectHelper = api.ObjectHelper;
+import {Schema, SchemaBuilder} from 'lib-admin-ui/schema/Schema';
+import {Equitable} from 'lib-admin-ui/Equitable';
+import {ObjectHelper} from 'lib-admin-ui/ObjectHelper';
 
 export class RelationshipType
-    extends api.schema.Schema
-    implements api.Equitable {
+    extends Schema
+    implements Equitable {
 
     private fromSemantic: string;
 
@@ -42,9 +44,9 @@ export class RelationshipType
         return this.allowedToTypes;
     }
 
-    equals(o: api.Equitable): boolean {
+    equals(o: Equitable): boolean {
 
-        if (!api.ObjectHelper.iFrameSafeInstanceOf(o, RelationshipType)) {
+        if (!ObjectHelper.iFrameSafeInstanceOf(o, RelationshipType)) {
             return false;
         }
 
@@ -79,7 +81,7 @@ export class RelationshipType
 }
 
 export class RelationshipTypeBuilder
-    extends api.schema.SchemaBuilder {
+    extends SchemaBuilder {
 
     fromSemantic: string;
 

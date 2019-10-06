@@ -5,12 +5,12 @@ import {ApplicationTask} from './ApplicationTask';
 import {IdProviderApplication} from './IdProviderApplication';
 import {AdminToolDescriptor} from './AdminToolDescriptor';
 import {RelationshipType} from '../relationshiptype/RelationshipType';
-import ContentTypeSummary = api.schema.content.ContentTypeSummary;
-import PageDescriptor = api.content.page.PageDescriptor;
-import PartDescriptor = api.content.page.region.PartDescriptor;
-import LayoutDescriptor = api.content.page.region.LayoutDescriptor;
-import MacroDescriptor = api.macro.MacroDescriptor;
-import Widget = api.content.Widget;
+import {ContentTypeSummary} from 'lib-admin-ui/schema/content/ContentTypeSummary';
+import {PageDescriptor} from 'lib-admin-ui/content/page/PageDescriptor';
+import {PartDescriptor} from 'lib-admin-ui/content/page/region/PartDescriptor';
+import {LayoutDescriptor} from 'lib-admin-ui/content/page/region/LayoutDescriptor';
+import {MacroDescriptor} from 'lib-admin-ui/macro/MacroDescriptor';
+import {Widget} from 'lib-admin-ui/content/Widget';
 
 export class ApplicationInfo {
 
@@ -87,19 +87,19 @@ export class ApplicationInfo {
         return result;
     }
 
-    getContentTypes(): api.schema.content.ContentTypeSummary[] {
+    getContentTypes(): ContentTypeSummary[] {
         return this.contentTypes;
     }
 
-    getPages(): api.content.page.PageDescriptor[] {
+    getPages(): PageDescriptor[] {
         return this.pages;
     }
 
-    getParts(): api.content.page.region.PartDescriptor[] {
+    getParts(): PartDescriptor[] {
         return this.parts;
     }
 
-    getLayouts(): api.content.page.region.LayoutDescriptor[] {
+    getLayouts(): LayoutDescriptor[] {
         return this.layouts;
     }
 
@@ -111,7 +111,7 @@ export class ApplicationInfo {
         return this.references;
     }
 
-    getMacros(): api.macro.MacroDescriptor[] {
+    getMacros(): MacroDescriptor[] {
         return this.macros;
     }
 

@@ -1,6 +1,5 @@
-import '../../api.ts';
-import IdProviderMode = api.security.IdProviderMode;
-import {IdProviderApplicationJson, ApplicationIdProviderJson} from './json/IdProviderApplicationJson';
+import {ApplicationIdProviderJson, IdProviderApplicationJson} from './json/IdProviderApplicationJson';
+import {IdProviderMode} from 'lib-admin-ui/security/IdProviderMode';
 
 export class IdProviderApplication {
 
@@ -16,7 +15,7 @@ export class IdProviderApplication {
         return result;
     }
 
-    getMode(): api.security.IdProviderMode {
+    getMode(): IdProviderMode {
         return this.mode;
     }
 

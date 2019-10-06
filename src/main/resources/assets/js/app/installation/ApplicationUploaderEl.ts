@@ -1,16 +1,20 @@
-import Application = api.application.Application;
-import ApplicationInstallResult = api.application.ApplicationInstallResult;
-import ApplicationInstallResultJson = api.application.json.ApplicationInstallResultJson;
+import {Application} from 'lib-admin-ui/application/Application';
+import {UploaderEl, UploaderElConfig} from 'lib-admin-ui/ui/uploader/UploaderEl';
+import {UriHelper} from 'lib-admin-ui/util/UriHelper';
+import {ApplicationInstallResultJson} from 'lib-admin-ui/application/json/ApplicationInstallResultJson';
+import {ApplicationInstallResult} from 'lib-admin-ui/application/ApplicationInstallResult';
+import {AEl} from 'lib-admin-ui/dom/AEl';
+import {Element} from 'lib-admin-ui/dom/Element';
 
 export class ApplicationUploaderEl
-    extends api.ui.uploader.UploaderEl<Application> {
+    extends UploaderEl<Application> {
 
     private failure: string;
 
-    constructor(config: api.ui.uploader.UploaderElConfig) {
+    constructor(config: UploaderElConfig) {
 
         if (config.url == null) {
-            config.url = api.util.UriHelper.getRestUri('application/install');
+            config.url = UriHelper.getRestUri('application/install');
         }
 
         if (config.allowExtensions == null) {
@@ -42,8 +46,8 @@ export class ApplicationUploaderEl
         return item.getId();
     }
 
-    createResultItem(value: string): api.dom.Element {
-        return new api.dom.AEl().setUrl(api.util.UriHelper.getRestUri('application/' + value), '_blank');
+    createResultItem(value: string): Element {
+        return new AEl().setUrl(UriHelper.getRestUri('application/' + value), '_blank');
     }
 
     protected getErrorMessage(): string {

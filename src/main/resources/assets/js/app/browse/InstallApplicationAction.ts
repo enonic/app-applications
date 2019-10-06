@@ -1,11 +1,11 @@
-import '../../api.ts';
 import {ApplicationTreeGrid} from './ApplicationTreeGrid';
 import {InstallAppPromptEvent} from '../installation/InstallAppPromptEvent';
+import {i18n} from 'lib-admin-ui/util/Messages';
+import {Application} from 'lib-admin-ui/application/Application';
+import {Action} from 'lib-admin-ui/ui/Action';
 
-import Application = api.application.Application;
-import i18n = api.util.i18n;
-
-export class InstallApplicationAction extends api.ui.Action {
+export class InstallApplicationAction
+    extends Action {
 
     constructor(applicationTreeGrid: ApplicationTreeGrid) {
         super(i18n('action.install'));

@@ -1,7 +1,6 @@
-import '../../api.ts';
-import ContentTypeName = api.schema.content.ContentTypeName;
-import ContentPath = api.content.ContentPath;
 import {ContentReferenceJson} from './json/ContentReferencesJson';
+import {ContentTypeName} from 'lib-admin-ui/schema/content/ContentTypeName';
+import {ContentPath} from 'lib-admin-ui/content/ContentPath';
 
 export class ContentReference {
 
