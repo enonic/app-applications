@@ -16,6 +16,7 @@ function runSelenium() {
                 if (error) {
                     return error;
                 }
+                console.log("Selenium server is started!")
                 selenium.child = child;
             });
         }
@@ -26,7 +27,7 @@ function stopSelenuim() {
     selenium.child.kill();
 }
 
-// runSelenium();
+//runSelenium();
 
 const mocha = new Mocha({
     reporter: 'mochawesome',
@@ -37,15 +38,15 @@ const mocha = new Mocha({
 });
 
 (async () => {
+    await runSelenium();
     const paths = await globby([testFilesGlob]);
-
-    paths.forEach(function(filePath){
+    paths.forEach(function (filePath) {
         console.log(filePath);
         mocha.addFile(filePath);
     });
 
-    mocha.run(exitCode => {
-        // stopSelenuim();
+    mocha.run(function (exitCode) {
+        stopSelenuim();
         if (exitCode !== 0) {
             process.exit(exitCode);
         }
