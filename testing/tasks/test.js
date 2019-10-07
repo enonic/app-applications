@@ -27,7 +27,7 @@ function stopSelenuim() {
     selenium.child.kill();
 }
 
-//runSelenium();
+runSelenium();
 
 const mocha = new Mocha({
     reporter: 'mochawesome',
@@ -38,7 +38,6 @@ const mocha = new Mocha({
 });
 
 (async () => {
-    await runSelenium();
     const paths = await globby([testFilesGlob]);
     paths.forEach(function (filePath) {
         console.log(filePath);
@@ -46,9 +45,11 @@ const mocha = new Mocha({
     });
 
     mocha.run(function (exitCode) {
-        stopSelenuim();
+        //stopSelenuim();
         if (exitCode !== 0) {
             process.exit(exitCode);
         }
     });
 })();
+
+stopSelenuim();
