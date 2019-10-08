@@ -145,17 +145,18 @@ task startSeleniumDaemon( type: com.github.psxpaul.task.ExecFork ) {
     standardOutput = "${buildDir}${File.separator}selenium-daemon.log"
     errorOutput = "${buildDir}${File.separator}selenium-daemon-error.log"
 }
+//run the tusk in the gulpfile.js. Name of the task is 'test'
 task testApplicationsApp( type: NpmTask,
-                          dependsOn: [npmInstall, startServer, copyApps, startSeleniumDaemon, ensureScreenshotsDirectory] ) {
+                          dependsOn: [npmInstall, startServer, copyApps, ensureScreenshotsDirectory] ) {
     inputs.files fileTree( dir: '.' )
     args = ['test']
     startServer.mustRunAfter npmInstall
     copyApps.mustRunAfter startServer
-    startSeleniumDaemon.mustRunAfter copyApps
-    ensureScreenshotsDirectory.mustRunAfter startSeleniumDaemon
+   
+    ensureScreenshotsDirectory.mustRunAfter copyApps
 }
 
-task testApplicationsAppLocally( type: NpmTask, dependsOn: [npmInstall, startSeleniumDaemon, ensureScreenshotsDirectory] ) {
+task testApplicationsAppLocally( type: NpmTask, dependsOn: [npmInstall, ensureScreenshotsDirectory] ) {
     inputs.files fileTree( dir: '.' )
     args = ['test']
 }
