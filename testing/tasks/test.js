@@ -5,33 +5,6 @@ const selenium = require('selenium-standalone');
 const globby = require('globby');
 const testFilesGlob = './specs/**/*.js';
 
-const mocha = new Mocha({
-    reporter: 'mochawesome',
-    reporterOptions: {
-        reportFilename: 'results',
-        quiet: true
-    }
-});
-
-function stopSelenuim() {
-    selenium.child.kill();
-}
-
-async function runTests() {
-    const paths = await globby([testFilesGlob]);
-    paths.forEach(function (filePath) {
-        console.log(filePath);
-        mocha.addFile(filePath);
-    });
-
-    mocha.run(function (exitCode) {
-        stopSelenuim();
-        if (exitCode !== 0) {
-            process.exit(exitCode);
-        }
-    });
-}
-
 function runSelenium() {
     selenium.install(
         {logger: msg => console.log(msg)},
@@ -43,12 +16,38 @@ function runSelenium() {
                 if (error) {
                     return error;
                 }
-                console.log("Selenium server is started!")
                 selenium.child = child;
-                runTests();
             });
         }
     );
 }
 
-runSelenium();
+function stopSelenuim() {
+    selenium.child.kill();
+}
+
+// runSelenium();
+
+const mocha = new Mocha({
+    reporter: 'mochawesome',
+    reporterOptions: {
+        reportFilename: 'results',
+        quiet: true
+    }
+});
+
+(async () => {
+    const paths = await globby([testFilesGlob]);
+
+    paths.forEach(function(filePath){
+        console.log(filePath);
+        mocha.addFile(filePath);
+    });
+
+    mocha.run(exitCode => {
+        // stopSelenuim();
+        if (exitCode !== 0) {
+            process.exit(exitCode);
+        }
+    });
+})();
