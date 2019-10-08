@@ -53,6 +53,7 @@ function runSelenium() {
                 return error;
             }
             selenium.start({
+                version: '3.9.0',
                 drivers: {
                     chrome: {
                         version: '76.0.3809.126'
