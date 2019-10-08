@@ -70,7 +70,6 @@ task webpack( type: NodeTask, dependsOn: lint ) {
     script = file( './node_modules/webpack/bin/webpack' )
 }
 
-
 jar {
     exclude 'assets/**/*.ts'
     exclude 'assets/**/*.less'
@@ -91,8 +90,7 @@ if ( hasProperty( 'env' ) )
 
 def applyExcludedTasks() {
     def libAdminUi = gradle.includedBuild( 'lib-admin-ui' )
-    Closure permittedTasks = { it == 'lint' || it == 'test' }
-    def excludedTasks = gradle.startParameter.getExcludedTaskNames().findAll( permittedTasks )
+    def excludedTasks = gradle.startParameter.getExcludedTaskNames().findAll( { it == 'lint' || it == 'test' } )
     libAdminUi.getLoadedSettings().getStartParameter().setExcludedTaskNames( excludedTasks )
 }
 
