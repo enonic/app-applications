@@ -40,6 +40,7 @@ function runSelenium() {
             drivers: {
                 chrome: {
                     version: '76.0.3809.126',
+                    arch: process.arch,
                     baseURL: 'https://chromedriver.storage.googleapis.com'
                 }},
 
@@ -51,6 +52,11 @@ function runSelenium() {
                 return error;
             }
             selenium.start((error, child) => {
+                drivers: {
+                    chrome: {
+                        version: '76.0.3809.126'
+                    }
+                }
                 if (error) {
                     console.log("Selenium server is not started 2 !"+ error);
                     return error;
