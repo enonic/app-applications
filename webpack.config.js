@@ -1,4 +1,3 @@
-const ErrorLoggerPlugin = require('error-logger-webpack-plugin');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const CircularDependencyPlugin = require('circular-dependency-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
@@ -56,7 +55,6 @@ module.exports = {
         ]
     },
     plugins: [
-        new ErrorLoggerPlugin(),
         new MiniCssExtractPlugin({
             filename: '[name].css',
             chunkFilename: './styles/[id].css'
