@@ -163,7 +163,7 @@ export class ApplicationBrowsePanel
         setTimeout(() => { // as uninstall usually follows stop event, lets wait to check if app still exists
             const stoppedApp: Application = this.treeGrid.getByApplicationKey(event.getApplicationKey());
             // seems to be present in the grid and xp is running
-            if (stoppedApp && ServerEventsConnection.getInstance().isConnected()) {
+            if (stoppedApp && ServerEventsConnection.get().isConnected()) {
                 this.treeGrid.updateApplicationNode(event.getApplicationKey());
             }
         }, 400);
