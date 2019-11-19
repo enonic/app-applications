@@ -30,7 +30,7 @@ export class MarketAppViewer
     }
 
     resolveDisplayName(object: MarketApplication): string {
-        let appLink = new AEl().setUrl(object.getUrl(), '_blank').setHtml(object.getDisplayName(), false);
+        let appLink = new AEl().setUrl(object.getUrl(), '_blank').setHtml(object.getDisplayName());
         return appLink.toString();
     }
 
