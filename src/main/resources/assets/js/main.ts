@@ -1,5 +1,3 @@
-import i18n = api.util.i18n;
-
 declare const CONFIG;
 
 const body = api.dom.Body.get();
@@ -18,22 +16,11 @@ function getApplication(): api.app.Application {
 }
 
 function startLostConnectionDetector() {
-    let messageId;
-    const lostConnectionDetector = new api.system.ConnectionDetector();
-    lostConnectionDetector.setAuthenticated(true);
-    lostConnectionDetector.onConnectionLost(() => {
-        api.notify.NotifyManager.get().hide(messageId);
-        messageId = api.notify.showError(i18n('notify.connection.loss'), false);
-    });
-    lostConnectionDetector.onSessionExpired(() => {
-        api.notify.NotifyManager.get().hide(messageId);
-        window.location.href = api.util.UriHelper.getToolUri('');
-    });
-    lostConnectionDetector.onConnectionRestored(() => {
-        api.notify.NotifyManager.get().hide(messageId);
-    });
-
-    lostConnectionDetector.startPolling();
+    api.system.ConnectionDetector.get()
+            .setAuthenticated(true)
+            .setSessionExpireRedirectUrl(api.util.UriHelper.getToolUri(''))
+            .setNotificationMessage(api.util.i18n('notify.connection.loss'))
+            .startPolling(true);
 }
 
 function startApplication() {
