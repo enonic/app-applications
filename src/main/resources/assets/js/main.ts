@@ -30,7 +30,8 @@ function startLostConnectionDetector() {
     ConnectionDetector.get()
         .setAuthenticated(true)
         .setSessionExpireRedirectUrl(UriHelper.getToolUri(''))
-        .setNotificationMessage(i18n('notify.connection.loss'));
+        .setNotificationMessage(i18n('notify.connection.loss'))
+        .startPolling(true);
 }
 
 function startApplication() {
