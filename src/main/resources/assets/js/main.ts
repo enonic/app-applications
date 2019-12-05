@@ -27,22 +27,11 @@ function getApplication(): Application {
 }
 
 function startLostConnectionDetector() {
-    let messageId;
-    const lostConnectionDetector = new ConnectionDetector();
-    lostConnectionDetector.setAuthenticated(true);
-    lostConnectionDetector.onConnectionLost(() => {
-        NotifyManager.get().hide(messageId);
-        messageId = showError(i18n('notify.connection.loss'), false);
-    });
-    lostConnectionDetector.onSessionExpired(() => {
-        NotifyManager.get().hide(messageId);
-        window.location.href = UriHelper.getToolUri('');
-    });
-    lostConnectionDetector.onConnectionRestored(() => {
-        NotifyManager.get().hide(messageId);
-    });
-
-    lostConnectionDetector.startPolling();
+    ConnectionDetector.get()
+            .setAuthenticated(true)
+            .setSessionExpireRedirectUrl(UriHelper.getToolUri(''))
+            .setNotificationMessage(i18n('notify.connection.loss'))
+            .startPolling(true);
 }
 
 function startApplication() {
