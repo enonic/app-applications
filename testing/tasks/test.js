@@ -72,5 +72,4 @@ function runSelenium() {
         }
     );
 }
-
 runSelenium();
