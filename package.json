@@ -3,8 +3,12 @@
   "version": "1.0.0",
   "description": "Enonix XP - Applications App",
   "license": "GPL-3.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/enonic/app-applications"
+  },
   "scripts": {
-    "build": "webpack --hide-modules",
+    "build": "webpack --hide-modules --colors",
     "lint": "tslint -p tsconfig.build.json -c tslint.json",
     "fix": "tslint -p tsconfig.build.json -c tslint.json --fix"
   },
@@ -17,12 +21,13 @@
     "@types/q": "^1.5.2",
     "autoprefixer": "^9.6.4",
     "browserslist": "^4.7.0",
-    "browserslist-config-enonic": "^1.0.4",
+    "browserslist-config-enonic": "^1.0.5",
     "circular-dependency-plugin": "^5.2.0",
     "css-loader": "^3.2.0",
     "css-mqpacker": "^7.0.0",
     "cssnano": "^4.1.10",
-    "enonic-admin-artifacts": "^1.5.4",
+    "enonic-admin-artifacts": "^1.5.5",
+    "error-logger-webpack-plugin": "^1.1.0",
     "file-loader": "^4.2.0",
     "less": "^3.10.3",
     "less-loader": "^5.0.0",
