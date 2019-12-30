@@ -1,5 +1,7 @@
+import {SchemaJson} from 'lib-admin-ui/schema/SchemaJson';
+
 export interface RelationshipTypeJson
-    extends api.schema.SchemaJson {
+    extends SchemaJson {
 
     fromSemantic: string;
 

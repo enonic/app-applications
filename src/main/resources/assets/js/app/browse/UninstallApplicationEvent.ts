@@ -1,7 +1,6 @@
-import '../../api.ts';
-
-import Application = api.application.Application;
-import Event = api.event.Event;
+import {Application} from 'lib-admin-ui/application/Application';
+import {ClassHelper} from 'lib-admin-ui/ClassHelper';
+import {Event} from 'lib-admin-ui/event/Event';
 
 export class UninstallApplicationEvent extends Event {
     private applications: Application[];
@@ -16,10 +15,10 @@ export class UninstallApplicationEvent extends Event {
     }
 
     static on(handler: (event: UninstallApplicationEvent) => void) {
-        Event.bind(api.ClassHelper.getFullName(this), handler);
+        Event.bind(ClassHelper.getFullName(this), handler);
     }
 
     static un(handler?: (event: UninstallApplicationEvent) => void) {
-        Event.unbind(api.ClassHelper.getFullName(this), handler);
+        Event.unbind(ClassHelper.getFullName(this), handler);
     }
 }

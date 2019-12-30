@@ -1,16 +1,20 @@
-import '../../api.ts';
+import * as Q from 'q';
 import {ApplicationBrowseActions} from './ApplicationBrowseActions';
 import {ApplicationRowFormatter} from './ApplicationRowFormatter';
 import {ListApplicationKeysRequest} from '../resource/ListApplicationKeysRequest';
-import Application = api.application.Application;
-import ApplicationUploadMock = api.application.ApplicationUploadMock;
-import TreeGrid = api.ui.treegrid.TreeGrid;
-import TreeNode = api.ui.treegrid.TreeNode;
-import TreeGridBuilder = api.ui.treegrid.TreeGridBuilder;
-import TreeGridContextMenu = api.ui.treegrid.TreeGridContextMenu;
-import ApplicationKey = api.application.ApplicationKey;
-import i18n = api.util.i18n;
-import ResponsiveRanges = api.ui.responsive.ResponsiveRanges;
+import {TreeNode} from 'lib-admin-ui/ui/treegrid/TreeNode';
+import {Application, ApplicationUploadMock} from 'lib-admin-ui/application/Application';
+import {ApplicationKey} from 'lib-admin-ui/application/ApplicationKey';
+import {i18n} from 'lib-admin-ui/util/Messages';
+import {TreeGrid} from 'lib-admin-ui/ui/treegrid/TreeGrid';
+import {TreeGridBuilder} from 'lib-admin-ui/ui/treegrid/TreeGridBuilder';
+import {ResponsiveRanges} from 'lib-admin-ui/ui/responsive/ResponsiveRanges';
+import {TreeGridContextMenu} from 'lib-admin-ui/ui/treegrid/TreeGridContextMenu';
+import {GetApplicationRequest} from 'lib-admin-ui/application/GetApplicationRequest';
+import {DefaultErrorHandler} from 'lib-admin-ui/DefaultErrorHandler';
+import {ListApplicationsRequest} from 'lib-admin-ui/application/ListApplicationsRequest';
+import {Body} from 'lib-admin-ui/dom/Body';
+import {UploadItem} from 'lib-admin-ui/ui/uploader/UploadItem';
 
 export class ApplicationTreeGrid extends TreeGrid<Application> {
 
@@ -43,7 +47,7 @@ export class ApplicationTreeGrid extends TreeGrid<Application> {
 
         const updateColumns = () => {
             let width = this.getEl().getWidth();
-            let checkSelIsMoved = ResponsiveRanges._540_720.isFitOrSmaller(api.dom.Body.get().getEl().getWidth());
+            let checkSelIsMoved = ResponsiveRanges._540_720.isFitOrSmaller(Body.get().getEl().getWidth());
 
             const curClass = nameColumn.getCssClass();
 
@@ -80,31 +84,31 @@ export class ApplicationTreeGrid extends TreeGrid<Application> {
         return data.getId();
     }
 
-    fetchRoot(): wemQ.Promise<Application[]> {
-        return new api.application.ListApplicationsRequest().sendAndParse();
+    fetchRoot(): Q.Promise<Application[]> {
+        return new ListApplicationsRequest().sendAndParse();
     }
 
-    fetch(node: TreeNode<Application>, dataId?: string): wemQ.Promise<api.application.Application> {
+    fetch(node: TreeNode<Application>, dataId?: string): Q.Promise<Application> {
         return this.fetchByKey(node.getData().getApplicationKey());
     }
 
-    private fetchByKey(applicationKey: api.application.ApplicationKey): wemQ.Promise<api.application.Application> {
-        let deferred = wemQ.defer<api.application.Application>();
-        new api.application.GetApplicationRequest(applicationKey,
-            true).sendAndParse().then((application: api.application.Application)=> {
+    private fetchByKey(applicationKey: ApplicationKey): Q.Promise<Application> {
+        let deferred = Q.defer<Application>();
+        new GetApplicationRequest(applicationKey,
+            true).sendAndParse().then((application: Application) => {
             deferred.resolve(application);
         }).catch((reason: any) => {
-            api.DefaultErrorHandler.handle(reason);
+            DefaultErrorHandler.handle(reason);
         });
 
         return deferred.promise;
     }
 
-    fetchRootKeys(): wemQ.Promise<ApplicationKey[]> {
+    fetchRootKeys(): Q.Promise<ApplicationKey[]> {
         return new ListApplicationKeysRequest().sendAndParse();
     }
 
-    placeNode(data: Application, stashedParentNode?: TreeNode<Application>): wemQ.Promise<void> {
+    placeNode(data: Application, stashedParentNode?: TreeNode<Application>): Q.Promise<void> {
         const parentNode = this.getParentNode(true, stashedParentNode);
         let index = parentNode.getChildren().length;
         for (let i = 0; i < index; i++) {
@@ -116,7 +120,7 @@ export class ApplicationTreeGrid extends TreeGrid<Application> {
         return this.insertNode(data, true, index, stashedParentNode);
     }
 
-    updateApplicationNode(applicationKey: api.application.ApplicationKey) {
+    updateApplicationNode(applicationKey: ApplicationKey) {
         const root: TreeNode<Application> = this.getRoot().getCurrentRoot();
         root.getChildren()
             .map((child: TreeNode<Application>) => child.getData())
@@ -124,7 +128,7 @@ export class ApplicationTreeGrid extends TreeGrid<Application> {
             .map(this.updateNode.bind(this));
     }
 
-    getByApplicationKey(applicationKey: api.application.ApplicationKey): Application {
+    getByApplicationKey(applicationKey: ApplicationKey): Application {
         let root = this.getRoot().getCurrentRoot();
         let result;
         root.getChildren().forEach((child: TreeNode<Application>) => {
@@ -136,7 +140,7 @@ export class ApplicationTreeGrid extends TreeGrid<Application> {
         return result;
     }
 
-    deleteApplicationNode(applicationKey: api.application.ApplicationKey) {
+    deleteApplicationNode(applicationKey: ApplicationKey) {
         let root = this.getRoot().getCurrentRoot();
         root.getChildren().forEach((child: TreeNode<Application>) => {
             let curApplication: Application = child.getData();
@@ -146,21 +150,21 @@ export class ApplicationTreeGrid extends TreeGrid<Application> {
         });
     }
 
-    appendApplicationNode(applicationKey: api.application.ApplicationKey): wemQ.Promise<void> {
+    appendApplicationNode(applicationKey: ApplicationKey): Q.Promise<void> {
         return this.fetchByKey(applicationKey)
-            .then((data: api.application.Application) => {
+            .then((data: Application) => {
                 return this.appendNode(data, true);
             });
     }
 
-    placeApplicationNode(applicationKey: api.application.ApplicationKey): wemQ.Promise<void> {
+    placeApplicationNode(applicationKey: ApplicationKey): Q.Promise<void> {
         return this.fetchByKey(applicationKey)
-            .then((data: api.application.Application) => {
+            .then((data: Application) => {
                 return this.placeNode(data);
             });
     }
 
-    refreshNodeData(parentNode: TreeNode<Application>): wemQ.Promise<TreeNode<Application>> {
+    refreshNodeData(parentNode: TreeNode<Application>): Q.Promise<TreeNode<Application>> {
         return this.fetchByKey(parentNode.getData().getApplicationKey()).then((curApplication: Application) => {
             parentNode.setData(curApplication);
             this.refreshNode(parentNode);
@@ -168,7 +172,7 @@ export class ApplicationTreeGrid extends TreeGrid<Application> {
         });
     }
 
-    appendUploadNode(item: api.ui.uploader.UploadItem<Application>) {
+    appendUploadNode(item: UploadItem<Application>) {
 
         let appMock: ApplicationUploadMock = new ApplicationUploadMock(item);
 

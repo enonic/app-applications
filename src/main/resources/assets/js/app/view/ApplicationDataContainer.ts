@@ -1,23 +1,26 @@
+import {Application} from 'lib-admin-ui/application/Application';
+import {Element} from 'lib-admin-ui/dom/Element';
 import {ApplicationInfo} from '../resource/ApplicationInfo';
 import {ContentReference} from '../resource/ContentReference';
 import {AdminToolDescriptor} from '../resource/AdminToolDescriptor';
 import {RelationshipType} from '../relationshiptype/RelationshipType';
-import ContentTypeSummary = api.schema.content.ContentTypeSummary;
-import ItemDataGroup = api.app.view.ItemDataGroup;
-import ApplicationKey = api.application.ApplicationKey;
-import Application = api.application.Application;
-import MacroDescriptor = api.macro.MacroDescriptor;
-import Widget = api.content.Widget;
-import Tooltip = api.ui.Tooltip;
-import i18n = api.util.i18n;
-import DateTimeFormatter = api.ui.treegrid.DateTimeFormatter;
-import StringHelper = api.util.StringHelper;
-import AEl = api.dom.AEl;
-import IdProviderMode = api.security.IdProviderMode;
-import Descriptor = api.content.page.Descriptor;
+import {DivEl} from 'lib-admin-ui/dom/DivEl';
+import {ItemDataGroup} from 'lib-admin-ui/app/view/ItemDataGroup';
+import {i18n} from 'lib-admin-ui/util/Messages';
+import {DateTimeFormatter} from 'lib-admin-ui/ui/treegrid/DateTimeFormatter';
+import {ApplicationKey} from 'lib-admin-ui/application/ApplicationKey';
+import {MacroDescriptor} from 'lib-admin-ui/macro/MacroDescriptor';
+import {IdProviderMode} from 'lib-admin-ui/security/IdProviderMode';
+import {Widget} from 'lib-admin-ui/content/Widget';
+import {SpanEl} from 'lib-admin-ui/dom/SpanEl';
+import {Tooltip} from 'lib-admin-ui/ui/Tooltip';
+import {AEl} from 'lib-admin-ui/dom/AEl';
+import {StringHelper} from 'lib-admin-ui/util/StringHelper';
+import {Descriptor} from 'lib-admin-ui/content/page/Descriptor';
+import {ContentTypeSummary} from 'lib-admin-ui/schema/content/ContentTypeSummary';
 
 export class ApplicationDataContainer
-    extends api.dom.DivEl {
+    extends DivEl {
     constructor() {
         super('application-data-container');
     }
@@ -171,25 +174,25 @@ export class ApplicationDataContainer
         return extensionGroup;
     }
 
-    private getExtensionsWidgets(applicationInfo: ApplicationInfo): api.dom.Element[] {
+    private getExtensionsWidgets(applicationInfo: ApplicationInfo): Element[] {
         return applicationInfo.getWidgets().map(this.widgetToElement).sort(this.sortElInAlphabeticallyAsc);
     }
 
-    private widgetToElement(widget: Widget): api.dom.Element {
+    private widgetToElement(widget: Widget): Element {
         const interfacesStr = widget.getInterfaces().join(', ');
         const displayString = widget.getDisplayName() + (StringHelper.isBlank(interfacesStr) ? '' : ' (' + interfacesStr + ')');
 
-        const spanEl = new api.dom.SpanEl().setHtml(displayString);
+        const spanEl = new SpanEl().setHtml(displayString);
         new Tooltip(spanEl, widget.getWidgetDescriptorKey().toString(), 200).setMode(Tooltip.MODE_GLOBAL_STATIC);
         return spanEl;
     }
 
-    private getExtensionsTools(applicationInfo: ApplicationInfo): api.dom.Element[] {
+    private getExtensionsTools(applicationInfo: ApplicationInfo): Element[] {
         return applicationInfo.getTools().map(this.adminToolDescriptorToElement).sort(this.sortElInAlphabeticallyAsc);
     }
 
-    private adminToolDescriptorToElement(adminToolDescriptor: AdminToolDescriptor): api.dom.Element {
-        const aEl = new api.dom.AEl().setUrl(adminToolDescriptor.getToolUrl(), '_blank').setHtml(adminToolDescriptor.getDisplayName());
+    private adminToolDescriptorToElement(adminToolDescriptor: AdminToolDescriptor): Element {
+        const aEl = new AEl().setUrl(adminToolDescriptor.getToolUrl(), '_blank').setHtml(adminToolDescriptor.getDisplayName());
         new Tooltip(aEl, adminToolDescriptor.getKey().toString(), 200).setMode(Tooltip.MODE_GLOBAL_STATIC);
         return aEl;
     }
@@ -221,7 +224,7 @@ export class ApplicationDataContainer
         return a.toLocaleLowerCase().localeCompare(b.toLocaleLowerCase());
     }
 
-    private sortElInAlphabeticallyAsc(a: api.dom.Element, b: api.dom.Element): number {
+    private sortElInAlphabeticallyAsc(a: Element, b: Element): number {
         return a.getHtml().toLocaleLowerCase().localeCompare(b.getHtml().toLocaleLowerCase());
     }
 }

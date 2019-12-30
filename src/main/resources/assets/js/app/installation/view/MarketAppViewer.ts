@@ -1,9 +1,14 @@
-import NamesAndIconViewSize = api.app.NamesAndIconViewSize;
-import MarketApplication = api.application.MarketApplication;
+import * as Q from 'q';
+import {Viewer} from 'lib-admin-ui/ui/Viewer';
+import {NamesAndIconView, NamesAndIconViewBuilder} from 'lib-admin-ui/app/NamesAndIconView';
+import {AEl} from 'lib-admin-ui/dom/AEl';
+import {MarketApplication} from 'lib-admin-ui/application/MarketApplication';
+import {NamesAndIconViewSize} from 'lib-admin-ui/app/NamesAndIconViewSize';
 
-export class MarketAppViewer extends api.ui.Viewer<MarketApplication> {
+export class MarketAppViewer
+    extends Viewer<MarketApplication> {
 
-    private namesAndIconView: api.app.NamesAndIconView;
+    private namesAndIconView: NamesAndIconView;
 
     private relativePath: boolean;
 
@@ -17,15 +22,15 @@ export class MarketAppViewer extends api.ui.Viewer<MarketApplication> {
         this.size = size;
     }
 
-    setObject(object: MarketApplication, relativePath: boolean = false): wemQ.Promise<boolean> {
+    setObject(object: MarketApplication, relativePath: boolean = false): Q.Promise<boolean> {
         this.relativePath = relativePath;
         super.setObject(object);
 
-        return wemQ(true);
+        return Q(true);
     }
 
     resolveDisplayName(object: MarketApplication): string {
-        let appLink = new api.dom.AEl().setUrl(object.getUrl(), '_blank').setHtml(object.getDisplayName(), false);
+        let appLink = new AEl().setUrl(object.getUrl(), '_blank').setHtml(object.getDisplayName());
         return appLink.toString();
     }
 
@@ -53,7 +58,7 @@ export class MarketAppViewer extends api.ui.Viewer<MarketApplication> {
         }
 
         if (!this.namesAndIconView) {
-            this.namesAndIconView = new api.app.NamesAndIconViewBuilder().setSize(this.size).build();
+            this.namesAndIconView = new NamesAndIconViewBuilder().setSize(this.size).build();
             this.appendChild(this.namesAndIconView);
         }
 

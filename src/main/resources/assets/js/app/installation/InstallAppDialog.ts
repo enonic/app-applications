@@ -1,21 +1,25 @@
+import * as Q from 'q';
 import {ApplicationInput} from './view/ApplicationInput';
 import {MarketAppsTreeGrid} from './view/MarketAppsTreeGrid';
 import {ApplicationUploaderEl} from './ApplicationUploaderEl';
 import {ApplicationUploadStartedEvent} from '../browse/ApplicationUploadStartedEvent';
-import TreeNode = api.ui.treegrid.TreeNode;
-import Application = api.application.Application;
-import DivEl = api.dom.DivEl;
-import MarketApplication = api.application.MarketApplication;
-import UploadFailedEvent = api.ui.uploader.UploadFailedEvent;
-import UploadStartedEvent = api.ui.uploader.UploadStartedEvent;
-import ButtonEl = api.dom.ButtonEl;
-import StringHelper = api.util.StringHelper;
-import i18n = api.util.i18n;
+import {Application} from 'lib-admin-ui/application/Application';
+import {ModalDialog} from 'lib-admin-ui/ui/dialog/ModalDialog';
+import {DropzoneContainer} from 'lib-admin-ui/ui/uploader/UploaderEl';
+import {ButtonEl} from 'lib-admin-ui/dom/ButtonEl';
+import {i18n} from 'lib-admin-ui/util/Messages';
+import {StringHelper} from 'lib-admin-ui/util/StringHelper';
+import {UploadFailedEvent} from 'lib-admin-ui/ui/uploader/UploadFailedEvent';
+import {NotifyManager} from 'lib-admin-ui/notify/NotifyManager';
+import {UploadStartedEvent} from 'lib-admin-ui/ui/uploader/UploadStartedEvent';
+import {DivEl} from 'lib-admin-ui/dom/DivEl';
+import {TreeNode} from 'lib-admin-ui/ui/treegrid/TreeNode';
+import {MarketApplication} from 'lib-admin-ui/application/MarketApplication';
 
 export class InstallAppDialog
-    extends api.ui.dialog.ModalDialog {
+    extends ModalDialog {
 
-    private dropzoneContainer: api.ui.uploader.DropzoneContainer;
+    private dropzoneContainer: DropzoneContainer;
 
     private applicationInput: ApplicationInput;
 
@@ -39,9 +43,9 @@ export class InstallAppDialog
 
         this.applicationInput = new ApplicationInput(this.getCancelAction(), 'large').setPlaceholder(i18n('dialog.install.search'));
 
-        this.clearButton = new api.dom.ButtonEl();
+        this.clearButton = new ButtonEl();
 
-        this.dropzoneContainer = new api.ui.uploader.DropzoneContainer(true);
+        this.dropzoneContainer = new DropzoneContainer(true);
 
         this.marketAppsTreeGrid = new MarketAppsTreeGrid();
     }
@@ -115,7 +119,7 @@ export class InstallAppDialog
         });
     }
 
-    updateInstallApplications(installApplications: api.application.Application[]) {
+    updateInstallApplications(installApplications: Application[]) {
         this.marketAppsTreeGrid.updateInstallApplications(installApplications);
     }
 
@@ -161,7 +165,7 @@ export class InstallAppDialog
     private initUploaderListeners() {
 
         const uploadFailedHandler = (event: UploadFailedEvent<Application>, uploader: ApplicationUploaderEl) => {
-            api.notify.NotifyManager.get().showWarning(uploader.getFailure());
+            NotifyManager.get().showWarning(uploader.getFailure());
 
             this.resetFileInputWithUploader();
         };
@@ -203,7 +207,7 @@ export class InstallAppDialog
 
     private filterNodes(nodes: TreeNode<MarketApplication>[]): TreeNode<MarketApplication>[] {
         let items = nodes;
-        if (this.applicationInput && !api.util.StringHelper.isEmpty(this.applicationInput.getValue())) {
+        if (this.applicationInput && !StringHelper.isEmpty(this.applicationInput.getValue())) {
             items = nodes.filter((node: TreeNode<MarketApplication>) => {
                 return this.nodePassesFilterCondition(node);
             });

@@ -1,17 +1,20 @@
-import '../api.ts';
 import {ApplicationBrowsePanel} from './browse/ApplicationBrowsePanel';
-import Application = api.application.Application;
+import {AppPanel} from 'lib-admin-ui/app/AppPanel';
+import {Path} from 'lib-admin-ui/rest/Path';
+import {ShowBrowsePanelEvent} from 'lib-admin-ui/app/ShowBrowsePanelEvent';
+import {Application} from 'lib-admin-ui/application/Application';
 
-export class ApplicationAppPanel extends api.app.AppPanel<Application> {
+export class ApplicationAppPanel
+    extends AppPanel<Application> {
 
-    constructor(path?: api.rest.Path) {
+    constructor(path?: Path) {
 
         super();
 
         this.route(path);
     }
 
-    private route(path?: api.rest.Path) {
+    private route(path?: Path) {
         let action = path ? path.getElement(0) : undefined;
         let id;
 
@@ -29,7 +32,7 @@ export class ApplicationAppPanel extends api.app.AppPanel<Application> {
             }
             break;
         default:
-            new api.app.ShowBrowsePanelEvent().fire();
+            new ShowBrowsePanelEvent().fire();
             break;
         }
     }

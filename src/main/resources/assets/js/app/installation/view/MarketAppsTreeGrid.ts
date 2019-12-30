@@ -1,23 +1,24 @@
 import {MarketAppViewer} from './MarketAppViewer';
 import {MarketApplicationFetcher} from '../../resource/MarketApplicationFetcher';
-import Element = api.dom.Element;
-import ElementHelper = api.dom.ElementHelper;
-import ElementFromHelperBuilder = api.dom.ElementFromHelperBuilder;
-import GridColumnBuilder = api.ui.grid.GridColumnBuilder;
-import TreeGrid = api.ui.treegrid.TreeGrid;
-import TreeNode = api.ui.treegrid.TreeNode;
-import TreeGridBuilder = api.ui.treegrid.TreeGridBuilder;
-import Application = api.application.Application;
-import ApplicationEvent = api.application.ApplicationEvent;
-import ApplicationEventType = api.application.ApplicationEventType;
-import MarketApplication = api.application.MarketApplication;
-import MarketAppStatus = api.application.MarketAppStatus;
-import MarketAppStatusFormatter = api.application.MarketAppStatusFormatter;
-import MarketApplicationResponse = api.application.MarketApplicationResponse;
-import MarketHelper = api.application.MarketHelper;
-import InstallUrlApplicationRequest = api.application.InstallUrlApplicationRequest;
-import ApplicationInstallResult = api.application.ApplicationInstallResult;
-import i18n = api.util.i18n;
+import {i18n} from 'lib-admin-ui/util/Messages';
+import {Application} from 'lib-admin-ui/application/Application';
+import {Element} from 'lib-admin-ui/dom/Element';
+import {TreeGrid} from 'lib-admin-ui/ui/treegrid/TreeGrid';
+import {MarketApplication, MarketAppStatus, MarketAppStatusFormatter} from 'lib-admin-ui/application/MarketApplication';
+import {TreeNode} from 'lib-admin-ui/ui/treegrid/TreeNode';
+import {GridColumnBuilder} from 'lib-admin-ui/ui/grid/GridColumn';
+import {TreeGridBuilder} from 'lib-admin-ui/ui/treegrid/TreeGridBuilder';
+import {ResponsiveItem} from 'lib-admin-ui/ui/responsive/ResponsiveItem';
+import {ResponsiveManager} from 'lib-admin-ui/ui/responsive/ResponsiveManager';
+import {ApplicationEvent, ApplicationEventType} from 'lib-admin-ui/application/ApplicationEvent';
+import {GetApplicationRequest} from 'lib-admin-ui/application/GetApplicationRequest';
+import {MarketHelper} from 'lib-admin-ui/application/MarketHelper';
+import {InstallUrlApplicationRequest} from 'lib-admin-ui/application/InstallUrlApplicationRequest';
+import {ApplicationInstallResult} from 'lib-admin-ui/application/ApplicationInstallResult';
+import {DefaultErrorHandler} from 'lib-admin-ui/DefaultErrorHandler';
+import {AEl} from 'lib-admin-ui/dom/AEl';
+import {MarketApplicationResponse} from 'lib-admin-ui/application/MarketApplicationResponse';
+
 
 declare var CONFIG;
 
@@ -121,13 +122,13 @@ export class MarketAppsTreeGrid extends TreeGrid<MarketApplication> {
     }
 
     private initAvailableSizeChangeListener() {
-        api.ui.responsive.ResponsiveManager.onAvailableSizeChanged(this, (item: api.ui.responsive.ResponsiveItem) => {
+        ResponsiveManager.onAvailableSizeChanged(this, (item: ResponsiveItem) => {
             this.getGrid().resizeCanvas();
         });
     }
 
     private subscribeOnUninstallEvent() { // set status of market app to NOT_INSTALLED if it was uninstalled
-        api.application.ApplicationEvent.on((event: ApplicationEvent) => {
+        ApplicationEvent.on((event: ApplicationEvent) => {
             if (ApplicationEventType.UNINSTALLED === event.getEventType()) {
                 let nodeToUpdate = this.getRoot().getCurrentRoot().findNode(event.getApplicationKey().toString());
                 if (!!nodeToUpdate) {
@@ -150,7 +151,7 @@ export class MarketAppsTreeGrid extends TreeGrid<MarketApplication> {
     }
 
     private subscribeOnInstallEvent() { // update status of market app
-        api.application.ApplicationEvent.on((event: ApplicationEvent) => {
+        ApplicationEvent.on((event: ApplicationEvent) => {
 
             let nodeToUpdate;
 
@@ -191,8 +192,8 @@ export class MarketAppsTreeGrid extends TreeGrid<MarketApplication> {
                     const app = <MarketApplication>nodeToUpdate.getData();
                     app.setStatus(MarketAppStatus.INSTALLED);
 
-                    new api.application.GetApplicationRequest(event.getApplicationKey(), true).sendAndParse()
-                        .then((application: api.application.Application)=> {
+                    new GetApplicationRequest(event.getApplicationKey(), true).sendAndParse()
+                        .then((application: Application) => {
                             if (application) {
                                 const marketApplication: MarketApplication = <MarketApplication>nodeToUpdate.getData();
 
@@ -215,11 +216,12 @@ export class MarketAppsTreeGrid extends TreeGrid<MarketApplication> {
 
     private subscribeAndManageInstallClick() {
         this.getGrid().subscribeOnClick((event, data) => {
-            let node = this.getItem(data.row);
-            let app = <MarketApplication>node.getData();
-            let url = app.getLatestVersionDownloadUrl();
-            let elem = new Element(new ElementFromHelperBuilder().setHelper(new ElementHelper(event.target)));
-            let status = app.getStatus();
+            const node = this.getItem(data.row);
+            const app = <MarketApplication>node.getData();
+            const url = app.getLatestVersionDownloadUrl();
+            const {target} = event;
+            const status = app.getStatus();
+            const elem = Element.fromHtmlElement(target.tagName.toLowerCase() === 'a' ? target : target.parentElement);
 
             if ((elem.hasClass(MarketAppStatusFormatter.statusInstallCssClass) ||
                  elem.hasClass(MarketAppStatusFormatter.statusUpdateCssClass))) {
@@ -237,7 +239,7 @@ export class MarketAppsTreeGrid extends TreeGrid<MarketApplication> {
 
                 new InstallUrlApplicationRequest(url)
                     .sendAndParse().then((result: ApplicationInstallResult) => {
-                    // api.application.ApplicationEvent.un(progressHandler);
+                    // ApplicationEvent.un(progressHandler);
                     if (!result.getFailure()) {
 
                         elem.removeClass(MarketAppStatusFormatter.statusInstallCssClass + ' ' +
@@ -245,17 +247,19 @@ export class MarketAppsTreeGrid extends TreeGrid<MarketApplication> {
                         elem.addClass(MarketAppStatusFormatter.getStatusCssClass(MarketAppStatus.INSTALLED));
 
                     } else {
-                        elem.setHtml(MarketAppStatusFormatter.formatStatus(status));
+                        elem.removeChildren();
+                        elem.appendChild(MarketAppStatusFormatter.createStatusElement(status));
                         app.setStatus(status);
                         if (row > -1) {
                             this.getGrid().updateCell(row, this.getGrid().getColumnIndex('appStatus'));
                         }
-                        api.DefaultErrorHandler.handle(result.getFailure());
+                        DefaultErrorHandler.handle(result.getFailure());
                     }
 
                 }).catch((reason: any) => {
-                    elem.setHtml(MarketAppStatusFormatter.formatStatus(status));
-                    api.DefaultErrorHandler.handle(reason);
+                    elem.removeChildren();
+                    elem.appendChild(MarketAppStatusFormatter.createStatusElement(status));
+                    DefaultErrorHandler.handle(reason);
                 });
             }
         });
@@ -284,14 +288,14 @@ export class MarketAppsTreeGrid extends TreeGrid<MarketApplication> {
 
     public static appStatusFormatter(row: number, cell: number, value: any, columnDef: any, node: TreeNode<MarketApplication>) {
         let app = <MarketApplication>node.getData();
-        let statusWrapper = new api.dom.AEl();
+        let statusWrapper = new AEl();
 
-        if (!!app.getAppKey()) {
+        if (app.getAppKey()) {
 
             let status = app.getStatus();
             let progress = app.getProgress();
 
-            statusWrapper.setHtml(MarketAppStatusFormatter.formatStatus(status, progress), false);
+            statusWrapper.appendChild(MarketAppStatusFormatter.createStatusElement(status, progress));
             statusWrapper.addClass(MarketAppStatusFormatter.getStatusCssClass(status));
 
             if (status !== MarketAppStatus.NOT_INSTALLED && status !== MarketAppStatus.OLDER_VERSION_INSTALLED) {
@@ -306,11 +310,11 @@ export class MarketAppsTreeGrid extends TreeGrid<MarketApplication> {
         this.initData(this.getRoot().getCurrentRoot().treeToList());
     }
 
-    updateInstallApplications(installApplications: api.application.Application[]) {
+    updateInstallApplications(installApplications: Application[]) {
         this.installedApplications = installApplications;
     }
 
-    fetchChildren(): wemQ.Promise<MarketApplication[]> {
+    fetchChildren(): Q.Promise<MarketApplication[]> {
         this.notifyLoadingStarted();
         this.hideErrorPanelIfVisible();
 

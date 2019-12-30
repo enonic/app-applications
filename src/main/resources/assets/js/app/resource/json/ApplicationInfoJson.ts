@@ -4,12 +4,12 @@ import {ApplicationTasksJson} from './ApplicationTasksJson';
 import {IdProviderApplicationJson} from './IdProviderApplicationJson';
 import {WidgetDescriptorsJson} from './WidgetDescriptorsJson';
 import {RelationshipTypeListJson} from '../../relationshiptype/RelationshipTypeListJson';
-import ContentTypeSummaryListJson = api.schema.content.ContentTypeSummaryListJson;
-import PageDescriptorsJson = api.content.page.PageDescriptorsJson;
-import PartDescriptorsJson = api.content.page.region.PartDescriptorsJson;
-import LayoutDescriptorsJson = api.content.page.region.LayoutDescriptorsJson;
-import AdminToolDescriptorsJson = api.content.json.AdminToolDescriptorsJson;
-import MacrosJson = api.macro.resource.MacrosJson;
+import {ContentTypeSummaryListJson} from 'lib-admin-ui/schema/content/ContentTypeSummaryListJson';
+import {PageDescriptorsJson} from 'lib-admin-ui/content/page/PageDescriptorsJson';
+import {PartDescriptorsJson} from 'lib-admin-ui/content/page/region/PartDescriptorsJson';
+import {LayoutDescriptorsJson} from 'lib-admin-ui/content/page/region/LayoutDescriptorsJson';
+import {MacrosJson} from 'lib-admin-ui/macro/resource/MacrosJson';
+import {AdminToolDescriptorsJson} from './AdminToolDescriptorsJson';
 
 export interface ApplicationInfoJson {
 

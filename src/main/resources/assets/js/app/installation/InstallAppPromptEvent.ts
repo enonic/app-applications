@@ -1,8 +1,9 @@
-import '../../api.ts';
+import {Application} from 'lib-admin-ui/application/Application';
+import {ClassHelper} from 'lib-admin-ui/ClassHelper';
+import {Event} from 'lib-admin-ui/event/Event';
 
-import  Application = api.application.Application;
-
-export class InstallAppPromptEvent extends api.event.Event {
+export class InstallAppPromptEvent
+    extends Event {
 
     private installedApplications: Application[];
 
@@ -16,10 +17,10 @@ export class InstallAppPromptEvent extends api.event.Event {
     }
 
     static on(handler: (event: InstallAppPromptEvent) => void) {
-        api.event.Event.bind(api.ClassHelper.getFullName(this), handler);
+        Event.bind(ClassHelper.getFullName(this), handler);
     }
 
     static un(handler?: (event: InstallAppPromptEvent) => void) {
-        api.event.Event.unbind(api.ClassHelper.getFullName(this), handler);
+        Event.unbind(ClassHelper.getFullName(this), handler);
     }
 }

@@ -1,8 +1,8 @@
-const ErrorLoggerPlugin = require('error-logger-webpack-plugin');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const CircularDependencyPlugin = require('circular-dependency-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
-
+const ProvidePlugin = require('webpack/lib/ProvidePlugin');
+const ErrorLoggerPlugin = require('error-logger-webpack-plugin');
 const path = require('path');
 
 const isProd = process.env.NODE_ENV === 'production';
@@ -11,7 +11,7 @@ module.exports = {
     context: path.join(__dirname, '/src/main/resources/assets'),
     entry: {
         'js/bundle': './js/main.ts',
-        'styles/_all': './styles/main.less',
+        'styles/main': './styles/main.less',
     },
     output: {
         path: path.join(__dirname, '/build/resources/main/assets'),
@@ -56,7 +56,11 @@ module.exports = {
         ]
     },
     plugins: [
-        new ErrorLoggerPlugin(),
+        new ProvidePlugin({
+            $: 'jquery',
+            jQuery: 'jquery',
+            'window.jQuery': 'jquery'
+        }),
         new MiniCssExtractPlugin({
             filename: '[name].css',
             chunkFilename: './styles/[id].css'
@@ -64,7 +68,8 @@ module.exports = {
         new CircularDependencyPlugin({
             exclude: /a\.js|node_modules/,
             failOnError: true
-        })
+        }),
+        new ErrorLoggerPlugin({showColumn: false})
     ],
     mode: isProd ? 'production' : 'development',
     devtool: isProd ? false : 'source-map'

@@ -1,14 +1,20 @@
 import {ApplicationUploaderEl} from '../ApplicationUploaderEl';
-import InputEl = api.dom.InputEl;
-import Action = api.ui.Action;
-import Application = api.application.Application;
-import InstallUrlApplicationRequest = api.application.InstallUrlApplicationRequest;
-import ApplicationInstallResult = api.application.ApplicationInstallResult;
-import UploadStartedEvent = api.ui.uploader.UploadStartedEvent;
-import UploadItem = api.ui.uploader.UploadItem;
-import UploadFailedEvent = api.ui.uploader.UploadFailedEvent;
+import {Application} from 'lib-admin-ui/application/Application';
+import {Action} from 'lib-admin-ui/ui/Action';
+import {CompositeFormInputEl} from 'lib-admin-ui/dom/CompositeFormInputEl';
+import {InputEl} from 'lib-admin-ui/dom/InputEl';
+import {UploadStartedEvent} from 'lib-admin-ui/ui/uploader/UploadStartedEvent';
+import {UploadItem} from 'lib-admin-ui/ui/uploader/UploadItem';
+import {KeyHelper} from 'lib-admin-ui/ui/KeyHelper';
+import {AppHelper} from 'lib-admin-ui/util/AppHelper';
+import {StringHelper} from 'lib-admin-ui/util/StringHelper';
+import {UploadFailedEvent} from 'lib-admin-ui/ui/uploader/UploadFailedEvent';
+import {ApplicationInstallResult} from 'lib-admin-ui/application/ApplicationInstallResult';
+import {InstallUrlApplicationRequest} from 'lib-admin-ui/application/InstallUrlApplicationRequest';
+import {DefaultErrorHandler} from 'lib-admin-ui/DefaultErrorHandler';
 
-export class ApplicationInput extends api.dom.CompositeFormInputEl {
+export class ApplicationInput
+    extends CompositeFormInputEl {
 
     private static LAST_KEY_PRESS_TIMEOUT: number = 300;
 
@@ -55,7 +61,7 @@ export class ApplicationInput extends api.dom.CompositeFormInputEl {
         this.applicationUploaderEl.getUploadButton().getEl().setTabIndex(0);
 
         this.applicationUploaderEl.getUploadButton().onKeyDown((event: KeyboardEvent) => {
-            if (api.ui.KeyHelper.isSpace(event)) {
+            if (KeyHelper.isSpace(event)) {
                 this.applicationUploaderEl.showFileSelectionDialog();
             }
         });
@@ -69,7 +75,7 @@ export class ApplicationInput extends api.dom.CompositeFormInputEl {
     }
 
     private initUrlEnteredHandler() {
-        const keyDownHandler: () => void = api.util.AppHelper.debounce(() => this.startInstall(), ApplicationInput.LAST_KEY_PRESS_TIMEOUT);
+        const keyDownHandler: () => void = AppHelper.debounce(() => this.startInstall(), ApplicationInput.LAST_KEY_PRESS_TIMEOUT);
 
         this.onKeyDown((event) => {
             switch (event.keyCode) {
@@ -93,7 +99,7 @@ export class ApplicationInput extends api.dom.CompositeFormInputEl {
 
     isUrlTyped() {
         const value = this.textInput.getValue();
-        return api.util.StringHelper.testRegex(ApplicationInput.APPLICATION_ADDRESS_MASK, value);
+        return StringHelper.testRegex(ApplicationInput.APPLICATION_ADDRESS_MASK, value);
     }
 
     onAppInstallStarted(listener: () => void) {
@@ -167,7 +173,7 @@ export class ApplicationInput extends api.dom.CompositeFormInputEl {
     }
 
     private startInstall() {
-        if (!api.util.StringHelper.isEmpty(this.textInput.getValue())) {
+        if (!StringHelper.isEmpty(this.textInput.getValue())) {
             if (!this.isUrlTyped()) {
                 this.notifyTextValueChanged();
             } else {
@@ -194,7 +200,7 @@ export class ApplicationInput extends api.dom.CompositeFormInputEl {
 
             this.enable();
         }).catch((reason: any) => {
-            api.DefaultErrorHandler.handle(reason);
+            DefaultErrorHandler.handle(reason);
             this.notifyAppInstallFailed(reason);
             this.enable();
         });

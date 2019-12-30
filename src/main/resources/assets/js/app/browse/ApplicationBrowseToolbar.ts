@@ -1,7 +1,8 @@
-import '../../api.ts';
 import {ApplicationBrowseActions} from './ApplicationBrowseActions';
+import {Toolbar} from 'lib-admin-ui/ui/toolbar/Toolbar';
 
-export class ApplicationBrowseToolbar extends api.ui.toolbar.Toolbar {
+export class ApplicationBrowseToolbar
+    extends Toolbar {
 
     constructor(actions: ApplicationBrowseActions) {
         super();

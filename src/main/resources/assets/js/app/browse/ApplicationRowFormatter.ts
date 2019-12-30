@@ -1,8 +1,9 @@
-import '../../api.ts';
-import TreeNode = api.ui.treegrid.TreeNode;
-import Application = api.application.Application;
-import ApplicationViewer = api.application.ApplicationViewer;
-import ApplicationUploadMock = api.application.ApplicationUploadMock;
+import {TreeNode} from 'lib-admin-ui/ui/treegrid/TreeNode';
+import {ApplicationViewer} from 'lib-admin-ui/application/ApplicationViewer';
+import {Application, ApplicationUploadMock} from 'lib-admin-ui/application/Application';
+import {DivEl} from 'lib-admin-ui/dom/DivEl';
+import {ObjectHelper} from 'lib-admin-ui/ObjectHelper';
+import {ProgressBar} from 'lib-admin-ui/ui/ProgressBar';
 
 export class ApplicationRowFormatter {
 
@@ -18,12 +19,12 @@ export class ApplicationRowFormatter {
 
     public static stateFormatter(row: number, cell: number, value: any, columnDef: any, node: TreeNode<Application>) {
         const data = node.getData();
-        const statusEl = new api.dom.DivEl();
+        const statusEl = new DivEl();
 
         if (data instanceof Application) {   // default node
             statusEl.getEl().setText(value);
-        } else if (api.ObjectHelper.iFrameSafeInstanceOf(data, ApplicationUploadMock)) {   // uploading node
-            const status = new api.ui.ProgressBar((<any>data).getUploadItem().getProgress());
+        } else if (ObjectHelper.iFrameSafeInstanceOf(data, ApplicationUploadMock)) {   // uploading node
+            const status = new ProgressBar((<any>data).getUploadItem().getProgress());
             statusEl.appendChild(status);
         }
 

@@ -1,8 +1,12 @@
-import '../../api.ts';
 import {ApplicationItemStatisticsPanel} from '../view/ApplicationItemStatisticsPanel';
-import BrowseItem = api.app.browse.BrowseItem;
+import {BrowseItem} from 'lib-admin-ui/app/browse/BrowseItem';
+import {BrowseItemPanel} from 'lib-admin-ui/app/browse/BrowseItemPanel';
+import {Application} from 'lib-admin-ui/application/Application';
+import {ItemStatisticsPanel} from 'lib-admin-ui/app/view/ItemStatisticsPanel';
+import {DivEl} from 'lib-admin-ui/dom/DivEl';
 
-export class ApplicationBrowseItemPanel extends api.app.browse.BrowseItemPanel<api.application.Application> {
+export class ApplicationBrowseItemPanel
+    extends BrowseItemPanel<Application> {
 
     constructor() {
         super();
@@ -11,15 +15,15 @@ export class ApplicationBrowseItemPanel extends api.app.browse.BrowseItemPanel<a
     }
 
     private createBackButton() {
-        let backButton = new api.dom.DivEl('application-item-statistics-panel-back-button');
-        backButton.onClicked((event) => {
+        let backButton = new DivEl('application-item-statistics-panel-back-button');
+        backButton.onClicked(() => {
             this.addClass('hidden');
         });
 
         this.itemStatisticsPanel.appendChild(backButton);
     }
 
-    togglePreviewForItem(item?: BrowseItem<api.application.Application>) {
+    togglePreviewForItem(item?: BrowseItem<Application>) {
         super.togglePreviewForItem(item);
 
         if (item) {
@@ -27,7 +31,7 @@ export class ApplicationBrowseItemPanel extends api.app.browse.BrowseItemPanel<a
         }
     }
 
-    createItemStatisticsPanel(): api.app.view.ItemStatisticsPanel<api.application.Application> {
+    createItemStatisticsPanel(): ItemStatisticsPanel<Application> {
         return new ApplicationItemStatisticsPanel();
     }
 

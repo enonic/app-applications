@@ -1,5 +1,5 @@
 import {ApplicationTaskJson} from './json/ApplicationTasksJson';
-import DescriptorKey = api.content.page.DescriptorKey;
+import {DescriptorKey} from 'lib-admin-ui/content/page/DescriptorKey';
 
 export class ApplicationTask {
 

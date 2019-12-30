@@ -1,42 +1,53 @@
-declare const CONFIG;
-
-const body = api.dom.Body.get();
-
-import './api.ts';
+import {Application} from 'lib-admin-ui/app/Application';
 import {ApplicationAppPanel} from './app/ApplicationAppPanel';
 import {InstallAppDialog} from './app/installation/InstallAppDialog';
 import {InstallAppPromptEvent} from './app/installation/InstallAppPromptEvent';
+import {Body} from 'lib-admin-ui/dom/Body';
+import {Path} from 'lib-admin-ui/rest/Path';
+import {NotifyManager} from 'lib-admin-ui/notify/NotifyManager';
+import {ConnectionDetector} from 'lib-admin-ui/system/ConnectionDetector';
+import {showError} from 'lib-admin-ui/notify/MessageBus';
+import {UriHelper} from 'lib-admin-ui/util/UriHelper';
+import {AppBar} from 'lib-admin-ui/app/bar/AppBar';
+import {AppHelper} from 'lib-admin-ui/util/AppHelper';
+import {ServerEventsListener} from 'lib-admin-ui/event/ServerEventsListener';
+import {i18nInit} from 'lib-admin-ui/util/MessagesInitializer';
+import {i18n} from 'lib-admin-ui/util/Messages';
 
-function getApplication(): api.app.Application {
-    const application = new api.app.Application('applications', 'Applications', 'AM', CONFIG.appIconUrl);
-    application.setPath(api.rest.Path.fromString('/'));
+declare const CONFIG;
+
+const body = Body.get();
+
+function getApplication(): Application {
+    const application = new Application('applications', 'Applications', 'AM', CONFIG.appIconUrl);
+    application.setPath(Path.fromString('/'));
     application.setWindow(window);
 
     return application;
 }
 
 function startLostConnectionDetector() {
-    api.system.ConnectionDetector.get()
+    ConnectionDetector.get()
             .setAuthenticated(true)
-            .setSessionExpireRedirectUrl(api.util.UriHelper.getToolUri(''))
-            .setNotificationMessage(api.util.i18n('notify.connection.loss'))
+            .setSessionExpireRedirectUrl(UriHelper.getToolUri(''))
+            .setNotificationMessage(i18n('notify.connection.loss'))
             .startPolling(true);
 }
 
 function startApplication() {
 
-    const application: api.app.Application = getApplication();
-    const appBar = new api.app.bar.AppBar(application);
+    const application: Application = getApplication();
+    const appBar = new AppBar(application);
     const appPanel = new ApplicationAppPanel(application.getPath());
 
     body.appendChild(appBar);
     body.appendChild(appPanel);
 
-    api.util.AppHelper.preventDragRedirect();
+    AppHelper.preventDragRedirect();
 
     application.setLoaded(true);
 
-    const serverEventsListener = new api.event.ServerEventsListener([application]);
+    const serverEventsListener = new ServerEventsListener([application]);
     serverEventsListener.start();
 
     startLostConnectionDetector();
@@ -51,7 +62,7 @@ function startApplication() {
 }
 
 const renderListener = () => {
-    api.util.i18nInit(CONFIG.i18nUrl).then(() => startApplication());
+    i18nInit(CONFIG.i18nUrl).then(() => startApplication());
     body.unRendered(renderListener);
 };
 if (body.isRendered()) {

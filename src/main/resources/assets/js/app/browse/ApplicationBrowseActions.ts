@@ -1,22 +1,23 @@
-import '../../api.ts';
+import * as Q from 'q';
 import {ApplicationTreeGrid} from './ApplicationTreeGrid';
 import {StartApplicationAction} from './StartApplicationAction';
 import {StopApplicationAction} from './StopApplicationAction';
 import {InstallApplicationAction} from './InstallApplicationAction';
 import {UninstallApplicationAction} from './UninstallApplicationAction';
-import BrowseItem = api.app.browse.BrowseItem;
-import Application = api.application.Application;
-import TreeGridActions = api.ui.treegrid.actions.TreeGridActions;
-import BrowseItemsChanges = api.app.browse.BrowseItemsChanges;
+import {TreeGridActions} from 'lib-admin-ui/ui/treegrid/actions/TreeGridActions';
+import {BrowseItem} from 'lib-admin-ui/app/browse/BrowseItem';
+import {BrowseItemsChanges} from 'lib-admin-ui/app/browse/BrowseItemsChanges';
+import {Application} from 'lib-admin-ui/application/Application';
+import {Action} from 'lib-admin-ui/ui/Action';
 
 export class ApplicationBrowseActions implements TreeGridActions<Application> {
 
-    public START_APPLICATION: api.ui.Action;
-    public STOP_APPLICATION: api.ui.Action;
-    public INSTALL_APPLICATION: api.ui.Action;
-    public UNINSTALL_APPLICATION: api.ui.Action;
+    public START_APPLICATION: Action;
+    public STOP_APPLICATION: Action;
+    public INSTALL_APPLICATION: Action;
+    public UNINSTALL_APPLICATION: Action;
 
-    private allActions: api.ui.Action[] = [];
+    private allActions: Action[] = [];
 
     private static INSTANCE: ApplicationBrowseActions;
 
@@ -41,12 +42,12 @@ export class ApplicationBrowseActions implements TreeGridActions<Application> {
         this.allActions.push(this.START_APPLICATION, this.STOP_APPLICATION, this.UNINSTALL_APPLICATION);
     }
 
-    getAllActions(): api.ui.Action[] {
+    getAllActions(): Action[] {
         return this.allActions;
     }
 
-    updateActionsEnabledState(browseItems: BrowseItem<Application>[], changes?: BrowseItemsChanges<Application>): wemQ.Promise<void> {
-        return wemQ(true).then(() => {
+    updateActionsEnabledState(browseItems: BrowseItem<Application>[], changes?: BrowseItemsChanges<Application>): Q.Promise<void> {
+        return Q(true).then(() => {
             const applicationsSelected = browseItems.length;
             const anySelected = applicationsSelected > 0;
 
