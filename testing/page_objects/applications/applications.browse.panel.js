@@ -4,23 +4,23 @@ const appConst = require('../../libs/app_const');
 const LauncherPanel = require('../launcher.panel');
 
 const XPATH = {
-    container: `//div[contains(@id,'ApplicationBrowsePanel')]`,
+    container: "//div[contains(@id,'ApplicationBrowsePanel')]",
     launcherButton: "//button[contains(@class,'launcher-button')]",
-    appGrid: `//div[contains(@class, 'application-grid')]`,
-    toolbar: `//div[contains(@id,'ApplicationBrowseToolbar')]`,
-    contextMenu: `//ul[contains(@id,'TreeGridContextMenu')]`,
-    treeGridToolbar: `//div[contains(@id,'api.ui.treegrid.TreeGridToolbar')]`,
+    appGrid: "//div[contains(@class, 'application-grid')]",
+    toolbar: "//div[contains(@id,'ApplicationBrowseToolbar')]",
+    contextMenu: "//ul[contains(@id,'TreeGridContextMenu')]",
+    treeGridToolbar: `//div[contains(@id,'TreeGridToolbar')]`,
     installButton: `//div[contains(@id,'ApplicationBrowseToolbar')]/button[contains(@id, 'ActionButton') and child::span[contains(.,'Install')]]`,
     unInstallButton: `//div[contains(@id,'ApplicationBrowseToolbar')]/button[contains(@id, 'ActionButton') and child::span[contains(.,'Uninstall')]]`,
-    stopButton: `//div[contains(@id,'ApplicationBrowseToolbar')]/button[contains(@id, 'ActionButton') and child::span[contains(.,'Stop')]]`,
+    stopButton: "//div[contains(@id,'ApplicationBrowseToolbar')]/button[contains(@id, 'ActionButton') and child::span[contains(.,'Stop')]]",
     startButton: `//div[contains(@id,'ApplicationBrowseToolbar')]/button[contains(@id, 'ActionButton') and child::span[contains(.,'Start')]]`,
-    selectAllCheckbox: `//div[@id='api.ui.treegrid.actions.SelectionController']`,
+    selectAllCheckbox: "//div[@id='SelectionController']",
     checkboxes: `(//div[contains(@class,'slick-cell-checkboxsel')])`,
     appState: "//div[contains(@class,'state')]",
     selectedRows: `//div[contains(@class,'slick-viewport')]//div[contains(@class,'slick-row') and child::div[contains(@class,'selected')]]`,
     selectionControllerCheckBox: `//div[contains(@id,'SelectionController')]`,
-    selectionPanelToggler: `//button[contains(@id,'SelectionPanelToggler')]`,
-    numberInToggler: `//button[contains(@id,'SelectionPanelToggler')]/span`,
+    selectionPanelToggler: "//button[contains(@id,'SelectionPanelToggler')]",
+    numberInToggler: "//button[contains(@id,'SelectionPanelToggler')]/span",
     appStateByName: displayName => `${lib.slickRowByDisplayName(XPATH.appGrid, displayName)}${XPATH.appState}`,
     enabledContextMenuButton: name => {
         return `${XPATH.contextMenu}/li[contains(@id,'MenuItem') and not(contains(@class,'disabled')) and contains(.,'${name}')]`;

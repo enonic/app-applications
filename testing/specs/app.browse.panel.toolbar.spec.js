@@ -1,5 +1,4 @@
 const chai = require('chai');
-const expect = chai.expect;
 const assert = chai.assert;
 chai.use(require('chai-as-promised'));
 const webDriverHelper = require('../libs/WebDriverHelper');
@@ -17,68 +16,56 @@ describe('Application Browse Panel, check buttons on the toolbar', function () {
     const appDescription1 = 'Inspect your content object JSON';
     const appDescription2 = 'A Chuck Norris fact widget';
 
-    it('WHEN app browse panel is loaded  AND no selections THEN only `Install` button should be enabled', () => {
+    it('WHEN app browse panel is loaded  AND no selections THEN only `Install` button should be enabled', async () => {
         let appBrowsePanel = new AppBrowsePanel();
-        return appBrowsePanel.waitForInstallButtonEnabled().then(result => {
-            assert.isTrue(result, 'Install button should be enabled');
-        }).then(() => {
-            return assert.eventually.isFalse(appBrowsePanel.isStartButtonEnabled(),
-                "`Start` button should be disabled");
-        }).then(() => {
-            return assert.eventually.isFalse(appBrowsePanel.isStopButtonEnabled(),
-                "`Stop` button should be disabled");
-        }).then(() => {
-            return assert.eventually.isFalse(appBrowsePanel.isUninstallButtonEnabled(),
-                "`Uninstall` button should be disabled");
-        })
+        //'Install' button should be enabled:
+        await appBrowsePanel.waitForInstallButtonEnabled()
+        // `Start` button should be disabled
+        await appBrowsePanel.isStartButtonEnabled();
+        //`Stop` button should be disabled
+        await appBrowsePanel.isStopButtonEnabled();
+        //Uninstall` button should be disabled
+        await appBrowsePanel.isUninstallButtonEnabled();
     });
 
     it('GIVEN Install App dialog is opened WHEN Install button has been clicked for two applications THEN two new applications should be present in the grid',
-        () => {
+        async () => {
             let appBrowsePanel = new AppBrowsePanel();
             let installAppDialog = new InstallAppDialog();
-            return appBrowsePanel.clickOnInstallButton()
-                .then(()=> installAppDialog.waitForGridLoaded())
-                .then(() => installAppDialog.waitForInstallLink(appDisplayName1))
-                .then(()=> installAppDialog.pause(500))
-                .then(() => installAppDialog.clickOnInstallAppLink(appDisplayName1))
-                .then(() => installAppDialog.waitForAppInstalled(appDisplayName1))
-                .then(() => installAppDialog.waitForInstallLink(appDisplayName2))
-                .then(() => installAppDialog.clickOnInstallAppLink(appDisplayName2))
-                .then(() => installAppDialog.waitForAppInstalled(appDisplayName2))
-                .then(() => installAppDialog.clickOnCancelButtonTop())
-                .then(() => installAppDialog.waitForClosed(2000))
-                .then(() => {
-                    studioUtils.saveScreenshot("chuck_norris_installed");
-                    return assert.eventually.isTrue(appBrowsePanel.isItemDisplayed(appDescription1),
-                        appDescription1 + "  application should be present");
+            await appBrowsePanel.clickOnInstallButton();
+            await installAppDialog.waitForGridLoaded();
+            await installAppDialog.waitForInstallLink(appDisplayName1);
+            //Install two applications and close the modal dialog:
+            await installAppDialog.pause(500);
+            await installAppDialog.clickOnInstallAppLink(appDisplayName1);
+            await installAppDialog.waitForAppInstalled(appDisplayName1);
+            await installAppDialog.waitForInstallLink(appDisplayName2);
+            await installAppDialog.clickOnInstallAppLink(appDisplayName2);
+            await installAppDialog.waitForAppInstalled(appDisplayName2);
+            await installAppDialog.clickOnCancelButtonTop();
+            await installAppDialog.waitForClosed(2000);
 
-                }).then(() => {
-                    return assert.eventually.isTrue(appBrowsePanel.isItemDisplayed(appDescription2),
-                        appDescription2 + "  application should be present");
-                })
+            studioUtils.saveScreenshot("chuck_norris_installed");
+            let result = await appBrowsePanel.isItemDisplayed(appDescription1);
+            assert.isTrue(result, appDescription1 + "  application should be present");
+            result = await appBrowsePanel.isItemDisplayed(appDescription2);
+            assert.isTrue(result, appDescription2 + "  application should be present");
         });
 
-    it('WHEN An installed application is selected or unselected THEN the toolbar buttons must be updated', () => {
+    it('WHEN An installed application is selected or unselected THEN the toolbar buttons must be updated', async () => {
         let appBrowsePanel = new AppBrowsePanel();
-        //select the application:
-        return appBrowsePanel.clickOnRowByName(appDescription1).then(() => {
-            studioUtils.saveScreenshot("chuck_norris_selected");
-            return assert.eventually.isTrue(appBrowsePanel.waitForUninstallButtonEnabled(), "Uninstall button gets enabled")
-        }).then(() => {
-            return appBrowsePanel.waitForStopButtonEnabled();
-        }).then(() => {
-            return appBrowsePanel.waitForStartButtonDisabled();
-        }).then(() => {
-            //click on the row again and unselect it
-            return appBrowsePanel.clickOnRowByName(appDescription1)
-        }).then(() => {
-            return appBrowsePanel.waitForUninstallButtonDisabled()
-        }).then(() => {
-            return appBrowsePanel.waitForStopButtonDisabled();
-        }).then(() => {
-            return appBrowsePanel.waitForStartButtonDisabled()
-        });
+        //1. select the application:
+        await appBrowsePanel.clickOnRowByName(appDescription1);
+        studioUtils.saveScreenshot("chuck_norris_selected");
+        //"Uninstall" button gets enabled:
+        await appBrowsePanel.waitForUninstallButtonEnabled();
+        await appBrowsePanel.waitForStopButtonEnabled();
+        await appBrowsePanel.waitForStartButtonDisabled();
+        //2. click on the row again and unselect it:
+        await appBrowsePanel.clickOnRowByName(appDescription1)
+        await appBrowsePanel.waitForUninstallButtonDisabled()
+        await appBrowsePanel.waitForStopButtonDisabled();
+        await appBrowsePanel.waitForStartButtonDisabled()
     });
 
     it('WHEN The select all checkbox is selected/unselected THEN the rows should be selected/unselected', () => {
@@ -129,9 +116,3 @@ function uninstallIfPresent(appDescription) {
         .then(() => uninstallAppDialog.clickOnYesButton())
         .then(() => appBrowsePanel.waitForNotificationMessage());
 }
-
-
-
-
-
-
