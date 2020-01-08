@@ -111,22 +111,22 @@ class Page {
 
     async isElementEnabled(selector) {
         let element = await this.findElement(selector);
-        return element.isEnabled();
+        return await element.isEnabled();
     }
 
     async waitForElementEnabled(selector, ms) {
         let element = await this.findElement(selector);
-        return element.waitForEnabled(ms);
+        return await element.waitForEnabled(ms);
     }
 
     async waitForElementDisabled(selector, ms) {
         let element = await this.findElement(selector);
-        return element.waitForEnabled(ms, true);
+        return await element.waitForEnabled(ms, true);
     }
 
     async waitForElementNotDisplayed(selector, ms) {
         let element = await this.findElement(selector);
-        return element.waitForDisplayed(ms, true);
+        return await element.waitForDisplayed(ms, true);
     }
 
     async waitForElementDisplayed(selector, ms) {
@@ -161,7 +161,7 @@ class Page {
 
     async waitForNotificationMessage() {
         try {
-            let notificationXpath = `//div[contains(@id,'NotificationContainer')]//div[@class='notification-content']/span`;
+            let notificationXpath = "//div[contains(@id,'NotificationContainer')]//div[@class='notification-content']";
             await this.getBrowser().waitUntil(async () => {
                 return await this.isElementDisplayed(notificationXpath);
             })
@@ -174,7 +174,7 @@ class Page {
     }
 
     waitForExpectedNotificationMessage(expectedMessage) {
-        let selector = `//div[contains(@id,'NotificationMessage')]//div[contains(@class,'notification-content')]//span[contains(.,'${expectedMessage}')]`;
+        let selector = `//div[contains(@id,'NotificationMessage')]//div[contains(@class,'notification-content') and contains(.,'${expectedMessage}')]`;
         return this.waitForElementDisplayed(selector, appConst.TIMEOUT_3).catch(err => {
             this.saveScreenshot('err_notification_mess');
             throw new Error('expected notification message was not shown! ' + err);
@@ -182,7 +182,7 @@ class Page {
     }
 
     waitForErrorNotificationMessage() {
-        let selector = `//div[contains(@id,'NotificationMessage') and @class='notification error']//div[contains(@class,'notification-content')]/span`;
+        let selector = `//div[contains(@id,'NotificationMessage') and @class='notification error']//div[contains(@class,'notification-content')]`;
         return this.waitForElementDisplayed(selector, appConst.TIMEOUT_3).then(() => {
             return this.getText(selector);
         })

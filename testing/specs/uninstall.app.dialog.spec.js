@@ -1,5 +1,4 @@
 const chai = require('chai');
-const expect = chai.expect;
 const assert = chai.assert;
 const webDriverHelper = require('../libs/WebDriverHelper');
 const AppBrowsePanel = require('../page_objects/applications/applications.browse.panel');
