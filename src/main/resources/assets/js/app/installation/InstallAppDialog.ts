@@ -134,7 +134,7 @@ export class InstallAppDialog
             this.applicationInput.appendChild(this.clearButton);
             this.applicationInput.getUploader().addDropzone(this.dropzoneContainer.getDropzone().getId());
 
-            this.header.appendChildren(...[this.applicationInput, this.statusMessage]);
+            this.header.appendChildren<DivEl>(this.applicationInput, this.statusMessage);
 
             const marketAppsDiv: DivEl = new DivEl('market-apps');
             marketAppsDiv.appendChild(this.marketAppsTreeGrid);
