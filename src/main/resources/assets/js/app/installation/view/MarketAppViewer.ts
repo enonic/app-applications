@@ -30,8 +30,7 @@ export class MarketAppViewer
     }
 
     resolveDisplayName(object: MarketApplication): string {
-        let appLink = new AEl().setUrl(object.getUrl(), '_blank').setHtml(object.getDisplayName());
-        return appLink.toString();
+        return object.getDisplayName();
     }
 
     resolveSubName(object: MarketApplication, relativePath: boolean = false): string {
@@ -63,18 +62,18 @@ export class MarketAppViewer
         }
 
         if (object) {
-            let displayName = this.resolveDisplayName(object);
+            let displayNameElements = [AEl.fromText(this.resolveDisplayName(object)).setUrl(object.getUrl(), '_blank')];
             let subName = this.resolveSubName(object, this.relativePath);
             let subTitle = this.resolveSubTitle(object);
             let iconUrl = this.resolveIconUrl(object);
 
-            this.namesAndIconView.getNamesView().setMainName(displayName, false).setSubName(subName, subTitle);
-            if (!!subTitle) {
+            this.namesAndIconView.getNamesView().setMainNameElements(displayNameElements).setSubName(subName, subTitle);
+            if (subTitle) {
                 this.namesAndIconView.getEl().setTitle(subTitle);
-            } else if (!!subName) {
+            } else if (subName) {
                 this.namesAndIconView.getEl().setTitle(subName);
             }
-            if (!!iconUrl) {
+            if (iconUrl) {
                 this.namesAndIconView.setIconUrl(iconUrl);
             }
             this.namesAndIconView.getIconImageEl().onError(() => {
