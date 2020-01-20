@@ -1,91 +1,75 @@
 const chai = require('chai');
 const assert = chai.assert;
-chai.use(require('chai-as-promised'));
 const webDriverHelper = require('../libs/WebDriverHelper');
 const studioUtils = require('../libs/studio.utils');
 const appConstants = require('../libs/app_const');
 const AppBrowsePanel = require('../page_objects/applications/applications.browse.panel');
 const AppStatisticPanel = require('../page_objects/applications/application.item.statistic.panel');
 
-const Apps = {
-    firstApp: 'First Selenium App',
-};
-
 describe('Item Statistics Panel `Action Menu` spec', function () {
     this.timeout(appConstants.SUITE_TIMEOUT);
     webDriverHelper.setupBrowser();
+    const APP_DISPLAY_NAME = 'First Selenium App';
 
-
-    it(`WHEN application is started THEN expected label should be displayed on the drop-down button AND 'Stop' menu item should be hidden`,
-        () => {
+    it(`WHEN started application is selected THEN expected label should be displayed in the drop-down button AND 'Stop' menu item should be hidden`,
+        async () => {
             let appBrowsePanel = new AppBrowsePanel();
             let appStatisticPanel = new AppStatisticPanel();
-            return appBrowsePanel.clickOnRowByDisplayName(Apps.firstApp).then(() => {
-                return appStatisticPanel.getDropDownButtonText();
-            }).then(result => {
-                studioUtils.saveScreenshot("application_action_menu_collapsed");
-                assert.strictEqual(result, 'Started', 'correct label should be displayed on the drop-down button');
-            }).then(() => {
-                return appStatisticPanel.waitForStopMenuItemVisible();
-            }).then(result => {
-                assert.isFalse(result, '`Stop` menu item should not be visible, because the menu is collapsed');
-            })
+            //1. Select the application:
+            await appBrowsePanel.clickOnRowByDisplayName(APP_DISPLAY_NAME);
+            //2. Verify info in Statistics Panel:
+            let result = await appStatisticPanel.getDropDownButtonText();
+            studioUtils.saveScreenshot("application_action_menu_collapsed");
+            assert.strictEqual(result, 'Started', 'correct label should be displayed on the drop-down button');
+
+            let isVisible = await appStatisticPanel.waitForStopMenuItemVisible();
+            assert.isFalse(isVisible, '`Stop` menu item should not be visible, because the menu is collapsed');
         });
 
-    it(`GIVEN existing application is started WHEN action-menu has been clicked THEN the menu should be expanded AND 'Stop' menu item should appear`,
-        () => {
+    it(`GIVEN started application is selected WHEN Click on dropdown handle and expand the menu THEN 'Stop' gets visible`,
+        async () => {
             let appBrowsePanel = new AppBrowsePanel();
             let appStatisticPanel = new AppStatisticPanel();
-            return appBrowsePanel.clickOnRowByDisplayName(Apps.firstApp).then(() => {
-                return appStatisticPanel.clickOnActionDropDownMenu();
-            }).then(() => {
-                return appStatisticPanel.waitForStopMenuItemVisible();
-            }).then(result => {
-                studioUtils.saveScreenshot("action_menu_is_expanded");
-                assert.isTrue(result, '`Stop` menu item should appear');
-            })
+            //1. Select the application
+            await appBrowsePanel.clickOnRowByDisplayName(APP_DISPLAY_NAME);
+            //2. Click on dropdown handle and expand he menu:
+            await appStatisticPanel.clickOnActionDropDownMenu();
+            let isVisible = await appStatisticPanel.waitForStopMenuItemVisible();
+            studioUtils.saveScreenshot("action_menu_is_expanded");
+            assert.isTrue(isVisible, '`Stop` menu item should appear');
         });
 
-    it(`GIVEN existing application is started WHEN Stop menu-item has been clicked THEN application is getting 'stopped'`,
-        () => {
+    it(`GIVEN existing application is started WHEN Stop menu-item has been clicked THEN the application gets 'stopped'`,
+        async () => {
             let appBrowsePanel = new AppBrowsePanel();
             let appStatisticPanel = new AppStatisticPanel();
-            return appBrowsePanel.clickOnRowByDisplayName(Apps.firstApp).then(() => {
-                return appStatisticPanel.clickOnActionDropDownMenu();
-            }).then(() => {
-                return appStatisticPanel.waitForStopMenuItemVisible();
-            }).then(() => {
-                return appStatisticPanel.clickOnStopActionMenuItem();
-            }).then(()=>{
-                return appBrowsePanel.pause(2000);
-            }).then(() => {
-                return appBrowsePanel.getApplicationState(Apps.firstApp);
-            }).then(result => {
-                studioUtils.saveScreenshot("action_menu_app_stopped");
-                assert.strictEqual(result, 'stopped', 'The application should be `stopped`');
-            })
+            //1. Select the app and expand he menu:
+            await appBrowsePanel.clickOnRowByDisplayName(APP_DISPLAY_NAME);
+            await appStatisticPanel.clickOnActionDropDownMenu();
+            await appStatisticPanel.waitForStopMenuItemVisible();
+            //2. Stop the app:
+            await appStatisticPanel.clickOnStopActionMenuItem();
+            await appBrowsePanel.pause(2000);
+            let state = await appBrowsePanel.getApplicationState(APP_DISPLAY_NAME);
+            studioUtils.saveScreenshot("action_menu_app_stopped");
+            assert.strictEqual(state, 'stopped', 'The application should be `stopped`');
         });
 
-    it(`GIVEN existing application is stopped WHEN Start menu-item has been clicked THEN application is getting 'started'`,
-        () => {
+    it(`GIVEN existing application is stopped WHEN Start menu-item has been clicked THEN the application gets 'started'`,
+        async () => {
             let appBrowsePanel = new AppBrowsePanel();
-            let appStatisticPanel = new AppStatisticPanel()
-            return appBrowsePanel.clickOnRowByDisplayName(Apps.firstApp).then(() => {
-                return appStatisticPanel.clickOnActionDropDownMenu();
-            }).then(() => {
-                return appStatisticPanel.waitForStartMenuItemVisible();
-            }).then(() => {
-                appStatisticPanel.clickOnStartActionMenuItem();
-            }).then(()=>{
-                return appBrowsePanel.pause(2000);
-            }).then(() => {
-                return appBrowsePanel.getApplicationState(Apps.firstApp);
-            }).then(result => {
-                studioUtils.saveScreenshot("action_menu_app_started");
-                assert.strictEqual(result, 'started', 'The application should be `started`');
-            })
-        }
-    );
+            let appStatisticPanel = new AppStatisticPanel();
+            //1. Select the app and expand he menu:
+            await appBrowsePanel.clickOnRowByDisplayName(APP_DISPLAY_NAME);
+            //2. Start the app:
+            await appStatisticPanel.clickOnActionDropDownMenu();
+            await appStatisticPanel.waitForStartMenuItemVisible();
+            await appStatisticPanel.clickOnStartActionMenuItem();
+            await appBrowsePanel.pause(2000);
+            let state = await appBrowsePanel.getApplicationState(APP_DISPLAY_NAME);
+            studioUtils.saveScreenshot("action_menu_app_started");
+            assert.strictEqual(state, 'started', 'The application should be `started`');
+        });
 
     beforeEach(() => studioUtils.navigateToApplicationsApp());
     afterEach(() => studioUtils.doCloseCurrentBrowserTab());

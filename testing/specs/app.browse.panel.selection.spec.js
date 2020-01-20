@@ -1,6 +1,4 @@
 const chai = require('chai');
-chai.use(require('chai-as-promised'));
-const expect = chai.expect;
 const assert = chai.assert;
 const webDriverHelper = require('../libs/WebDriverHelper');
 const appConst = require('../libs/app_const');
@@ -14,100 +12,87 @@ describe('Applications Browse panel - selection of items spec', function () {
     //Content Studio should not be installed!
     const TOTAL_NUMBER_OF_APPLICATIONS = 5;
 
-    it(`GIVEN applications grid is loaded THEN expected page-title should be displayed`, () => {
+    it(`GIVEN applications grid is loaded THEN expected page-title should be displayed`, async () => {
         let appBrowsePanel = new AppBrowsePanel();
-        return appBrowsePanel.getTitle().then(title => {
-            expect(title).to.equal(appConst.APPLICATION_TITLE);
-        })
+        let title = await appBrowsePanel.getTitle();
+        assert.equal(title, appConst.APPLICATION_TITLE, "expected page-title should be loaded");
     });
 
-    it(`WHEN 'selection controller'-checkbox has been clicked THEN all rows in grid should be selected`, () => {
+    it(`WHEN 'selection controller'-checkbox has been clicked THEN all rows in grid should be selected`, async () => {
         let appBrowsePanel = new AppBrowsePanel();
-        return appBrowsePanel.clickOnSelectionControllerCheckbox().then(() => {
-            studioUtils.saveScreenshot("selection_controller_checked");
-            return appBrowsePanel.getNumberOfSelectedRows();
-        }).then(result => {
-            assert.equal(result, TOTAL_NUMBER_OF_APPLICATIONS, 'all applications should be selected');
-        })
+        await appBrowsePanel.clickOnSelectionControllerCheckbox();
+        studioUtils.saveScreenshot("selection_controller_checked");
+        let result = await appBrowsePanel.getNumberOfSelectedRows();
+        assert.equal(result, TOTAL_NUMBER_OF_APPLICATIONS, 'all applications should be selected');
     });
 
-    it(`GIVEN all applications are selected WHEN 'selection controller'-checkbox has been clicked THEN all rows in grid should be white`,
-        () => {
+    it(`GIVEN all applications are selected WHEN 'selection controller'-checkbox has been clicked THEN all rows in grid get white`,
+        async () => {
             let appBrowsePanel = new AppBrowsePanel();
-            return appBrowsePanel.clickOnSelectionControllerCheckbox().then(() => {
-                return appBrowsePanel.clickOnSelectionControllerCheckbox();
-            }).then(() => {
-                studioUtils.saveScreenshot("selection_controller_unchecked");
-                return appBrowsePanel.getNumberOfSelectedRows();
-            }).then(result => {
-                assert.equal(result, 0, 'all applications should be unselected');
-            })
+            //1. Click on he checkbox and select all apps:
+            await appBrowsePanel.clickOnSelectionControllerCheckbox();
+            //2. Click on he checkbox and unselect all apps:
+            await appBrowsePanel.clickOnSelectionControllerCheckbox();
+            studioUtils.saveScreenshot("selection_controller_unchecked");
+            let numb = await appBrowsePanel.getNumberOfSelectedRows();
+            assert.equal(numb, 0, 'all applications should be unselected');
         });
 
-    it(`WHEN applications grid is loaded THEN rows with applications should be present in the grid`, () => {
+    it(`WHEN applications grid is loaded THEN rows with applications should be present in the grid`, async () => {
         let appBrowsePanel = new AppBrowsePanel();
-        return appBrowsePanel.getApplicationDisplayNames().then(result => {
-            studioUtils.saveScreenshot("app_browse_application");
-            assert.isTrue(result.length > 0, 'rows with applications should be present in the grid')
-        })
+        let result = await appBrowsePanel.getApplicationDisplayNames();
+        studioUtils.saveScreenshot("app_browse_application");
+        assert.isTrue(result.length > 0, 'rows with applications should be present in the grid');
     });
 
     it(`GIVEN existing application is selected WHEN Arrow Down key has been pressed THEN the next application should be selected`,
-        () => {
+        async () => {
             let appBrowsePanel = new AppBrowsePanel();
             let appStatisticPanel = new AppStatisticPanel();
-            return appBrowsePanel.clickCheckboxAndSelectRowByDisplayName(appConst.TEST_APPLICATIONS.FIRST_APP).then(() => {
-                return appBrowsePanel.pressArrowDownKey();
-            }).then(() => {
-                return appStatisticPanel.getApplicationName();
-            }).then(result => {
-                assert.isTrue(result == appConst.TEST_APPLICATIONS.FOURTH_APP, 'the next application should be selected');
-            })
+            //1. Select the app:
+            await appBrowsePanel.clickCheckboxAndSelectRowByDisplayName(appConst.TEST_APPLICATIONS.FIRST_APP);
+            //2. Press Arrow Down key:
+            await appBrowsePanel.pressArrowDownKey();
+            let appName = await appStatisticPanel.getApplicationName();
+            assert.equal(appName, appConst.TEST_APPLICATIONS.FOURTH_APP, 'the next application should be selected');
         });
 
     it(`GIVEN existing application is selected WHEN Arrow Down key has been pressed THEN the next application should be selected`,
-        () => {
+        async () => {
             let appBrowsePanel = new AppBrowsePanel();
             let appStatisticPanel = new AppStatisticPanel();
-            return appBrowsePanel.clickCheckboxAndSelectRowByDisplayName(appConst.TEST_APPLICATIONS.FOURTH_APP).then(() => {
-                return appBrowsePanel.pressArrowUpKey();
-            }).then(() => {
-                return appStatisticPanel.getApplicationName();
-            }).then(result => {
-                assert.isTrue(result == appConst.TEST_APPLICATIONS.FIRST_APP, 'previous application should be selected');
-            })
+            //1. Select the app:
+            await appBrowsePanel.clickCheckboxAndSelectRowByDisplayName(appConst.TEST_APPLICATIONS.FOURTH_APP);
+            //2. Press Arrow Up key:
+            await appBrowsePanel.pressArrowUpKey();
+            let result = await appStatisticPanel.getApplicationName();
+            assert.equal(result, appConst.TEST_APPLICATIONS.FIRST_APP, 'previous application should be selected');
         });
 
-    it(`GIVEN existing application is selected WHEN selecting one more THEN last selected application should be displayed on the Selection Panel`,
-        () => {
+    it(`GIVEN existing application is selected WHEN selecting one more THEN last selected application should be displayed in the Selection Panel`,
+        async () => {
             let appStatisticPanel = new AppStatisticPanel();
             let appBrowsePanel = new AppBrowsePanel();
-            return appBrowsePanel.clickCheckboxAndSelectRowByDisplayName(appConst.TEST_APPLICATIONS.FIRST_APP).then(() => {
-                return appBrowsePanel.clickCheckboxAndSelectRowByDisplayName(appConst.TEST_APPLICATIONS.SECOND_APP);
-            }).then(() => {
-                return appStatisticPanel.getApplicationName();
-            }).then(result => {
-                assert.isTrue(result == appConst.TEST_APPLICATIONS.SECOND_APP,
-                    'last selected application should be displayed on the Selection Panel');
-            })
+            await appBrowsePanel.clickCheckboxAndSelectRowByDisplayName(appConst.TEST_APPLICATIONS.FIRST_APP);
+            await appBrowsePanel.clickCheckboxAndSelectRowByDisplayName(appConst.TEST_APPLICATIONS.SECOND_APP);
+            let result = await appStatisticPanel.getApplicationName();
+            assert.equal(result, appConst.TEST_APPLICATIONS.SECOND_APP,
+                'last selected application should be displayed in the Selection Panel');
         });
 
     it(`GIVEN three application are selected WHEN deselecting one THEN second application should be displayed on the Statistic Panel`,
-        () => {
+        async () => {
             let appBrowsePanel = new AppBrowsePanel();
             let appStatisticPanel = new AppStatisticPanel();
-            return appBrowsePanel.clickCheckboxAndSelectRowByDisplayName(appConst.TEST_APPLICATIONS.FIRST_APP).then(() => {
-                return appBrowsePanel.clickCheckboxAndSelectRowByDisplayName(appConst.TEST_APPLICATIONS.SECOND_APP);
-            }).then(() => {
-                return appBrowsePanel.clickCheckboxAndSelectRowByDisplayName(appConst.TEST_APPLICATIONS.THIRD_APP);
-            }).then(() => {
-                return appBrowsePanel.clickCheckboxAndSelectRowByDisplayName(appConst.TEST_APPLICATIONS.THIRD_APP);
-            }).then(() => {
-                return appStatisticPanel.getApplicationName();
-            }).then(result => {
-                assert.isTrue(result == appConst.TEST_APPLICATIONS.SECOND_APP,
-                    'last selected application should be displayed on the Selection Panel');
-            })
+            //1.Select three applications:
+            await appBrowsePanel.clickCheckboxAndSelectRowByDisplayName(appConst.TEST_APPLICATIONS.FIRST_APP);
+            await appBrowsePanel.clickCheckboxAndSelectRowByDisplayName(appConst.TEST_APPLICATIONS.SECOND_APP);
+            await appBrowsePanel.clickCheckboxAndSelectRowByDisplayName(appConst.TEST_APPLICATIONS.THIRD_APP);
+            //2. Unselect one application:
+            await appBrowsePanel.clickCheckboxAndSelectRowByDisplayName(appConst.TEST_APPLICATIONS.THIRD_APP);
+            let appName = await appStatisticPanel.getApplicationName();
+            assert.equal(appName, appConst.TEST_APPLICATIONS.SECOND_APP,
+                'last selected application should be displayed on the Selection Panel');
         });
 
     beforeEach(() => studioUtils.navigateToApplicationsApp());

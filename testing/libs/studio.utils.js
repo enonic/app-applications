@@ -53,7 +53,7 @@ module.exports = {
     },
     navigateToApplicationsApp: function (userName, password) {
         let launcherPanel = new LauncherPanel();
-        return launcherPanel.waitForPanelDisplayed(appConst.TIMEOUT_3).then(result => {
+        return launcherPanel.waitForPanelDisplayed(appConst.TIMEOUT_7).then(result => {
             if (result) {
                 console.log("Launcher Panel is opened, click on the `Applications` link...");
                 return launcherPanel.clickOnApplicationsLink();

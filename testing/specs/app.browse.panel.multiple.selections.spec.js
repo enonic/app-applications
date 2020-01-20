@@ -1,7 +1,5 @@
 const chai = require('chai');
-const expect = chai.expect;
 const assert = chai.assert;
-chai.use(require('chai-as-promised'));
 const webDriverHelper = require('../libs/WebDriverHelper');
 const AppBrowsePanel = require('../page_objects/applications/applications.browse.panel');
 const appConst = require('../libs/app_const');
@@ -30,81 +28,71 @@ describe('Application Browse Panel, multiple selection in grid', function () {
             await statisticPanel.waitForApplicationStatus("Stopped");
         });
 
-    it(`GIVEN two stopped applications are checked WHEN right click on selected apps THEN only Start menu item should be enabled in the opened context menu`,
-        () => {
+    it(`GIVEN two stopped applications are checked WHEN right click on selected apps THEN Start menu item should be enabled in the opened context menu`,
+        async () => {
             let appBrowsePanel = new AppBrowsePanel();
-            return appBrowsePanel.clickCheckboxAndSelectRowByDisplayName(appConst.TEST_APPLICATIONS.THIRD_APP).then(() => {
-                return appBrowsePanel.clickCheckboxAndSelectRowByDisplayName(appConst.TEST_APPLICATIONS.FIRST_APP);
-            }).then(() => {
-                return appBrowsePanel.rightClickOnRowByDisplayName(appConst.TEST_APPLICATIONS.FIRST_APP);
-            }).then(() => {
-                return appBrowsePanel.waitForContextMenuDisplayed();
-            }).then(() => {
-                //'Start menu item should be enabled'
-                return appBrowsePanel.waitForContextMenuItemEnabled('Start');
-            }).then(() => {
-                //'Stop menu item should be disabled'
-                return appBrowsePanel.waitForContextMenuItemDisabled('Stop');
-            }).then(() => {
-                studioUtils.saveScreenshot("2apps_context_menu_1");
-                let statisticPanel = new StatisticPanel();
-                //Stopped status should be displayed on  Statistic Panel
-                return statisticPanel.waitForApplicationStatus("Stopped");
-            });
+            //1. Two applications have been selected:
+            await appBrowsePanel.clickCheckboxAndSelectRowByDisplayName(appConst.TEST_APPLICATIONS.THIRD_APP);
+            await appBrowsePanel.clickCheckboxAndSelectRowByDisplayName(appConst.TEST_APPLICATIONS.FIRST_APP);
+            //2. Open the context menu:
+            await appBrowsePanel.rightClickOnRowByDisplayName(appConst.TEST_APPLICATIONS.FIRST_APP);
+            await appBrowsePanel.waitForContextMenuDisplayed();
+            //'Start' menu item should be enabled
+            await appBrowsePanel.waitForContextMenuItemEnabled('Start');
+            //'Stop' menu item should be disabled
+            await appBrowsePanel.waitForContextMenuItemDisabled('Stop');
+            studioUtils.saveScreenshot("2apps_context_menu_1");
+            let statisticPanel = new StatisticPanel();
+            //'Stopped' status should be displayed in Statistic Panel:
+            await statisticPanel.waitForApplicationStatus("Stopped");
         });
 
-    it('GIVEN two stopped applications are checked WHEN Start button has been pressed THEN Start gets disabled AND Stop gets enabled',
-        () => {
+    it('GIVEN two stopped applications are checked WHEN Start button has been pressed THEN Start button gets disabled AND Stop gets enabled',
+        async () => {
             let appBrowsePanel = new AppBrowsePanel();
-            return appBrowsePanel.clickCheckboxAndSelectRowByDisplayName(appConst.TEST_APPLICATIONS.THIRD_APP).then(() => {
-                return appBrowsePanel.clickCheckboxAndSelectRowByDisplayName(appConst.TEST_APPLICATIONS.FIRST_APP);
-            }).then(() => {
-                return appBrowsePanel.clickOnStartButton();
-            }).then(() => {
-                return assert.eventually.isTrue(appBrowsePanel.waitForStartButtonDisabled(), "`Start` button should be disabled");
-            }).then(() => {
-                return assert.eventually.isTrue(appBrowsePanel.isStopButtonEnabled(), "`Stop` button should be enabled");
-            }).then(() => {
-                let statisticPanel = new StatisticPanel();
-                //Started status should be displayed on  Statistic Panel
-                return statisticPanel.waitForApplicationStatus("Started");
-            });
+            //1. Select and stop two applications:
+            await appBrowsePanel.clickCheckboxAndSelectRowByDisplayName(appConst.TEST_APPLICATIONS.THIRD_APP);
+            await appBrowsePanel.clickCheckboxAndSelectRowByDisplayName(appConst.TEST_APPLICATIONS.FIRST_APP);
+            await appBrowsePanel.clickOnStartButton();
+            //`Start` button gets disabled:
+            await appBrowsePanel.waitForStartButtonDisabled();
+            let result = await appBrowsePanel.isStopButtonEnabled();
+            assert.isTrue(result, "'Stop' button gets enabled");
+            let statisticPanel = new StatisticPanel();
+            //'Started' status should be displayed in Statistic Panel:
+            await statisticPanel.waitForApplicationStatus("Started");
         });
 
     it(`GIVEN one stopped and one started applications are checked WHEN right click on selected apps THEN Start and Stop menu item should be enabled in the opened context menu`,
-        () => {
+        async () => {
             let appBrowsePanel = new AppBrowsePanel();
-            return appBrowsePanel.clickCheckboxAndSelectRowByDisplayName(appConst.TEST_APPLICATIONS.THIRD_APP).then(() => {
-                return appBrowsePanel.clickOnStopButton();
-            }).then(() => {
-                return appBrowsePanel.clickCheckboxAndSelectRowByDisplayName(appConst.TEST_APPLICATIONS.FIRST_APP);
-            }).then(() => {
-                return appBrowsePanel.rightClickOnRowByDisplayName(appConst.TEST_APPLICATIONS.FIRST_APP);
-            }).then(() => {
-                return appBrowsePanel.waitForContextMenuDisplayed();
-            }).then(() => {
-                studioUtils.saveScreenshot("2apps_context_menu");
-                return appBrowsePanel.waitForContextMenuItemEnabled('Start');
-            }).then(() => {
-                //'Stop menu item should be enabled'
-                return appBrowsePanel.waitForContextMenuItemEnabled('Stop');
-            });
+            //1. Select and stop the app:
+            await appBrowsePanel.clickCheckboxAndSelectRowByDisplayName(appConst.TEST_APPLICATIONS.THIRD_APP);
+            await appBrowsePanel.clickOnStopButton();
+            //2. Select the second app(stated):
+            await appBrowsePanel.clickCheckboxAndSelectRowByDisplayName(appConst.TEST_APPLICATIONS.FIRST_APP);
+            //3. Open the context menu:
+            await appBrowsePanel.rightClickOnRowByDisplayName(appConst.TEST_APPLICATIONS.FIRST_APP);
+            await appBrowsePanel.waitForContextMenuDisplayed();
+            studioUtils.saveScreenshot("2apps_context_menu");
+            await appBrowsePanel.waitForContextMenuItemEnabled('Start');
+            //'Stop menu item should be enabled'
+            await appBrowsePanel.waitForContextMenuItemEnabled('Stop');
         });
 
     it('GIVEN at least one app is stopped AND `select all` checkbox is checked WHEN right click on selected apps THEN Start and Stop menu item should be enabled in the opened context menu',
-        () => {
+        async () => {
             let appBrowsePanel = new AppBrowsePanel();
-            return appBrowsePanel.clickOnSelectAll().then(() => {
-                return appBrowsePanel.rightClickOnRowByDisplayName(appConst.TEST_APPLICATIONS.FIRST_APP);
-            }).then(() => {
-                return appBrowsePanel.waitForContextMenuDisplayed();
-            }).then(() => {
-                studioUtils.saveScreenshot("all_apps_context_menu");
-                return appBrowsePanel.waitForContextMenuItemEnabled('Start');
-            }).then(() => {
-                //'Stop menu item should be enabled'
-                return appBrowsePanel.waitForContextMenuItemEnabled('Stop');
-            });
+            //1. Select all applications(one app is stopped):
+            await appBrowsePanel.clickOnSelectAll();
+            //2. Open the context menu:
+            await appBrowsePanel.rightClickOnRowByDisplayName(appConst.TEST_APPLICATIONS.FIRST_APP);
+            await appBrowsePanel.waitForContextMenuDisplayed();
+
+            studioUtils.saveScreenshot("all_apps_context_menu");
+            await appBrowsePanel.waitForContextMenuItemEnabled('Start');
+            //'Stop menu item should be enabled'
+            await appBrowsePanel.waitForContextMenuItemEnabled('Stop');
         });
 
     beforeEach(() => studioUtils.navigateToApplicationsApp());
@@ -127,9 +115,7 @@ function restartApps() {
                 })
             }
         });
-    }).then(()=>{
-        //return appBrowsePanel.
-    })
+    });
 }
 
 
