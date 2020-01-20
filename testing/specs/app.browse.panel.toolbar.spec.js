@@ -7,7 +7,7 @@ const InstallAppDialog = require('../page_objects/applications/install.app.dialo
 const UninstallAppDialog = require('../page_objects/applications/uninstall.app.dialog');
 const studioUtils = require('../libs/studio.utils.js');
 
-describe('Application Browse Panel, check buttons on the toolbar', function () {
+describe('Application Browse Panel, check buttons in the toolbar', function () {
     this.timeout(70000);
     webDriverHelper.setupBrowser();
 
@@ -28,7 +28,7 @@ describe('Application Browse Panel, check buttons on the toolbar', function () {
         await appBrowsePanel.isUninstallButtonEnabled();
     });
 
-    it('GIVEN Install App dialog is opened WHEN Install button has been clicked for two applications THEN two new applications should be present in the grid',
+    it('GIVEN Install App dialog is opened WHEN Install button has been clicked in two rows THEN two new applications should appear in the grid',
         async () => {
             let appBrowsePanel = new AppBrowsePanel();
             let installAppDialog = new InstallAppDialog();

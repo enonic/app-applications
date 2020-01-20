@@ -1,5 +1,4 @@
 const chai = require('chai');
-const expect = chai.expect;
 const assert = chai.assert;
 const webDriverHelper = require('../libs/WebDriverHelper');
 const AppBrowsePanel = require('../page_objects/applications/applications.browse.panel');
@@ -10,34 +9,28 @@ describe(`Applications Grid context menu`, function () {
     this.timeout(appConst.SUITE_TIMEOUT);
     webDriverHelper.setupBrowser();
 
-    it("Context menu should initially not be visible", () => {
+    it("Context menu should not be visible initially", async () => {
         let appBrowsePanel = new AppBrowsePanel();
-        return appBrowsePanel.waitForContextMenuNotDisplayed().then(result => {
-            assert.isTrue(result, 'context menu should initially not be visible');
-        })
+        await appBrowsePanel.waitForContextMenuNotDisplayed();
     });
     //verifies the https://github.com/enonic/lib-admin-ui/issues/478
     //BrowsePanel - context menu does not appear when right click on selected row
-    it(`GIVEN one row is selected WHEN right click on the row THEN context menu should appear`, () => {
+    it(`GIVEN one row is selected WHEN right click on the row THEN context menu should appear`, async () => {
         let appBrowsePanel = new AppBrowsePanel();
-        return appBrowsePanel.clickOnRowByDisplayName(appConst.TEST_APPLICATIONS.THIRD_APP).then(() => {
-            return appBrowsePanel.rightClickOnRowByDisplayName(appConst.TEST_APPLICATIONS.THIRD_APP);
-        }).then(() => {
-            return appBrowsePanel.waitForContextMenuDisplayed();
-        }).then(result => {
-            studioUtils.saveScreenshot("app_context_menu_blue");
-            assert.isTrue(result, 'context menu should be visible');
-        })
+        await appBrowsePanel.clickOnRowByDisplayName(appConst.TEST_APPLICATIONS.THIRD_APP);
+        await appBrowsePanel.rightClickOnRowByDisplayName(appConst.TEST_APPLICATIONS.THIRD_APP);
+        // 'context menu' gets opened:
+        await appBrowsePanel.waitForContextMenuDisplayed();
+        studioUtils.saveScreenshot("app_context_menu_blue");
     });
 
-    it(`WHEN right click an an application THEN context menu should appear`, () => {
+    it(`WHEN right click on an application THEN context menu should appear`, async () => {
         let appBrowsePanel = new AppBrowsePanel();
-        return appBrowsePanel.rightClickOnRowByDisplayName(appConst.TEST_APPLICATIONS.THIRD_APP).then(() => {
-            return appBrowsePanel.waitForContextMenuDisplayed();
-        }).then(result => {
-            studioUtils.saveScreenshot("app_context_menu1");
-            assert.isTrue(result, 'context menu should be visible');
-        })
+        //1. do right click:
+        await appBrowsePanel.rightClickOnRowByDisplayName(appConst.TEST_APPLICATIONS.THIRD_APP);
+        //'context menu' gets opened:
+        await appBrowsePanel.waitForContextMenuDisplayed();
+        studioUtils.saveScreenshot("app_context_menu1");
     });
 
     it(`WHEN right click on a started application THEN 'Start' menu item should be disabled, because the application is started`, () => {
@@ -66,15 +59,14 @@ describe(`Applications Grid context menu`, function () {
         });
     });
 
-    it(`should close the context menu after clicking on the same row`, () => {
+    it(`should close the context menu after clicking on the same row`, async () => {
         let appBrowsePanel = new AppBrowsePanel();
-        return appBrowsePanel.rightClickOnRowByDisplayName(appConst.TEST_APPLICATIONS.THIRD_APP).then(() => {
-            return appBrowsePanel.waitForContextMenuDisplayed();
-        }).then(() => {
-            return appBrowsePanel.clickOnRowByDisplayName(appConst.TEST_APPLICATIONS.FIRST_APP);
-        }).then(() => {
-            return appBrowsePanel.waitForContextMenuNotDisplayed()
-        });
+        //1. Open the context mneu:
+        await appBrowsePanel.rightClickOnRowByDisplayName(appConst.TEST_APPLICATIONS.THIRD_APP);
+        await appBrowsePanel.waitForContextMenuDisplayed();
+        //2. Click outside the menu:
+        await appBrowsePanel.clickOnRowByDisplayName(appConst.TEST_APPLICATIONS.FIRST_APP);
+        await appBrowsePanel.waitForContextMenuNotDisplayed()
     });
 
     beforeEach(() => studioUtils.navigateToApplicationsApp());

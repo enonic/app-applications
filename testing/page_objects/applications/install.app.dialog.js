@@ -61,9 +61,9 @@ class InstallAppDialog extends Page {
     }
 
     waitForGridLoaded() {
-        return this.waitForElementDisplayed(this.grid + lib.H6_DISPLAY_NAME, appConst.TIMEOUT_3).catch(err => {
+        return this.waitForElementDisplayed(this.grid + lib.H6_DISPLAY_NAME, appConst.TIMEOUT_7).catch(err => {
             this.saveScreenshot('err_install_dialog_grid');
-            throw new Error('New Content dialog, grid was not loaded! ' + err);
+            throw new Error('Install App dialog, grid was not loaded! ' + err);
         });
     }
 
@@ -97,7 +97,7 @@ class InstallAppDialog extends Page {
 
     isCancelButtonTopDisplayed() {
         return this.isElementDisplayed(this.cancelButton).catch(err => {
-            throw new Error('error  Cancel button top is not displayed ' + err);
+            throw new Error('error- Cancel button top is not displayed ' + err);
         })
     }
 
@@ -117,7 +117,7 @@ class InstallAppDialog extends Page {
             return this.getTextInDisplayedElements(selector);
         }).catch(err => {
             this.saveScreenshot('err_app_not_found_message');
-            throw new Error('Application not found message is not visible  ' + err);
+            throw new Error("'Application not found' message is not visible  " + err);
         })
     }
 

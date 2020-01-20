@@ -1,5 +1,4 @@
 const chai = require('chai');
-const expect = chai.expect;
 const assert = chai.assert;
 const webDriverHelper = require('../libs/WebDriverHelper');
 const AppBrowsePanel = require('../page_objects/applications/applications.browse.panel');
@@ -7,63 +6,54 @@ const InstallDialog = require('../page_objects/applications/install.app.dialog')
 const studioUtils = require('../libs/studio.utils.js');
 const appConst = require('../libs/app_const');
 
-
 describe('Install app dialog, search input spec.', function () {
     this.timeout(appConst.SUITE_TIMEOUT);
     webDriverHelper.setupBrowser();
     const not_existing = 'http://test.com';
-    const CONTENT_VIEWER_APP = 'https://repo.enonic.com/public/com/enonic/app/contentviewer/1.5.1/contentviewer-1.5.1.jar';
+    const CONTENT_VIEWER_APP = 'https://repo.enonic.com/public/com/enonic/app/contentviewer/1.5.2/contentviewer-1.5.2.jar';
 
     const local_file = "file:c:/";
 
-    it(`GIVEN 'install app' dialog is opened WHEN not existing URL has been typed THEN correct validation message should appear`,
-        () => {
+    it(`GIVEN 'install app' dialog is opened WHEN not existing URL has been typed THEN expected validation message should appear`,
+        async () => {
             let appBrowsePanel = new AppBrowsePanel();
             let installDialog = new InstallDialog();
-            return appBrowsePanel.clickOnInstallButton().then(() => {
-                return installDialog.waitForOpened();
-            }).then(() => {
-                return installDialog.typeSearchTextAndEnter(not_existing);
-            }).then(() => {
-                return installDialog.getErrorValidationMessage();
-            }).then(message => {
-                studioUtils.saveScreenshot("url_not_exist");
-                assert.isTrue(message.includes('Failed to process application from'), 'expected notification message should appear');
-            });
+            await appBrowsePanel.clickOnInstallButton();
+            await installDialog.waitForOpened();
+            //Type not existing app:
+            await installDialog.typeSearchTextAndEnter(not_existing);
+            let message = await installDialog.getErrorValidationMessage();
+            studioUtils.saveScreenshot("url_not_exist");
+            assert.isTrue(message.includes('Failed to process application from'), 'expected notification message should appear');
         });
 
     it(`GIVEN 'install app' dialog is opened WHEN path to local file has been typed THEN correct search-status message should appear`,
-        () => {
+        async () => {
             let appBrowsePanel = new AppBrowsePanel();
             let installDialog = new InstallDialog();
-            return appBrowsePanel.clickOnInstallButton().then(() => {
-                return installDialog.waitForOpened();
-            }).then(() => {
-                return installDialog.typeSearchTextAndEnter(local_file);
-            }).then(() => {
-                return installDialog.applicationNotFoundMessage();
-            }).then(message => {
-                studioUtils.saveScreenshot("app_not_found");
-                assert.isTrue(message.includes('No applications found'), '`No applications found` - message should appear');
-            });
+            await appBrowsePanel.clickOnInstallButton();
+            await installDialog.waitForOpened();
+            //Type path to local file:
+            await installDialog.typeSearchTextAndEnter(local_file);
+            let message = await installDialog.applicationNotFoundMessage();
+            studioUtils.saveScreenshot("app_not_found");
+            assert.isTrue(message.includes('No applications found'), '`No applications found` - message should appear');
         });
+
     it(`GIVEN 'install app' dialog is opened WHEN actual URL has been typed and 'Enter' key pressed THEN application should be installed`,
-        () => {
+        async () => {
             let appBrowsePanel = new AppBrowsePanel();
             let installDialog = new InstallDialog();
-            return appBrowsePanel.clickOnInstallButton().then(() => {
-                return installDialog.waitForOpened();
-            }).then(() => {
-                return installDialog.typeSearchTextAndEnter(CONTENT_VIEWER_APP);
-            }).then(() => {
-                return installDialog.waitForClosed(45000);
-            }).then(() => {
-                return installDialog.waitForNotificationMessage();
-            }).then(message => {
-                studioUtils.saveScreenshot("app_url_installed");
-                assert.isTrue(message.includes('Application \'Content Viewer App\' installed successfully'),
-                    'expected notification message should appear');
-            });
+            await appBrowsePanel.clickOnInstallButton();
+            await installDialog.waitForOpened();
+            //Type the correct URL to app:
+            await installDialog.typeSearchTextAndEnter(CONTENT_VIEWER_APP);
+            await installDialog.waitForClosed(45000);
+
+            let message = await installDialog.waitForNotificationMessage();
+            studioUtils.saveScreenshot("app_url_installed");
+            assert.isTrue(message.includes('Application \'Content Viewer App\' installed successfully'),
+                'expected notification message should appear');
         });
 
     beforeEach(() => studioUtils.navigateToApplicationsApp());
