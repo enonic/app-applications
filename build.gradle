@@ -79,10 +79,17 @@ jar {
 
     exclude 'assets/styles/*.js'
 
+    outputs.dir "${buildDir}/resources/main"
+
     dependsOn += webpack
 }
 
-jar.outputs.dir "${buildDir}/resources/main"
+project.afterEvaluate {
+    jar {
+        bnd ('Private-Package': '!dev.*, *;-split-package:=merge-first')
+    }
+}
+
 processResources.dependsOn += unpackDevResources
 
 if ( hasProperty( 'env' ) )
