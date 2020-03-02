@@ -2,6 +2,7 @@ import * as Q from 'q';
 import {ApplicationResourceRequest} from 'lib-admin-ui/application/ApplicationResourceRequest';
 import {ApplicationKey} from 'lib-admin-ui/application/ApplicationKey';
 import {Path} from 'lib-admin-ui/rest/Path';
+import {HttpMethod} from 'lib-admin-ui/rest/HttpMethod';
 
 export class ApplicationActionRequest
     extends ApplicationResourceRequest<void, void> {
@@ -11,7 +12,7 @@ export class ApplicationActionRequest
 
     constructor(applicationKeys: ApplicationKey[], action: string) {
         super();
-        super.setMethod('POST');
+        super.setMethod(HttpMethod.POST);
         this.applicationKeys = applicationKeys;
         this.action = action;
     }
