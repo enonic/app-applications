@@ -11,7 +11,6 @@ export class ListApplicationKeysRequest
 
     constructor(apiName: string = 'listKeys') {
         super();
-        super.setMethod('GET');
 
         this.apiName = apiName;
     }

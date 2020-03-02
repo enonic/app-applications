@@ -13,7 +13,6 @@ export class GetApplicationInfoRequest
     constructor(applicationKey: ApplicationKey) {
         super();
         this.applicationKey = applicationKey;
-        super.setMethod('GET');
     }
 
     getParams(): Object {
