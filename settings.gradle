@@ -1,7 +1,6 @@
 enableFeaturePreview('STABLE_PUBLISHING')
 
 if ( hasProperty( 'env' ) ) {
-    addBuild('../xp')
     addBuild('../lib-admin-ui')
 }
 
