@@ -183,7 +183,6 @@ export class ApplicationTreeGrid extends TreeGrid<Application> {
             if (nodeToRemove) {
                 this.deleteNode(nodeToRemove.getData());
                 this.invalidate();
-                this.triggerSelectionChangedListeners();
             }
         };
 
@@ -198,7 +197,6 @@ export class ApplicationTreeGrid extends TreeGrid<Application> {
 
         item.onFailed(() => {
             this.deleteNode(<any>appMock);
-            this.triggerSelectionChangedListeners();
         });
     }
 

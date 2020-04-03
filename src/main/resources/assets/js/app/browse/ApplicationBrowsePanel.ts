@@ -143,7 +143,6 @@ export class ApplicationBrowsePanel
     private handleAppInstalledEvent(event: ApplicationEvent) {
         this.treeGrid.placeApplicationNode(event.getApplicationKey()).then(() => {
             setTimeout(() => { // timeout lets grid to remove UploadMockNode so that its not counted in the toolbar
-                this.treeGrid.triggerSelectionChangedListeners();
                 const installedApp: Application = this.treeGrid.getByApplicationKey(event.getApplicationKey());
                 const installedAppName: string = installedApp ? installedApp.getDisplayName() : event.getApplicationKey().toString();
                 showFeedback(i18n('notify.installed', installedAppName));
