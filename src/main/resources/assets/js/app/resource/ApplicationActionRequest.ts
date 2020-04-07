@@ -13,7 +13,7 @@ export class ApplicationActionRequest
         super.setMethod(HttpMethod.POST);
         this.applicationKeys = applicationKeys;
 
-        this.addRequestPathElements(action)
+        this.addRequestPathElements(action);
     }
 
     getParams(): Object {
