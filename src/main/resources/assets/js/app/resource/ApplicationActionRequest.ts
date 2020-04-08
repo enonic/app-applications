@@ -1,24 +1,19 @@
 import * as Q from 'q';
 import {ApplicationResourceRequest} from 'lib-admin-ui/application/ApplicationResourceRequest';
 import {ApplicationKey} from 'lib-admin-ui/application/ApplicationKey';
-import {Path} from 'lib-admin-ui/rest/Path';
 import {HttpMethod} from 'lib-admin-ui/rest/HttpMethod';
 
 export class ApplicationActionRequest
-    extends ApplicationResourceRequest<void, void> {
+    extends ApplicationResourceRequest<void> {
 
     private applicationKeys: ApplicationKey[];
-    private action: string;
 
     constructor(applicationKeys: ApplicationKey[], action: string) {
         super();
         super.setMethod(HttpMethod.POST);
         this.applicationKeys = applicationKeys;
-        this.action = action;
-    }
 
-    getRequestPath(): Path {
-        return Path.fromParent(super.getResourcePath(), this.action);
+        this.addRequestPathElements(action);
     }
 
     getParams(): Object {
