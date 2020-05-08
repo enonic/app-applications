@@ -93,7 +93,7 @@ export class ApplicationBrowsePanel
         const browseItems: BrowseItem<Application>[] = this.dataItemsToBrowseItems(event.getTreeNodes().map(node => node.getData()));
         this.getBrowseItemPanel().updateItems(browseItems);
         this.getBrowseItemPanel().updatePreviewPanel();
-        this.getBrowseActions().updateActionsEnabledState(this.treeNodesToBrowseItems(this.treeGrid.getRoot().getFullSelection()));
+        this.getBrowseActions().updateActionsEnabledState(this.dataItemsToBrowseItems(this.treeGrid.getFullSelection()));
     }
 
     private handleAppEvent(event: ApplicationEvent) {
