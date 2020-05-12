@@ -8,7 +8,6 @@ import {UninstallApplicationEvent} from './UninstallApplicationEvent';
 import {ApplicationUploadStartedEvent} from './ApplicationUploadStartedEvent';
 import {ApplicationActionRequest} from '../resource/ApplicationActionRequest';
 import {BrowsePanel} from 'lib-admin-ui/app/browse/BrowsePanel';
-import {TreeNode} from 'lib-admin-ui/ui/treegrid/TreeNode';
 import {BrowseItem} from 'lib-admin-ui/app/browse/BrowseItem';
 import {Application, ApplicationUploadMock} from 'lib-admin-ui/application/Application';
 import {ObjectHelper} from 'lib-admin-ui/ObjectHelper';
@@ -46,45 +45,18 @@ export class ApplicationBrowsePanel
         return new ApplicationBrowseItemPanel();
     }
 
-    treeNodeToBrowseItem(node: TreeNode<Application>): BrowseItem<Application>|null {
-
-        if (!node || !node.getData()) {
-            return null;
-        }
-
-        const nodeData: Application = node.getData();
+    dataToBrowseItem(data: Application): BrowseItem<Application> | null {
         const browseItem: BrowseItem<Application> =
-            <BrowseItem<Application>>new BrowseItem<Application>(nodeData)
-            .setId(nodeData.getId())
-            .setDisplayName(nodeData.getDisplayName())
-            .setPath(nodeData.getName());
+            <BrowseItem<Application>>new BrowseItem<Application>(data)
+                .setId(data.getId())
+                .setDisplayName(data.getDisplayName())
+                .setPath(data.getName());
 
-        if (!ObjectHelper.iFrameSafeInstanceOf(nodeData, ApplicationUploadMock)) {
-            browseItem.setIconUrl(nodeData.getIconUrl());
+        if (!ObjectHelper.iFrameSafeInstanceOf(data, ApplicationUploadMock)) {
+            browseItem.setIconUrl(data.getIconUrl());
         }
 
         return browseItem;
-    }
-
-    treeNodesToBrowseItems(nodes: TreeNode<Application>[]): BrowseItem<Application>[] {
-        const browseItems: BrowseItem<Application>[] = [];
-
-        // do not proceed duplicated content. still, it can be selected
-        nodes.forEach((node: TreeNode<Application>, index: number) => {
-            let i = 0;
-            for (; i <= index; i++) {
-                if (nodes[i].getData().getId() === node.getData().getId()) {
-                    break;
-                }
-            }
-            if (i === index) {
-                const item = this.treeNodeToBrowseItem(node);
-                if (item) {
-                    browseItems.push(item);
-                }
-            }
-        });
-        return browseItems;
     }
 
     private sendApplicationActionRequest(action: string, applications: Application[]) {
@@ -118,10 +90,10 @@ export class ApplicationBrowsePanel
     }
 
     private handleTreeGridUpdated(event: DataChangedEvent<Application>) {
-        const browseItems: BrowseItem<Application>[] = this.treeNodesToBrowseItems(event.getTreeNodes());
+        const browseItems: BrowseItem<Application>[] = this.dataItemsToBrowseItems(event.getTreeNodes().map(node => node.getData()));
         this.getBrowseItemPanel().updateItems(browseItems);
         this.getBrowseItemPanel().updatePreviewPanel();
-        this.getBrowseActions().updateActionsEnabledState(this.treeNodesToBrowseItems(this.treeGrid.getRoot().getFullSelection()));
+        this.getBrowseActions().updateActionsEnabledState(this.dataItemsToBrowseItems(this.treeGrid.getFullSelection()));
     }
 
     private handleAppEvent(event: ApplicationEvent) {
