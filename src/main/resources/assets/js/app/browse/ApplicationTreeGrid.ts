@@ -108,8 +108,8 @@ export class ApplicationTreeGrid extends TreeGrid<Application> {
         return new ListApplicationKeysRequest().sendAndParse();
     }
 
-    placeNode(data: Application, stashedParentNode?: TreeNode<Application>): Q.Promise<void> {
-        const parentNode = this.getParentNode(true, stashedParentNode);
+    placeNode(data: Application): Q.Promise<void> {
+        const parentNode = this.getParentNode(true);
         let index = parentNode.getChildren().length;
         for (let i = 0; i < index; i++) {
             if (parentNode.getChildren()[i].getData().getDisplayName().localeCompare(data.getDisplayName()) >= 0) {
@@ -117,7 +117,7 @@ export class ApplicationTreeGrid extends TreeGrid<Application> {
                 break;
             }
         }
-        return this.insertNode(data, true, index, stashedParentNode);
+        return this.insertNode(data, true, index);
     }
 
     updateApplicationNode(applicationKey: ApplicationKey) {
