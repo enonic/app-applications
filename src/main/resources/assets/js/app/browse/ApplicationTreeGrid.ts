@@ -109,35 +109,28 @@ export class ApplicationTreeGrid extends TreeGrid<Application> {
     }
 
     placeNode(data: Application): Q.Promise<void> {
-        const parentNode = this.getParentNode(true);
-        let index = parentNode.getChildren().length;
+        const parentNode: TreeNode<Application> = this.getRoot().getDefaultRoot();
+
+        let index: number = parentNode.getChildren().length;
+
         for (let i = 0; i < index; i++) {
             if (parentNode.getChildren()[i].getData().getDisplayName().localeCompare(data.getDisplayName()) >= 0) {
                 index = i;
                 break;
             }
         }
-        return this.insertNode(data, true, index);
+
+        return this.insertNode(data, true, index, parentNode);
     }
 
     updateApplicationNode(applicationKey: ApplicationKey) {
-        const root: TreeNode<Application> = this.getRoot().getCurrentRoot();
-        root.getChildren()
-            .map((child: TreeNode<Application>) => child.getData())
-            .filter((app: Application) => app.getApplicationKey().toString() === applicationKey.toString())
-            .map(this.updateNode.bind(this));
+        this.updateNodeByDataId(applicationKey.toString());
     }
 
     getByApplicationKey(applicationKey: ApplicationKey): Application {
-        let root = this.getRoot().getCurrentRoot();
-        let result;
-        root.getChildren().forEach((child: TreeNode<Application>) => {
-            let curApplication: Application = child.getData();
-            if (curApplication.getApplicationKey().toString() === applicationKey.toString()) {
-                result = curApplication;
-            }
-        });
-        return result;
+        const node: TreeNode<Application> = this.getRoot().getNodeByDataId(applicationKey.toString());
+
+        return !!node ? node.getData() : null;
     }
 
     deleteApplicationNode(applicationKey: ApplicationKey) {
