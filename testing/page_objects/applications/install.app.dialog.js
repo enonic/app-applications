@@ -18,6 +18,7 @@ const XPATH = {
         return `${lib.slickRowByDisplayName(XPATH.container, displayName)}//a[@class='installed']`;
     }
 };
+
 class InstallAppDialog extends Page {
 
     get searchInput() {
@@ -72,24 +73,24 @@ class InstallAppDialog extends Page {
         return this.waitForElementDisplayed(selector, appConst.TIMEOUT_3).catch(err => {
             this.saveScreenshot('err_install_link_load');
             throw new Error('Install link was not loaded! ' + err);
-        }).then(()=>{
-            return this.pause(300);
-        });
+        })
     }
 
-    clickOnInstallAppLink(appName) {
-        const selector = XPATH.installLinkByName(appName);
-        return this.waitForElementDisplayed(selector, appConst.TIMEOUT_3).then(() => {
-            return this.clickOnElement(selector);
-        }).catch(err => {
+    async clickOnInstallAppLink(appName) {
+        try {
+            let selector = XPATH.installLinkByName(appName);
+            await this.waitForElementDisplayed(selector, appConst.TIMEOUT_3);
+            await this.pause(400);
+            return await this.clickOnElement(selector);
+        } catch (err) {
             throw new Error(`Couldn't find install link for app ${appName}` + " " + err);
-        });
+        }
     }
 
     //checks that 'installed' status appeared
     isApplicationInstalled(appName) {
         const selector = lib.slickRowByDisplayName(XPATH.container, appName) + "//a[@class='installed']";
-        return this.waitForElementDisplayed(selector, appConst.TIMEOUT_3).catch(err => {
+        return this.waitForElementDisplayed(selector, appConst.TIMEOUT_7).catch(err => {
             this.saveScreenshot('err_find_installed_status');
             throw new Error(`Couldn't find installed label for the app ${appName}` + " " + err);
         });
@@ -134,14 +135,11 @@ class InstallAppDialog extends Page {
         return this.typeTextInInput(this.searchInput, text);
     }
 
-    typeSearchTextAndEnter(text) {
-        return this.typeTextInInput(this.searchInput, text).then(()=>{
-            return this.pause(1000);
-        }).then(() => {
-            return this.keys('Enter');
-        }).then(() => {
-            return this.pause(1000);
-        })
+    async typeSearchTextAndEnter(text) {
+        await this.typeTextInInput(this.searchInput, text);
+        await this.pause(700);
+        await this.keys('Enter');
+        return await this.pause(1000);
     }
 
     isApplicationPresent(appName) {
@@ -149,11 +147,10 @@ class InstallAppDialog extends Page {
         return this.waitForElementDisplayed(selector, appConst.TIMEOUT_3);
     }
 
-    clickOnInstallLink(appName) {
+    async clickOnInstallLink(appName) {
         let selector = XPATH.appByDisplayName(appName);
-        return this.waitForElementDisplayed(selector, appConst.TIMEOUT_2).then(() => {
-            return this.clickOnElement(selector);
-        })
+        await this.waitForElementDisplayed(selector, appConst.TIMEOUT_2);
+        return await this.clickOnElement(selector);
     }
 
     isDefaultFocused() {

@@ -62,7 +62,7 @@ describe('Item Statistics Panel', function () {
             let appStatisticPanel = new AppStatisticPanel();
             await appBrowsePanel.clickOnRowByDisplayName(Apps.firstApp);
             let contentTypes = await appStatisticPanel.getContentTypes();
-            assert.isTrue(contentTypes.length == 3, 'Content Types list should not be empty');
+            assert.equal(contentTypes.length, 3, 'Content Types list should not be empty');
             assert.strictEqual(contentTypes[0], 'article',
                 'article type should be first in the list, because the list is sorted by a name');
         });

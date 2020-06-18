@@ -42,9 +42,9 @@ describe('Install Application Dialog specification', function () {
     it('WHEN dialog is opened THEN applications should be present in the grid AND applications are sorted by a name', async () => {
         let appBrowsePanel = new AppBrowsePanel();
         let dialog = new InstallDialog();
+        //1. Open Install Dialog:
         await appBrowsePanel.clickOnInstallButton();
         await dialog.waitForGridLoaded();
-
         await dialog.pause(1000);
         let names = await dialog.getApplicationNames();
         studioUtils.saveScreenshot("install_dlg_sorted");
@@ -57,9 +57,10 @@ describe('Install Application Dialog specification', function () {
         let dialog = new InstallDialog();
         await appBrowsePanel.clickOnInstallButton();
         await dialog.waitForOpened();
+        await dialog.waitForSpinnerNotVisible();
         //Type a name in the search input:
         await dialog.typeSearchText('Chuck Norris');
-        await dialog.pause(1500);
+        await dialog.pause(2500);
         let names = await dialog.getApplicationNames();
         assert.isTrue(names.length === 1, 'only one application should be displayed');
         assert.equal(names[0], appName, 'Chuck Norris app should be filtered');
@@ -70,6 +71,7 @@ describe('Install Application Dialog specification', function () {
         let dialog = new InstallDialog();
         await appBrowsePanel.clickOnInstallButton();
         await dialog.waitForOpened();
+        await dialog.waitForSpinnerNotVisible();
         //1. Install the app:
         await dialog.clickOnInstallAppLink(appName);
         let visible = await dialog.waitForAppInstalled(appName);
@@ -87,10 +89,11 @@ describe('Install Application Dialog specification', function () {
     it('GIVEN existing installed application WHEN install dialog has been opened THEN `Installed` status should be displayed near the application',
         async () => {
             let appBrowsePanel = new AppBrowsePanel();
-            let dialog = new InstallDialog();
+            let installAppDialog = new InstallDialog();
             await appBrowsePanel.clickOnInstallButton();
-            await dialog.waitForOpened();
-            let result = await dialog.isApplicationInstalled(appName);
+            await installAppDialog.waitForOpened();
+            await installAppDialog.waitForSpinnerNotVisible();
+            let result = await installAppDialog.isApplicationInstalled(appName);
             assert.isTrue(result, `'${appName}' should be with Installed status`);
         });
 
