@@ -88,7 +88,6 @@ describe('Application Browse Panel, multiple selection in grid', function () {
             //2. Open the context menu:
             await appBrowsePanel.rightClickOnRowByDisplayName(appConst.TEST_APPLICATIONS.FIRST_APP);
             await appBrowsePanel.waitForContextMenuDisplayed();
-
             studioUtils.saveScreenshot("all_apps_context_menu");
             await appBrowsePanel.waitForContextMenuItemEnabled('Start');
             //'Stop menu item should be enabled'
