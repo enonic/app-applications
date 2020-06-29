@@ -12,7 +12,7 @@ describe('Install Application Dialog specification', function () {
     this.timeout(appConst.SUITE_TIMEOUT);
     webDriverHelper.setupBrowser();
 
-    const appName = 'Chuck Norris';
+    const APP_DISPLAY_NAME = 'Chuck Norris';
 
     it('SHOULD show install app dialog WHEN Install button has been clicked', async () => {
         let appBrowsePanel = new AppBrowsePanel();
@@ -63,7 +63,7 @@ describe('Install Application Dialog specification', function () {
         await dialog.pause(2500);
         let names = await dialog.getApplicationNames();
         assert.isTrue(names.length === 1, 'only one application should be displayed');
-        assert.equal(names[0], appName, 'Chuck Norris app should be filtered');
+        assert.equal(names[0], APP_DISPLAY_NAME, 'Chuck Norris app should be filtered');
     });
 
     it('GIVEN dialog is opened WHEN install link has been clicked THEN the app should be installed', async () => {
@@ -73,28 +73,29 @@ describe('Install Application Dialog specification', function () {
         await dialog.waitForOpened();
         await dialog.waitForSpinnerNotVisible();
         //1. Install the app:
-        await dialog.clickOnInstallAppLink(appName);
-        let visible = await dialog.waitForAppInstalled(appName);
-        assert.isTrue(visible, `'${appName}' should've been installed by now`);
+        await dialog.clickOnInstallAppLink(APP_DISPLAY_NAME);
+        let visible = await dialog.waitForAppInstalled(APP_DISPLAY_NAME);
+        assert.isTrue(visible, `'${APP_DISPLAY_NAME}' should've been installed by now`);
         await dialog.clickOnCancelButtonTop();
         await dialog.waitForClosed();
          //2. Check the app in grid:
-        visible = await appBrowsePanel.isItemDisplayed(appName);
-        assert.isTrue(visible, `'${appName}' application should've been present in the grid`);
+        visible = await appBrowsePanel.isAppByDescriptionDisplayed(APP_DISPLAY_NAME);
+        assert.isTrue(visible, `'${APP_DISPLAY_NAME}' application should've been present in the grid`);
         let message = await appBrowsePanel.waitForNotificationMessage();
         assert.equal(message, 'Application \'Chuck Norris\' installed successfully', `Incorrect notification message [${message}]`)
     });
 
     //verifies  https://github.com/enonic/app-applications/issues/8
-    it('GIVEN existing installed application WHEN install dialog has been opened THEN `Installed` status should be displayed near the application',
+    it("GIVEN existing installed application WHEN install dialog has been opened THEN 'Installed' status should be displayed near the application",
         async () => {
             let appBrowsePanel = new AppBrowsePanel();
             let installAppDialog = new InstallDialog();
             await appBrowsePanel.clickOnInstallButton();
             await installAppDialog.waitForOpened();
             await installAppDialog.waitForSpinnerNotVisible();
-            let result = await installAppDialog.isApplicationInstalled(appName);
-            assert.isTrue(result, `'${appName}' should be with Installed status`);
+            //'Installed' button appears in the modal dialog:
+            let result = await installAppDialog.isApplicationInstalled(APP_DISPLAY_NAME);
+            assert.isTrue(result, `'${APP_DISPLAY_NAME}' should be with Installed status`);
         });
 
     beforeEach(() => studioUtils.navigateToApplicationsApp());

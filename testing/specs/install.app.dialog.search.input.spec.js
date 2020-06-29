@@ -10,7 +10,7 @@ describe('Install app dialog, search input spec.', function () {
     this.timeout(appConst.SUITE_TIMEOUT);
     webDriverHelper.setupBrowser();
     const not_existing = 'http://test.com';
-    const CONTENT_VIEWER_APP = 'https://repo.enonic.com/public/com/enonic/app/contentviewer/1.5.2/contentviewer-1.5.2.jar';
+    const CONTENT_VIEWER_APP_URL = 'https://repo.enonic.com/public/com/enonic/app/contentviewer/1.5.2/contentviewer-1.5.2.jar';
 
     const local_file = "file:c:/";
 
@@ -47,7 +47,7 @@ describe('Install app dialog, search input spec.', function () {
             await appBrowsePanel.clickOnInstallButton();
             await installDialog.waitForOpened();
             //Type the correct URL to app:
-            await installDialog.typeSearchTextAndEnter(CONTENT_VIEWER_APP);
+            await installDialog.typeSearchTextAndEnter(CONTENT_VIEWER_APP_URL);
             await installDialog.waitForClosed(45000);
 
             let message = await installDialog.waitForNotificationMessage();

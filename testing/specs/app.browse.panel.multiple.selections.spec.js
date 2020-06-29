@@ -15,8 +15,8 @@ describe('Application Browse Panel, multiple selection in grid', function () {
             //preconditions:
             //await restartApps();
             let appBrowsePanel = new AppBrowsePanel();
-            await appBrowsePanel.clickCheckboxAndSelectRowByDisplayName(appConst.TEST_APPLICATIONS.THIRD_APP)
-            await appBrowsePanel.clickCheckboxAndSelectRowByDisplayName(appConst.TEST_APPLICATIONS.FIRST_APP);
+            await appBrowsePanel.clickOnCheckboxAndSelectRowByDisplayName(appConst.TEST_APPLICATIONS.THIRD_APP)
+            await appBrowsePanel.clickOnCheckboxAndSelectRowByDisplayName(appConst.TEST_APPLICATIONS.FIRST_APP);
 
             await appBrowsePanel.clickOnStopButton();
             await appBrowsePanel.waitForStartButtonEnabled();
@@ -32,8 +32,8 @@ describe('Application Browse Panel, multiple selection in grid', function () {
         async () => {
             let appBrowsePanel = new AppBrowsePanel();
             //1. Two applications have been selected:
-            await appBrowsePanel.clickCheckboxAndSelectRowByDisplayName(appConst.TEST_APPLICATIONS.THIRD_APP);
-            await appBrowsePanel.clickCheckboxAndSelectRowByDisplayName(appConst.TEST_APPLICATIONS.FIRST_APP);
+            await appBrowsePanel.clickOnCheckboxAndSelectRowByDisplayName(appConst.TEST_APPLICATIONS.THIRD_APP);
+            await appBrowsePanel.clickOnCheckboxAndSelectRowByDisplayName(appConst.TEST_APPLICATIONS.FIRST_APP);
             //2. Open the context menu:
             await appBrowsePanel.rightClickOnRowByDisplayName(appConst.TEST_APPLICATIONS.FIRST_APP);
             await appBrowsePanel.waitForContextMenuDisplayed();
@@ -51,8 +51,8 @@ describe('Application Browse Panel, multiple selection in grid', function () {
         async () => {
             let appBrowsePanel = new AppBrowsePanel();
             //1. Select and stop two applications:
-            await appBrowsePanel.clickCheckboxAndSelectRowByDisplayName(appConst.TEST_APPLICATIONS.THIRD_APP);
-            await appBrowsePanel.clickCheckboxAndSelectRowByDisplayName(appConst.TEST_APPLICATIONS.FIRST_APP);
+            await appBrowsePanel.clickOnCheckboxAndSelectRowByDisplayName(appConst.TEST_APPLICATIONS.THIRD_APP);
+            await appBrowsePanel.clickOnCheckboxAndSelectRowByDisplayName(appConst.TEST_APPLICATIONS.FIRST_APP);
             await appBrowsePanel.clickOnStartButton();
             //`Start` button gets disabled:
             await appBrowsePanel.waitForStartButtonDisabled();
@@ -67,10 +67,10 @@ describe('Application Browse Panel, multiple selection in grid', function () {
         async () => {
             let appBrowsePanel = new AppBrowsePanel();
             //1. Select and stop the app:
-            await appBrowsePanel.clickCheckboxAndSelectRowByDisplayName(appConst.TEST_APPLICATIONS.THIRD_APP);
+            await appBrowsePanel.clickOnCheckboxAndSelectRowByDisplayName(appConst.TEST_APPLICATIONS.THIRD_APP);
             await appBrowsePanel.clickOnStopButton();
             //2. Select the second app(stated):
-            await appBrowsePanel.clickCheckboxAndSelectRowByDisplayName(appConst.TEST_APPLICATIONS.FIRST_APP);
+            await appBrowsePanel.clickOnCheckboxAndSelectRowByDisplayName(appConst.TEST_APPLICATIONS.FIRST_APP);
             //3. Open the context menu:
             await appBrowsePanel.rightClickOnRowByDisplayName(appConst.TEST_APPLICATIONS.FIRST_APP);
             await appBrowsePanel.waitForContextMenuDisplayed();
@@ -102,14 +102,14 @@ function restartApps() {
     let appBrowsePanel = new AppBrowsePanel();
     return appBrowsePanel.getApplicationState(appConst.TEST_APPLICATIONS.THIRD_APP).then(result => {
         if (result === 'stopped') {
-            return appBrowsePanel.clickCheckboxAndSelectRowByDisplayName(appConst.TEST_APPLICATIONS.THIRD_APP).then(() => {
+            return appBrowsePanel.clickOnCheckboxAndSelectRowByDisplayName(appConst.TEST_APPLICATIONS.THIRD_APP).then(() => {
                 return appBrowsePanel.clickOnStartButton();
             })
         }
     }).then(() => {
         return appBrowsePanel.getApplicationState(appConst.TEST_APPLICATIONS.FIRST_APP).then(result => {
             if (result === 'stopped') {
-                return appBrowsePanel.clickCheckboxAndSelectRowByDisplayName(appConst.TEST_APPLICATIONS.FIRST_APP).then(() => {
+                return appBrowsePanel.clickOnCheckboxAndSelectRowByDisplayName(appConst.TEST_APPLICATIONS.FIRST_APP).then(() => {
                     return appBrowsePanel.clickOnStartButton();
                 })
             }
