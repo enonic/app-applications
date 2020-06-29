@@ -113,6 +113,7 @@ describe('Application Browse Panel, check buttons in the toolbar', function () {
             await uninstallAppDialog.waitForOpened();
             await uninstallAppDialog.clickOnYesButton();
             await appBrowsePanel.waitForNotificationMessage();
+            studioUtils.saveScreenshot("show_selection_issue");
 
             //4. Verify that 'Selection Toggler' is not visible:
             await appBrowsePanel.waitForSelectionTogglerNotVisible();
