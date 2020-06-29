@@ -50,7 +50,7 @@ describe('Applications Browse panel - selection of items spec', function () {
             let appBrowsePanel = new AppBrowsePanel();
             let appStatisticPanel = new AppStatisticPanel();
             //1. Select the app:
-            await appBrowsePanel.clickCheckboxAndSelectRowByDisplayName(appConst.TEST_APPLICATIONS.FIRST_APP);
+            await appBrowsePanel.clickOnCheckboxAndSelectRowByDisplayName(appConst.TEST_APPLICATIONS.FIRST_APP);
             //2. Press Arrow Down key:
             await appBrowsePanel.pressArrowDownKey();
             let appName = await appStatisticPanel.getApplicationName();
@@ -62,7 +62,7 @@ describe('Applications Browse panel - selection of items spec', function () {
             let appBrowsePanel = new AppBrowsePanel();
             let appStatisticPanel = new AppStatisticPanel();
             //1. Select the app:
-            await appBrowsePanel.clickCheckboxAndSelectRowByDisplayName(appConst.TEST_APPLICATIONS.FOURTH_APP);
+            await appBrowsePanel.clickOnCheckboxAndSelectRowByDisplayName(appConst.TEST_APPLICATIONS.FOURTH_APP);
             //2. Press Arrow Up key:
             await appBrowsePanel.pressArrowUpKey();
             let result = await appStatisticPanel.getApplicationName();
@@ -73,8 +73,8 @@ describe('Applications Browse panel - selection of items spec', function () {
         async () => {
             let appStatisticPanel = new AppStatisticPanel();
             let appBrowsePanel = new AppBrowsePanel();
-            await appBrowsePanel.clickCheckboxAndSelectRowByDisplayName(appConst.TEST_APPLICATIONS.FIRST_APP);
-            await appBrowsePanel.clickCheckboxAndSelectRowByDisplayName(appConst.TEST_APPLICATIONS.SECOND_APP);
+            await appBrowsePanel.clickOnCheckboxAndSelectRowByDisplayName(appConst.TEST_APPLICATIONS.FIRST_APP);
+            await appBrowsePanel.clickOnCheckboxAndSelectRowByDisplayName(appConst.TEST_APPLICATIONS.SECOND_APP);
             let result = await appStatisticPanel.getApplicationName();
             assert.equal(result, appConst.TEST_APPLICATIONS.SECOND_APP,
                 'last selected application should be displayed in the Selection Panel');
@@ -85,11 +85,11 @@ describe('Applications Browse panel - selection of items spec', function () {
             let appBrowsePanel = new AppBrowsePanel();
             let appStatisticPanel = new AppStatisticPanel();
             //1.Select three applications:
-            await appBrowsePanel.clickCheckboxAndSelectRowByDisplayName(appConst.TEST_APPLICATIONS.FIRST_APP);
-            await appBrowsePanel.clickCheckboxAndSelectRowByDisplayName(appConst.TEST_APPLICATIONS.SECOND_APP);
-            await appBrowsePanel.clickCheckboxAndSelectRowByDisplayName(appConst.TEST_APPLICATIONS.THIRD_APP);
+            await appBrowsePanel.clickOnCheckboxAndSelectRowByDisplayName(appConst.TEST_APPLICATIONS.FIRST_APP);
+            await appBrowsePanel.clickOnCheckboxAndSelectRowByDisplayName(appConst.TEST_APPLICATIONS.SECOND_APP);
+            await appBrowsePanel.clickOnCheckboxAndSelectRowByDisplayName(appConst.TEST_APPLICATIONS.THIRD_APP);
             //2. Unselect one application:
-            await appBrowsePanel.clickCheckboxAndSelectRowByDisplayName(appConst.TEST_APPLICATIONS.THIRD_APP);
+            await appBrowsePanel.clickOnCheckboxAndSelectRowByDisplayName(appConst.TEST_APPLICATIONS.THIRD_APP);
             let appName = await appStatisticPanel.getApplicationName();
             assert.equal(appName, appConst.TEST_APPLICATIONS.SECOND_APP,
                 'last selected application should be displayed on the Selection Panel');

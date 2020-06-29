@@ -17,7 +17,7 @@ describe('Item Statistics Panel `Action Menu` spec', function () {
             let appStatisticPanel = new AppStatisticPanel();
             //1. Select the application:
             await appBrowsePanel.clickOnRowByDisplayName(APP_DISPLAY_NAME);
-            //2. Verify info in Statistics Panel:
+            //2. Verify the info in Statistics Panel:
             let result = await appStatisticPanel.getDropDownButtonText();
             studioUtils.saveScreenshot("application_action_menu_collapsed");
             assert.strictEqual(result, 'Started', 'correct label should be displayed on the drop-down button');

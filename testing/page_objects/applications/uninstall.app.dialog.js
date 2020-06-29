@@ -7,6 +7,7 @@ const XPATH = {
     yesButton: `//button[contains(@id,'DialogButton')]/span[text()='Yes']`,
     noButton: `//button[contains(@id,'DialogButton')]/span[text()='No']`,
 };
+
 class UninstallAppDialog extends Page {
 
     get cancelButtonTop() {
@@ -32,12 +33,9 @@ class UninstallAppDialog extends Page {
         });
     }
 
-    clickOnYesButton() {
-        return this.clickOnElement(this.yesButton).catch(err => {
-            throw new Error('Error when try click on Yes button ' + err);
-        }).then(()=>{
-            return this.pause(300);
-        })
+    async clickOnYesButton() {
+        await this.clickOnElement(this.yesButton);
+        return await this.pause(300);
     }
 
     clickOnCancelButtonTop() {

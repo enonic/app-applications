@@ -216,5 +216,11 @@ class Page {
         let el = await this.findElement(selector);
         return await el.isFocused();
     }
+
+    //is checkbox selected...
+    async isSelected(selector) {
+        let elems = await this.findElements(selector);
+        return await elems[0].isSelected();
+    }
 }
 module.exports = Page;

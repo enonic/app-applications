@@ -11,22 +11,24 @@ describe('Application Browse Panel, check buttons in the toolbar', function () {
     this.timeout(70000);
     webDriverHelper.setupBrowser();
 
-    const appDisplayName1 = 'Content viewer';
+    const appDisplayName1InGrid = 'Content Viewer App';//This displayName should be in grid
+    const appDisplayName1 = 'Content viewer';//This displayName should be in Uninstall modal dialog
     const appDisplayName2 = 'Chuck Norris';
     const appDescription1 = 'Inspect your content object JSON';
     const appDescription2 = 'A Chuck Norris fact widget';
 
-    it('WHEN app browse panel is loaded  AND no selections THEN only `Install` button should be enabled', async () => {
-        let appBrowsePanel = new AppBrowsePanel();
-        //'Install' button should be enabled:
-        await appBrowsePanel.waitForInstallButtonEnabled()
-        // `Start` button should be disabled
-        await appBrowsePanel.isStartButtonEnabled();
-        //`Stop` button should be disabled
-        await appBrowsePanel.isStopButtonEnabled();
-        //Uninstall` button should be disabled
-        await appBrowsePanel.isUninstallButtonEnabled();
-    });
+    it('WHEN app browse panel is loaded  AND no selections THEN only `Install` button should be enabled',
+        async () => {
+            let appBrowsePanel = new AppBrowsePanel();
+            //'Install' button should be enabled:
+            await appBrowsePanel.waitForInstallButtonEnabled()
+            // `Start` button should be disabled
+            await appBrowsePanel.isStartButtonEnabled();
+            //`Stop` button should be disabled
+            await appBrowsePanel.isStopButtonEnabled();
+            //Uninstall` button should be disabled
+            await appBrowsePanel.isUninstallButtonEnabled();
+        });
 
     it('GIVEN Install App dialog is opened WHEN Install button has been clicked in two rows THEN two new applications should appear in the grid',
         async () => {
@@ -46,27 +48,28 @@ describe('Application Browse Panel, check buttons in the toolbar', function () {
             await installAppDialog.waitForClosed(2000);
 
             studioUtils.saveScreenshot("chuck_norris_installed");
-            let result = await appBrowsePanel.isItemDisplayed(appDescription1);
+            let result = await appBrowsePanel.isAppByDescriptionDisplayed(appDescription1);
             assert.isTrue(result, appDescription1 + "  application should be present");
-            result = await appBrowsePanel.isItemDisplayed(appDescription2);
+            result = await appBrowsePanel.isAppByDescriptionDisplayed(appDescription2);
             assert.isTrue(result, appDescription2 + "  application should be present");
         });
 
-    it('WHEN An installed application is selected or unselected THEN the toolbar buttons must be updated', async () => {
-        let appBrowsePanel = new AppBrowsePanel();
-        //1. select the application:
-        await appBrowsePanel.clickOnRowByName(appDescription1);
-        studioUtils.saveScreenshot("chuck_norris_selected");
-        //"Uninstall" button gets enabled:
-        await appBrowsePanel.waitForUninstallButtonEnabled();
-        await appBrowsePanel.waitForStopButtonEnabled();
-        await appBrowsePanel.waitForStartButtonDisabled();
-        //2. click on the row again and unselect it:
-        await appBrowsePanel.clickOnRowByName(appDescription1)
-        await appBrowsePanel.waitForUninstallButtonDisabled()
-        await appBrowsePanel.waitForStopButtonDisabled();
-        await appBrowsePanel.waitForStartButtonDisabled()
-    });
+    it('WHEN An installed application is selected or unselected THEN the toolbar buttons must be updated',
+        async () => {
+            let appBrowsePanel = new AppBrowsePanel();
+            //1. select the application:
+            await appBrowsePanel.clickOnRowByDescription(appDescription1);
+            studioUtils.saveScreenshot("chuck_norris_selected");
+            //"Uninstall" button gets enabled:
+            await appBrowsePanel.waitForUninstallButtonEnabled();
+            await appBrowsePanel.waitForStopButtonEnabled();
+            await appBrowsePanel.waitForStartButtonDisabled();
+            //2. click on the row again and unselect it:
+            await appBrowsePanel.clickOnRowByDescription(appDescription1)
+            await appBrowsePanel.waitForUninstallButtonDisabled()
+            await appBrowsePanel.waitForStopButtonDisabled();
+            await appBrowsePanel.waitForStartButtonDisabled()
+        });
 
     it('WHEN The select all checkbox is selected/unselected THEN the rows should be selected/unselected', () => {
         let appBrowsePanel = new AppBrowsePanel();
@@ -84,20 +87,44 @@ describe('Application Browse Panel, check buttons in the toolbar', function () {
         });
     });
 
-    it('Uninstall installed applications', () => {
-        let appBrowsePanel = new AppBrowsePanel();
-        return appBrowsePanel.isItemDisplayed(appDescription1).then(result => {
-            if (result) {
-                return uninstallIfPresent(appDescription1);
-            }
-        }).then(() => {
-            return appBrowsePanel.isItemDisplayed(appDescription2)
-        }).then(result => {
-            if (result) {
-                return uninstallIfPresent(appDescription2);
-            }
-        })
-    });
+    it("WHEN Two existing applications have been checked THEN 'Selection Controller' gets partial",
+        async () => {
+            let appBrowsePanel = new AppBrowsePanel();
+            //1. Select 2 applications:
+            await appBrowsePanel.clickOnCheckboxAndSelectRowByDisplayName(appDisplayName1InGrid);
+            await appBrowsePanel.clickOnCheckboxAndSelectRowByDisplayName(appDisplayName2);
+            //2. Verify that Selection Controller checkbox gets partial:
+            await appBrowsePanel.isSelectionControllerSelected();
+            await appBrowsePanel.waitForSelectionControllerPartial();
+        });
+
+    //Verifies issue#145 "Selection Controller remains checked after uninstalling applications."
+    it('GIVEN Two existing applications are filtered (Show Selection has been clicked )WHEN both application have uninstalled THEN Selection Toggler get not visible AND Selection checkbox gets unselected',
+        async () => {
+            let appBrowsePanel = new AppBrowsePanel();
+            let uninstallAppDialog = new UninstallAppDialog();
+            //1. Select 2 applications:
+            await appBrowsePanel.clickOnCheckboxAndSelectRowByDisplayName(appDisplayName1InGrid);
+            await appBrowsePanel.clickOnCheckboxAndSelectRowByDisplayName(appDisplayName2);
+            //2. Click on 'Show Selections' button:
+            await appBrowsePanel.clickOnSelectionToggler();
+            //3. Click on Uninstall button  and confirm:
+            await appBrowsePanel.clickOnUninstallButton();
+            await uninstallAppDialog.waitForOpened();
+            await uninstallAppDialog.clickOnYesButton();
+            await appBrowsePanel.waitForNotificationMessage();
+            studioUtils.saveScreenshot("show_selection_issue");
+
+            //4. Verify that 'Selection Toggler' is not visible:
+            await appBrowsePanel.waitForSelectionTogglerNotVisible();
+            //5. Verify that grid is not filtered now:
+            await appBrowsePanel.waitForAppByDisplayNameNotDisplayed(appDisplayName1InGrid);
+            await appBrowsePanel.waitForAppByDisplayNameNotDisplayed(appDisplayName2);
+            //6. Verify that initial applications are visible:
+            await appBrowsePanel.waitForAppByDisplayNameDisplayed(appConst.TEST_APPLICATIONS.FIRST_APP);
+            //7. Selection Controller checkbox gets not selected:
+            await appBrowsePanel.isSelectionControllerSelected();
+        });
 
     beforeEach(() => studioUtils.navigateToApplicationsApp());
     afterEach(() => studioUtils.doCloseCurrentBrowserTab());
@@ -106,13 +133,3 @@ describe('Application Browse Panel, check buttons in the toolbar', function () {
     });
 });
 
-function uninstallIfPresent(appDescription) {
-    let uninstallAppDialog = new UninstallAppDialog();
-    let appBrowsePanel = new AppBrowsePanel();
-    return appBrowsePanel.clickOnRowByName(appDescription)
-        .then(() => appBrowsePanel.waitForUninstallButtonEnabled())
-        .then(() => appBrowsePanel.clickOnUninstallButton())
-        .then(() => uninstallAppDialog.waitForOpened())
-        .then(() => uninstallAppDialog.clickOnYesButton())
-        .then(() => appBrowsePanel.waitForNotificationMessage());
-}

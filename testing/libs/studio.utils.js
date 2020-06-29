@@ -43,14 +43,6 @@ module.exports = {
             return appBrowsePanel.pause(700);
         });
     },
-    findAndSelectItem: function (name) {
-        let browsePanel = new BrowsePanel();
-        return browsePanel.waitForRowByNameVisible(name).then(() => {
-            return browsePanel.clickOnRowByName(name);
-        }).catch(err => {
-            throw new Error('Application with the name:' + ' not found')
-        })
-    },
     navigateToApplicationsApp: function (userName, password) {
         let launcherPanel = new LauncherPanel();
         return launcherPanel.waitForPanelDisplayed(appConst.TIMEOUT_7).then(result => {

@@ -139,7 +139,7 @@ class InstallAppDialog extends Page {
         await this.typeTextInInput(this.searchInput, text);
         await this.pause(700);
         await this.keys('Enter');
-        return await this.pause(1000);
+        return await this.pause(1500);
     }
 
     isApplicationPresent(appName) {

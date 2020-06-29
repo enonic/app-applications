@@ -34,6 +34,7 @@ const XPATH = {
     checkboxByDisplayName: displayName => `${lib.itemByDisplayName(
         displayName)}/ancestor::div[contains(@class,'slick-row')]/div[contains(@class,'slick-cell-checkboxsel')]/label`,
 };
+
 class AppBrowsePanel extends Page {
 
     get selectionControllerCheckBox() {
@@ -64,7 +65,7 @@ class AppBrowsePanel extends Page {
         });
     }
 
-    clickOnRowByName(name) {
+    clickOnRowByDescription(name) {
         const nameXpath = XPATH.rowByName(name);
         return this.waitForElementDisplayed(nameXpath, appConst.TIMEOUT_2).then(() => {
             return this.clickOnElement(nameXpath);
@@ -86,17 +87,6 @@ class AppBrowsePanel extends Page {
         })
     }
 
-    waitForSelectionTogglerVisible() {
-        return this.waitForElementDisplayed(this.selectionPanelToggler, appConst.TIMEOUT_2).then(() => {
-            return this.getAttribute(this.selectionPanelToggler, 'class');
-        }).then(result => {
-            return result.includes('any-selected');
-        }).catch(err => {
-            console.log(`error when check the 'Selection toogler'` + err);
-            return false;
-        });
-    }
-
     getNumberInSelectionToggler() {
         return this.waitForElementDisplayed(this.numberInToggler, appConst.TIMEOUT_2).then(() => {
             return this.getText(this.numberInToggler);
@@ -106,15 +96,16 @@ class AppBrowsePanel extends Page {
         });
     }
 
+    //Click on Show Selection/Hide Selection
     clickOnSelectionToggler() {
         return this.clickOnElement(this.selectionPanelToggler).catch(err => {
             throw new Error(`Error when clicking 'Selection toogler' ` + err);
         });
     }
 
-    isItemDisplayed(itemName) {
-        return this.waitForElementDisplayed(XPATH.rowByName(itemName), appConst.TIMEOUT_2).catch(() => {
-            console.log("item is not displayed:" + itemName);
+    isAppByDescriptionDisplayed(descritption) {
+        return this.waitForElementDisplayed(XPATH.rowByName(descritption), appConst.TIMEOUT_2).catch(() => {
+            console.log("item is not displayed:" + descritption);
             return false;
         });
     }
@@ -127,7 +118,7 @@ class AppBrowsePanel extends Page {
         });
     }
 
-    isAppByDisplayNameDisplayed(appName) {
+    waitForAppByDisplayNameDisplayed(appName) {
         return this.waitForElementDisplayed(XPATH.rowByDisplayName(appName), 1000).catch(() => {
             this.saveScreenshot(`err_find_${appName}`);
             throw new Error(`Item was not found! ${appName}`);
@@ -152,9 +143,18 @@ class AppBrowsePanel extends Page {
         });
     }
 
-    waitForAppNotDisplayed(itemName) {
-        return this.waitForElementNotDisplayed(XPATH.rowByName(itemName), appConst.TIMEOUT_2).catch(err => {
-            console.log("item is still displayed:" + itemName + " " + err);
+    //Wait for application with the description is not displayed in app-grid:
+    waitForAppNotDisplayed(description) {
+        return this.waitForElementNotDisplayed(XPATH.rowByName(description), appConst.TIMEOUT_2).catch(err => {
+            console.log("item is still displayed:" + description + " " + err);
+            return false;
+        });
+    }
+
+    //Wait for application with the displayName is not displayed in app-grid:
+    waitForAppByDisplayNameNotDisplayed(displayName) {
+        return this.waitForElementNotDisplayed(XPATH.rowByDisplayName(displayName), appConst.TIMEOUT_2).catch(err => {
+            console.log("Application is still displayed:" + itemName + " " + err);
             return false;
         });
     }
@@ -281,7 +281,7 @@ class AppBrowsePanel extends Page {
         })
     }
 
-    clickCheckboxAndSelectRowByDisplayName(displayName) {
+    clickOnCheckboxAndSelectRowByDisplayName(displayName) {
         const displayNameXpath = XPATH.checkboxByDisplayName(displayName);
         return this.waitForElementDisplayed(displayNameXpath, appConst.TIMEOUT_2).then(() => {
             return this.clickOnElement(displayNameXpath);
@@ -339,7 +339,7 @@ class AppBrowsePanel extends Page {
     //throw exception after the timeout
     waitForContextMenuItemDisabled(name) {
         let menuItemXpath = XPATH.contextMenuItemByName(name);
-        return this.waitForElementDisplayed(menuItemXpath, 1000).catch(err => {
+        return this.waitForElementDisplayed(menuItemXpath, 3000).catch(err => {
             throw Error('Failed to find context menu item ' + name);
         }).then(() => {
             return this.browser.waitUntil(() => {
@@ -347,11 +347,9 @@ class AppBrowsePanel extends Page {
                     return result.includes("disabled");
                 })
             }, appConst.TIMEOUT_3, "context menu item is not disabled in 3000 ms");
-        }).catch(err => {
-            this.saveScreenshot("err_context_menu");
-            throw new Error(err);
         })
     }
+
 
     waitForContextMenuItemEnabled(menuItem) {
         let nameXpath = XPATH.enabledContextMenuButton(menuItem);
@@ -386,6 +384,46 @@ class AppBrowsePanel extends Page {
                 throw new Error("Launcher Panel was not loaded");
             }
         })
+    }
+
+    //wait for the "Show Selection" circle appears in the toolbar
+    async waitForSelectionTogglerVisible() {
+        try {
+            await this.waitForElementDisplayed(this.selectionPanelToggler, appConst.TIMEOUT_3);
+            let attr = await this.getAttribute(this.selectionPanelToggler, 'class');
+            return attr.includes('any-selected');
+        } catch (err) {
+            return false;
+        }
+    }
+
+    async waitForSelectionTogglerNotVisible() {
+        try {
+            await this.waitForElementNotDisplayed(this.selectionPanelToggler, appConst.TIMEOUT_3);
+        } catch (err) {
+            this.saveScreenshot("err_selection_toggler_should_not_visible");
+            throw new Error("Selection toggler should not be visible")
+        }
+    }
+
+    async waitForSelectionControllerPartial() {
+        let selector = this.selectionControllerCheckBox + "//input[@type='checkbox']";
+        await this.getBrowser().waitUntil(async () => {
+            let text = await this.getAttribute(selector, "class");
+            return text.includes('partial');
+        }, appConst.TIMEOUT_2, "Selection Controller checkBox should displayed as partial");
+    }
+
+    async isSelectionControllerPartial() {
+        let selector = this.selectionControllerCheckBox + "//input[@type='checkbox']";
+        let text = await this.getAttribute(selector, "class");
+        return text.includes('partial');
+    }
+
+    // returns true if 'Selection Controller' checkbox is selected:
+    isSelectionControllerSelected() {
+        let selector = this.selectionControllerCheckBox + "//input[@type='checkbox']";
+        return this.isSelected(selector);
     }
 };
 module.exports = AppBrowsePanel;
