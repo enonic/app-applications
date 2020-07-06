@@ -1,7 +1,7 @@
 Enonic XP - Applications App
 ===
 
-[![Travis Build Status][travis-image]][travis-url]
+[![Actions Status](https://github.com/enonic/app-applications/workflows/Gradle%20Build/badge.svg)](https://github.com/enonic/app-applications/actions)
 [![License][license-image]][license-url]
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/85183c43117642708e7f3af2db5fcdb2)](https://www.codacy.com/app/enonic/app-applications?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=enonic/app-applications&amp;utm_campaign=Badge_Grade)
 
