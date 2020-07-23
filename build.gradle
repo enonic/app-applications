@@ -6,6 +6,8 @@ plugins {
     id "com.github.node-gradle.node" version '2.2.3'
 }
 
+def xpVersion=version
+
 app {
     name = 'com.enonic.xp.app.applications'
     group = 'com.enonic.xp'
@@ -31,7 +33,7 @@ configurations.all {
 repositories {
     mavenLocal()
     jcenter()
-    xp.enonicRepo()
+    xp.enonicRepo('dev')
 }
 
 node {
