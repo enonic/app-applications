@@ -33,14 +33,14 @@ configurations {
 
 ext.extProgram = new Properties()
 extProgram.load( new FileInputStream( "../gradle.properties" ) )
-extProgram['xpVersion']
+extProgram['version']
 
 enonic {
     publishRepo = 'inhouse'
 }
 
 ext {
-    xpVersion = extProgram['xpVersion']
+    xpVersion = extProgram['version']
     unpackDir = "$buildDir${File.separator}install"
     screenshotsDir = "$buildDir${File.separator}screenshots"
     reportsDir = "$buildDir${File.separator}reports"
@@ -164,7 +164,7 @@ task testApplicationsAppLocally( type: NpmTask, dependsOn: [npmInstall, ensureSc
 
 repositories {
     maven {
-        url 'https://repo.enonic.com/public'
+        url 'https://repo.enonic.com/dev'
     }
     mavenCentral()
 }
