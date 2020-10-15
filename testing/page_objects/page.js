@@ -42,7 +42,7 @@ class Page {
 
     async clickOnElement(selector) {
         let element = await this.findElement(selector);
-        await element.waitForDisplayed(1500);
+        await element.waitForDisplayed({timeout: 2000});
         return await element.click();
     }
 
@@ -90,7 +90,7 @@ class Page {
 
     async clearInputText(selector) {
         let inputElement = await this.findElement(selector);
-        await inputElement.waitForDisplayed(1000);
+        await inputElement.waitForDisplayed({timeout: 1500});
         await inputElement.clearValue();
         return await inputElement.pause(300);
     }
@@ -116,36 +116,36 @@ class Page {
 
     async waitForElementEnabled(selector, ms) {
         let element = await this.findElement(selector);
-        return await element.waitForEnabled(ms);
+        return await element.waitForEnabled({timeout: ms});
     }
 
     async waitForElementDisabled(selector, ms) {
         let element = await this.findElement(selector);
-        return await element.waitForEnabled(ms, true);
+        return await element.waitForEnabled({timeout: ms, reverse: true});
     }
 
     async waitForElementNotDisplayed(selector, ms) {
         let element = await this.findElement(selector);
-        return await element.waitForDisplayed(ms, true);
+        return await element.waitForDisplayed({timeout: ms, reverse: true});
     }
 
     async waitForElementDisplayed(selector, ms) {
         let element = await this.findElement(selector);
-        return await element.waitForDisplayed(ms);
+        return await element.waitForDisplayed({timeout: ms});
     }
 
     waitForSpinnerNotVisible() {
         let message = "Spinner still displayed! timeout is " + appConst.TIMEOUT_7;
         return this.browser.waitUntil(() => {
-            return this.isElementNotDisplayed(`//div[@class='spinner']`);
-        }, appConst.TIMEOUT_7, message);
+            return this.isElementNotDisplayed("//div[@class='spinner']");
+        }, {timeout: appConst.TIMEOUT_7, timeoutMsg: message});
     }
 
     waitUntilElementNotVisible(selector, timeout) {
-        let message = "Element still displayed! timeout is " + appConst.TIMEOUT_7 + "  " + selector;
+        let message = "Element still displayed! timeout is " + timeout + "  " + selector;
         return this.browser.waitUntil(() => {
             return this.isElementNotDisplayed(selector);
-        }, timeout, message);
+        }, {timeout: timeout, timeoutMsg: message});
     }
 
     isElementNotDisplayed(selector) {
@@ -164,7 +164,7 @@ class Page {
             let notificationXpath = "//div[contains(@id,'NotificationContainer')]//div[@class='notification-content']";
             await this.getBrowser().waitUntil(async () => {
                 return await this.isElementDisplayed(notificationXpath);
-            })
+            }, {timeout: appConst.mediumTimeout});
             await this.pause(300);
             let result = await this.getTextInElements(notificationXpath);
             return result[0];
@@ -175,7 +175,7 @@ class Page {
 
     waitForExpectedNotificationMessage(expectedMessage) {
         let selector = `//div[contains(@id,'NotificationMessage')]//div[contains(@class,'notification-content') and contains(.,'${expectedMessage}')]`;
-        return this.waitForElementDisplayed(selector, appConst.TIMEOUT_3).catch(err => {
+        return this.waitForElementDisplayed(selector, appConst.mediumTimeout).catch(err => {
             this.saveScreenshot('err_notification_mess');
             throw new Error('expected notification message was not shown! ' + err);
         })
@@ -183,7 +183,7 @@ class Page {
 
     waitForErrorNotificationMessage() {
         let selector = `//div[contains(@id,'NotificationMessage') and @class='notification error']//div[contains(@class,'notification-content')]`;
-        return this.waitForElementDisplayed(selector, appConst.TIMEOUT_3).then(() => {
+        return this.waitForElementDisplayed(selector, appConst.mediumTimeout).then(() => {
             return this.getText(selector);
         })
     }
@@ -223,4 +223,5 @@ class Page {
         return await elems[0].isSelected();
     }
 }
+
 module.exports = Page;

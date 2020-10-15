@@ -1,6 +1,5 @@
 const chai = require('chai');
 const assert = chai.assert;
-chai.use(require('chai-as-promised'));
 const webDriverHelper = require('../libs/WebDriverHelper');
 const AppBrowsePanel = require('../page_objects/applications/applications.browse.panel');
 const InstallAppDialog = require('../page_objects/applications/install.app.dialog');
@@ -71,21 +70,18 @@ describe('Application Browse Panel, check buttons in the toolbar', function () {
             await appBrowsePanel.waitForStartButtonDisabled()
         });
 
-    it('WHEN The select all checkbox is selected/unselected THEN the rows should be selected/unselected', () => {
-        let appBrowsePanel = new AppBrowsePanel();
-        return appBrowsePanel.clickOnSelectAll().then(() => {
-            return assert.eventually.isTrue(appBrowsePanel.isRowByIndexSelected(0), "First row should be selected(blue)");
-        }).then(() => {
-            return assert.eventually.isTrue(appBrowsePanel.isRowByIndexSelected(1), "Second row should be selected(blue)");
-        }).then(() => {
-            //click on 'Select all/Unselect all' checkbox
-            return appBrowsePanel.clickOnSelectAll();
-        }).then(() => {
-            return assert.eventually.isFalse(appBrowsePanel.isRowByIndexSelected(0), "First row should be unselected");
-        }).then(() => {
-            return assert.eventually.isFalse(appBrowsePanel.isRowByIndexSelected(1), "Second row should be unselected");
+    it('WHEN The select all checkbox is selected/unselected THEN the rows should be selected/unselected',
+        async () => {
+            let appBrowsePanel = new AppBrowsePanel();
+            //1. Click on Select All checkbox:
+            await appBrowsePanel.clickOnSelectAll();
+            assert.isTrue(await appBrowsePanel.isRowByIndexSelected(0), "First row should be selected(blue)");
+            assert.isTrue(await appBrowsePanel.isRowByIndexSelected(1), "Second row should be selected(blue)");
+            //2. click on 'Select all/Unselect all' checkbox, the checkbox gets unchecked:
+            await appBrowsePanel.clickOnSelectAll();
+            assert.isFalse(await appBrowsePanel.isRowByIndexSelected(0), "First row should be unselected");
+            assert.isFalse(await appBrowsePanel.isRowByIndexSelected(1), "Second row should be unselected");
         });
-    });
 
     it("WHEN Two existing applications have been checked THEN 'Selection Controller' gets partial",
         async () => {

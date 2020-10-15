@@ -22,7 +22,7 @@ class LauncherPanel extends Page {
     }
 
     async clickOnApplicationsLink() {
-        await this.waitForElementDisplayed(this.applicationsLink, appConst.TIMEOUT_3);
+        await this.waitForElementDisplayed(this.applicationsLink, appConst.mediumTimeout);
         return await this.clickOnElement(this.applicationsLink);
     }
 
@@ -47,5 +47,5 @@ class LauncherPanel extends Page {
             return false;
         })
     }
-};
+}
 module.exports = LauncherPanel;

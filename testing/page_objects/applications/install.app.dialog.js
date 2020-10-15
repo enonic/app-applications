@@ -41,7 +41,7 @@ class InstallAppDialog extends Page {
     }
 
     waitForOpened() {
-        return this.waitForElementDisplayed(this.searchInput, appConst.TIMEOUT_3).catch(err => {
+        return this.waitForElementDisplayed(this.searchInput, appConst.mediumTimeout).catch(err => {
             this.saveScreenshot('err_load_install_dialog');
             throw new Error('Install App dialog was not loaded! ' + err);
         });
@@ -70,7 +70,7 @@ class InstallAppDialog extends Page {
 
     waitForInstallLink(appName) {
         const selector = XPATH.installLinkByName(appName);
-        return this.waitForElementDisplayed(selector, appConst.TIMEOUT_3).catch(err => {
+        return this.waitForElementDisplayed(selector, appConst.mediumTimeout).catch(err => {
             this.saveScreenshot('err_install_link_load');
             throw new Error('Install link was not loaded! ' + err);
         })
@@ -79,7 +79,7 @@ class InstallAppDialog extends Page {
     async clickOnInstallAppLink(appName) {
         try {
             let selector = XPATH.installLinkByName(appName);
-            await this.waitForElementDisplayed(selector, appConst.TIMEOUT_3);
+            await this.waitForElementDisplayed(selector, appConst.mediumTimeout);
             await this.pause(400);
             return await this.clickOnElement(selector);
         } catch (err) {
@@ -104,7 +104,7 @@ class InstallAppDialog extends Page {
 
     getErrorValidationMessage() {
         let selector = XPATH.container + `//div[contains(@class,'status-message') and contains(@class,'failed')]`;
-        return this.waitForElementDisplayed(selector, appConst.TIMEOUT_3).then(() => {
+        return this.waitForElementDisplayed(selector, appConst.TIMEOUT_7).then(() => {
             return this.getText(selector);
         }).catch(err => {
             this.saveScreenshot('err_wait_for_validation_message');
@@ -114,7 +114,7 @@ class InstallAppDialog extends Page {
 
     applicationNotFoundMessage() {
         let selector = XPATH.container + `//div[@class='status-message']`;
-        return this.waitForElementDisplayed(selector, appConst.TIMEOUT_3).then(() => {
+        return this.waitForElementDisplayed(selector, appConst.mediumTimeout).then(() => {
             return this.getTextInDisplayedElements(selector);
         }).catch(err => {
             this.saveScreenshot('err_app_not_found_message');
@@ -137,14 +137,14 @@ class InstallAppDialog extends Page {
 
     async typeSearchTextAndEnter(text) {
         await this.typeTextInInput(this.searchInput, text);
-        await this.pause(700);
+        await this.pause(1000);
         await this.keys('Enter');
         return await this.pause(1500);
     }
 
     isApplicationPresent(appName) {
         let selector = XPATH.appByDisplayName(appName);
-        return this.waitForElementDisplayed(selector, appConst.TIMEOUT_3);
+        return this.waitForElementDisplayed(selector, appConst.mediumTimeout);
     }
 
     async clickOnInstallLink(appName) {
@@ -156,6 +156,6 @@ class InstallAppDialog extends Page {
     isDefaultFocused() {
         return this.isFocused(XPATH.filterInput);
     }
-};
+}
 module.exports = InstallAppDialog;
 

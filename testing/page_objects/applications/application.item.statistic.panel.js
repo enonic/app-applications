@@ -2,19 +2,20 @@ const Page = require('../page');
 const appConst = require('../../libs/app_const');
 
 const xpath = {
-    main: `//div[contains(@id,'ApplicationItemStatisticsPanel')]`,
-    title: `//div[contains(@id,'ItemStatisticsHeader')]/h1[contains(@class,'title')]`,
-    dropDownButton: `//div[contains(@id,'ActionMenu')]//div[contains(@class,'drop-down-button')]`,
-    dataContainer: `//div[contains(@class,'application-data-container')]`,
-    siteItemDataGroup: `//div[contains(@id,'ItemDataGroup') and child::h2[text()='Site']]`,
-    applicationItemDataGroup: `//div[contains(@id,'ItemDataGroup') and child::h2[text()='Application']]`,
-    contentTypes: `//ul[@class='data-list' and descendant::li[text()='Content Types']]//span`,
-    applicationDataHeaders: `//li[@class='list-header']`,
+    main: "//div[contains(@id,'ApplicationItemStatisticsPanel')]",
+    title: "//div[contains(@id,'ItemStatisticsHeader')]/h1[contains(@class,'title')]",
+    dropDownButton: "//div[contains(@id,'ActionMenu')]//div[contains(@class,'drop-down-button')]",
+    dataContainer: "//div[contains(@class,'application-data-container')]",
+    siteItemDataGroup: "//div[contains(@id,'ItemDataGroup') and child::h2[text()='Site']]",
+    applicationItemDataGroup: "//div[contains(@id,'ItemDataGroup') and child::h2[text()='Application']]",
+    contentTypes: "//ul[@class='data-list' and descendant::li[text()='Content Types']]//span",
+    applicationDataHeaders: "//li[@class='list-header']",
     idProviderApplicationsHeaders: `//div[contains(@id,'ItemDataGroup') and descendant::h2[text()='ID Provider Applications']]//li[@class='list-header']`,
     stopActionMenuItem: `//div[contains(@id,'ActionMenu')]//li[contains(@id,'ActionMenuItem') and text()='Stop']`,
     startActionMenuItem: `//div[contains(@id,'ActionMenu')]//li[contains(@id,'ActionMenuItem') and text()='Start']`,
-    siteDataHeaders: `//div[contains(@id,'ApplicationItemStatisticsPanel')]/div[contains(@class,'application-data-container')]/div[contains(@class,'site')]//li[contains(@class,'list-header')]`,
+    siteDataHeaders: "//div[contains(@id,'ApplicationItemStatisticsPanel')]/div[contains(@class,'application-data-container')]/div[contains(@class,'site')]//li[contains(@class,'list-header')]",
 };
+
 class ApplicationItemStatisticsPanel extends Page {
 
     //Site data-group, content types list
@@ -76,7 +77,7 @@ class ApplicationItemStatisticsPanel extends Page {
             return this.getText(selector).then(text => {
                 return text === state;
             });
-        }, 3000, "Expected sate should be " + state);
+        }, {timeout: appConst.mediumTimeout, timeoutMsg: "Expected state should be " + state});
     }
 
     clickOnActionDropDownMenu() {
@@ -99,5 +100,6 @@ class ApplicationItemStatisticsPanel extends Page {
             return false;
         })
     }
-};
+}
+
 module.exports = ApplicationItemStatisticsPanel;

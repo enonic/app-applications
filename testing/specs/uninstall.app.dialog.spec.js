@@ -5,12 +5,13 @@ const AppBrowsePanel = require('../page_objects/applications/applications.browse
 const UninstallAppDialog = require('../page_objects/applications/uninstall.app.dialog');
 const InstallAppDialog = require('../page_objects/applications/install.app.dialog');
 const studioUtils = require('../libs/studio.utils.js');
+const AppStatisticPanel = require('../page_objects/applications/application.item.statistic.panel');
 
 describe('Uninstall Application dialog specification', function () {
     this.timeout(70000);
     webDriverHelper.setupBrowser();
 
-    it(`should display Uninstall Dialog with right content when Uninstall Button has been clicked`,
+    it("WHEN uninstall dialog is opened THEN expected title and buttons should be present",
         async () => {
             let uninstallAppDialog = new UninstallAppDialog();
             //1. Select 'Chuck Norris' app and click on 'Uninstall' button:
@@ -24,7 +25,7 @@ describe('Uninstall Application dialog specification', function () {
             await uninstallAppDialog.isNoButtonDisplayed();
         });
 
-    it(`'GIVEN uninstall dialog is opened WHEN Cancel-top button has been pressed THEN modal dialog closes`,
+    it("GIVEN uninstall dialog is opened WHEN 'Cancel-top' button has been pressed THEN modal dialog closes",
         async () => {
             let uninstallAppDialog = new UninstallAppDialog();
             //1. Select 'Chuck Norris' app and click on 'Uninstall' button:
@@ -33,17 +34,35 @@ describe('Uninstall Application dialog specification', function () {
             await uninstallAppDialog.waitForClosed();
         });
 
-    it(`should display expected notification message`,
+    it("GIVEN uninstall dialog is opened WHEN 'Esc' key has been pressed THEN dialog closes",
         async () => {
             let uninstallAppDialog = new UninstallAppDialog();
             let appBrowsePanel = new AppBrowsePanel();
             //1. Select 'Chuck Norris' app and click on 'Uninstall' button:
             await openUninstallDialog();
+            //2. Press 'Esc' key
+            await appBrowsePanel.pressEscKey();
+            //3. Verify that the modal dialog is closed:
+            await uninstallAppDialog.waitForClosed();
+        });
+
+    it("GIVEN Uninstall dialog is opened WHEN 'Yes' button has been pressed THEN app should be uninstalled",
+        async () => {
+            let uninstallAppDialog = new UninstallAppDialog();
+            let appBrowsePanel = new AppBrowsePanel();
+            let appStatisticPanel = new AppStatisticPanel();
+            //1. Select 'Chuck Norris' app and click on 'Uninstall' button:
+            await openUninstallDialog();
+            //2. Click on Yes button in Uninstall dialog:
             await uninstallAppDialog.clickOnYesButton();
+            //3. Verify the notification message:
             let result = await appBrowsePanel.waitForNotificationMessage();
             studioUtils.saveScreenshot("chuck_norris_uninstalled_message");
             const text = result instanceof Array ? result[result.length - 1] : result;
             assert.equal(text, 'Application \'Chuck Norris\' uninstalled successfully', `Incorrect notification message [${text}]`);
+            //4. Verify that Statistics Panel is cleared:
+            let title = await appStatisticPanel.getApplicationName();
+            assert.equal(title,"","Statistics panel should be cleared");
         });
 
     beforeEach(() => studioUtils.navigateToApplicationsApp());

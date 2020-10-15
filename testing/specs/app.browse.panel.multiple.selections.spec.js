@@ -15,13 +15,13 @@ describe('Application Browse Panel, multiple selection in grid', function () {
             //preconditions:
             //await restartApps();
             let appBrowsePanel = new AppBrowsePanel();
-            await appBrowsePanel.clickOnCheckboxAndSelectRowByDisplayName(appConst.TEST_APPLICATIONS.THIRD_APP)
+            await appBrowsePanel.clickOnCheckboxAndSelectRowByDisplayName(appConst.TEST_APPLICATIONS.THIRD_APP);
             await appBrowsePanel.clickOnCheckboxAndSelectRowByDisplayName(appConst.TEST_APPLICATIONS.FIRST_APP);
 
             await appBrowsePanel.clickOnStopButton();
             await appBrowsePanel.waitForStartButtonEnabled();
             let result = await appBrowsePanel.isStopButtonEnabled();
-            assert.isFalse(result, "`Stop` button should be disabled");
+            assert.isFalse(result, "'Stop' button should be disabled");
 
             let statisticPanel = new StatisticPanel();
             //Stopped status should be displayed on  Statistic Panel

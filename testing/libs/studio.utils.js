@@ -43,23 +43,23 @@ module.exports = {
             return appBrowsePanel.pause(700);
         });
     },
-    navigateToApplicationsApp: function (userName, password) {
-        let launcherPanel = new LauncherPanel();
-        return launcherPanel.waitForPanelDisplayed(appConst.TIMEOUT_7).then(result => {
+    async navigateToApplicationsApp(userName, password) {
+        try {
+            let launcherPanel = new LauncherPanel();
+            let result = await launcherPanel.waitForPanelDisplayed(appConst.TIMEOUT_2);
             if (result) {
                 console.log("Launcher Panel is opened, click on the `Applications` link...");
-                return launcherPanel.clickOnApplicationsLink();
+                await launcherPanel.clickOnApplicationsLink();
             } else {
                 console.log("Login Page is opened, type a password and name...");
-                return this.doLoginAndClickOnApplicationsLink(userName, password);
+                await this.doLoginAndClickOnApplicationsLink(userName, password);
             }
-        }).then(() => {
-            return this.doSwitchToApplicationsBrowsePanel();
-        }).catch(err => {
+            return await this.doSwitchToApplicationsBrowsePanel();
+        } catch (err) {
             console.log('tried to navigate to applications app, but: ' + err);
             this.saveScreenshot("err_navigate_to_applications");
             throw new Error('error when navigate to Applications app ' + err);
-        });
+        }
     },
 
     doSwitchToApplicationsBrowsePanel: function () {
@@ -69,7 +69,7 @@ module.exports = {
             console.log("switched to Applications app...");
             return browsePanel.waitForSpinnerNotVisible();
         }).then(() => {
-            return browsePanel.waitForGridLoaded(appConst.TIMEOUT_3);
+            return browsePanel.waitForGridLoaded(appConst.mediumTimeout);
         })
     },
 
@@ -79,7 +79,7 @@ module.exports = {
             console.log("switched to Home Page...");
         }).then(() => {
             let homePage = new HomePage();
-            return homePage.waitForLoaded(appConst.TIMEOUT_3);
+            return homePage.waitForLoaded(appConst.mediumTimeout);
         });
     },
     doSwitchToLoginPage: function () {
@@ -88,7 +88,7 @@ module.exports = {
             console.log("switched to Login Page...");
         }).then(() => {
             let loginPage = new LoginPage();
-            return loginPage.waitForPageLoaded(appConst.TIMEOUT_3);
+            return loginPage.waitForPageLoaded(appConst.mediumTimeout);
         });
     },
     switchAndCheckTitle: function (handle, reqTitle) {
