@@ -71,5 +71,5 @@ class UninstallAppDialog extends Page {
             throw new Error('Uninstall Dialog No button is not visible ' + err);
         });
     }
-};
+}
 module.exports = UninstallAppDialog;

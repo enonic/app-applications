@@ -31,7 +31,7 @@ describe('Install Application Dialog specification', function () {
     it('GIVEN install dialog is opened WHEN Esc key has been pressed THEN dialog closes', async () => {
         let appBrowsePanel = new AppBrowsePanel();
         let dialog = new InstallDialog();
-        await appBrowsePanel.clickOnInstallButton()
+        await appBrowsePanel.clickOnInstallButton();
         await dialog.waitForOpened();
         studioUtils.saveScreenshot("install_esc_key_test1");
         await appBrowsePanel.pressEscKey();

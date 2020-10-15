@@ -18,7 +18,7 @@ describe('Item Statistics Panel', function () {
     it('WHEN existing started application is selected THEN should display app-info for the running selected application',
         async () => {
             let appBrowsePanel = new AppBrowsePanel();
-            let appStatisticPanel = new AppStatisticPanel()
+            let appStatisticPanel = new AppStatisticPanel();
             //1. Select existing started app:
             await appBrowsePanel.clickOnRowByDisplayName(Apps.firstApp);
             //2. Verify that expected appName should be displayed in Statistics Panel:
@@ -39,7 +39,7 @@ describe('Item Statistics Panel', function () {
             let appStatisticPanel = new AppStatisticPanel();
             //1. Select existing started app:
             await appBrowsePanel.clickOnRowByDisplayName(Apps.firstApp);
-            let headers = await appStatisticPanel.getSiteDataHeaders()
+            let headers = await appStatisticPanel.getSiteDataHeaders();
             //3. Verify that expected application's site-info should be displayed in Statistics Panel:
             assert.strictEqual(headers[0], 'Content Types');
             assert.strictEqual(headers[1], 'Page');
@@ -53,7 +53,7 @@ describe('Item Statistics Panel', function () {
             let appBrowsePanel = new AppBrowsePanel();
             let appStatisticPanel = new AppStatisticPanel();
             await appBrowsePanel.clickOnRowByDisplayName(Apps.firstApp);
-            let header = await appStatisticPanel.getProviderDataHeaders()
+            let header = await appStatisticPanel.getProviderDataHeaders();
             assert.strictEqual(header, 'Mode');
         });
 

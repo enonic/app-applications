@@ -20,7 +20,7 @@ describe('Application Browse Panel, check buttons in the toolbar', function () {
         async () => {
             let appBrowsePanel = new AppBrowsePanel();
             //'Install' button should be enabled:
-            await appBrowsePanel.waitForInstallButtonEnabled()
+            await appBrowsePanel.waitForInstallButtonEnabled();
             // `Start` button should be disabled
             await appBrowsePanel.isStartButtonEnabled();
             //`Stop` button should be disabled
@@ -64,8 +64,8 @@ describe('Application Browse Panel, check buttons in the toolbar', function () {
             await appBrowsePanel.waitForStopButtonEnabled();
             await appBrowsePanel.waitForStartButtonDisabled();
             //2. click on the row again and unselect it:
-            await appBrowsePanel.clickOnRowByDescription(appDescription1)
-            await appBrowsePanel.waitForUninstallButtonDisabled()
+            await appBrowsePanel.clickOnRowByDescription(appDescription1);
+            await appBrowsePanel.waitForUninstallButtonDisabled();
             await appBrowsePanel.waitForStopButtonDisabled();
             await appBrowsePanel.waitForStartButtonDisabled()
         });
