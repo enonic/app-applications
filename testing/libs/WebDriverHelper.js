@@ -41,6 +41,8 @@ WebDriverHelper.prototype.setupBrowser = function setupBrowser() {
         console.log('browser name ##################### ' + browser_name);
         let options = {
             logLevel: "error",
+            automationProtocol: "webdriver",
+            path: "/wd/hub",
             capabilities: {
                 browserName: browser_name,
                 platformName:platform_name,

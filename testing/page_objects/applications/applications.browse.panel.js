@@ -51,7 +51,7 @@ class AppBrowsePanel extends Page {
 
     waitForGridLoaded(ms) {
         return this.waitForElementDisplayed(XPATH.container + lib.GRID_CANVAS, ms).then(() => {
-            return this.waitForSpinnerNotVisible(appConst.TIMEOUT_3);
+            return this.waitForSpinnerNotVisible(appConst.mediumTimeout);
         }).then(() => {
             return console.log('applications browse panel is loaded')
         }).catch(err => {
@@ -65,14 +65,15 @@ class AppBrowsePanel extends Page {
         });
     }
 
-    clickOnRowByDescription(name) {
-        const nameXpath = XPATH.rowByName(name);
-        return this.waitForElementDisplayed(nameXpath, appConst.TIMEOUT_2).then(() => {
-            return this.clickOnElement(nameXpath);
-        }).catch(() => {
+    async clickOnRowByDescription(name) {
+        try {
+            const nameXpath = XPATH.rowByName(name);
+            await this.waitForElementDisplayed(nameXpath, appConst.TIMEOUT_2);
+            await this.clickOnElement(nameXpath);
+        } catch (err) {
             this.saveScreenshot("err_find_item");
             throw Error(`Row with the name ${name} was not found.`)
-        })
+        }
     }
 
     clickOnRowByDisplayName(displayName) {
@@ -127,7 +128,7 @@ class AppBrowsePanel extends Page {
 
     waitForRowByNameVisible(name) {
         const nameXpath = XPATH.rowByName(name);
-        return this.waitForElementDisplayed(nameXpath, appConst.TIMEOUT_3).catch(() => {
+        return this.waitForElementDisplayed(nameXpath, appConst.mediumTimeout).catch(() => {
             throw Error(`Row with the name ${name} is not visible in 3000ms.`)
         })
     }
@@ -175,26 +176,26 @@ class AppBrowsePanel extends Page {
         })
     }
 
-    clickOnStartButton() {
-        return this.waitForElementEnabled(XPATH.startButton, appConst.TIMEOUT_2).then(() => {
-            return this.clickOnElement(XPATH.startButton);
-        }).then(() => {
-            return this.pause(1500);
-        }).catch(() => {
+    async clickOnStartButton() {
+        try {
+            await this.waitForElementEnabled(XPATH.startButton, appConst.TIMEOUT_2);
+            await this.clickOnElement(XPATH.startButton);
+            await this.pause(1500);
+        } catch (err) {
             this.saveScreenshot('err_browsepanel_start');
-            throw new Error(`Start button is disabled!`);
-        });
+            throw new Error(`Start button is disabled!` + err);
+        }
     }
 
-    clickOnStopButton() {
-        return this.waitForElementEnabled(XPATH.stopButton, appConst.TIMEOUT_2).then(() => {
-            return this.clickOnElement(XPATH.stopButton);
-        }).then(() => {
-            return this.pause(1500);
-        }).catch(err => {
+    async clickOnStopButton() {
+        try {
+            await this.waitForElementEnabled(XPATH.stopButton, appConst.TIMEOUT_2);
+            await this.clickOnElement(XPATH.stopButton);
+            return await this.pause(1500);
+        } catch (err) {
             this.saveScreenshot('err_browsepanel_stop');
             throw new Error(`Stop button is disabled!` + err);
-        });
+        }
     }
 
     waitForInstallButtonEnabled() {
@@ -210,7 +211,7 @@ class AppBrowsePanel extends Page {
     }
 
     waitForStartButtonDisabled() {
-        return this.waitForElementDisabled(XPATH.startButton, appConst.TIMEOUT_3).catch(err => {
+        return this.waitForElementDisabled(XPATH.startButton, appConst.mediumTimeout).catch(err => {
             throw new Error("Button Start-app is not disabled " + err);
         });
     }
@@ -229,7 +230,7 @@ class AppBrowsePanel extends Page {
 
     rightClickOnRowByDisplayName(name) {
         const nameXpath = XPATH.rowByDisplayName(name);
-        return this.waitForElementDisplayed(nameXpath, appConst.TIMEOUT_3).then(() => {
+        return this.waitForElementDisplayed(nameXpath, appConst.mediumTimeout).then(() => {
             return this.doRightClick(nameXpath);
         }).catch(err => {
             throw Error(`Error when do right click on the row:` + err);
@@ -237,13 +238,13 @@ class AppBrowsePanel extends Page {
     }
 
     waitForUninstallButtonEnabled() {
-        return this.waitForElementEnabled(XPATH.unInstallButton, appConst.TIMEOUT_3).catch(err => {
+        return this.waitForElementEnabled(XPATH.unInstallButton, appConst.mediumTimeout).catch(err => {
             throw new Error('Uninstall button ' + err);
         });
     }
 
     waitForUninstallButtonDisabled() {
-        return this.waitForElementDisabled(XPATH.unInstallButton, appConst.TIMEOUT_3).catch(err => {
+        return this.waitForElementDisabled(XPATH.unInstallButton, appConst.mediumTimeout).catch(err => {
             throw new Error("Uninstall button is not disabled " + err);
         });
     }
@@ -271,7 +272,7 @@ class AppBrowsePanel extends Page {
     //clicks on 'select all' checkbox
     clickOnSelectAll() {
         let checkboxXpath = XPATH.treeGridToolbar + XPATH.selectAllCheckbox;
-        return this.waitForElementDisplayed(checkboxXpath, appConst.TIMEOUT_3).then(() => {
+        return this.waitForElementDisplayed(checkboxXpath, appConst.mediumTimeout).then(() => {
             return this.clickOnElement(checkboxXpath);
         }).then(() => {
             return this.pause(700);
@@ -346,7 +347,7 @@ class AppBrowsePanel extends Page {
                 return this.getAttribute(menuItemXpath, "class").then(result => {
                     return result.includes("disabled");
                 })
-            }, appConst.TIMEOUT_3, "context menu item is not disabled in 3000 ms");
+            }, {timeout: appConst.mediumTimeout, timeoutMsg: "context menu item is not disabled in 3000 ms"});
         })
     }
 
@@ -389,7 +390,7 @@ class AppBrowsePanel extends Page {
     //wait for the "Show Selection" circle appears in the toolbar
     async waitForSelectionTogglerVisible() {
         try {
-            await this.waitForElementDisplayed(this.selectionPanelToggler, appConst.TIMEOUT_3);
+            await this.waitForElementDisplayed(this.selectionPanelToggler, appConst.mediumTimeout);
             let attr = await this.getAttribute(this.selectionPanelToggler, 'class');
             return attr.includes('any-selected');
         } catch (err) {
@@ -399,7 +400,7 @@ class AppBrowsePanel extends Page {
 
     async waitForSelectionTogglerNotVisible() {
         try {
-            await this.waitForElementNotDisplayed(this.selectionPanelToggler, appConst.TIMEOUT_3);
+            await this.waitForElementNotDisplayed(this.selectionPanelToggler, appConst.mediumTimeout);
         } catch (err) {
             this.saveScreenshot("err_selection_toggler_should_not_visible");
             throw new Error("Selection toggler should not be visible")
@@ -411,7 +412,7 @@ class AppBrowsePanel extends Page {
         await this.getBrowser().waitUntil(async () => {
             let text = await this.getAttribute(selector, "class");
             return text.includes('partial');
-        }, appConst.TIMEOUT_2, "Selection Controller checkBox should displayed as partial");
+        }, {timeout: appConst.TIMEOUT_2, timeoutMsg: "Selection Controller checkBox should displayed as partial"});
     }
 
     async isSelectionControllerPartial() {
@@ -425,5 +426,6 @@ class AppBrowsePanel extends Page {
         let selector = this.selectionControllerCheckBox + "//input[@type='checkbox']";
         return this.isSelected(selector);
     }
-};
+}
+
 module.exports = AppBrowsePanel;

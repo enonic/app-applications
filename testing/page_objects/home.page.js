@@ -5,7 +5,7 @@ const Page = require('./page');
 const appConst = require('../libs/app_const');
 
 const xpTourDialog = {
-    container: `//div[contains(@id,'ModalDialog') and descendant::h2[contains(.,'Welcome Tour')]]`
+    container: "//div[contains(@id,'ModalDialog') and descendant::h2[contains(.,'Welcome Tour')]]",
 };
 const XPATH = {
     container: `div[class*='home-main-container']`
@@ -18,7 +18,8 @@ class HomePage extends Page {
     }
 
     waitForLoaded() {
-        return this.waitForElementDisplayed(XPATH.container, appConst.TIMEOUT_3);
+        return this.waitForElementDisplayed(XPATH.container, appConst.mediumTimeout);
     }
-};
+}
+
 module.exports = HomePage;

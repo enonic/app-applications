@@ -63,7 +63,7 @@ describe('Applications Browse panel - selection of items spec', function () {
             let appStatisticPanel = new AppStatisticPanel();
             //1. Select the app:
             await appBrowsePanel.clickOnCheckboxAndSelectRowByDisplayName(appConst.TEST_APPLICATIONS.FOURTH_APP);
-            //2. Press Arrow Up key:
+            //2. Press 'Arrow Up' key:
             await appBrowsePanel.pressArrowUpKey();
             let result = await appStatisticPanel.getApplicationName();
             assert.equal(result, appConst.TEST_APPLICATIONS.FIRST_APP, 'previous application should be selected');

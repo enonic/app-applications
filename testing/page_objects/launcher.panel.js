@@ -2,7 +2,7 @@
  * Created by on 6/26/2017.
  */
 const Page = require('./page');
-const appConst = require('../libs/app_const')
+const appConst = require('../libs/app_const');
 const XPATH = {
     container: `//div[contains(@class,'launcher-main-container')]`
 };
@@ -22,7 +22,7 @@ class LauncherPanel extends Page {
     }
 
     async clickOnApplicationsLink() {
-        await this.waitForElementDisplayed(this.applicationsLink, appConst.TIMEOUT_3);
+        await this.waitForElementDisplayed(this.applicationsLink, appConst.mediumTimeout);
         return await this.clickOnElement(this.applicationsLink);
     }
 
@@ -47,5 +47,5 @@ class LauncherPanel extends Page {
             return false;
         })
     }
-};
+}
 module.exports = LauncherPanel;
