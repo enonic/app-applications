@@ -1,4 +1,3 @@
-import {ApplicationBrowseToolbar} from './ApplicationBrowseToolbar';
 import {ApplicationBrowseActions} from './ApplicationBrowseActions';
 import {ApplicationTreeGrid} from './ApplicationTreeGrid';
 import {ApplicationBrowseItemPanel} from './ApplicationBrowseItemPanel';
@@ -19,6 +18,10 @@ import {showFeedback} from 'lib-admin-ui/notify/MessageBus';
 import {i18n} from 'lib-admin-ui/util/Messages';
 import {ServerEventsConnection} from 'lib-admin-ui/event/ServerEventsConnection';
 import {UploadItem} from 'lib-admin-ui/ui/uploader/UploadItem';
+import {Toolbar} from 'lib-admin-ui/ui/toolbar/Toolbar';
+import {TreeGridActions} from 'lib-admin-ui/ui/treegrid/actions/TreeGridActions';
+
+declare const CONFIG;
 
 export class ApplicationBrowsePanel
     extends BrowsePanel<Application> {
@@ -31,10 +34,19 @@ export class ApplicationBrowsePanel
         this.registerEvents();
     }
 
-    protected createToolbar(): ApplicationBrowseToolbar {
-        const browseActions: ApplicationBrowseActions = <ApplicationBrowseActions> this.treeGrid.getContextMenu().getActions();
+    protected createToolbar(): Toolbar {
+        const toolbar: Toolbar = new Toolbar();
+        const readonlyMode: boolean = CONFIG.readonlyMode === 'true';
 
-        return new ApplicationBrowseToolbar(browseActions);
+        if (!readonlyMode) {
+            const browseActions: ApplicationBrowseActions = <ApplicationBrowseActions> this.treeGrid.getContextMenu().getActions();
+            toolbar.addAction(browseActions.INSTALL_APPLICATION);
+            toolbar.addAction(browseActions.UNINSTALL_APPLICATION);
+            toolbar.addAction(browseActions.START_APPLICATION);
+            toolbar.addAction(browseActions.STOP_APPLICATION);
+        }
+
+        return toolbar;
     }
 
     protected createTreeGrid(): ApplicationTreeGrid {
@@ -43,6 +55,11 @@ export class ApplicationBrowsePanel
 
     protected createBrowseItemPanel(): ApplicationBrowseItemPanel {
         return new ApplicationBrowseItemPanel();
+    }
+
+    protected getBrowseActions(): TreeGridActions<Application> {
+        const readonlyMode: boolean = CONFIG.readonlyMode === 'true';
+        return readonlyMode ? null : super.getBrowseActions();
     }
 
     dataToBrowseItem(data: Application): BrowseItem<Application> | null {
@@ -93,7 +110,7 @@ export class ApplicationBrowsePanel
         const browseItems: BrowseItem<Application>[] = this.dataItemsToBrowseItems(event.getTreeNodes().map(node => node.getData()));
         this.getBrowseItemPanel().updateItems(browseItems);
         this.getBrowseItemPanel().updatePreviewPanel();
-        this.getBrowseActions().updateActionsEnabledState(this.dataItemsToBrowseItems(this.treeGrid.getFullSelection()));
+        this.updateBrowseActions(this.dataItemsToBrowseItems(this.treeGrid.getFullSelection()));
     }
 
     private handleAppEvent(event: ApplicationEvent) {
