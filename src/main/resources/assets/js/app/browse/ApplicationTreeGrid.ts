@@ -15,15 +15,17 @@ import {ListApplicationsRequest} from 'lib-admin-ui/application/ListApplications
 import {Body} from 'lib-admin-ui/dom/Body';
 import {UploadItem} from 'lib-admin-ui/ui/uploader/UploadItem';
 
+declare const CONFIG;
+
 export class ApplicationTreeGrid extends TreeGrid<Application> {
 
     constructor() {
-        const builder = new TreeGridBuilder<Application>().setColumnConfig([{
+        const builder = new TreeGridBuilder<Application>().setCheckableRows(false).setColumnConfig([{
             name: i18n('field.name'),
             id: 'displayName',
             field: 'displayName',
             formatter: ApplicationRowFormatter.nameFormatter,
-            style: {minWidth: 250}
+            style: {cssClass: 'name', minWidth: 250}
         }, {
             name: i18n('field.version'),
             id: 'version',
@@ -76,7 +78,12 @@ export class ApplicationTreeGrid extends TreeGrid<Application> {
 
         super(builder);
 
-        this.setContextMenu(new TreeGridContextMenu(ApplicationBrowseActions.init(this)));
+        const readonlyMode: boolean = CONFIG.readonlyMode === 'true';
+        if (!readonlyMode) {
+            this.setContextMenu(new TreeGridContextMenu(ApplicationBrowseActions.init(this)));
+        } else {
+            this.getToolbar().hideAndDisableSelectionToggler();
+        }
     }
 
     fetchRoot(): Q.Promise<Application[]> {

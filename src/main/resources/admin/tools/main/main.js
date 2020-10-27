@@ -9,6 +9,7 @@ function getMarketUrl() {
 
 function handleGet() {
     var view = resolve('./main.html');
+    var readonlyMode = app.config['readonlyMode'] === 'true' || false;
 
     var params = {
         adminUrl: admin.getBaseUri(),
@@ -22,7 +23,8 @@ function handleGet() {
         launcherPath: admin.getLauncherPath(),
         launcherUrl: admin.getLauncherUrl(),
         i18nUrl: portal.serviceUrl({service: 'i18n'}),
-        marketUrl: getMarketUrl()
+        marketUrl: getMarketUrl(),
+        readonlyMode: readonlyMode
     };
 
     return {

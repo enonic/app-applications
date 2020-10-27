@@ -10,11 +10,13 @@ import {ViewItem} from 'lib-admin-ui/app/view/ViewItem';
 import {Application} from 'lib-admin-ui/application/Application';
 import {DefaultErrorHandler} from 'lib-admin-ui/DefaultErrorHandler';
 
+declare const CONFIG;
+
 export class ApplicationItemStatisticsPanel
     extends ItemStatisticsPanel<Application> {
 
     private applicationDataContainer: ApplicationDataContainer;
-    private actionMenu: ActionMenu;
+    private actionMenu?: ActionMenu;
 
     constructor() {
         super('application-item-statistics-panel');
@@ -24,6 +26,12 @@ export class ApplicationItemStatisticsPanel
     }
 
     private addActionMenu() {
+        const readonlyMode: boolean = CONFIG.readonlyMode === 'true';
+
+        if (readonlyMode) {
+            return;
+        }
+
         this.actionMenu =
             new ActionMenu(i18n('application.state.stopped'), ApplicationBrowseActions.get().START_APPLICATION,
                 ApplicationBrowseActions.get().STOP_APPLICATION);
@@ -74,7 +82,9 @@ export class ApplicationItemStatisticsPanel
     }
 
     private updateActionMenu() {
-        this.actionMenu.setLabel(this.getLocalizedState(this.getItem().getModel().getState()));
+        if (!!this.actionMenu) {
+            this.actionMenu.setLabel(this.getLocalizedState(this.getItem().getModel().getState()));
+        }
     }
 
     private updateApplicationDataContainer() {
