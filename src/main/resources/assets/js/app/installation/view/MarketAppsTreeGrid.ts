@@ -112,7 +112,7 @@ export class MarketAppsTreeGrid extends TreeGrid<MarketApplication> {
                 setTimeout(() => {
                     if (!this.gridDataLoaded) {
                         this.gridDataLoaded = true;
-                        this.refresh();// this helps to show default app icon if one provided in json fails to upload
+                        this.reload();// this helps to show default app icon if one provided in json fails to upload
                     }
                 }, 500);
             }
@@ -130,10 +130,10 @@ export class MarketAppsTreeGrid extends TreeGrid<MarketApplication> {
     private subscribeOnUninstallEvent() { // set status of market app to NOT_INSTALLED if it was uninstalled
         ApplicationEvent.on((event: ApplicationEvent) => {
             if (ApplicationEventType.UNINSTALLED === event.getEventType()) {
-                let nodeToUpdate = this.getRoot().getCurrentRoot().findNode(event.getApplicationKey().toString());
+                let nodeToUpdate = this.getRoot().getNodeByDataIdFromCurrent(event.getApplicationKey().toString());
                 if (!!nodeToUpdate) {
                     (<MarketApplication>nodeToUpdate.getData()).setStatus(MarketAppStatus.NOT_INSTALLED);
-                    this.refresh();
+                    this.reload();
                 }
             }
         });

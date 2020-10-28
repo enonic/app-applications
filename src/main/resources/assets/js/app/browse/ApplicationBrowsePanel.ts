@@ -124,7 +124,7 @@ export class ApplicationBrowsePanel
             this.handleAppUninstalledEvent(event);
         } else if (ApplicationEventType.STOPPED === event.getEventType()) {
             this.handleAppStoppedEvent(event);
-        } else if (event.isNeedToUpdateApplication()) {
+        } else if (event.isNeedToUpdateApplication() && event.getApplicationKey()) {
             this.treeGrid.updateApplicationNode(event.getApplicationKey());
         }
     }
@@ -135,7 +135,7 @@ export class ApplicationBrowsePanel
                 const installedApp: Application = this.treeGrid.getByApplicationKey(event.getApplicationKey());
                 const installedAppName: string = installedApp ? installedApp.getDisplayName() : event.getApplicationKey().toString();
                 showFeedback(i18n('notify.installed', installedAppName));
-                this.treeGrid.refresh();
+                this.treeGrid.reload();
             }, 200);
         });
     }
@@ -144,7 +144,7 @@ export class ApplicationBrowsePanel
         const uninstalledApp: Application = this.treeGrid.getByApplicationKey(event.getApplicationKey());
         const uninstalledAppName: string = uninstalledApp ? uninstalledApp.getDisplayName() : event.getApplicationKey().toString();
         showFeedback(i18n('notify.uninstalled', uninstalledAppName));
-        this.treeGrid.deleteApplicationNode(event.getApplicationKey());
+        this.treeGrid.deleteNodeByDataId(event.getApplicationKey().toString());
     }
 
     private handleAppStoppedEvent(event: ApplicationEvent) {

@@ -1,9 +1,8 @@
 import * as Q from 'q';
 import {ApplicationBrowseActions} from './ApplicationBrowseActions';
 import {ApplicationRowFormatter} from './ApplicationRowFormatter';
-import {ListApplicationKeysRequest} from '../resource/ListApplicationKeysRequest';
 import {TreeNode} from 'lib-admin-ui/ui/treegrid/TreeNode';
-import {Application, ApplicationUploadMock} from 'lib-admin-ui/application/Application';
+import {Application} from 'lib-admin-ui/application/Application';
 import {ApplicationKey} from 'lib-admin-ui/application/ApplicationKey';
 import {i18n} from 'lib-admin-ui/util/Messages';
 import {TreeGrid} from 'lib-admin-ui/ui/treegrid/TreeGrid';
@@ -87,10 +86,6 @@ export class ApplicationTreeGrid extends TreeGrid<Application> {
         }
     }
 
-    getDataId(data: Application): string {
-        return data.getId();
-    }
-
     fetchRoot(): Q.Promise<Application[]> {
         return new ListApplicationsRequest().sendAndParse();
     }
@@ -111,11 +106,7 @@ export class ApplicationTreeGrid extends TreeGrid<Application> {
         return deferred.promise;
     }
 
-    fetchRootKeys(): Q.Promise<ApplicationKey[]> {
-        return new ListApplicationKeysRequest().sendAndParse();
-    }
-
-    placeNode(data: Application): Q.Promise<void> {
+    private placeNode(data: Application) {
         const parentNode: TreeNode<Application> = this.getRoot().getDefaultRoot();
 
         let index: number = parentNode.getChildren().length;
@@ -127,11 +118,13 @@ export class ApplicationTreeGrid extends TreeGrid<Application> {
             }
         }
 
-        return this.insertNode(data, true, index, parentNode);
+        return this.insertDataToParentNode(data, parentNode, index);
     }
 
     updateApplicationNode(applicationKey: ApplicationKey) {
-        this.updateNodeByDataId(applicationKey.toString());
+        this.fetchByKey(applicationKey).then((data: Application) => {
+            this.updateNodeByData(data);
+        }).catch(DefaultErrorHandler.handle);
     }
 
     getByApplicationKey(applicationKey: ApplicationKey): Application {
@@ -140,64 +133,40 @@ export class ApplicationTreeGrid extends TreeGrid<Application> {
         return !!node ? node.getData() : null;
     }
 
-    deleteApplicationNode(applicationKey: ApplicationKey) {
-        let root = this.getRoot().getCurrentRoot();
-        root.getChildren().forEach((child: TreeNode<Application>) => {
-            let curApplication: Application = child.getData();
-            if (curApplication.getApplicationKey().toString() === applicationKey.toString()) {
-                this.deleteNode(curApplication);
-            }
-        });
-    }
-
-    appendApplicationNode(applicationKey: ApplicationKey): Q.Promise<void> {
-        return this.fetchByKey(applicationKey)
-            .then((data: Application) => {
-                return this.appendNode(data, true);
-            });
-    }
-
     placeApplicationNode(applicationKey: ApplicationKey): Q.Promise<void> {
         return this.fetchByKey(applicationKey)
             .then((data: Application) => {
-                return this.placeNode(data);
+                this.placeNode(data);
+                return Q(null);
             });
-    }
-
-    refreshNodeData(parentNode: TreeNode<Application>): Q.Promise<TreeNode<Application>> {
-        return this.fetchByKey(parentNode.getData().getApplicationKey()).then((curApplication: Application) => {
-            parentNode.setData(curApplication);
-            this.refreshNode(parentNode);
-            return parentNode;
-        });
     }
 
     appendUploadNode(item: UploadItem<Application>) {
 
-        let appMock: ApplicationUploadMock = new ApplicationUploadMock(item);
-
-        this.appendNode(<any>appMock, false).done();
-
-        let deleteUploadedNodeHandler = () => {
-            let nodeToRemove = this.getRoot().getCurrentRoot().findNode(item.getId());
-            if (nodeToRemove) {
-                this.deleteNode(nodeToRemove.getData());
-                this.invalidate();
-            }
-        };
-
-        item.onProgress((progress: number) => {
-            this.invalidate();
-            if (progress === 100) {
-                deleteUploadedNodeHandler();
-            }
-        });
-
-        item.onUploadStopped(deleteUploadedNodeHandler);
-
-        item.onFailed(() => {
-            this.deleteNode(<any>appMock);
-        });
+        // let appMock: ApplicationUploadMock = new ApplicationUploadMock(item);
+        //
+        // this.appendNode(<any>appMock, false).done();
+        //
+        // let deleteUploadedNodeHandler = () => {
+        //     let nodeToRemove = this.getRoot().getCurrentRoot().findNode(item.getId());
+        //     if (nodeToRemove) {
+        //         this.deleteNode(nodeToRemove.getData());
+        //         this.invalidate();
+        //     }
+        // };
+        //
+        // item.onProgress((progress: number) => {
+        //     this.invalidate();
+        //     if (progress === 100) {
+        //         deleteUploadedNodeHandler();
+        //     }
+        // });
+        //
+        // item.onUploadStopped(deleteUploadedNodeHandler);
+        //
+        // item.onFailed(() => {
+        //     this.deleteNode(<any>appMock);
+        // });
     }
 
 }
