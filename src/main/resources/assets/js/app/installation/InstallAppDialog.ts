@@ -63,7 +63,7 @@ export class InstallAppDialog
         this.applicationInput.onTextValueChanged(() => {
             this.clearButton.setVisible(!StringHelper.isEmpty(this.applicationInput.getValue()));
             this.marketAppsTreeGrid.mask();
-            this.marketAppsTreeGrid.refresh();
+            this.marketAppsTreeGrid.reload();
         });
 
         this.applicationInput.onAppInstallStarted(() => {
@@ -106,7 +106,7 @@ export class InstallAppDialog
 
         this.clearButton.onClicked(() => {
             this.applicationInput.reset();
-            this.marketAppsTreeGrid.refresh();
+            this.marketAppsTreeGrid.reload();
             this.clearButton.hide();
             this.applicationInput.getTextInput().giveFocus();
         });

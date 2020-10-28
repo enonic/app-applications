@@ -11,8 +11,7 @@ export class InstallApplicationAction
         super(i18n('action.install'));
         this.setEnabled(false);
         this.onExecuted(() => {
-            const installedApplications: Application[] = applicationTreeGrid.getRoot().getCurrentRoot().treeToList().map(
-                (node) => node.getData());
+            const installedApplications: Application[] = applicationTreeGrid.getCurrentData();
             new InstallAppPromptEvent(installedApplications).fire();
         });
     }
