@@ -8,7 +8,7 @@
     "url": "https://github.com/enonic/app-applications"
   },
   "scripts": {
-    "build": "webpack --hide-modules --colors",
+    "build": "webpack --color",
     "lint": "tslint -p tsconfig.build.json -c tslint.json",
     "fix": "tslint -p tsconfig.build.json -c tslint.json --fix"
   },
