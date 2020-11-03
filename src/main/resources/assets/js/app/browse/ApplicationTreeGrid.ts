@@ -20,7 +20,7 @@ declare const CONFIG;
 export class ApplicationTreeGrid extends TreeGrid<Application> {
 
     constructor() {
-        const builder = new TreeGridBuilder<Application>().setCheckableRows(false).setColumnConfig([{
+        const builder = new TreeGridBuilder<Application>().setColumnConfig([{
             name: i18n('field.name'),
             id: 'displayName',
             field: 'displayName',
@@ -74,11 +74,12 @@ export class ApplicationTreeGrid extends TreeGrid<Application> {
             this.setColumns(columns.slice(0), checkSelIsMoved);
         };
 
+        const readonlyMode: boolean = CONFIG.readonlyMode === 'true';
+        builder.setCheckableRows(!readonlyMode);
         builder.setColumnUpdater(updateColumns);
 
         super(builder);
 
-        const readonlyMode: boolean = CONFIG.readonlyMode === 'true';
         if (!readonlyMode) {
             this.setContextMenu(new TreeGridContextMenu(ApplicationBrowseActions.init(this)));
         } else {
