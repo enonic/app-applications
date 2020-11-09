@@ -99,6 +99,8 @@ describe('Install Application Dialog specification', function () {
             assert.isTrue(result, `'${APP_DISPLAY_NAME}' should be with Installed status`);
         });
 
+    //Verifies issue https://github.com/enonic/app-applications/issues/241
+    //Install Dialog - application's status is not updated after installing an application in filtered grid #241
     it("GIVEN an application is installed in filtered grid WHEN Install dialog has been reopened THEN the application should be with 'Installed' status",
         async () => {
             let appBrowsePanel = new AppBrowsePanel();
