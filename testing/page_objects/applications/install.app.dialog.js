@@ -34,9 +34,9 @@ class InstallAppDialog extends Page {
     }
 
     waitForAppInstalled(appName) {
-        return this.waitForElementDisplayed(XPATH.installedStatusByName(appName), 25000).catch(err => {
+        return this.waitForElementDisplayed(XPATH.installedStatusByName(appName), appConst.installAppTimeout).catch(err => {
             this.saveScreenshot('err_installed_status');
-            return false;
+            throw new Error("Install App Dialog - Application status should be Installed: " + appName + " " + err);
         })
     }
 
@@ -92,7 +92,7 @@ class InstallAppDialog extends Page {
         const selector = lib.slickRowByDisplayName(XPATH.container, appName) + "//a[@class='installed']";
         return this.waitForElementDisplayed(selector, appConst.TIMEOUT_7).catch(err => {
             this.saveScreenshot('err_find_installed_status');
-            throw new Error(`Couldn't find installed label for the app ${appName}` + " " + err);
+            throw new Error(`Couldn't find 'Installed' label for the app ${appName}` + " " + err);
         });
     }
 
@@ -157,5 +157,6 @@ class InstallAppDialog extends Page {
         return this.isFocused(XPATH.filterInput);
     }
 }
+
 module.exports = InstallAppDialog;
 

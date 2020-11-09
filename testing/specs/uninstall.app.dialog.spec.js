@@ -62,7 +62,7 @@ describe('Uninstall Application dialog specification', function () {
             assert.equal(text, 'Application \'Chuck Norris\' uninstalled successfully', `Incorrect notification message [${text}]`);
             //4. Verify that Statistics Panel is cleared:
             let title = await appStatisticPanel.getApplicationName();
-            assert.equal(title,"","Statistics panel should be cleared");
+            assert.equal(title, "", "Statistics panel should be cleared");
         });
 
     beforeEach(() => studioUtils.navigateToApplicationsApp());

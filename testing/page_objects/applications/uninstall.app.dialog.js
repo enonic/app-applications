@@ -34,6 +34,7 @@ class UninstallAppDialog extends Page {
     }
 
     async clickOnYesButton() {
+        await this.waitForElementDisplayed(this.yesButton, appConst.mediumTimeout);
         await this.clickOnElement(this.yesButton);
         return await this.pause(300);
     }
@@ -72,4 +73,5 @@ class UninstallAppDialog extends Page {
         });
     }
 }
+
 module.exports = UninstallAppDialog;
