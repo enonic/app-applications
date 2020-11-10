@@ -5,6 +5,7 @@ const AppBrowsePanel = require('../page_objects/applications/applications.browse
 const InstallAppDialog = require('../page_objects/applications/install.app.dialog');
 const UninstallAppDialog = require('../page_objects/applications/uninstall.app.dialog');
 const studioUtils = require('../libs/studio.utils.js');
+const appConst = require('../libs/app_const');
 
 describe('Application Browse Panel, check buttons in the toolbar', function () {
     this.timeout(70000);

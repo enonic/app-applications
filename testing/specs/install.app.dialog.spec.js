@@ -5,6 +5,7 @@ const assert = chai.assert;
 const webDriverHelper = require('../libs/WebDriverHelper');
 const AppBrowsePanel = require('../page_objects/applications/applications.browse.panel');
 const InstallDialog = require('../page_objects/applications/install.app.dialog');
+const UninstallDialog = require('../page_objects/applications/uninstall.app.dialog');
 const studioUtils = require('../libs/studio.utils.js');
 const appConst = require('../libs/app_const');
 
@@ -78,7 +79,7 @@ describe('Install Application Dialog specification', function () {
         assert.isTrue(visible, `'${APP_DISPLAY_NAME}' should've been installed by now`);
         await dialog.clickOnCancelButtonTop();
         await dialog.waitForClosed();
-         //2. Check the app in grid:
+        //2. Check the app in grid:
         visible = await appBrowsePanel.isAppByDescriptionDisplayed(APP_DISPLAY_NAME);
         assert.isTrue(visible, `'${APP_DISPLAY_NAME}' application should've been present in the grid`);
         let message = await appBrowsePanel.waitForNotificationMessage();
@@ -97,6 +98,39 @@ describe('Install Application Dialog specification', function () {
             let result = await installAppDialog.isApplicationInstalled(APP_DISPLAY_NAME);
             assert.isTrue(result, `'${APP_DISPLAY_NAME}' should be with Installed status`);
         });
+
+    //Verifies issue https://github.com/enonic/app-applications/issues/241
+    //Install Dialog - application's status is not updated after installing an application in filtered grid #241
+    it("GIVEN an application is installed in filtered grid WHEN Install dialog has been reopened THEN the application should be with 'Installed' status",
+        async () => {
+            let appBrowsePanel = new AppBrowsePanel();
+            let installAppDialog = new InstallDialog();
+            let uninstallDialog = new UninstallDialog();
+            //1. Precondition - uninstall the application
+            await appBrowsePanel.clickOnCheckboxAndSelectRowByDisplayName(APP_DISPLAY_NAME);
+            await appBrowsePanel.clickOnUninstallButton();
+            await uninstallDialog.waitForOpened();
+            await uninstallDialog.clickOnYesButton();
+            await appBrowsePanel.waitForNotificationMessage();
+            //2. Select an application and click on 'Show Selections' button:
+            await appBrowsePanel.clickOnCheckboxAndSelectRowByDisplayName(appConst.TEST_APPLICATIONS.FIRST_APP);
+            await appBrowsePanel.clickOnSelectionToggler();
+            //3. Install the app in Filtered grid and close the modal dialog:
+            await appBrowsePanel.clickOnInstallButton();
+            await installAppDialog.waitForOpened();
+            await installAppDialog.waitForSpinnerNotVisible();
+            await installAppDialog.clickOnInstallAppLink(APP_DISPLAY_NAME);
+            await installAppDialog.waitForAppInstalled(APP_DISPLAY_NAME);
+            await installAppDialog.clickOnCancelButtonTop();
+            await installAppDialog.waitForClosed(1000);
+            //4. Reopen 'Install App' Dialog:
+            await appBrowsePanel.clickOnInstallButton();
+            await installAppDialog.waitForOpened();
+            await installAppDialog.waitForSpinnerNotVisible();
+            //5.Verify that status of the application is 'Installed':
+            await installAppDialog.isApplicationInstalled(APP_DISPLAY_NAME);
+        });
+
 
     beforeEach(() => studioUtils.navigateToApplicationsApp());
     afterEach(() => {
