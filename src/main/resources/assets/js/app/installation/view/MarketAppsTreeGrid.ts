@@ -28,8 +28,6 @@ export class MarketAppsTreeGrid extends TreeGrid<MarketApplication> {
 
     public static debug: boolean = false;
 
-    private gridDataLoaded: boolean;
-
     private nodesFilter: (nodes: TreeNode<MarketApplication>[]) => TreeNode<MarketApplication>[];
 
     private loadingStartedListeners: { (): void; }[];
@@ -80,7 +78,6 @@ export class MarketAppsTreeGrid extends TreeGrid<MarketApplication> {
 
         this.installedApplications = [];
         this.loadingStartedListeners = [];
-        this.gridDataLoaded = false;
 
         this.subscribeAndManageInstallClick();
         this.subscribeOnUninstallEvent();
@@ -99,26 +96,9 @@ export class MarketAppsTreeGrid extends TreeGrid<MarketApplication> {
 
     doRender(): Q.Promise<boolean> {
         return super.doRender().then((rendered) => {
-            this.initDataLoadListener();
             this.initAvailableSizeChangeListener();
             return rendered;
         });
-    }
-
-    private initDataLoadListener() {
-        let firstLoadListener = () => {
-            if (this.getGrid().getDataView().getLength() > 0) {
-                this.unLoaded(firstLoadListener);
-                setTimeout(() => {
-                    if (!this.gridDataLoaded) {
-                        this.gridDataLoaded = true;
-                        this.reload();// this helps to show default app icon if one provided in json fails to upload
-                    }
-                }, 500);
-            }
-        };
-
-        this.onLoaded(firstLoadListener);
     }
 
     private initAvailableSizeChangeListener() {
@@ -272,9 +252,10 @@ export class MarketAppsTreeGrid extends TreeGrid<MarketApplication> {
             let viewer: MarketAppViewer = <MarketAppViewer>node.getViewer('name');
             if (!viewer) {
                 viewer = new MarketAppViewer();
-                viewer.setObject(data, node.calcLevel() > 1);
                 node.setViewer('name', viewer);
             }
+
+            viewer.setObject(data, node.calcLevel() > 1);
             return viewer.toString();
         }
 
