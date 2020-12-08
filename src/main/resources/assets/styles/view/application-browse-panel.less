@@ -1,0 +1,26 @@
+.application-browse-panel {
+  .toolbar {
+    &.read-only {
+      background-color: @admin-bg-toolbar;
+
+      .readonly-help {
+        width: 100%;
+        text-align: center;
+        font-size: 14px;
+
+        .main-text {
+          font-weight: bold;
+          margin-right: 10px;
+        }
+      }
+    }
+  }
+
+  &._0-240,
+  &._240-360,
+  &._360-540 {
+    .toolbar.read-only .readonly-help {
+      font-size: 12px;
+    }
+  }
+}
