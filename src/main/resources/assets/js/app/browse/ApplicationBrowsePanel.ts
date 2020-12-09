@@ -13,13 +13,15 @@ import {ObjectHelper} from 'lib-admin-ui/ObjectHelper';
 import {DefaultErrorHandler} from 'lib-admin-ui/DefaultErrorHandler';
 import {ApplicationKey} from 'lib-admin-ui/application/ApplicationKey';
 import {DataChangedEvent, DataChangedType} from 'lib-admin-ui/ui/treegrid/DataChangedEvent';
+import {TreeGridActions} from 'lib-admin-ui/ui/treegrid/actions/TreeGridActions';
 import {ApplicationEvent, ApplicationEventType} from 'lib-admin-ui/application/ApplicationEvent';
 import {showFeedback} from 'lib-admin-ui/notify/MessageBus';
 import {i18n} from 'lib-admin-ui/util/Messages';
 import {ServerEventsConnection} from 'lib-admin-ui/event/ServerEventsConnection';
 import {UploadItem} from 'lib-admin-ui/ui/uploader/UploadItem';
 import {Toolbar} from 'lib-admin-ui/ui/toolbar/Toolbar';
-import {TreeGridActions} from 'lib-admin-ui/ui/treegrid/actions/TreeGridActions';
+import {DivEl} from 'lib-admin-ui/dom/DivEl';
+import {SpanEl} from 'lib-admin-ui/dom/SpanEl';
 
 declare const CONFIG;
 
@@ -31,6 +33,7 @@ export class ApplicationBrowsePanel
     constructor() {
         super();
 
+        this.addClass('application-browse-panel');
         this.registerEvents();
     }
 
@@ -38,7 +41,13 @@ export class ApplicationBrowsePanel
         const toolbar: Toolbar = new Toolbar();
         const readonlyMode: boolean = CONFIG.readonlyMode === 'true';
 
-        if (!readonlyMode) {
+        toolbar.toggleClass('read-only', readonlyMode);
+        if (readonlyMode) {
+            const spanEl = SpanEl.fromText(i18n('field.managed'), 'main-text');
+            const spanEl2 = SpanEl.fromText(i18n('field.managed.help'), 'secondary-text');
+            const divEl = new DivEl('readonly-help').appendChildren(spanEl, spanEl2);
+            toolbar.appendChild(divEl);
+        } else {
             const browseActions: ApplicationBrowseActions = <ApplicationBrowseActions> this.treeGrid.getContextMenu().getActions();
             toolbar.addAction(browseActions.INSTALL_APPLICATION);
             toolbar.addAction(browseActions.UNINSTALL_APPLICATION);
