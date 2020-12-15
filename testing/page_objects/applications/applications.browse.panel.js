@@ -133,15 +133,15 @@ class AppBrowsePanel extends Page {
         })
     }
 
-    clickOnSelectionControllerCheckbox() {
-        return this.waitForElementDisplayed(this.selectionControllerCheckBox, appConst.TIMEOUT_2).then(() => {
-            return this.clickOnElement(this.selectionControllerCheckBox)
-        }).then(() => {
-            return this.pause(700);
-        }).catch(() => {
+    async clickOnSelectionControllerCheckbox() {
+        try {
+            await this.waitForElementDisplayed(this.selectionControllerCheckBox, appConst.mediumTimeout);
+            await this.clickOnElement(this.selectionControllerCheckBox);
+            return await this.pause(700);
+        } catch (err) {
             this.saveScreenshot('err_click_on_selection_controller');
-            throw new Error(`Error when clicking on Selection controller`);
-        });
+            throw new Error(`Error when clicking on Selection controller ` + err);
+        }
     }
 
     //Wait for application with the description is not displayed in app-grid:
@@ -161,7 +161,7 @@ class AppBrowsePanel extends Page {
     }
 
     clickOnInstallButton() {
-        return this.waitForElementEnabled(XPATH.installButton, appConst.TIMEOUT_2).then(() => {
+        return this.waitForElementEnabled(XPATH.installButton, appConst.mediumTimeout).then(() => {
             return this.clickOnElement(XPATH.installButton);
         }).catch(err => {
             throw new Error(`Install button is not enabled! ${err}`);
@@ -169,7 +169,7 @@ class AppBrowsePanel extends Page {
     }
 
     clickOnUninstallButton() {
-        return this.waitForElementEnabled(XPATH.unInstallButton, appConst.TIMEOUT_2).then(() => {
+        return this.waitForElementEnabled(XPATH.unInstallButton, appConst.mediumTimeout).then(() => {
             return this.clickOnElement(XPATH.unInstallButton);
         }).catch(err => {
             throw new Error(`Uninstall button is not enabled  ! ${err}`);
@@ -178,18 +178,18 @@ class AppBrowsePanel extends Page {
 
     async clickOnStartButton() {
         try {
-            await this.waitForElementEnabled(XPATH.startButton, appConst.TIMEOUT_2);
+            await this.waitForElementEnabled(XPATH.startButton, appConst.mediumTimeout);
             await this.clickOnElement(XPATH.startButton);
-            await this.pause(1500);
+            return await this.pause(1500);
         } catch (err) {
             this.saveScreenshot('err_browsepanel_start');
-            throw new Error(`Start button is disabled!` + err);
+            throw new Error(`Start button is disabled! ` + err);
         }
     }
 
     async clickOnStopButton() {
         try {
-            await this.waitForElementEnabled(XPATH.stopButton, appConst.TIMEOUT_2);
+            await this.waitForElementEnabled(XPATH.stopButton, appConst.mediumTimeout);
             await this.clickOnElement(XPATH.stopButton);
             return await this.pause(1500);
         } catch (err) {
@@ -199,13 +199,13 @@ class AppBrowsePanel extends Page {
     }
 
     waitForInstallButtonEnabled() {
-        return this.waitForElementEnabled(XPATH.installButton, appConst.TIMEOUT_2).catch(err => {
+        return this.waitForElementEnabled(XPATH.installButton, appConst.mediumTimeout).catch(err => {
             throw new Error("Button Install-app is not enabled! " + err);
         });
     }
 
     waitForStartButtonEnabled() {
-        return this.waitForElementEnabled(XPATH.startButton, appConst.TIMEOUT_2).catch(err => {
+        return this.waitForElementEnabled(XPATH.startButton, appConst.mediumTimeout).catch(err => {
             throw new Error("Button Start-app is not enabled " + err);
         });
     }
@@ -217,24 +217,26 @@ class AppBrowsePanel extends Page {
     }
 
     waitForStopButtonEnabled() {
-        return this.waitForElementEnabled(XPATH.stopButton, appConst.TIMEOUT_2).catch(err => {
+        return this.waitForElementEnabled(XPATH.stopButton, appConst.mediumTimeout).catch(err => {
             throw new Error("Button Stop-app is not enabled " + err);
         });
     }
 
     waitForStopButtonDisabled() {
-        return this.waitForElementDisabled(XPATH.stopButton, appConst.TIMEOUT_2).catch(err => {
+        return this.waitForElementDisabled(XPATH.stopButton, appConst.mediumTimeout).catch(err => {
             throw new Error('Button Stop-app is not disabled! ' + err);
         });
     }
 
-    rightClickOnRowByDisplayName(name) {
-        const nameXpath = XPATH.rowByDisplayName(name);
-        return this.waitForElementDisplayed(nameXpath, appConst.mediumTimeout).then(() => {
-            return this.doRightClick(nameXpath);
-        }).catch(err => {
-            throw Error(`Error when do right click on the row:` + err);
-        })
+    async rightClickOnRowByDisplayName(name) {
+        try {
+            const nameXpath = XPATH.rowByDisplayName(name);
+            await this.waitForElementDisplayed(nameXpath, appConst.mediumTimeout);
+            return await this.doRightClick(nameXpath);
+        } catch (err) {
+            this.saveScreenshot('err_open_context_menu');
+            throw Error("Error when do right click on the row:" + err);
+        }
     }
 
     waitForUninstallButtonEnabled() {
@@ -270,27 +272,27 @@ class AppBrowsePanel extends Page {
     }
 
     //clicks on 'select all' checkbox
-    clickOnSelectAll() {
-        let checkboxXpath = XPATH.treeGridToolbar + XPATH.selectAllCheckbox;
-        return this.waitForElementDisplayed(checkboxXpath, appConst.mediumTimeout).then(() => {
-            return this.clickOnElement(checkboxXpath);
-        }).then(() => {
-            return this.pause(700);
-        }).catch(err => {
+    async clickOnSelectAll() {
+        try {
+            let checkboxXpath = XPATH.treeGridToolbar + XPATH.selectAllCheckbox;
+            await this.waitForElementDisplayed(checkboxXpath, appConst.mediumTimeout);
+            await this.clickOnElement(checkboxXpath);
+            return await this.pause(500);
+        } catch (err) {
             this.saveScreenshot('err_selecta_ll_checkbox');
             throw Error('Select all checkbox was not found')
-        })
+        }
     }
 
-    clickOnCheckboxAndSelectRowByDisplayName(displayName) {
+    async clickOnCheckboxAndSelectRowByDisplayName(displayName) {
         const displayNameXpath = XPATH.checkboxByDisplayName(displayName);
-        return this.waitForElementDisplayed(displayNameXpath, appConst.TIMEOUT_2).then(() => {
-            return this.clickOnElement(displayNameXpath);
-        }).then(() => {
-            return this.pause(500);
-        }).catch(err => {
+        try {
+            await this.waitForElementDisplayed(displayNameXpath, appConst.mediumTimeout);
+            await this.clickOnElement(displayNameXpath);
+            return await this.pause(500);
+        } catch (err) {
             throw Error(`Row with the displayName ${displayName} was not found.` + err)
-        })
+        }
     }
 
     pressArrowDownKey() {

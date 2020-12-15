@@ -11,20 +11,43 @@ const Apps = {
     secondApp: 'Second Selenium App'
 };
 
-describe('Item Statistics Panel', function () {
+describe('Tests for Applications Item Statistics Panel', function () {
     this.timeout(appConstants.SUITE_TIMEOUT);
     webDriverHelper.setupBrowser();
 
-    it('WHEN existing started application is selected THEN should display app-info for the running selected application',
+    //Verifies : https://github.com/enonic/app-applications/issues/259
+    //Toolbar and Statistics panel is not correctly updated after stopping/starting an application #259
+    it('WHEN existing stopped application is selected THEN should display app-info for the stopped selected application',
         async () => {
             let appBrowsePanel = new AppBrowsePanel();
             let appStatisticPanel = new AppStatisticPanel();
-            //1. Select existing started app:
+            //1. Stop the existing started app:
             await appBrowsePanel.clickOnRowByDisplayName(Apps.firstApp);
+            await studioUtils.stopSelectedApp(Apps.firstApp);
             //2. Verify that expected appName should be displayed in Statistics Panel:
             let actualName = await appStatisticPanel.getApplicationName();
             assert.strictEqual(actualName, Apps.firstApp, `Application should be "${Apps.firstApp}".`);
+
+            let actualHeaders = await appStatisticPanel.getApplicationDataHeaders();
+            //3. Verify that expected application's item-data should be displayed in Statistics Panel:
+            assert.strictEqual(actualHeaders[0], 'Installed');
+            assert.strictEqual(actualHeaders[1], 'Version');
+            assert.strictEqual(actualHeaders[2], 'Key');
+            assert.strictEqual(actualHeaders[3], 'System Required');
+        });
+
+    //Verifies: Toolbar and Statistics panel is not correctly updated after stopping/starting an application #259
+    it('GIVEN existing stopped application is selected WHEN the application has been started THEN should display app-info for the running selected application',
+        async () => {
+            let appBrowsePanel = new AppBrowsePanel();
+            let appStatisticPanel = new AppStatisticPanel();
+            //1. Start the existing stopped app:
+            await appBrowsePanel.clickOnRowByDisplayName(Apps.firstApp);
             await studioUtils.startSelectedApp(Apps.firstApp);
+            //2. Verify that expected appName should be displayed in Statistics Panel:
+            let actualName = await appStatisticPanel.getApplicationName();
+            assert.strictEqual(actualName, Apps.firstApp, `Application should be "${Apps.firstApp}".`);
+
             let actualHeaders = await appStatisticPanel.getApplicationDataHeaders();
             //3. Verify that expected application's item-data should be displayed in Statistics Panel:
             assert.strictEqual(actualHeaders[0], 'Installed');
@@ -75,6 +98,10 @@ describe('Item Statistics Panel', function () {
             await appBrowsePanel.clickOnRowByDisplayName(Apps.firstApp);
             //1. The application has been stopped:
             await studioUtils.stopSelectedApp(Apps.firstApp);
+            //2. Verify that Start button gets enabled
+            await appBrowsePanel.waitForStartButtonEnabled();
+            let appName = await appStatisticPanel.getApplicationName();
+            assert.strictEqual(headers.length, 0, 'Stopped application should not have site data');
             //2. Verify that site-info  gets not visible in stopped application:
             let headers = await appStatisticPanel.getSiteDataHeaders();
             studioUtils.saveScreenshot("application_stopped");
@@ -113,9 +140,10 @@ describe('Item Statistics Panel', function () {
         async () => {
             let appBrowsePanel = new AppBrowsePanel();
             let appStatisticPanel = new AppStatisticPanel();
+            //1. Select the application and press Start button:
             await appBrowsePanel.clickOnRowByDisplayName(Apps.firstApp);
             await appBrowsePanel.clickOnStartButton();
-
+            //2. Verify that Content types list is not empty:
             let contentTypes = await appStatisticPanel.getContentTypes();
             studioUtils.saveScreenshot("application_started_again");
             assert.isTrue(contentTypes.length > 0, 'Content Types list should not be empty');
