@@ -23,25 +23,21 @@ module.exports = {
         return await this.doSwitchToLoginPage();
 
     },
-    startSelectedApp(appName) {
+    async startSelectedApp(appName) {
         let appBrowsePanel = new BrowsePanel();
-        return appBrowsePanel.getApplicationState(appName).then(result => {
-            if (result === 'stopped') {
-                return appBrowsePanel.clickOnStartButton();
-            }
-        }).then(() => {
-            return appBrowsePanel.pause(500);
-        });
+        let result = await appBrowsePanel.getApplicationState(appName);
+        if (result === 'stopped') {
+            await appBrowsePanel.clickOnStartButton();
+        }
+        return await appBrowsePanel.pause(1000);
     },
-    stopSelectedApp(appName) {
+    async stopSelectedApp(appName) {
         let appBrowsePanel = new BrowsePanel();
-        return appBrowsePanel.getApplicationState(appName).then(result => {
-            if (result === 'started') {
-                return appBrowsePanel.clickOnStopButton();
-            }
-        }).then(() => {
-            return appBrowsePanel.pause(700);
-        });
+        let result = await appBrowsePanel.getApplicationState(appName);
+        if (result === 'started') {
+            await appBrowsePanel.clickOnStopButton();
+        }
+        return await appBrowsePanel.pause(500);
     },
     async navigateToApplicationsApp(userName, password) {
         try {

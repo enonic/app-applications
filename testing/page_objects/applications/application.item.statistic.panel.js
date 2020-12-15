@@ -32,8 +32,17 @@ class ApplicationItemStatisticsPanel extends Page {
     }
 
     //return the application's name
-    getApplicationName() {
-        return this.getText(xpath.title);
+    async getApplicationName() {
+        await this.waitForAppNameDisplayed();
+        return await this.getText(xpath.title);
+    }
+
+    async waitForAppNameDisplayed() {
+        try {
+            return await this.waitForElementDisplayed(xpath.title, appConst.mediumTimeout);
+        } catch (err) {
+            throw  new Error("App Item Statistic Panel - application's name is not displayed in the panel " + err);
+        }
     }
 
     //return list of names of content types
@@ -44,12 +53,12 @@ class ApplicationItemStatisticsPanel extends Page {
     }
 
     getProviderDataHeaders() {
-        return this.getText(xpath.idProviderApplicationsHeaders);
+        return this.getTextInDisplayedElements(xpath.idProviderApplicationsHeaders);
     }
 
     // Expected list of headers: Content Types, Page, Part, Layout,Relationship Types
     getSiteDataHeaders() {
-        return this.getTextInElements(xpath.siteDataHeaders);
+        return this.getTextInDisplayedElements(xpath.siteDataHeaders);
     }
 
     clickOnStopActionMenuItem() {

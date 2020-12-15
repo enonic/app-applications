@@ -5,7 +5,7 @@ const AppBrowsePanel = require('../page_objects/applications/applications.browse
 const studioUtils = require('../libs/studio.utils.js');
 const appConst = require('../libs/app_const');
 
-describe(`Applications Grid context menu`, function () {
+describe("Tests for Applications Grid context menu", function () {
     this.timeout(appConst.SUITE_TIMEOUT);
     webDriverHelper.setupBrowser();
 
