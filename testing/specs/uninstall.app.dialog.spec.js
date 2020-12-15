@@ -60,9 +60,13 @@ describe('Uninstall Application dialog specification', function () {
             studioUtils.saveScreenshot("chuck_norris_uninstalled_message");
             const text = result instanceof Array ? result[result.length - 1] : result;
             assert.equal(text, 'Application \'Chuck Norris\' uninstalled successfully', `Incorrect notification message [${text}]`);
-            //4. Verify that Statistics Panel is cleared:
-            let title = await appStatisticPanel.getApplicationName();
-            assert.equal(title, "", "Statistics panel should be cleared");
+            //4. Verify that Statistics Panel is cleared, the application name should not be displayed in the statistics panel :
+            await appStatisticPanel.waitForAppNameNotDisplayed();
+            //5. Verify that Uninsatll button is disabled
+            await appBrowsePanel.waitForUninstallButtonDisabled();
+            //6. Verify that install button is enabled
+            await appBrowsePanel.waitForInstallButtonEnabled();
+            await appBrowsePanel.waitForStartButtonDisabled();
         });
 
     beforeEach(() => studioUtils.navigateToApplicationsApp());

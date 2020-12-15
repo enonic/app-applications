@@ -59,12 +59,12 @@ describe("Tests for Applications Grid context menu", function () {
     it(`should close the context menu after clicking on the same row`,
         async () => {
             let appBrowsePanel = new AppBrowsePanel();
-            //1. Open the context mneu:
+            //1. Open the context menu:
             await appBrowsePanel.rightClickOnRowByDisplayName(appConst.TEST_APPLICATIONS.THIRD_APP);
             await appBrowsePanel.waitForContextMenuDisplayed();
             //2. Click outside the menu:
             await appBrowsePanel.clickOnRowByDisplayName(appConst.TEST_APPLICATIONS.FIRST_APP);
-            await appBrowsePanel.waitForContextMenuNotDisplayed()
+            await appBrowsePanel.waitForContextMenuNotDisplayed();
         });
 
     beforeEach(() => studioUtils.navigateToApplicationsApp());

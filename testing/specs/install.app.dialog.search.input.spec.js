@@ -20,7 +20,7 @@ describe('Install app dialog, search input spec.', function () {
             let installDialog = new InstallDialog();
             await appBrowsePanel.clickOnInstallButton();
             await installDialog.waitForOpened();
-            //Type not existing app:
+            //Type a URL of not existing app:
             await installDialog.typeSearchTextAndEnter(not_existing);
             let message = await installDialog.getErrorValidationMessage();
             studioUtils.saveScreenshot("url_not_exist");
@@ -33,7 +33,7 @@ describe('Install app dialog, search input spec.', function () {
             let installDialog = new InstallDialog();
             await appBrowsePanel.clickOnInstallButton();
             await installDialog.waitForOpened();
-            //Type path to local file:
+            //Type a path to the local file:
             await installDialog.typeSearchTextAndEnter(local_file);
             let message = await installDialog.applicationNotFoundMessage();
             studioUtils.saveScreenshot("app_not_found");
@@ -46,7 +46,7 @@ describe('Install app dialog, search input spec.', function () {
             let installDialog = new InstallDialog();
             await appBrowsePanel.clickOnInstallButton();
             await installDialog.waitForOpened();
-            //Type the correct URL to app:
+            //Type a correct URL for the app:
             await installDialog.typeSearchTextAndEnter(CONTENT_VIEWER_APP_URL);
             await installDialog.waitForClosed(45000);
 

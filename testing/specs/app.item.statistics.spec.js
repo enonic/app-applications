@@ -76,8 +76,8 @@ describe('Tests for Applications Item Statistics Panel', function () {
             let appBrowsePanel = new AppBrowsePanel();
             let appStatisticPanel = new AppStatisticPanel();
             await appBrowsePanel.clickOnRowByDisplayName(Apps.firstApp);
-            let header = await appStatisticPanel.getProviderDataHeaders();
-            assert.strictEqual(header, 'Mode');
+            let headers = await appStatisticPanel.getProviderDataHeaders();
+            assert.strictEqual(headers[0], 'Mode');
         });
 
     it(`WHEN existing started application is selected THEN content types list should not be empty and items should be sorted by name`,

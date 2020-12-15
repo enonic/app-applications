@@ -232,7 +232,8 @@ class AppBrowsePanel extends Page {
         try {
             const nameXpath = XPATH.rowByDisplayName(name);
             await this.waitForElementDisplayed(nameXpath, appConst.mediumTimeout);
-            return await this.doRightClick(nameXpath);
+            await this.doRightClick(nameXpath);
+            return await this.pause(500);
         } catch (err) {
             this.saveScreenshot('err_open_context_menu');
             throw Error("Error when do right click on the row:" + err);
