@@ -45,6 +45,15 @@ class ApplicationItemStatisticsPanel extends Page {
         }
     }
 
+    async waitForAppNameNotDisplayed() {
+        try {
+            return await this.waitForElementNotDisplayed(xpath.title, appConst.mediumTimeout);
+        } catch (err) {
+            throw  new Error("App Item Statistic Panel - application's name should not be displayed in the panel " + err);
+        }
+    }
+
+
     //return list of names of content types
     getContentTypes() {
         return this.getTextInElements(this.contentTypes).catch(err => {
