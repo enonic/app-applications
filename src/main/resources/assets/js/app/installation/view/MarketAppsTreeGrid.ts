@@ -16,6 +16,7 @@ import {MarketHelper} from 'lib-admin-ui/application/MarketHelper';
 import {InstallUrlApplicationRequest} from 'lib-admin-ui/application/InstallUrlApplicationRequest';
 import {ApplicationInstallResult} from 'lib-admin-ui/application/ApplicationInstallResult';
 import {DefaultErrorHandler} from 'lib-admin-ui/DefaultErrorHandler';
+import {Exception} from 'lib-admin-ui/Exception';
 import {AEl} from 'lib-admin-ui/dom/AEl';
 import {MarketApplicationResponse} from 'lib-admin-ui/application/MarketApplicationResponse';
 
@@ -310,7 +311,8 @@ export class MarketAppsTreeGrid extends TreeGrid<MarketApplication> {
         }).catch((reason: any) => {
             const status500Message = i18n('market.error.500');
             const defaultErrorMessage = i18n('market.error.default');
-            this.handleError(reason, reason.getStatusCode() === 500 ? status500Message : defaultErrorMessage);
+            const exception = new Exception(reason.getStatusCode() === 500 ? status500Message : defaultErrorMessage);
+            DefaultErrorHandler.handle(exception);
             return [];
         });
     }

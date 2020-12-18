@@ -2,226 +2,206 @@
 
   transition: margin-top 0.2s ease-in-out;
 
-  .modal-dialog-content-push {
-    display: none;
-  }
-
-  .modal-dialog-header {
-    padding-bottom: 0;
-  }
-
-  .modal-dialog-body {
-    padding-top: 0;
-  }
-
-  .modal-dialog-header {
-    margin-bottom: 0;
-
-    .path {
-      font-size: 16px;
-    }
-  }
-
-  .@{_COMMON_PREFIX}&.@{_CLS_PREFIX}large {
-    font-size: 13px;
-    border: 2px solid @admin-medium-gray-border;
-  }
-
-  .url-input {
-    width: 100%;
-  }
-
-  .file-input {
-    margin: 20px 0;
-
-    > input.text {
-      padding-right: 72px;
-    }
-
-    @media screen and (max-height: 360px) {
-      margin-bottom: 5px;
-    }
-
-    @media screen and (max-height: 950px) {
-      margin-right: 10px;
-    }
-
-    &.disabled {
-      opacity: 0.5;
-      pointer-events: none;
-    }
-  }
-
-  .uploader-el {
-    position: absolute;
-    top: 0;
-    right: 0;
-
-    .upload-button {
-      .input-glow()
-    }
-  }
-
   .dropzone-container {
     .dialog-dropzone-container(90px);
+
     .dropzone {
       font-size: 16px;
     }
   }
 
-  .upload-app-panel {
-    margin-top: 20px;
-    overflow: visible;
-    padding: 1px;
-  }
+  .modal-dialog-wrapper {
 
-  .panel {
-    position: static;
-  }
+    .modal-dialog-header {
+      padding-bottom: 0;
 
-  &.loading {
-    .market-apps {
-      min-height: 48px;
+      .file-input {
+        margin: 20px 0;
+
+        > input.text {
+          padding-right: 72px;
+        }
+
+        @media screen and (max-height: 360px) {
+          margin-bottom: 5px;
+        }
+
+        @media screen and (max-height: 950px) {
+          margin-right: 10px;
+        }
+
+        &.disabled {
+          opacity: 0.5;
+          pointer-events: none;
+        }
+
+        .uploader-el {
+          position: absolute;
+          top: 0;
+          right: 0;
+
+          .upload-button {
+            .input-glow()
+          }
+        }
+
+        .clear-button {
+          .icon-close();
+          position: absolute;
+          top: 10px;
+          right: 45px;
+          line-height: 20px;
+          border-radius: 20px;
+          border: none;
+          padding: 0px 4px;
+          background-color: white;
+          cursor: pointer;
+
+          &:hover, &:focus {
+            opacity: 0.7;
+            color: @admin-input-blue;
+          }
+
+          @media screen and (max-width: 540px) {
+            right: 56px;
+          }
+        }
+      }
+
+      .status-message {
+        display: block;
+        color: @admin-font-gray2;
+        text-align: center;
+        margin: 15px 0;
+        font-size: 14px;
+
+        &.failed {
+          color: @admin-red;
+        }
+      }
     }
-  }
 
-  .market-apps {
+    .modal-dialog-body {
+      padding-top: 0;
 
-    position: static !important;
-    box-shadow: none;
-    width: 100%;
-    overflow-x: hidden;
-    overflow-y: auto;
+      .dialog-content {
 
-    .market-app-tree-grid {
-      .grid {
-        padding-right: 15px;
-        .slick-cell {
-          padding-top: 15px;
-          height: 52px;
-          cursor: default;
-          * {
-            cursor: default;
-          }
+        .market-apps {
+          .market-app-tree-grid {
+            .grid {
 
-          .viewer {
-            .names-and-icon-view {
-              cursor: default;
-            }
-          }
+              .slick-cell {
+                padding-top: 15px;
+                height: 52px;
+                cursor: default;
 
-          &.app-name-and-icon {
-            margin-left: 10px;
-            .@{_COMMON_PREFIX}main-name {
-              font-size: 16px;
-              padding-bottom: 2px;
-              color: @admin-blue;
-              a {
-                cursor: pointer !important;
-                text-decoration: none;
-                &:hover, &:focus {
-                  text-decoration: underline;
+                * {
+                  cursor: default;
+                }
+
+                .viewer {
+                  .names-and-icon-view {
+                    cursor: default;
+                  }
+                }
+
+                &.app-name-and-icon {
+                  margin-left: 10px;
+
+                  .@{_COMMON_PREFIX}main-name {
+                    font-size: 16px;
+                    padding-bottom: 2px;
+                    color: @admin-blue;
+
+                    a {
+                      cursor: pointer !important;
+                      text-decoration: none;
+
+                      &:hover, &:focus {
+                        text-decoration: underline;
+                      }
+                    }
+                  }
+                }
+
+                .toggle.icon {
+                  display: none;
                 }
               }
             }
+
+            .version {
+              text-align: center;
+              color: @admin-black;
+              font-size: 12px;
+            }
+
+            .app-status {
+              text-align: center;
+
+              a {
+                text-decoration: none;
+              }
+
+              .install, .update {
+                font-size: 16px;
+                cursor: pointer !important;
+
+                span {
+                  cursor: pointer !important;
+                }
+              }
+
+              .install {
+                &:hover, &:focus {
+                  text-decoration: underline;
+                }
+
+                color: @admin-green;
+              }
+
+              .update {
+                &:hover, &:focus {
+                  text-decoration: underline;
+                }
+
+                color: @input-dark-red;
+              }
+
+              .installing .progress-bar {
+                display: block;
+              }
+
+              .installed {
+                opacity: 0.6;
+                font-size: 14px;
+                color: @admin-font-gray2;
+              }
+            }
           }
-
-          .toggle.icon {
-            display: none;
-          }
-
         }
-      }
-
-      .version {
-        text-align: center;
-        color: @admin-black;
-        font-size: 12px;
-      }
-
-      .app-status {
-        text-align: center;
-
-        a {
-          text-decoration: none;
-        }
-
-        .install, .update {
-          font-size: 16px;
-          cursor: pointer !important;
-          span {
-            cursor: pointer !important;
-          }
-        }
-        .install {
-          &:hover, &:focus {
-            text-decoration: underline;
-          }
-          color: @admin-green;
-        }
-        .update {
-          &:hover, &:focus {
-            text-decoration: underline;
-          }
-          color: @input-dark-red;
-        }
-        .installing .progress-bar {
-          display: block;
-        }
-        .installed {
-          opacity: 0.6;
-          font-size: 14px;
-          color: #777777;
-        }
-      }
-    }
-
-    .load-mask {
-      margin-left: 20px;
-    }
-
-    .slick-pane-top {
-      height: auto !important;
-    }
-
-    .slick-viewport {
-      position: relative;
-
-      .grid-canvas {
-        max-height: 40vh;
       }
     }
   }
 
-  .status-message {
-    display: block;
-    color: @admin-font-gray2;
-    text-align: center;
-    margin: 15px 0;
-    font-size: 14px;
-
-    &.failed {
-      color: @admin-red;
+  &.loading {
+    .modal-dialog-body .dialog-content {
+      min-height: 50px; // To give room for spinner inside an empty dialog
     }
   }
 
-  .clear-button {
-    .icon-close();
-    position: absolute;
-    top: 10px;
-    right: 45px;
-    line-height: 20px;
-    border-radius: 20px;
-    border: none;
-    padding: 0px 4px;
-    background-color: white;
-    cursor: pointer;
-    &:hover, &:focus {
-      opacity: 0.7;
-      color: @admin-input-blue;
-    }
-    @media screen and (max-width: 540px) {
-      right: 56px;
+  &._0-240,
+  &._240-360,
+  &._360-540,
+  &._540-720 {
+
+    .modal-dialog-wrapper {
+      .modal-dialog-header {
+        padding-bottom: 0;
+      }
+      .modal-dialog-footer {
+        padding: 10px;
+      }
     }
   }
 }
