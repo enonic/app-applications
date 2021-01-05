@@ -12,7 +12,6 @@ import {Application, ApplicationUploadMock} from 'lib-admin-ui/application/Appli
 import {ObjectHelper} from 'lib-admin-ui/ObjectHelper';
 import {DefaultErrorHandler} from 'lib-admin-ui/DefaultErrorHandler';
 import {ApplicationKey} from 'lib-admin-ui/application/ApplicationKey';
-import {DataChangedEvent, DataChangedType} from 'lib-admin-ui/ui/treegrid/DataChangedEvent';
 import {TreeGridActions} from 'lib-admin-ui/ui/treegrid/actions/TreeGridActions';
 import {ApplicationEvent, ApplicationEventType} from 'lib-admin-ui/application/ApplicationEvent';
 import {showFeedback} from 'lib-admin-ui/notify/MessageBus';
@@ -26,7 +25,7 @@ import {SpanEl} from 'lib-admin-ui/dom/SpanEl';
 declare const CONFIG;
 
 export class ApplicationBrowsePanel
-    extends BrowsePanel<Application> {
+    extends BrowsePanel {
 
     protected treeGrid: ApplicationTreeGrid;
 
@@ -71,20 +70,6 @@ export class ApplicationBrowsePanel
         return readonlyMode ? null : super.getBrowseActions();
     }
 
-    dataToBrowseItem(data: Application): BrowseItem<Application> | null {
-        const browseItem: BrowseItem<Application> =
-            <BrowseItem<Application>>new BrowseItem<Application>(data)
-                .setId(data.getId())
-                .setDisplayName(data.getDisplayName())
-                .setPath(data.getName());
-
-        if (!ObjectHelper.iFrameSafeInstanceOf(data, ApplicationUploadMock)) {
-            browseItem.setIconUrl(data.getIconUrl());
-        }
-
-        return browseItem;
-    }
-
     private sendApplicationActionRequest(action: string, applications: Application[]) {
         const applicationKeys: ApplicationKey[] = ApplicationKey.fromApplications(applications);
         new ApplicationActionRequest(applicationKeys, action)
@@ -93,12 +78,6 @@ export class ApplicationBrowsePanel
     }
 
     private registerEvents() {
-        this.treeGrid.onDataChanged((event: DataChangedEvent<Application>) => {
-            if (event.getType() === DataChangedType.UPDATED) {
-                this.handleTreeGridUpdated(event);
-            }
-        });
-
         StopApplicationEvent.on((event: StopApplicationEvent) =>
             this.sendApplicationActionRequest('stop', event.getApplications()));
         StartApplicationEvent.on((event: StartApplicationEvent) =>
@@ -113,13 +92,6 @@ export class ApplicationBrowsePanel
         ApplicationUploadStartedEvent.on((event) => {
             this.handleNewAppUpload(event);
         });
-    }
-
-    private handleTreeGridUpdated(event: DataChangedEvent<Application>) {
-        const browseItems: BrowseItem<Application>[] = this.dataItemsToBrowseItems(event.getTreeNodes().map(node => node.getData()));
-        this.getBrowseItemPanel().updateItems(browseItems);
-        this.getBrowseItemPanel().updatePreviewPanel();
-        this.updateBrowseActions(this.dataItemsToBrowseItems(this.treeGrid.getFullSelection()));
     }
 
     private handleAppEvent(event: ApplicationEvent) {

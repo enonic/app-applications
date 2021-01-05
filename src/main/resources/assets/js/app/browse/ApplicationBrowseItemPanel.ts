@@ -6,7 +6,7 @@ import {ItemStatisticsPanel} from 'lib-admin-ui/app/view/ItemStatisticsPanel';
 import {DivEl} from 'lib-admin-ui/dom/DivEl';
 
 export class ApplicationBrowseItemPanel
-    extends BrowseItemPanel<Application> {
+    extends BrowseItemPanel {
 
     constructor() {
         super();
@@ -23,7 +23,7 @@ export class ApplicationBrowseItemPanel
         this.itemStatisticsPanel.appendChild(backButton);
     }
 
-    togglePreviewForItem(item?: BrowseItem<Application>) {
+    togglePreviewForItem(item?: Application) {
         super.togglePreviewForItem(item);
 
         if (item) {
@@ -31,7 +31,7 @@ export class ApplicationBrowseItemPanel
         }
     }
 
-    createItemStatisticsPanel(): ItemStatisticsPanel<Application> {
+    createItemStatisticsPanel(): ItemStatisticsPanel {
         return new ApplicationItemStatisticsPanel();
     }
 
