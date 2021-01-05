@@ -118,8 +118,19 @@ export class ApplicationBrowsePanel
     private handleTreeGridUpdated(event: DataChangedEvent<Application>) {
         const browseItems: BrowseItem<Application>[] = this.dataItemsToBrowseItems(event.getTreeNodes().map(node => node.getData()));
         this.getBrowseItemPanel().updateItems(browseItems);
-        this.getBrowseItemPanel().updatePreviewPanel();
-        this.updateBrowseActions(this.dataItemsToBrowseItems(this.treeGrid.getFullSelection()));
+
+        const updatedPreviewId: string = this.getBrowseItemPanel().getStatisticsItem()?.getModel().getId();
+
+        if (updatedPreviewId) {
+            const previewItemToUpdate: BrowseItem<Application> =
+                browseItems.filter((item: BrowseItem<Application>) => item.getId() === updatedPreviewId)[0];
+
+            if (previewItemToUpdate) {
+                this.getBrowseItemPanel().togglePreviewForItem(previewItemToUpdate);
+            }
+        }
+
+        this.updateBrowseActions(this.dataItemsToBrowseItems(this.getSelectedOrHighlightedItems()));
     }
 
     private handleAppEvent(event: ApplicationEvent) {
@@ -170,5 +181,17 @@ export class ApplicationBrowsePanel
         event.getUploadItems().forEach((item: UploadItem<Application>) => {
             this.treeGrid.appendUploadNode(item);
         });
+    }
+
+    private getSelectedOrHighlightedItems(): Application[] {
+        if (this.treeGrid.hasSelectedItems()) {
+            return this.treeGrid.getSelectedDataList();
+        }
+
+        if (this.treeGrid.hasHighlightedNode()) {
+            return [this.treeGrid.getHighlightedItem()];
+        }
+
+        return [];
     }
 }
