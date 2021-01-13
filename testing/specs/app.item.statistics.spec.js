@@ -101,7 +101,7 @@ describe('Tests for Applications Item Statistics Panel', function () {
             //2. Verify that Start button gets enabled
             await appBrowsePanel.waitForStartButtonEnabled();
             let appName = await appStatisticPanel.getApplicationName();
-            assert.strictEqual(headers.length, 0, 'Stopped application should not have site data');
+            assert.strictEqual(appName, Apps.firstApp, 'Application name should be displayed for stopped application');
             //2. Verify that site-info  gets not visible in stopped application:
             let headers = await appStatisticPanel.getSiteDataHeaders();
             studioUtils.saveScreenshot("application_stopped");
