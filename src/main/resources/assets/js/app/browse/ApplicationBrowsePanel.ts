@@ -7,7 +7,7 @@ import {UninstallApplicationEvent} from './UninstallApplicationEvent';
 import {ApplicationUploadStartedEvent} from './ApplicationUploadStartedEvent';
 import {ApplicationActionRequest} from '../resource/ApplicationActionRequest';
 import {BrowsePanel} from 'lib-admin-ui/app/browse/BrowsePanel';
-import {Application, ApplicationUploadMock} from 'lib-admin-ui/application/Application';
+import {Application} from 'lib-admin-ui/application/Application';
 import {DefaultErrorHandler} from 'lib-admin-ui/DefaultErrorHandler';
 import {ApplicationKey} from 'lib-admin-ui/application/ApplicationKey';
 import {TreeGridActions} from 'lib-admin-ui/ui/treegrid/actions/TreeGridActions';
