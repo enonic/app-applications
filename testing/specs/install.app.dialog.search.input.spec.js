@@ -20,6 +20,8 @@ describe('Install app dialog, search input spec.', function () {
             let installDialog = new InstallDialog();
             await appBrowsePanel.clickOnInstallButton();
             await installDialog.waitForOpened();
+            await installDialog.waitForSpinnerNotVisible();
+            await installDialog.pause(1000);
             //Type a URL of not existing app:
             await installDialog.typeSearchTextAndEnter(not_existing);
             let message = await installDialog.getErrorValidationMessage();
@@ -33,11 +35,13 @@ describe('Install app dialog, search input spec.', function () {
             let installDialog = new InstallDialog();
             await appBrowsePanel.clickOnInstallButton();
             await installDialog.waitForOpened();
+            await installDialog.waitForSpinnerNotVisible();
             //Type a path to the local file:
             await installDialog.typeSearchTextAndEnter(local_file);
+            await installDialog.waitForSpinnerNotVisible();
             let message = await installDialog.applicationNotFoundMessage();
             studioUtils.saveScreenshot("app_not_found");
-            assert.isTrue(message.includes('No applications found'), '`No applications found` - message should appear');
+            assert.isTrue(message.includes('No applications found'), "'No applications found' - message should appear");
         });
 
     it(`GIVEN 'install app' dialog is opened WHEN actual URL has been typed and 'Enter' key pressed THEN application should be installed`,
@@ -45,6 +49,7 @@ describe('Install app dialog, search input spec.', function () {
             let appBrowsePanel = new AppBrowsePanel();
             let installDialog = new InstallDialog();
             await appBrowsePanel.clickOnInstallButton();
+            await installDialog.waitForSpinnerNotVisible();
             await installDialog.waitForOpened();
             //Type a correct URL for the app:
             await installDialog.typeSearchTextAndEnter(CONTENT_VIEWER_APP_URL);
