@@ -5,8 +5,6 @@ import {StopApplicationAction} from './StopApplicationAction';
 import {InstallApplicationAction} from './InstallApplicationAction';
 import {UninstallApplicationAction} from './UninstallApplicationAction';
 import {TreeGridActions} from 'lib-admin-ui/ui/treegrid/actions/TreeGridActions';
-import {BrowseItem} from 'lib-admin-ui/app/browse/BrowseItem';
-import {BrowseItemsChanges} from 'lib-admin-ui/app/browse/BrowseItemsChanges';
 import {Application} from 'lib-admin-ui/application/Application';
 import {Action} from 'lib-admin-ui/ui/Action';
 
