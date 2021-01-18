@@ -114,7 +114,7 @@ class InstallAppDialog extends Page {
 
     applicationNotFoundMessage() {
         let selector = XPATH.container + `//div[@class='status-message']`;
-        return this.waitForElementDisplayed(selector, appConst.mediumTimeout).then(() => {
+        return this.waitForElementDisplayed(selector, appConst.longTimeout).then(() => {
             return this.getTextInDisplayedElements(selector);
         }).catch(err => {
             this.saveScreenshot('err_app_not_found_message');
@@ -137,9 +137,8 @@ class InstallAppDialog extends Page {
 
     async typeSearchTextAndEnter(text) {
         await this.typeTextInInput(this.searchInput, text);
-        await this.pause(1000);
-        await this.keys('Enter');
-        return await this.pause(1200);
+        await this.pause(700);
+        return await this.keys('Enter');
     }
 
     isApplicationPresent(appName) {
