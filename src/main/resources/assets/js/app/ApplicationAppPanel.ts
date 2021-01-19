@@ -5,7 +5,7 @@ import {ShowBrowsePanelEvent} from 'lib-admin-ui/app/ShowBrowsePanelEvent';
 import {Application} from 'lib-admin-ui/application/Application';
 
 export class ApplicationAppPanel
-    extends AppPanel<Application> {
+    extends AppPanel {
 
     constructor(path?: Path) {
 

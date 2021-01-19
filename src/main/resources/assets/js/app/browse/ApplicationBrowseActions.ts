@@ -5,8 +5,6 @@ import {StopApplicationAction} from './StopApplicationAction';
 import {InstallApplicationAction} from './InstallApplicationAction';
 import {UninstallApplicationAction} from './UninstallApplicationAction';
 import {TreeGridActions} from 'lib-admin-ui/ui/treegrid/actions/TreeGridActions';
-import {BrowseItem} from 'lib-admin-ui/app/browse/BrowseItem';
-import {BrowseItemsChanges} from 'lib-admin-ui/app/browse/BrowseItemsChanges';
 import {Application} from 'lib-admin-ui/application/Application';
 import {Action} from 'lib-admin-ui/ui/Action';
 
@@ -46,7 +44,7 @@ export class ApplicationBrowseActions implements TreeGridActions<Application> {
         return this.allActions;
     }
 
-    updateActionsEnabledState(browseItems: BrowseItem<Application>[], changes?: BrowseItemsChanges<Application>): Q.Promise<void> {
+    updateActionsEnabledState(browseItems: Application[]): Q.Promise<void> {
         return Q(true).then(() => {
             const applicationsSelected = browseItems.length;
             const anySelected = applicationsSelected > 0;
@@ -55,14 +53,14 @@ export class ApplicationBrowseActions implements TreeGridActions<Application> {
             let anyStopped = false;
             let localAppSelected = false;
 
-            browseItems.forEach((browseItem: BrowseItem<Application>) => {
-                let state = browseItem.getModel().getState();
+            browseItems.forEach((browseItem: Application) => {
+                let state = browseItem.getState();
                 if (state === Application.STATE_STARTED) {
                     anyStarted = true;
                 } else if (state === Application.STATE_STOPPED) {
                     anyStopped = true;
                 }
-                if ((<Application>browseItem.getModel()).isLocal()) {
+                if (browseItem.isLocal()) {
                     localAppSelected = true;
                 }
             });
