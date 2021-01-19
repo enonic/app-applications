@@ -1,5 +1,4 @@
 import {ApplicationItemStatisticsPanel} from '../view/ApplicationItemStatisticsPanel';
-import {BrowseItem} from 'lib-admin-ui/app/browse/BrowseItem';
 import {BrowseItemPanel} from 'lib-admin-ui/app/browse/BrowseItemPanel';
 import {Application} from 'lib-admin-ui/application/Application';
 import {ItemStatisticsPanel} from 'lib-admin-ui/app/view/ItemStatisticsPanel';
