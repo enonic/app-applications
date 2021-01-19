@@ -18,27 +18,35 @@ describe('Install app dialog, search input spec.', function () {
         async () => {
             let appBrowsePanel = new AppBrowsePanel();
             let installDialog = new InstallDialog();
+            //1. Open Install Dialog
             await appBrowsePanel.clickOnInstallButton();
             await installDialog.waitForOpened();
+            //2. Wait for the spinner disappears:
             await installDialog.waitForSpinnerNotVisible();
             await installDialog.pause(1000);
-            //Type a URL of not existing app:
+            //3. Type a URL of not existing app:
             await installDialog.typeSearchTextAndEnter(not_existing);
+            //4. Verify that validation message appears:
             let message = await installDialog.getErrorValidationMessage();
             studioUtils.saveScreenshot("url_not_exist");
             assert.isTrue(message.includes('Failed to process application from'), 'expected notification message should appear');
         });
 
-    it(`GIVEN 'install app' dialog is opened WHEN path to local file has been typed THEN correct search-status message should appear`,
+    it(`GIVEN 'install app' dialog is opened WHEN path to local file has been typed THEN expected warning message should appear`,
         async () => {
             let appBrowsePanel = new AppBrowsePanel();
             let installDialog = new InstallDialog();
+            //1. Open Install Dialog
             await appBrowsePanel.clickOnInstallButton();
             await installDialog.waitForOpened();
+            //2. Wait for the spinner disappears:
             await installDialog.waitForSpinnerNotVisible();
-            //Type a path to the local file:
+            await installDialog.pause(500);
+            //3.Type a path to the local file:
             await installDialog.typeSearchTextAndEnter(local_file);
             await installDialog.waitForSpinnerNotVisible();
+            //4. Verify the expected warning:
+            await installDialog.waitForApplicationNotFoundMessage();
             let message = await installDialog.applicationNotFoundMessage();
             studioUtils.saveScreenshot("app_not_found");
             assert.isTrue(message.includes('No applications found'), "'No applications found' - message should appear");
