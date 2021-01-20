@@ -122,6 +122,14 @@ class InstallAppDialog extends Page {
         })
     }
 
+    waitForApplicationNotFoundMessage() {
+        let selector = XPATH.container + `//div[contains(@class,'status-message') and contains(.,'No applications found')]`;
+        return this.waitForElementDisplayed(selector, appConst.mediumTimeout).catch(err => {
+            this.saveScreenshot('err_app_not_found_mess');
+            throw new Error('expected notification message was not displayed! ' + err);
+        })
+    }
+
     getPlaceholderMessage() {
         return this.getAttribute(this.searchInput, 'placeholder');
     }
