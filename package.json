@@ -19,7 +19,7 @@
   "devDependencies": {
     "@types/core-js": "^2.5.4",
     "@types/q": "^1.5.4",
-    "autoprefixer": "^10.2.1",
+    "autoprefixer": "^10.2.4",
     "browserslist": "^4.16.3",
     "browserslist-config-enonic": "^1.0.5",
     "circular-dependency-plugin": "^5.2.2",
