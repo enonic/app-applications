@@ -62,7 +62,7 @@ class InstallAppDialog extends Page {
     }
 
     waitForGridLoaded() {
-        return this.waitForElementDisplayed(this.grid + lib.H6_DISPLAY_NAME, appConst.TIMEOUT_7).catch(err => {
+        return this.waitForElementDisplayed(this.grid + lib.H6_DISPLAY_NAME, appConst.longTimeout).catch(err => {
             this.saveScreenshot('err_install_dialog_grid');
             throw new Error('Install App dialog, grid was not loaded! ' + err);
         });
@@ -90,7 +90,7 @@ class InstallAppDialog extends Page {
     //checks that 'installed' status appeared
     isApplicationInstalled(appName) {
         const selector = lib.slickRowByDisplayName(XPATH.container, appName) + "//a[@class='installed']";
-        return this.waitForElementDisplayed(selector, appConst.TIMEOUT_7).catch(err => {
+        return this.waitForElementDisplayed(selector, appConst.longTimeout).catch(err => {
             this.saveScreenshot('err_find_installed_status');
             throw new Error(`Couldn't find 'Installed' label for the app ${appName}` + " " + err);
         });
@@ -104,7 +104,7 @@ class InstallAppDialog extends Page {
 
     getErrorValidationMessage() {
         let selector = XPATH.container + `//div[contains(@class,'status-message') and contains(@class,'failed')]`;
-        return this.waitForElementDisplayed(selector, appConst.TIMEOUT_7).then(() => {
+        return this.waitForElementDisplayed(selector, appConst.longTimeout).then(() => {
             return this.getText(selector);
         }).catch(err => {
             this.saveScreenshot('err_wait_for_validation_message');
@@ -156,7 +156,7 @@ class InstallAppDialog extends Page {
 
     async clickOnInstallLink(appName) {
         let selector = XPATH.appByDisplayName(appName);
-        await this.waitForElementDisplayed(selector, appConst.TIMEOUT_2);
+        await this.waitForElementDisplayed(selector, appConst.shortTimeout);
         return await this.clickOnElement(selector);
     }
 

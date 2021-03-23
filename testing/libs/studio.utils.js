@@ -42,7 +42,7 @@ module.exports = {
     async navigateToApplicationsApp(userName, password) {
         try {
             let launcherPanel = new LauncherPanel();
-            let result = await launcherPanel.waitForPanelDisplayed(appConst.TIMEOUT_2);
+            let result = await launcherPanel.waitForPanelDisplayed(appConst.shortTimeout);
             if (result) {
                 console.log("Launcher Panel is opened, click on the `Applications` link...");
                 await launcherPanel.clickOnApplicationsLink();
@@ -57,19 +57,15 @@ module.exports = {
             throw new Error('error when navigate to Applications app ' + err);
         }
     },
-
-    doSwitchToApplicationsBrowsePanel: function () {
+    async doSwitchToApplicationsBrowsePanel() {
         let browsePanel = new BrowsePanel();
         console.log('testUtils:switching to Applications app...');
-        return webDriverHelper.browser.switchWindow("Applications - Enonic XP Admin").then(() => {
-            console.log("switched to Applications app...");
-            return browsePanel.waitForSpinnerNotVisible();
-        }).then(() => {
-            return browsePanel.waitForGridLoaded(appConst.mediumTimeout);
-        })
+        await webDriverHelper.browser.switchWindow(appConst.APPLICATION_TITLE);
+        console.log("switched to Applications app...");
+        await browsePanel.waitForSpinnerNotVisible();
+        return await browsePanel.waitForGridLoaded(appConst.mediumTimeout);
     },
-
-    doSwitchToHome: function () {
+    doSwitchToHome() {
         console.log('testUtils:switching to Home page...');
         return webDriverHelper.browser.switchWindow("Enonic XP Home").then(() => {
             console.log("switched to Home Page...");
@@ -78,7 +74,7 @@ module.exports = {
             return homePage.waitForLoaded(appConst.mediumTimeout);
         });
     },
-    doSwitchToLoginPage: function () {
+    doSwitchToLoginPage() {
         console.log('testUtils:switching to Home page...');
         return webDriverHelper.browser.switchWindow("Enonic XP - Login").then(() => {
             console.log("switched to Login Page...");
@@ -95,17 +91,15 @@ module.exports = {
         });
     },
 
-    doLoginAndClickOnApplicationsLink: function (userName, password) {
+    async doLoginAndClickOnApplicationsLink(userName, password) {
         let loginPage = new LoginPage();
-        return loginPage.doLogin(userName, password).then(() => {
-            let launcherPanel = new LauncherPanel();
-            return launcherPanel.clickOnApplicationsLink();
-        }).then(() => {
-            return loginPage.pause(1500);
-        })
+        await loginPage.doLogin(userName, password);
+        let launcherPanel = new LauncherPanel();
+        await launcherPanel.clickOnApplicationsLink();
+        return await loginPage.pause(1500);
     },
 
-    saveScreenshot: function (name) {
+    saveScreenshot(name) {
         let path = require('path');
         let screenshotsDir = path.join(__dirname, '/../build/screenshots/');
         return webDriverHelper.browser.saveScreenshot(screenshotsDir + name + '.png').then(() => {

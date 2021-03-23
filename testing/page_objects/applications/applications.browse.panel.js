@@ -68,28 +68,29 @@ class AppBrowsePanel extends Page {
     async clickOnRowByDescription(name) {
         try {
             const nameXpath = XPATH.rowByName(name);
-            await this.waitForElementDisplayed(nameXpath, appConst.TIMEOUT_2);
+            await this.waitForElementDisplayed(nameXpath, appConst.shortTimeout);
             await this.clickOnElement(nameXpath);
+            return await this.pause(500);
         } catch (err) {
             this.saveScreenshot("err_find_item");
             throw Error(`Row with the name ${name} was not found.`)
         }
     }
 
-    clickOnRowByDisplayName(displayName) {
-        let nameXpath = XPATH.rowByDisplayName(displayName);
-        return this.waitForElementDisplayed(nameXpath, 3000).then(() => {
-            return this.clickOnElement(nameXpath);
-        }).then(() => {
-            return this.pause(500);
-        }).catch(err => {
+    async clickOnRowByDisplayName(displayName) {
+        try {
+            let nameXpath = XPATH.rowByDisplayName(displayName);
+            await this.waitForElementDisplayed(nameXpath, 3000);
+            await this.clickOnElement(nameXpath);
+            return await this.pause(500);
+        } catch (err) {
             this.saveScreenshot('err_click_on_app');
             throw Error('Error when clicking on the row with the name ' + displayName + '  ' + err);
-        })
+        }
     }
 
     getNumberInSelectionToggler() {
-        return this.waitForElementDisplayed(this.numberInToggler, appConst.TIMEOUT_2).then(() => {
+        return this.waitForElementDisplayed(this.numberInToggler, appConst.shortTimeout).then(() => {
             return this.getText(this.numberInToggler);
         }).catch(err => {
             this.saveScreenshot('err_number_selection_toggler');
@@ -105,7 +106,7 @@ class AppBrowsePanel extends Page {
     }
 
     isAppByDescriptionDisplayed(descritption) {
-        return this.waitForElementDisplayed(XPATH.rowByName(descritption), appConst.TIMEOUT_2).catch(() => {
+        return this.waitForElementDisplayed(XPATH.rowByName(descritption), appConst.shortTimeout).catch(() => {
             console.log("item is not displayed:" + descritption);
             return false;
         });
@@ -146,7 +147,7 @@ class AppBrowsePanel extends Page {
 
     //Wait for application with the description is not displayed in app-grid:
     waitForAppNotDisplayed(description) {
-        return this.waitForElementNotDisplayed(XPATH.rowByName(description), appConst.TIMEOUT_2).catch(err => {
+        return this.waitForElementNotDisplayed(XPATH.rowByName(description), appConst.shortTimeout).catch(err => {
             console.log("item is still displayed:" + description + " " + err);
             return false;
         });
@@ -154,7 +155,7 @@ class AppBrowsePanel extends Page {
 
     //Wait for application with the displayName is not displayed in app-grid:
     waitForAppByDisplayNameNotDisplayed(displayName) {
-        return this.waitForElementNotDisplayed(XPATH.rowByDisplayName(displayName), appConst.TIMEOUT_2).catch(err => {
+        return this.waitForElementNotDisplayed(XPATH.rowByDisplayName(displayName), appConst.shortTimeout).catch(err => {
             console.log("Application is still displayed:" + itemName + " " + err);
             return false;
         });
@@ -321,14 +322,14 @@ class AppBrowsePanel extends Page {
     }
 
     waitForContextMenuNotDisplayed() {
-        return this.waitForElementNotDisplayed(XPATH.contextMenu, appConst.TIMEOUT_2).catch(err => {
+        return this.waitForElementNotDisplayed(XPATH.contextMenu, appConst.shortTimeout).catch(err => {
             this.saveScreenshot('err_close_context_menu');
             throw new Error("Browse context menu is not closed!");
         });
     }
 
     waitForContextMenuDisplayed() {
-        return this.waitForElementDisplayed(XPATH.contextMenu, appConst.TIMEOUT_2).catch(err => {
+        return this.waitForElementDisplayed(XPATH.contextMenu, appConst.shortTimeout).catch(err => {
             this.saveScreenshot('err_open_context_menu');
             throw Error('Context menu is not visible' + err);
         });
@@ -357,7 +358,7 @@ class AppBrowsePanel extends Page {
 
     waitForContextMenuItemEnabled(menuItem) {
         let nameXpath = XPATH.enabledContextMenuButton(menuItem);
-        return this.waitForElementDisplayed(nameXpath, appConst.TIMEOUT_2).catch(err => {
+        return this.waitForElementDisplayed(nameXpath, appConst.shortTimeout).catch(err => {
             throw new Error("Menu item is not enabled! " + menuItem)
         });
     }
@@ -377,17 +378,14 @@ class AppBrowsePanel extends Page {
         });
     }
 
-    doOpenLauncherPanel() {
-        return this.waitForElementDisplayed(XPATH.launcherButton, appConst.TIMEOUT_2).then(() => {
-            return this.clickOnElement(XPATH.launcherButton);
-        }).then(() => {
-            let launcherPanel = new LauncherPanel();
-            return launcherPanel.waitForPanelDisplayed(appConst.TIMEOUT_2);
-        }).then(result => {
-            if (!result) {
-                throw new Error("Launcher Panel was not loaded");
-            }
-        })
+    async doOpenLauncherPanel() {
+        await this.waitForElementDisplayed(XPATH.launcherButton, appConst.shortTimeout);
+        await this.clickOnElement(XPATH.launcherButton);
+        let launcherPanel = new LauncherPanel();
+        let isLoaded = await launcherPanel.waitForPanelDisplayed(appConst.shortTimeout);
+        if (!isLoaded) {
+            throw new Error("Launcher Panel was not loaded");
+        }
     }
 
     //wait for the "Show Selection" circle appears in the toolbar
@@ -415,7 +413,7 @@ class AppBrowsePanel extends Page {
         await this.getBrowser().waitUntil(async () => {
             let text = await this.getAttribute(selector, "class");
             return text.includes('partial');
-        }, {timeout: appConst.TIMEOUT_2, timeoutMsg: "Selection Controller checkBox should displayed as partial"});
+        }, {timeout: appConst.shortTimeout, timeoutMsg: "Selection Controller checkBox should displayed as partial"});
     }
 
     async isSelectionControllerPartial() {
