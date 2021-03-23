@@ -50,6 +50,10 @@ class ApplicationItemStatisticsPanel extends Page {
         }
     }
 
+    waitForSiteItemDataGroupDisplayed() {
+        return this.waitForElementDisplayed(xpath.dataContainer + xpath.siteItemDataGroup, appConst.mediumTimeout);
+    }
+
     async waitForAppNameNotDisplayed() {
         try {
             return await this.waitForElementNotDisplayed(xpath.title, appConst.mediumTimeout);

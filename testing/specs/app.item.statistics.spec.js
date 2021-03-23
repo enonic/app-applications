@@ -84,8 +84,11 @@ describe('Tests for Applications Item Statistics Panel', function () {
         async () => {
             let appBrowsePanel = new AppBrowsePanel();
             let appStatisticPanel = new AppStatisticPanel();
+            //1. Select the application:
             await appBrowsePanel.clickOnRowByDisplayName(Apps.firstApp);
             studioUtils.saveScreenshot("application_content_types_parts");
+            //2. Verify that Site data group is displayed:
+            await appStatisticPanel.waitForSiteItemDataGroupDisplayed();
             let contentTypes = await appStatisticPanel.getContentTypes();
             assert.equal(contentTypes.length, 3, 'Content Types list should not be empty');
             assert.strictEqual(contentTypes[0], 'article',
