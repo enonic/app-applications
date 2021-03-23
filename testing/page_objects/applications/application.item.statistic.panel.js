@@ -6,9 +6,10 @@ const xpath = {
     title: "//div[contains(@id,'ItemStatisticsHeader')]/h1[contains(@class,'title')]",
     dropDownButton: "//div[contains(@id,'ActionMenu')]//div[contains(@class,'drop-down-button')]",
     dataContainer: "//div[contains(@class,'application-data-container')]",
-    siteItemDataGroup: "//div[contains(@id,'ItemDataGroup') and child::h2[text()='Site']]",
+    siteItemDataGroup: "//div[contains(@id,'ItemDataGroup') and child::h2[contains(.,'Site')]]",
     applicationItemDataGroup: "//div[contains(@id,'ItemDataGroup') and child::h2[text()='Application']]",
     contentTypes: "//ul[@class='data-list' and descendant::li[text()='Content Types']]//span",
+    parts: "//ul[@class='data-list' and descendant::li[text()='Part']]//span",
     applicationDataHeaders: "//li[@class='list-header']",
     idProviderApplicationsHeaders: `//div[contains(@id,'ItemDataGroup') and descendant::h2[text()='ID Provider Applications']]//li[@class='list-header']`,
     stopActionMenuItem: `//div[contains(@id,'ActionMenu')]//li[contains(@id,'ActionMenuItem') and text()='Stop']`,
@@ -21,6 +22,10 @@ class ApplicationItemStatisticsPanel extends Page {
     //Site data-group, content types list
     get contentTypes() {
         return xpath.main + xpath.dataContainer + xpath.siteItemDataGroup + xpath.contentTypes;
+    }
+
+    get parts() {
+        return xpath.main + xpath.dataContainer + xpath.siteItemDataGroup + xpath.parts;
     }
 
     //Application data-group(Installed,Version,Key,System Required)
@@ -45,6 +50,10 @@ class ApplicationItemStatisticsPanel extends Page {
         }
     }
 
+    waitForSiteItemDataGroupDisplayed() {
+        return this.waitForElementDisplayed(xpath.dataContainer + xpath.siteItemDataGroup, appConst.mediumTimeout);
+    }
+
     async waitForAppNameNotDisplayed() {
         try {
             return await this.waitForElementNotDisplayed(xpath.title, appConst.mediumTimeout);
@@ -55,10 +64,28 @@ class ApplicationItemStatisticsPanel extends Page {
 
 
     //return list of names of content types
-    getContentTypes() {
-        return this.getTextInElements(this.contentTypes).catch(err => {
-            throw new Error('error while getting Content Types: ' + err);
-        })
+    async getContentTypes() {
+        try {
+            //Wait for list of content types is displayed
+            await this.waitForElementDisplayed(this.contentTypes, appConst.shortTimeout);
+            return await this.getTextInElements(this.contentTypes);
+        } catch (err) {
+            //otherwise returns empty list:
+            this.saveScreenshot(appConst.generateRandomName("content_types_list_empty"));
+            return await this.getTextInElements(this.contentTypes);
+        }
+    }
+
+    async getParts() {
+        try {
+            //Wait for list of content types is displayed
+            await this.waitForElementDisplayed(this.parts, appConst.shortTimeout);
+            return await this.getTextInElements(this.parts);
+        } catch (err) {
+            //otherwise returns empty list:
+            this.saveScreenshot(appConst.generateRandomName("parts_list_empty"));
+            return await this.getTextInElements(this.parts);
+        }
     }
 
     getProviderDataHeaders() {
@@ -106,14 +133,14 @@ class ApplicationItemStatisticsPanel extends Page {
     }
 
     waitForStopMenuItemVisible() {
-        return this.waitForElementDisplayed(xpath.stopActionMenuItem, appConst.TIMEOUT_2).catch(err => {
+        return this.waitForElementDisplayed(xpath.stopActionMenuItem, appConst.shortTimeout).catch(err => {
             this.saveScreenshot("stop_menu_item_not_visible");
             return false;
         })
     }
 
     waitForStartMenuItemVisible() {
-        return this.waitForElementDisplayed(xpath.startActionMenuItem, appConst.TIMEOUT_2).catch(err => {
+        return this.waitForElementDisplayed(xpath.startActionMenuItem, appConst.shortTimeout).catch(err => {
             this.saveScreenshot("stop_menu_item_not_visible");
             return false;
         })

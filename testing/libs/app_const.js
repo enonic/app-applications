@@ -1,9 +1,8 @@
 module.exports = Object.freeze({
     //waitForTimeout
     mediumTimeout: 3000,
-    longTimeout: 6000,
-    TIMEOUT_2: 2000,
-    TIMEOUT_7: 7000,
+    longTimeout: 7000,
+    shortTimeout: 2000,
     TIMEOUT_10: 10000,
     TIMEOUT_1: 1000,
     SUITE_TIMEOUT: 280000,
@@ -22,5 +21,8 @@ module.exports = Object.freeze({
     },
     contentTypes: {
         SHORTCUT: 'base:shortcut',
+    },
+    generateRandomName: function (part) {
+        return part + Math.round(Math.random() * 1000000);
     },
 });

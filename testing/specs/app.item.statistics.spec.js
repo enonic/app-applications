@@ -84,11 +84,18 @@ describe('Tests for Applications Item Statistics Panel', function () {
         async () => {
             let appBrowsePanel = new AppBrowsePanel();
             let appStatisticPanel = new AppStatisticPanel();
+            //1. Select the application:
             await appBrowsePanel.clickOnRowByDisplayName(Apps.firstApp);
+            studioUtils.saveScreenshot("application_content_types_parts");
+            //2. Verify that Site data group is displayed:
+            await appStatisticPanel.waitForSiteItemDataGroupDisplayed();
             let contentTypes = await appStatisticPanel.getContentTypes();
             assert.equal(contentTypes.length, 3, 'Content Types list should not be empty');
             assert.strictEqual(contentTypes[0], 'article',
                 'article type should be first in the list, because the list is sorted by a name');
+
+            let parts = await appStatisticPanel.getParts();
+            assert.equal(parts.length, 4, 'Part list should not be empty');
         });
 
     it(`WHEN existing stopped application is selected THEN site-info gets not visible in stopped application`,
@@ -124,6 +131,9 @@ describe('Tests for Applications Item Statistics Panel', function () {
             await appBrowsePanel.clickOnRowByDisplayName(Apps.firstApp);
             let contentTypes = await appStatisticPanel.getContentTypes();
             assert.equal(contentTypes.length, 0, 'Content Types list should be empty');
+
+            let parts = await appStatisticPanel.getParts();
+            assert.equal(contentTypes.length, 0, 'Part list should be empty');
         });
 
     it(`WHEN two applications have been selected THEN should display info of the last selected application`,

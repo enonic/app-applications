@@ -17,6 +17,10 @@ class LauncherPanel extends Page {
         return XPATH.container + `//a[contains(@data-id,'app.applications')]`;
     }
 
+    get usersLink() {
+        return XPATH.container + `//a[contains(@data-id,'app.users')]`;
+    }
+
     get logoutLink() {
         return XPATH.container + `//div[@class='user-logout']`;
     }
@@ -37,15 +41,16 @@ class LauncherPanel extends Page {
     }
 
     isApplicationsLinkDisplayed() {
-        return this.waitForElementDisplayed(this.applicationsLink, appConst.TIMEOUT_2).catch(err => {
+        return this.waitForElementDisplayed(this.applicationsLink, appConst.shortTimeout).catch(err => {
             return false;
         })
     }
 
     isUsersLinkDisplayed() {
-        return this.waitForElementDisplayed(this.usersLink, appConst.TIMEOUT_2).catch(err => {
+        return this.waitForElementDisplayed(this.usersLink, appConst.shortTimeout).catch(err => {
             return false;
         })
     }
 }
+
 module.exports = LauncherPanel;
