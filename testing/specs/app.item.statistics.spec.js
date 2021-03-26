@@ -95,7 +95,7 @@ describe('Tests for Applications Item Statistics Panel', function () {
                 'article type should be first in the list, because the list is sorted by a name');
 
             let parts = await appStatisticPanel.getParts();
-            assert.equal(parts.length, 4, 'Part list should not be empty');
+            assert.equal(parts.length, 3, 'Part list should not be empty');
         });
 
     it(`WHEN existing stopped application is selected THEN site-info gets not visible in stopped application`,
