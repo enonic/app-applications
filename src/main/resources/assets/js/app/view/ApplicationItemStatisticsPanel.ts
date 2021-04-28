@@ -9,6 +9,9 @@ import {DivEl} from 'lib-admin-ui/dom/DivEl';
 import {Application} from 'lib-admin-ui/application/Application';
 import {DefaultErrorHandler} from 'lib-admin-ui/DefaultErrorHandler';
 import {ApplicationItemStatisticsHeader} from './ApplicationItemStatisticsHeader';
+import {Action} from 'lib-admin-ui/ui/Action';
+import {StartApplicationEvent} from '../browse/StartApplicationEvent';
+import {StopApplicationEvent} from '../browse/StopApplicationEvent';
 
 declare const CONFIG;
 
@@ -18,6 +21,10 @@ export class ApplicationItemStatisticsPanel
     private readonly applicationDataContainer: ApplicationDataContainer;
 
     private actionMenu?: ActionMenu;
+
+    private startAction: Action;
+
+    private stopAction: Action;
 
     private readonly header: ApplicationItemStatisticsHeader;
 
@@ -36,9 +43,9 @@ export class ApplicationItemStatisticsPanel
             return;
         }
 
-        this.actionMenu =
-            new ActionMenu(i18n('application.state.stopped'), ApplicationBrowseActions.get().START_APPLICATION,
-                ApplicationBrowseActions.get().STOP_APPLICATION);
+        this.startAction = new Action(i18n('action.start')).onExecuted(() => new StartApplicationEvent([this.getItem()]).fire());
+        this.stopAction = new Action(i18n('action.stop')).onExecuted(() => new StopApplicationEvent([this.getItem()]).fire());
+        this.actionMenu = new ActionMenu(i18n('application.state.stopped'), this.startAction, this.stopAction);
     }
 
     setItem(item: Application) {
@@ -53,7 +60,7 @@ export class ApplicationItemStatisticsPanel
     }
 
     private skipItemUpdate(item: Application): boolean {
-        const currentItem: Application = <Application>this.getItem();
+        const currentItem: Application = this.getItem();
 
         if (!currentItem) {
             return false;
@@ -64,12 +71,15 @@ export class ApplicationItemStatisticsPanel
 
     private updateActionMenu() {
         if (!!this.actionMenu) {
-            this.actionMenu.setLabel(this.getLocalizedState((<Application>this.getItem()).getState()));
+            const app: Application = this.getItem();
+            this.actionMenu.setLabel(this.getLocalizedState(app.getState()));
+            this.startAction.setEnabled(!app.isStarted());
+            this.stopAction.setEnabled(app.isStarted());
         }
     }
 
     private updateApplicationDataContainer() {
-        const application: Application = <Application>this.getItem();
+        const application: Application = this.getItem();
         new GetApplicationInfoRequest(application.getApplicationKey()).sendAndParse().then(
             (appInfo: ApplicationInfo) => this.applicationDataContainer.update(application, appInfo)).catch(DefaultErrorHandler.handle);
     }
@@ -83,6 +93,10 @@ export class ApplicationItemStatisticsPanel
         default:
             return '';
         }
+    }
+
+    getItem(): Application {
+        return <Application>super.getItem();
     }
 
     doRender(): Q.Promise<boolean> {
