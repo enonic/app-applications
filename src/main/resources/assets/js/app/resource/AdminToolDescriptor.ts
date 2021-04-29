@@ -1,10 +1,10 @@
-import {DescriptorKey} from 'lib-admin-ui/content/page/DescriptorKey';
+import {BaseDescriptor} from './BaseDescriptor';
 import {ApplicationKey} from 'lib-admin-ui/application/ApplicationKey';
 import {AdminToolDescriptorJson} from './json/AdminToolDescriptorJson';
 
 export class AdminToolDescriptor {
 
-    private key: DescriptorKey;
+    private key: string;
 
     private applicationKey: ApplicationKey;
 
@@ -34,7 +34,7 @@ export class AdminToolDescriptor {
 
     public static fromJson(json: AdminToolDescriptorJson): AdminToolDescriptor {
         return AdminToolDescriptor.create()
-            .setKey(DescriptorKey.fromString(json.key))
+            .setKey(json.key)
             .setApplicationKey(ApplicationKey.fromString(json.application))
             .setName(json.name)
             .setDisplayName(json.displayName)
@@ -44,7 +44,7 @@ export class AdminToolDescriptor {
             .build();
     }
 
-    getKey(): DescriptorKey {
+    getKey(): string {
         return this.key;
     }
 
@@ -75,7 +75,7 @@ export class AdminToolDescriptor {
 
 class AdminToolDescriptorBuilder {
 
-    key: DescriptorKey;
+    key: string;
 
     applicationKey: ApplicationKey;
 
@@ -89,7 +89,7 @@ class AdminToolDescriptorBuilder {
 
     toolUrl: string;
 
-    public setKey(value: DescriptorKey) {
+    public setKey(value: string) {
         this.key = value;
         return this;
     }

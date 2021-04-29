@@ -6,21 +6,19 @@ import {IdProviderApplication} from './IdProviderApplication';
 import {AdminToolDescriptor} from './AdminToolDescriptor';
 import {RelationshipType} from '../relationshiptype/RelationshipType';
 import {ContentTypeSummary} from 'lib-admin-ui/schema/content/ContentTypeSummary';
-import {PageDescriptor} from 'lib-admin-ui/content/page/PageDescriptor';
-import {PartDescriptor} from 'lib-admin-ui/content/page/region/PartDescriptor';
-import {LayoutDescriptor} from 'lib-admin-ui/content/page/region/LayoutDescriptor';
 import {MacroDescriptor} from 'lib-admin-ui/macro/MacroDescriptor';
 import {Widget} from 'lib-admin-ui/content/Widget';
+import {BaseDescriptor} from './BaseDescriptor';
 
 export class ApplicationInfo {
 
     private contentTypes: ContentTypeSummary[];
 
-    private pages: PageDescriptor[];
+    private pages: BaseDescriptor[];
 
-    private parts: PartDescriptor[];
+    private parts: BaseDescriptor[];
 
-    private layouts: LayoutDescriptor[];
+    private layouts: BaseDescriptor[];
 
     private relations: RelationshipType[];
 
@@ -43,17 +41,14 @@ export class ApplicationInfo {
 
         result.contentTypes = json.contentTypes ? ContentTypeSummary.fromJsonArray(json.contentTypes.contentTypes) : [];
 
-        result.pages = (json.pages && json.pages.descriptors) ? json.pages.descriptors.map(descriptorJson => {
-            return PageDescriptor.fromJson(descriptorJson);
-        }) : [];
+        result.pages = (json.pages && json.pages.descriptors) ?
+            json.pages.descriptors.map(descriptorJson => BaseDescriptor.fromJson(descriptorJson)) : [];
 
-        result.parts = (json.parts && json.parts.descriptors) ? json.parts.descriptors.map((descriptorJson => {
-            return PartDescriptor.fromJson(descriptorJson);
-        })) : [];
+        result.parts = (json.parts && json.parts.descriptors) ?
+            json.parts.descriptors.map((descriptorJson => BaseDescriptor.fromJson(descriptorJson))) : [];
 
-        result.layouts = (json.layouts && json.layouts.descriptors) ? json.layouts.descriptors.map((descriptorJson => {
-            return LayoutDescriptor.fromJson(descriptorJson);
-        })) : [];
+        result.layouts = (json.layouts && json.layouts.descriptors) ?
+            json.layouts.descriptors.map((descriptorJson => BaseDescriptor.fromJson(descriptorJson))) : [];
 
         result.relations = (json.relations && json.relations.relationshipTypes) ? json.relations.relationshipTypes.map(
             (relationshipJson) => {
@@ -91,15 +86,15 @@ export class ApplicationInfo {
         return this.contentTypes;
     }
 
-    getPages(): PageDescriptor[] {
+    getPages(): BaseDescriptor[] {
         return this.pages;
     }
 
-    getParts(): PartDescriptor[] {
+    getParts(): BaseDescriptor[] {
         return this.parts;
     }
 
-    getLayouts(): LayoutDescriptor[] {
+    getLayouts(): BaseDescriptor[] {
         return this.layouts;
     }
 

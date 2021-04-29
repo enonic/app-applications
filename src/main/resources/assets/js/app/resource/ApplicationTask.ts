@@ -1,16 +1,15 @@
 import {ApplicationTaskJson} from './json/ApplicationTasksJson';
-import {DescriptorKey} from 'lib-admin-ui/content/page/DescriptorKey';
 
 export class ApplicationTask {
 
-    private key: DescriptorKey;
+    private key: string;
 
     private description: string;
 
     public static fromJson(json: ApplicationTaskJson) {
         const result = new ApplicationTask();
 
-        result.key = DescriptorKey.fromString(json.key);
+        result.key = json.key;
         result.description = json.description;
 
         return result;
@@ -20,7 +19,7 @@ export class ApplicationTask {
         return this.description;
     }
 
-    public getKey(): DescriptorKey {
+    public getKey(): string {
         return this.key;
     }
 }

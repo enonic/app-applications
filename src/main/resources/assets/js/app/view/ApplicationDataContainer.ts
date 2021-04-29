@@ -16,8 +16,8 @@ import {SpanEl} from 'lib-admin-ui/dom/SpanEl';
 import {Tooltip} from 'lib-admin-ui/ui/Tooltip';
 import {AEl} from 'lib-admin-ui/dom/AEl';
 import {StringHelper} from 'lib-admin-ui/util/StringHelper';
-import {Descriptor} from 'lib-admin-ui/content/page/Descriptor';
 import {ContentTypeSummary} from 'lib-admin-ui/schema/content/ContentTypeSummary';
+import {BaseDescriptor} from '../resource/BaseDescriptor';
 
 export class ApplicationDataContainer
     extends DivEl {
@@ -69,15 +69,15 @@ export class ApplicationDataContainer
             (contentType: ContentTypeSummary) => contentType.getContentTypeName().getLocalName()).sort(this.sortAlphabeticallyAsc);
         siteGroup.addDataArray(i18n('field.contentTypes'), contentTypeNames);
 
-        const pageNames: string[] = applicationInfo.getPages().map(this.getDescriptorNameAsString).sort(
+        const pageNames: string[] = applicationInfo.getPages().map(this.getDescriptorName).sort(
             this.sortAlphabeticallyAsc);
         siteGroup.addDataArray(i18n('field.page'), pageNames);
 
-        const partNames: string[] = applicationInfo.getParts().map(this.getDescriptorNameAsString).sort(
+        const partNames: string[] = applicationInfo.getParts().map(this.getDescriptorName).sort(
             this.sortAlphabeticallyAsc);
         siteGroup.addDataArray(i18n('field.part'), partNames);
 
-        const layoutNames: string[] = applicationInfo.getLayouts().map(this.getDescriptorNameAsString).sort(
+        const layoutNames: string[] = applicationInfo.getLayouts().map(this.getDescriptorName).sort(
             this.sortAlphabeticallyAsc);
         siteGroup.addDataArray(i18n('field.layout'), layoutNames);
 
@@ -193,7 +193,7 @@ export class ApplicationDataContainer
 
     private adminToolDescriptorToElement(adminToolDescriptor: AdminToolDescriptor): Element {
         const aEl = new AEl().setUrl(adminToolDescriptor.getToolUrl(), '_blank').setHtml(adminToolDescriptor.getDisplayName());
-        new Tooltip(aEl, adminToolDescriptor.getKey().toString(), 200).setMode(Tooltip.MODE_GLOBAL_STATIC);
+        new Tooltip(aEl, adminToolDescriptor.getKey(), 200).setMode(Tooltip.MODE_GLOBAL_STATIC);
         return aEl;
     }
 
@@ -216,8 +216,8 @@ export class ApplicationDataContainer
         return null;
     }
 
-    private getDescriptorNameAsString(descriptor: Descriptor): string {
-        return descriptor.getName().toString();
+    private getDescriptorName(descriptor: BaseDescriptor): string {
+        return descriptor.getName();
     }
 
     private sortAlphabeticallyAsc(a: string, b: string): number {
