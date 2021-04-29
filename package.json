@@ -13,6 +13,7 @@
     "fix": "tslint -p tsconfig.build.json -c tslint.json --fix"
   },
   "dependencies": {
+    "jquery": "^3.6.0",
     "lib-admin-ui": "file:./.xp/dev/lib-admin-ui",
     "q": "^1.5.1"
   },
