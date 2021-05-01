@@ -35,7 +35,7 @@
     "postcss": "^8.2.13",
     "postcss-loader": "^5.2.0",
     "postcss-normalize": "^10.0.0",
-    "postcss-sort-media-queries": "^3.6.5",
+    "postcss-sort-media-queries": "^3.8.9",
     "terser-webpack-plugin": "^5.1.1",
     "ts-loader": "^9.1.1",
     "tslint": "^6.1.3",
