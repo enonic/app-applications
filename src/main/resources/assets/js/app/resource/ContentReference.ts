@@ -1,6 +1,5 @@
 import {ContentReferenceJson} from './json/ContentReferencesJson';
 import {ContentTypeName} from 'lib-admin-ui/schema/content/ContentTypeName';
-import {ContentPath} from 'lib-admin-ui/content/ContentPath';
 
 export class ContentReference {
 
@@ -8,7 +7,7 @@ export class ContentReference {
 
     private displayName: string;
 
-    private path: ContentPath;
+    private path: string;
 
     getType(): ContentTypeName {
         return this.type;
@@ -18,7 +17,7 @@ export class ContentReference {
         return this.displayName;
     }
 
-    getContentPath(): ContentPath {
+    getContentPath(): string {
         return this.path;
     }
 
@@ -27,7 +26,7 @@ export class ContentReference {
 
         result.type = new ContentTypeName(json.type);
         result.displayName = json.displayName;
-        result.path = ContentPath.fromString(json.path);
+        result.path = json.path;
 
         return result;
     }

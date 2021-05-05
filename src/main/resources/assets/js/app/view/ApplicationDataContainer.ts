@@ -87,7 +87,7 @@ export class ApplicationDataContainer
         siteGroup.addDataArray(i18n('field.relationshipTypes'), relationshipTypeNames);
 
         const referencesPaths: string[] = applicationInfo.getReferences().map(
-            (reference: ContentReference) => reference.getContentPath().toString()).sort(this.sortAlphabeticallyAsc);
+            (reference: ContentReference) => reference.getContentPath()).sort(this.sortAlphabeticallyAsc);
         siteGroup.addDataArray(i18n('field.usedBy'), referencesPaths);
 
         return siteGroup;
