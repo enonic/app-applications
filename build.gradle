@@ -17,12 +17,19 @@ app {
     devSourcePaths += file("$rootDir/../lib-admin-ui/src/main/resources")
 }
 
-dependencies {
-    include "${group}:lib-admin:${xpVersion}"
-    compile ("com.enonic.xp:portal-api:${xpVersion}") {
-        force = true
+configurations {
+    devResources {
+        attributes {
+            attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE, objects.named(LibraryElements, 'dev-resources'))
+        }
     }
+}
+
+dependencies {
+    implementation "com.enonic.xp:portal-api:${xpVersion}"
+    include "com.enonic.xp:lib-admin:${xpVersion}"
     include "com.enonic.lib:lib-admin-ui:${libAdminUiVersion}"
+    devResources "com.enonic.lib:lib-admin-ui:${libAdminUiVersion}"
     include "com.enonic.lib:lib-mustache:2.0.0"
 }
 
@@ -32,7 +39,7 @@ configurations.all {
 
 repositories {
     mavenLocal()
-    jcenter()
+    mavenCentral()
     xp.enonicRepo('dev')
 }
 
@@ -41,6 +48,17 @@ node {
     version = '14.15.0'
 }
 
+task copyDevResources {
+    doLast {
+        copy {
+            from configurations.devResources.files.collect { zipTree( it ) }
+            include 'dev/**'
+            into '.xp'
+        }
+    }
+}
+
+npmInstall.dependsOn copyDevResources
 
 task flush( type: Delete, dependsOn: clean ) {
     description = 'Clean the project from built sources and dependencies'
@@ -55,8 +73,6 @@ task npmInstallForce( type: NpmTask ) {
 task cleanNode( type: Delete ) {
     delete 'node_modules'
 }
-
-npmInstall.mustRunAfter unpackDevResources
 
 task lint( type: NpmTask, dependsOn: npmInstall ) {
     args = [ 'run', 'lint' ]
@@ -86,14 +102,6 @@ jar {
     dependsOn += webpack
 }
 
-project.afterEvaluate {
-    jar {
-        bnd ('Private-Package': '!dev.*, *;-split-package:=merge-first')
-    }
-}
-
-processResources.dependsOn += unpackDevResources
-
 if ( hasProperty( 'env' ) )
 {
     addBuildDependency()
@@ -112,17 +120,11 @@ def applyExcludedTasks() {
 def addBuildDependency() {
     if ( isLibAdminUiIncluded() )
     {
-        def buildTask = gradle.includedBuild( 'lib-admin-ui' ).task( ':build' )
-
-        build.dependsOn += buildTask
+        def libAdminBuildTask = gradle.includedBuild( 'lib-admin-ui' ).task( ':build' )
+        copyDevResources.dependsOn += libAdminBuildTask
+        build.dependsOn += libAdminBuildTask
         clean.dependsOn += gradle.includedBuild( 'lib-admin-ui' ).task( ':clean' )
         flush.dependsOn += gradle.includedBuild( 'lib-admin-ui' ).task( ':flush' )
-
-        def webpackTask = tasks.findByPath( ':webpack' )
-        def unpackDevResources = tasks.findByPath( ':unpackDevResources' )
-
-        if ( webpackTask != null ) webpackTask.dependsOn += unpackDevResources
-        unpackDevResources.dependsOn += buildTask
     }
 }
 
