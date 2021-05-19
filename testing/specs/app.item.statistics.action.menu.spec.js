@@ -90,7 +90,7 @@ describe("Item Statistics Panel 'Action Menu' spec", function () {
             let state1 = await appBrowsePanel.getApplicationState(APP_DISPLAY_NAME);
             studioUtils.saveScreenshot("action_menu_multiselect");
             assert.strictEqual(state1, 'started', "The application should be 'started'");
-            let state2 = await appBrowsePanel.getApplicationState(APP_DISPLAY_NAME);
+            let state2 = await appBrowsePanel.getApplicationState(APP_DISPLAY_NAME2);
             assert.strictEqual(state2, 'stopped', "The application should be 'stopped'");
 
         });
