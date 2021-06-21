@@ -193,7 +193,7 @@ class Page {
         await el.moveTo();
         let x = await el.getLocation('x');
         let y = await el.getLocation('y');
-        console.log("X:" + x + "Y " + y);
+        console.log("X:" + x + "Y: " + y);
         return await this.browser.performActions([{
             type: 'pointer',
             id: 'pointer1',
@@ -201,7 +201,7 @@ class Page {
                 pointerType: 'mouse'
             },
             actions: [
-                {type: "pointerMove", origin: "pointer", "x": x, "y": y},
+                {type: "pointerMove", origin: "pointer", "x": Math.floor(x), "y": Math.floor(y)},
                 {
                     type: 'pointerDown',
                     button: 2
