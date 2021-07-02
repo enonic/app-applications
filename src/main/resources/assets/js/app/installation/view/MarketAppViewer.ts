@@ -45,10 +45,6 @@ export class MarketAppViewer
         return object.getIconUrl();
     }
 
-    getPreferredHeight(): number {
-        return 50;
-    }
-
     doLayout(object: MarketApplication) {
         super.doLayout(object);
 
