@@ -9,8 +9,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.moowork.gradle:gradle-gulp-plugin:0.13'
-        classpath "com.moowork.gradle:gradle-node-plugin:0.13"
+        classpath "com.moowork.gradle:gradle-node-plugin:1.3.1"
     }
 }
 
@@ -18,10 +17,7 @@ plugins {
     id 'java'
     id 'maven-publish'
     id 'com.enonic.defaults' version '2.0.1'
-    id 'com.moowork.node' version '0.13'
-    id 'com.moowork.gulp' version '0.13'
-    id 'com.github.psxpaul.execfork' version '0.1.8'
-
+    id 'com.moowork.node' version '1.3.1'
 }
 
 group = 'com.enonic.xp.js_testing'
@@ -140,12 +136,6 @@ tasks.withType( Test ) {
     }
 }
 
-task startSeleniumDaemon( type: com.github.psxpaul.task.ExecFork ) {
-    commandLine = "${seleniumDir}${File.separator}selenium-server.sh"
-    standardOutput = "${buildDir}${File.separator}selenium-daemon.log"
-    errorOutput = "${buildDir}${File.separator}selenium-daemon-error.log"
-}
-//run the tusk in the gulpfile.js. Name of the task is 'test'
 task testApplicationsApp( type: NpmTask,
                           dependsOn: [npmInstall, startServer, copyApps, ensureScreenshotsDirectory] ) {
     inputs.files fileTree( dir: '.' )
