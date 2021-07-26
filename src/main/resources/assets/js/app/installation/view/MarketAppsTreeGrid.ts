@@ -21,7 +21,7 @@ import {AEl} from 'lib-admin-ui/dom/AEl';
 import {MarketApplicationResponse} from 'lib-admin-ui/application/MarketApplicationResponse';
 
 
-declare var CONFIG;
+declare let CONFIG;
 
 export class MarketAppsTreeGrid extends TreeGrid<MarketApplication> {
 
@@ -113,7 +113,7 @@ export class MarketAppsTreeGrid extends TreeGrid<MarketApplication> {
             if (ApplicationEventType.UNINSTALLED === event.getEventType()) {
                 let nodeToUpdate = this.getRoot().getNodeByDataIdFromCurrent(event.getApplicationKey().toString());
                 if (!!nodeToUpdate) {
-                    (<MarketApplication>nodeToUpdate.getData()).setStatus(MarketAppStatus.NOT_INSTALLED);
+                    (nodeToUpdate.getData()).setStatus(MarketAppStatus.NOT_INSTALLED);
                     this.reload();
                 }
             }
@@ -198,7 +198,7 @@ export class MarketAppsTreeGrid extends TreeGrid<MarketApplication> {
     private subscribeAndManageInstallClick() {
         this.getGrid().subscribeOnClick((event, data) => {
             const node = this.getItem(data.row);
-            const app = <MarketApplication>node.getData();
+            const app = node.getData();
             const url = app.getLatestVersionDownloadUrl();
             const {target} = event;
             const status = app.getStatus();
@@ -247,7 +247,7 @@ export class MarketAppsTreeGrid extends TreeGrid<MarketApplication> {
     }
 
     public static nameFormatter(row: number, cell: number, value: any, columnDef: any, node: TreeNode<MarketApplication>) {
-        const data = <MarketApplication>node.getData();
+        const data = node.getData();
 
         if (data.getAppKey()) {
             let viewer: MarketAppViewer = <MarketAppViewer>node.getViewer('name');
@@ -269,7 +269,7 @@ export class MarketAppsTreeGrid extends TreeGrid<MarketApplication> {
     }
 
     public static appStatusFormatter(row: number, cell: number, value: any, columnDef: any, node: TreeNode<MarketApplication>) {
-        let app = <MarketApplication>node.getData();
+        let app = node.getData();
         let statusWrapper = new AEl();
 
         if (app.getAppKey()) {

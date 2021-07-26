@@ -6,7 +6,7 @@ export class RelationshipTypeName
     extends ApplicationBasedName {
 
     constructor(name: string) {
-        assertNotNull(name, `RelationshipType name can't be null`);
+        assertNotNull(name, 'RelationshipType name can\'t be null');
         let parts = name.split(ApplicationBasedName.SEPARATOR);
         super(ApplicationKey.fromString(parts[0]), parts[1]);
     }
