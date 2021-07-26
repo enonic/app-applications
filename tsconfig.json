@@ -1,5 +1,5 @@
 {
-  "extends": "tsconfig.build",
+  "extends": "./tsconfig.build",
   "files": [
     "./src/main/resources/assets/js/main.ts"
   ],
