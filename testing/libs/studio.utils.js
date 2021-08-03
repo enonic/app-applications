@@ -4,6 +4,9 @@ const LoginPage = require('../page_objects/login.page');
 const appConst = require("./app_const");
 const webDriverHelper = require("./WebDriverHelper");
 const BrowsePanel = require('../page_objects/applications/applications.browse.panel');
+const addContext = require('mochawesome/addContext');
+const fs = require('fs');
+const path = require('path');
 
 module.exports = {
 
@@ -99,10 +102,17 @@ module.exports = {
         return await loginPage.pause(1500);
     },
 
-    saveScreenshot(name) {
-        let path = require('path');
-        let screenshotsDir = path.join(__dirname, '/../build/screenshots/');
+    saveScreenshot: function (name, that) {
+
+        let screenshotsDir = path.join(__dirname, '/../build/mochawesome-report/screenshots/');
+        if (!fs.existsSync(screenshotsDir)) {
+            fs.mkdirSync(screenshotsDir, { recursive: true });
+        }
         return webDriverHelper.browser.saveScreenshot(screenshotsDir + name + '.png').then(() => {
+            if (that) {
+                addContext(that, 'screenshots/' + name + '.png');
+            }
+
             return console.log('screenshot saved ' + name);
         }).catch(err => {
             return console.log('screenshot was not saved ' + screenshotsDir + 'utils  ' + err);
