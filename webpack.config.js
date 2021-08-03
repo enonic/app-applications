@@ -14,7 +14,8 @@ module.exports = {
     },
     output: {
         path: path.join(__dirname, '/build/resources/main/assets'),
-        filename: './[name].js'
+        filename: './[name].js',
+        assetModuleFilename: './[file]'
     },
     resolve: {
         extensions: ['.ts', '.js', '.less', '.css']
@@ -41,10 +42,6 @@ module.exports = {
                     {loader: 'postcss-loader', options: {sourceMap: !isProd}},
                     {loader: 'less-loader', options: {sourceMap: !isProd}},
                 ],
-            },
-            {
-                test: /\.(eot|woff|woff2|ttf)$|icomoon.svg/,
-                use: 'file-loader?name=fonts/[name].[ext]'
             }
         ]
     },
