@@ -1,3 +1,5 @@
+include 'testing'
+
 if ( hasProperty( 'env' ) ) {
     addBuild('../lib-admin-ui')
 }
