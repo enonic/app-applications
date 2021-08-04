@@ -19,6 +19,34 @@
     &.name.l0 {
       padding-left: 10px;
     }
+
+    &.name {
+      flex-grow: 1;
+
+      .viewer {
+        overflow: hidden;
+
+        .@{_COMMON_PREFIX}wrapper {
+          flex-shrink: 0;
+
+          &:before {
+            display: none;
+          }
+        }
+      }
+    }
+
+    &.version {
+      flex-shrink: 0;
+      flex-basis: 90px;
+      justify-content: center;
+    }
+
+    &.state {
+      flex-shrink: 0;
+      flex-basis: 50px;
+      justify-content: center;
+    }
   }
 
   .application-viewer {
