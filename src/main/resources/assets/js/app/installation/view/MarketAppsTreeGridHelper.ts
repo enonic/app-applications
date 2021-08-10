@@ -37,7 +37,7 @@ export class MarketAppsTreeGridHelper {
         return [nameColumn, versionColumn, appStatusColumns];
     }
 
-    private static nameFormatter(row: number, cell: number, value: any, columnDef: Slick.Column<TreeNode<MarketApplication>>,
+    private static nameFormatter(row: number, cell: number, value: string, columnDef: Slick.Column<TreeNode<MarketApplication>>,
                                  node: TreeNode<MarketApplication>): string {
         const data: MarketApplication = node.getData();
 
@@ -55,7 +55,7 @@ export class MarketAppsTreeGridHelper {
         return '';
     }
 
-    public static appStatusFormatter(row: number, cell: number, value: any, columnDef: Slick.Column<TreeNode<MarketApplication>>,
+    public static appStatusFormatter(row: number, cell: number, value: number, columnDef: Slick.Column<TreeNode<MarketApplication>>,
                                      node: TreeNode<MarketApplication>): string {
         const app: MarketApplication = node.getData();
         const statusWrapper: AEl = new AEl();
