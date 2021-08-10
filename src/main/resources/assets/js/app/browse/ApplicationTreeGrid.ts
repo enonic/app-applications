@@ -1,10 +1,8 @@
 import * as Q from 'q';
 import {ApplicationBrowseActions} from './ApplicationBrowseActions';
-import {ApplicationRowFormatter} from './ApplicationRowFormatter';
 import {TreeNode} from 'lib-admin-ui/ui/treegrid/TreeNode';
-import {Application} from 'lib-admin-ui/application/Application';
+import {Application, ApplicationUploadMock} from 'lib-admin-ui/application/Application';
 import {ApplicationKey} from 'lib-admin-ui/application/ApplicationKey';
-import {i18n} from 'lib-admin-ui/util/Messages';
 import {TreeGrid} from 'lib-admin-ui/ui/treegrid/TreeGrid';
 import {TreeGridBuilder} from 'lib-admin-ui/ui/treegrid/TreeGridBuilder';
 import {TreeGridContextMenu} from 'lib-admin-ui/ui/treegrid/TreeGridContextMenu';
@@ -12,30 +10,16 @@ import {GetApplicationRequest} from 'lib-admin-ui/application/GetApplicationRequ
 import {DefaultErrorHandler} from 'lib-admin-ui/DefaultErrorHandler';
 import {ListApplicationsRequest} from 'lib-admin-ui/application/ListApplicationsRequest';
 import {UploadItem} from 'lib-admin-ui/ui/uploader/UploadItem';
+import {ApplicationTreeGridHelper} from './ApplicationTreeGridHelper';
 
 declare const CONFIG;
 
 export class ApplicationTreeGrid extends TreeGrid<Application> {
 
     constructor() {
-        const builder = new TreeGridBuilder<Application>().setColumnConfig([{
-            name: i18n('field.name'),
-            id: 'displayName',
-            field: 'displayName',
-            formatter: ApplicationRowFormatter.nameFormatter,
-            style: {cssClass: 'name', minWidth: 250}
-        }, {
-            name: i18n('field.version'),
-            id: 'version',
-            field: 'version',
-            style: {cssClass: 'version', minWidth: 50, maxWidth: 130}
-        }, {
-            name: i18n('field.state'),
-            id: 'state',
-            field: 'state',
-            formatter: ApplicationRowFormatter.stateFormatter,
-            style: {cssClass: 'state', minWidth: 80, maxWidth: 100}
-        }]).prependClasses('application-grid');
+        const builder: TreeGridBuilder<Application> = new TreeGridBuilder<Application>()
+            .setColumnConfig(ApplicationTreeGridHelper.generateColumnsConfig())
+            .prependClasses('application-grid');
 
         const readonlyMode: boolean = CONFIG.readonlyMode === 'true';
 
@@ -106,31 +90,32 @@ export class ApplicationTreeGrid extends TreeGrid<Application> {
     }
 
     appendUploadNode(item: UploadItem<Application>) {
+        const appMock: ApplicationUploadMock = new ApplicationUploadMock(item);
+        const parent: TreeNode<Application> = this.getRoot().getDefaultRoot();
+        const uploadNode: TreeNode<any> = this.dataToTreeNode(<any>appMock, this.getRoot().getDefaultRoot());
+        this.insertNodeToParentNode(uploadNode, parent, 0);
 
-        // let appMock: ApplicationUploadMock = new ApplicationUploadMock(item);
-        //
-        // this.appendNode(<any>appMock, false).done();
-        //
-        // let deleteUploadedNodeHandler = () => {
-        //     let nodeToRemove = this.getRoot().getCurrentRoot().findNode(item.getId());
-        //     if (nodeToRemove) {
-        //         this.deleteNode(nodeToRemove.getData());
-        //         this.invalidate();
-        //     }
-        // };
-        //
-        // item.onProgress((progress: number) => {
-        //     this.invalidate();
-        //     if (progress === 100) {
-        //         deleteUploadedNodeHandler();
-        //     }
-        // });
-        //
-        // item.onUploadStopped(deleteUploadedNodeHandler);
-        //
-        // item.onFailed(() => {
-        //     this.deleteNode(<any>appMock);
-        // });
+        const deleteUploadedNodeHandler = () => {
+            const nodeToRemove: TreeNode<Application> = this.getRoot().getCurrentRoot().findNode(appMock.getId());
+
+            if (nodeToRemove) {
+                this.deleteNode(uploadNode);
+                this.invalidate();
+            }
+        };
+
+        item.onProgress((progress: number) => {
+            this.invalidateNodes([uploadNode]);
+            if (progress === 100) {
+                deleteUploadedNodeHandler();
+            }
+        });
+
+        item.onUploadStopped(deleteUploadedNodeHandler);
+
+        item.onFailed(() => {
+            this.deleteNode(uploadNode);
+        });
     }
 
 }
