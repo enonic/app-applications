@@ -23,44 +23,8 @@ export class ApplicationTreeGrid extends TreeGrid<Application> {
             .setColumnConfig(ApplicationTreeGridHelper.generateColumnsConfig())
             .prependClasses('application-grid');
 
-        const columns = builder.getColumns().slice(0);
-        const [
-            nameColumn,
-            versionColumn,
-            stateColumn,
-        ] = columns;
-
-        const updateColumns = () => {
-            let width = this.getEl().getWidth();
-            let checkSelIsMoved = ResponsiveRanges._540_720.isFitOrSmaller(Body.get().getEl().getWidth());
-
-            const curClass = nameColumn.getCssClass();
-
-            if (checkSelIsMoved) {
-                nameColumn.setCssClass(curClass || 'shifted');
-            } else if (curClass && curClass.indexOf('shifted') >= 0) {
-                nameColumn.setCssClass(curClass.replace('shifted', ''));
-            }
-
-            if (ResponsiveRanges._240_360.isFitOrSmaller(width)) {
-                nameColumn.setBoundaryWidth(150, 250);
-                versionColumn.setBoundaryWidth(50, 70);
-                stateColumn.setBoundaryWidth(50, 50);
-            } else if (ResponsiveRanges._360_540.isFitOrSmaller(width)) {
-                nameColumn.setBoundaryWidth(200, 350);
-                versionColumn.setBoundaryWidth(50, 70);
-                stateColumn.setBoundaryWidth(50, 70);
-            } else {
-                nameColumn.setBoundaryWidth(200, 9999);
-                versionColumn.setBoundaryWidth(50, 130);
-                stateColumn.setBoundaryWidth(80, 100);
-            }
-            this.setColumns(columns.slice(0), checkSelIsMoved);
-        };
-
         const readonlyMode: boolean = CONFIG.readonlyMode === 'true';
         builder.setCheckableRows(!readonlyMode);
-        builder.setColumnUpdater(updateColumns);
 
         super(builder);
 
@@ -129,7 +93,7 @@ export class ApplicationTreeGrid extends TreeGrid<Application> {
     appendUploadNode(item: UploadItem<Application>) {
         const appMock: ApplicationUploadMock = new ApplicationUploadMock(item);
         const parent: TreeNode<Application> = this.getRoot().getDefaultRoot();
-        const uploadNode: TreeNode<any> = this.dataToTreeNode(<any>appMock, this.getRoot().getDefaultRoot());
+        const uploadNode: TreeNode<Application> = this.dataToTreeNode(<any>appMock, this.getRoot().getDefaultRoot());
         this.insertNodeToParentNode(uploadNode, parent, 0);
 
         const deleteUploadedNodeHandler = () => {
