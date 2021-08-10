@@ -92,7 +92,7 @@ export class ApplicationTreeGrid extends TreeGrid<Application> {
     appendUploadNode(item: UploadItem<Application>) {
         const appMock: ApplicationUploadMock = new ApplicationUploadMock(item);
         const parent: TreeNode<Application> = this.getRoot().getDefaultRoot();
-        const uploadNode: TreeNode<any> = this.dataToTreeNode(<any>appMock, this.getRoot().getDefaultRoot());
+        const uploadNode: TreeNode<Application> = this.dataToTreeNode(<any>appMock, this.getRoot().getDefaultRoot());
         this.insertNodeToParentNode(uploadNode, parent, 0);
 
         const deleteUploadedNodeHandler = () => {
