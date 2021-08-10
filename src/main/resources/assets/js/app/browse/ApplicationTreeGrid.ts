@@ -5,12 +5,10 @@ import {Application, ApplicationUploadMock} from 'lib-admin-ui/application/Appli
 import {ApplicationKey} from 'lib-admin-ui/application/ApplicationKey';
 import {TreeGrid} from 'lib-admin-ui/ui/treegrid/TreeGrid';
 import {TreeGridBuilder} from 'lib-admin-ui/ui/treegrid/TreeGridBuilder';
-import {ResponsiveRanges} from 'lib-admin-ui/ui/responsive/ResponsiveRanges';
 import {TreeGridContextMenu} from 'lib-admin-ui/ui/treegrid/TreeGridContextMenu';
 import {GetApplicationRequest} from 'lib-admin-ui/application/GetApplicationRequest';
 import {DefaultErrorHandler} from 'lib-admin-ui/DefaultErrorHandler';
 import {ListApplicationsRequest} from 'lib-admin-ui/application/ListApplicationsRequest';
-import {Body} from 'lib-admin-ui/dom/Body';
 import {UploadItem} from 'lib-admin-ui/ui/uploader/UploadItem';
 import {ApplicationTreeGridHelper} from './ApplicationTreeGridHelper';
 
@@ -93,7 +91,7 @@ export class ApplicationTreeGrid extends TreeGrid<Application> {
     appendUploadNode(item: UploadItem<Application>) {
         const appMock: ApplicationUploadMock = new ApplicationUploadMock(item);
         const parent: TreeNode<Application> = this.getRoot().getDefaultRoot();
-        const uploadNode: TreeNode<Application> = this.dataToTreeNode(<any>appMock, this.getRoot().getDefaultRoot());
+        const uploadNode: TreeNode<Application> = this.dataToTreeNode(<Application><unknown>appMock, this.getRoot().getDefaultRoot());
         this.insertNodeToParentNode(uploadNode, parent, 0);
 
         const deleteUploadedNodeHandler = () => {
