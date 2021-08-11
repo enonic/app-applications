@@ -22,6 +22,7 @@ export class ApplicationTreeGrid extends TreeGrid<Application> {
             .prependClasses('application-grid');
 
         const readonlyMode: boolean = CONFIG.readonlyMode === 'true';
+
         builder.setCheckableRows(!readonlyMode);
 
         super(builder);

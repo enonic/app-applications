@@ -1,0 +1,104 @@
+.market-app-tree-grid {
+  .grid {
+    .slick-cell {
+      padding-top: 15px;
+      height: 52px;
+      cursor: default;
+
+      * {
+        cursor: default;
+      }
+
+      &.app-name-and-icon {
+        margin-left: 10px;
+        flex-grow: 1;
+
+        .viewer {
+          overflow: hidden;
+
+          .names-and-icon-view {
+            cursor: default;
+
+            .@{_COMMON_PREFIX}main-name {
+              font-size: 16px;
+              padding-bottom: 2px;
+              color: @admin-blue;
+
+              a {
+                cursor: pointer !important;
+                text-decoration: none;
+
+                &:hover,
+                &:focus {
+                  text-decoration: underline;
+                }
+              }
+            }
+          }
+        }
+      }
+
+      &.version {
+        text-align: center;
+        color: @admin-black;
+        font-size: 12px;
+        flex-shrink: 0;
+        flex-basis: 90px;
+        justify-content: center;
+      }
+
+      &.app-status {
+        text-align: center;
+        flex-shrink: 0;
+        flex-basis: 100px;
+        justify-content: center;
+
+        a {
+          text-decoration: none;
+        }
+
+        .install,
+        .update {
+          font-size: 16px;
+          cursor: pointer !important;
+
+          span {
+            cursor: pointer !important;
+          }
+        }
+
+        .install {
+          &:hover,
+          &:focus {
+            text-decoration: underline;
+          }
+
+          color: @admin-green;
+        }
+
+        .update {
+          &:hover,
+          &:focus {
+            text-decoration: underline;
+          }
+
+          color: @input-dark-red;
+        }
+
+        .installing .progress-bar {
+          display: block;
+        }
+
+        .installed {
+          opacity: 0.6;
+          font-size: 14px;
+          color: @admin-font-gray2;
+        }
+      }
+
+      .toggle.icon {
+        display: none;
+      }
+    }
+  }
+}
