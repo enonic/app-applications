@@ -88,7 +88,7 @@ class InstallAppDialog extends Page {
     }
 
     //checks that 'installed' status appeared
-    isApplicationInstalled(appName) {
+    waitForApplicationInstalled(appName) {
         const selector = lib.slickRowByDisplayName(XPATH.container, appName) + "//a[@class='installed']";
         return this.waitForElementDisplayed(selector, appConst.longTimeout).catch(err => {
             this.saveScreenshot('err_find_installed_status');
@@ -139,6 +139,11 @@ class InstallAppDialog extends Page {
         return this.getTextInDisplayedElements(items);
     }
 
+    waitForApplicationDisplayed(appDisplayName) {
+        let selector = XPATH.appByDisplayName(appDisplayName);
+        return this.waitForElementDisplayed(selector, appConst.longTimeout);
+    }
+
     typeSearchText(text) {
         return this.typeTextInInput(this.searchInput, text);
     }
@@ -147,11 +152,6 @@ class InstallAppDialog extends Page {
         await this.typeTextInInput(this.searchInput, text);
         await this.pause(700);
         return await this.keys('Enter');
-    }
-
-    isApplicationPresent(appName) {
-        let selector = XPATH.appByDisplayName(appName);
-        return this.waitForElementDisplayed(selector, appConst.mediumTimeout);
     }
 
     async clickOnInstallLink(appName) {
