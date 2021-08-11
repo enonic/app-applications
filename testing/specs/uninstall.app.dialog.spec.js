@@ -104,7 +104,7 @@ function installApp(displayName) {
     }).then(() => {
         return installAppDialog.pause(1000);
     }).then(() => {
-        return installAppDialog.isApplicationPresent(displayName);
+        return installAppDialog.waitForApplicationDisplayed(displayName);
     }).then(() => {
         return installAppDialog.clickOnInstallAppLink(displayName);
     }).then(() => {
