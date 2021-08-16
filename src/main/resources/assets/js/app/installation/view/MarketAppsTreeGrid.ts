@@ -16,6 +16,7 @@ import {ApplicationInstallResult} from 'lib-admin-ui/application/ApplicationInst
 import {DefaultErrorHandler} from 'lib-admin-ui/DefaultErrorHandler';
 import {Exception} from 'lib-admin-ui/Exception';
 import {MarketApplicationResponse} from 'lib-admin-ui/application/MarketApplicationResponse';
+import {MarketHelper} from 'lib-admin-ui/application/MarketHelper';
 import {MarketAppsTreeGridHelper} from './MarketAppsTreeGridHelper';
 
 declare let CONFIG;
@@ -147,7 +148,7 @@ export class MarketAppsTreeGrid extends TreeGrid<MarketApplication> {
                             if (application) {
                                 const marketApplication: MarketApplication = <MarketApplication>nodeToUpdate.getData();
 
-                                if (MarketAppsTreeGridHelper.installedAppCanBeUpdated(marketApplication, application)) {
+                                if (MarketHelper.installedAppCanBeUpdated(marketApplication, application)) {
                                     marketApplication.setStatus(MarketAppStatus.OLDER_VERSION_INSTALLED);
                                 } else {
                                     marketApplication.setStatus(MarketAppStatus.INSTALLED);
