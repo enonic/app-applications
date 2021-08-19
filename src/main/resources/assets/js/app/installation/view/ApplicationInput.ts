@@ -9,9 +9,9 @@ import {KeyHelper} from 'lib-admin-ui/ui/KeyHelper';
 import {AppHelper} from 'lib-admin-ui/util/AppHelper';
 import {StringHelper} from 'lib-admin-ui/util/StringHelper';
 import {UploadFailedEvent} from 'lib-admin-ui/ui/uploader/UploadFailedEvent';
-import {ApplicationInstallResult} from 'lib-admin-ui/application/ApplicationInstallResult';
-import {InstallUrlApplicationRequest} from 'lib-admin-ui/application/InstallUrlApplicationRequest';
 import {DefaultErrorHandler} from 'lib-admin-ui/DefaultErrorHandler';
+import {InstallUrlApplicationRequest} from '../../resource/InstallUrlApplicationRequest';
+import {ApplicationInstallResult} from '../../resource/ApplicationInstallResult';
 
 export class ApplicationInput
     extends CompositeFormInputEl {

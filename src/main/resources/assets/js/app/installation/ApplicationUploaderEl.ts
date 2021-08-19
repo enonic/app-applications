@@ -1,10 +1,10 @@
 import {Application} from 'lib-admin-ui/application/Application';
 import {UploaderEl, UploaderElConfig} from 'lib-admin-ui/ui/uploader/UploaderEl';
 import {UriHelper} from 'lib-admin-ui/util/UriHelper';
-import {ApplicationInstallResultJson} from 'lib-admin-ui/application/json/ApplicationInstallResultJson';
-import {ApplicationInstallResult} from 'lib-admin-ui/application/ApplicationInstallResult';
 import {AEl} from 'lib-admin-ui/dom/AEl';
 import {Element} from 'lib-admin-ui/dom/Element';
+import {ApplicationInstallResultJson} from '../resource/json/ApplicationInstallResultJson';
+import {ApplicationInstallResult} from '../resource/ApplicationInstallResult';
 
 export class ApplicationUploaderEl
     extends UploaderEl<Application> {

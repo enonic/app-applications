@@ -1,11 +1,11 @@
 import {ApplicationInfoJson} from './json/ApplicationInfoJson';
 import {ApplicationInfo} from './ApplicationInfo';
-import {ApplicationResourceRequest} from 'lib-admin-ui/application/ApplicationResourceRequest';
 import {ApplicationKey} from 'lib-admin-ui/application/ApplicationKey';
 import {JsonResponse} from 'lib-admin-ui/rest/JsonResponse';
+import {CmsApplicationResourceRequest} from './CmsApplicationResourceRequest';
 
 export class GetApplicationInfoRequest
-    extends ApplicationResourceRequest<ApplicationInfo> {
+    extends CmsApplicationResourceRequest<ApplicationInfo> {
 
     private applicationKey: ApplicationKey;
 
