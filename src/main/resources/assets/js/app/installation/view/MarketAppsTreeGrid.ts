@@ -10,18 +10,19 @@ import {TreeGridBuilder} from 'lib-admin-ui/ui/treegrid/TreeGridBuilder';
 import {ResponsiveItem} from 'lib-admin-ui/ui/responsive/ResponsiveItem';
 import {ResponsiveManager} from 'lib-admin-ui/ui/responsive/ResponsiveManager';
 import {ApplicationEvent, ApplicationEventType} from 'lib-admin-ui/application/ApplicationEvent';
-import {GetApplicationRequest} from 'lib-admin-ui/application/GetApplicationRequest';
-import {InstallUrlApplicationRequest} from 'lib-admin-ui/application/InstallUrlApplicationRequest';
-import {ApplicationInstallResult} from 'lib-admin-ui/application/ApplicationInstallResult';
 import {DefaultErrorHandler} from 'lib-admin-ui/DefaultErrorHandler';
 import {Exception} from 'lib-admin-ui/Exception';
 import {MarketApplicationResponse} from 'lib-admin-ui/application/MarketApplicationResponse';
 import {MarketHelper} from 'lib-admin-ui/application/MarketHelper';
 import {MarketAppsTreeGridHelper} from './MarketAppsTreeGridHelper';
+import {InstallUrlApplicationRequest} from '../../resource/InstallUrlApplicationRequest';
+import {ApplicationInstallResult} from '../../resource/ApplicationInstallResult';
+import {GetApplicationRequest} from '../../resource/GetApplicationRequest';
 
 declare let CONFIG;
 
-export class MarketAppsTreeGrid extends TreeGrid<MarketApplication> {
+export class MarketAppsTreeGrid
+    extends TreeGrid<MarketApplication> {
 
     private installedApplications: Application[];
 

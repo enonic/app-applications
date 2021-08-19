@@ -1,0 +1,29 @@
+package com.enonic.xp.app.applications.rest.resource.application.json;
+
+import com.google.common.collect.ImmutableList;
+
+import com.enonic.xp.descriptor.Descriptors;
+import com.enonic.xp.task.TaskDescriptor;
+
+public class ApplicationTaskDescriptorsJson
+{
+    private final ImmutableList<ApplicationTaskDescriptorJson> tasks;
+
+    public ApplicationTaskDescriptorsJson( final Descriptors<TaskDescriptor> taskDescriptors )
+    {
+        final ImmutableList.Builder<ApplicationTaskDescriptorJson> builder = ImmutableList.builder();
+        if ( taskDescriptors != null )
+        {
+            for ( final TaskDescriptor taskDescriptor : taskDescriptors )
+            {
+                builder.add( new ApplicationTaskDescriptorJson( taskDescriptor ) );
+            }
+        }
+        this.tasks = builder.build();
+    }
+
+    public ImmutableList<ApplicationTaskDescriptorJson> getTasks()
+    {
+        return tasks;
+    }
+}

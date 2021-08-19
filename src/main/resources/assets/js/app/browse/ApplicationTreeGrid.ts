@@ -6,15 +6,16 @@ import {ApplicationKey} from 'lib-admin-ui/application/ApplicationKey';
 import {TreeGrid} from 'lib-admin-ui/ui/treegrid/TreeGrid';
 import {TreeGridBuilder} from 'lib-admin-ui/ui/treegrid/TreeGridBuilder';
 import {TreeGridContextMenu} from 'lib-admin-ui/ui/treegrid/TreeGridContextMenu';
-import {GetApplicationRequest} from 'lib-admin-ui/application/GetApplicationRequest';
 import {DefaultErrorHandler} from 'lib-admin-ui/DefaultErrorHandler';
-import {ListApplicationsRequest} from 'lib-admin-ui/application/ListApplicationsRequest';
 import {UploadItem} from 'lib-admin-ui/ui/uploader/UploadItem';
 import {ApplicationTreeGridHelper} from './ApplicationTreeGridHelper';
+import {ListApplicationsRequest} from '../resource/ListApplicationsRequest';
+import {GetApplicationRequest} from '../resource/GetApplicationRequest';
 
 declare const CONFIG;
 
-export class ApplicationTreeGrid extends TreeGrid<Application> {
+export class ApplicationTreeGrid
+    extends TreeGrid<Application> {
 
     constructor() {
         const builder: TreeGridBuilder<Application> = new TreeGridBuilder<Application>()
@@ -44,12 +45,9 @@ export class ApplicationTreeGrid extends TreeGrid<Application> {
 
     private fetchByKey(applicationKey: ApplicationKey): Q.Promise<Application> {
         let deferred = Q.defer<Application>();
-        new GetApplicationRequest(applicationKey,
-            true).sendAndParse().then((application: Application) => {
-            deferred.resolve(application);
-        }).catch((reason: any) => {
-            DefaultErrorHandler.handle(reason);
-        });
+        new GetApplicationRequest(applicationKey, true).sendAndParse()
+            .then((application: Application) => deferred.resolve(application))
+            .catch(DefaultErrorHandler.handle);
 
         return deferred.promise;
     }

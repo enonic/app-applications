@@ -26,11 +26,19 @@ configurations {
 }
 
 dependencies {
+    implementation "com.enonic.xp:jaxrs-api:${xpVersion}"
+    implementation "com.enonic.xp:admin-api:${xpVersion}"
     implementation "com.enonic.xp:portal-api:${xpVersion}"
     include "com.enonic.xp:lib-admin:${xpVersion}"
     include "com.enonic.lib:lib-admin-ui:${libAdminUiVersion}"
     devResources "com.enonic.lib:lib-admin-ui:${libAdminUiVersion}"
     include "com.enonic.lib:lib-mustache:2.0.0"
+    testImplementation "org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}"
+    testImplementation "org.mockito:mockito-core:${mockitoVersion}"
+    testImplementation( testFixtures( "com.enonic.xp:jaxrs-impl:${xpVersion}" ) )
+    testImplementation( testFixtures( "com.enonic.xp:core-app:${xpVersion}" ) )
+    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${junitJupiterVersion}"
+    testRuntimeOnly "org.slf4j:slf4j-simple:${slf4jVersion}"
 }
 
 configurations.all {
@@ -100,6 +108,12 @@ jar {
     outputs.dir "${buildDir}/resources/main"
 
     dependsOn += webpack
+}
+
+test {
+    useJUnitPlatform()
+    systemProperty 'java.awt.headless', 'true'
+    jvmArgs '-noverify', '-XX:TieredStopAtLevel=1'
 }
 
 if ( hasProperty( 'env' ) )
