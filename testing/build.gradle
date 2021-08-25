@@ -72,7 +72,11 @@ task deployApp( type: DefaultTask ) {
     outputs.files( appFile )
     doLast {
         def f = new File( appFile )
-        f.delete(  )
+        println "Deleting  ${appFile}. Exists ${f.exists()}"
+
+        f.delete()
+
+        println "Copying from ${appUrl} to ${appFile}"
         new URL( appUrl ).withInputStream { i -> f.withOutputStream { it << i } }
     }
     mustRunAfter unpackDistro
