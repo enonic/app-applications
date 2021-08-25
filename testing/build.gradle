@@ -70,6 +70,7 @@ task copyApps( type: Copy ) {
 
 task deployApp( type: DefaultTask ) {
     outputs.files( appFile )
+    outputs.upToDateWhen { false }
     doLast {
         def f = new File( appFile )
         println "Deleting  ${appFile}. Exists ${f.exists()}"
@@ -82,27 +83,11 @@ task deployApp( type: DefaultTask ) {
     mustRunAfter unpackDistro
 }
 
-task zipReport( type: Zip ) {
-    from mochaResultsDir
-    include '*'
-    include '*/*'
-    classifier 'mochaReport'
-}
-
-publishing {
-    publications {
-        mavenJava( MavenPublication ) {
-            artifact zipReport
-        }
-    }
-}
-
-task startServer( dependsOn: [unpackDistro, copyConfig] ) {
+task startServer(dependsOn: unpackDistro) {
     doLast {
         xpServer.installDir = file( distroDir )
         xpServer.start()
     }
-    mustRunAfter npmInstall
 }
 
 task stopServer {
@@ -112,8 +97,9 @@ task stopServer {
 }
 
 task testApplicationsApp( type: NpmTask,
-                          dependsOn: [npmInstall, startServer, copyApps, deployApp] ) {
+                          dependsOn: [npmInstall, startServer, copyConfig, copyApps, deployApp] ) {
     args = ['test']
+    finalizedBy stopServer
 }
 
 task testApplicationsAppLocally( type: NpmTask, dependsOn: [npmInstall] ) {
