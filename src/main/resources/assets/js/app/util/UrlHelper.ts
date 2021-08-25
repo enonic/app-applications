@@ -2,7 +2,7 @@ import {UriHelper} from 'lib-admin-ui/util/UriHelper';
 
 export class UrlHelper {
 
-    static getCmsRestUri(path: string): string {
+    static getRestUri(path: string): string {
         return UriHelper.getAdminUri(UriHelper.joinPath('rest-v2', 'apps', UriHelper.relativePath(path)));
     }
 }

@@ -1,9 +1,9 @@
 import {ApplicationKey} from 'lib-admin-ui/application/ApplicationKey';
 import {JsonResponse} from 'lib-admin-ui/rest/JsonResponse';
-import {CmsApplicationResourceRequest} from './CmsApplicationResourceRequest';
+import {ApplicationResourceRequest} from './ApplicationResourceRequest';
 
 export class ListApplicationKeysRequest
-    extends CmsApplicationResourceRequest<ApplicationKey[]> {
+    extends ApplicationResourceRequest<ApplicationKey[]> {
 
     private searchQuery: string;
 

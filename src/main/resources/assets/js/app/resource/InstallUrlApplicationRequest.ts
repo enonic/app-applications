@@ -1,4 +1,4 @@
-import {CmsApplicationResourceRequest} from './CmsApplicationResourceRequest';
+import {ApplicationResourceRequest} from './ApplicationResourceRequest';
 import {ApplicationInstallResult} from './ApplicationInstallResult';
 import {HttpMethod} from 'lib-admin-ui/rest/HttpMethod';
 import {ApplicationInstallResultJson} from './json/ApplicationInstallResultJson';
@@ -6,7 +6,7 @@ import {JsonResponse} from 'lib-admin-ui/rest/JsonResponse';
 
 
 export class InstallUrlApplicationRequest
-    extends CmsApplicationResourceRequest<ApplicationInstallResult> {
+    extends ApplicationResourceRequest<ApplicationInstallResult> {
 
     private applicationUrl: string;
 

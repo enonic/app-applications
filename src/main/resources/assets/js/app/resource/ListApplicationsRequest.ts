@@ -5,6 +5,6 @@ export class ListApplicationsRequest
     extends LibListAppsRequest {
 
     getPostfixUri(): string {
-        return UrlHelper.getCmsRestUri('');
+        return UrlHelper.getRestUri('');
     }
 }

@@ -5,6 +5,6 @@ export class GetApplicationRequest
     extends LibGetAppRequest {
 
     getPostfixUri(): string {
-        return UrlHelper.getCmsRestUri('');
+        return UrlHelper.getRestUri('');
     }
 }

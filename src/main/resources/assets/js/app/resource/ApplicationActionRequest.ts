@@ -1,10 +1,10 @@
 import * as Q from 'q';
 import {ApplicationKey} from 'lib-admin-ui/application/ApplicationKey';
 import {HttpMethod} from 'lib-admin-ui/rest/HttpMethod';
-import {CmsApplicationResourceRequest} from './CmsApplicationResourceRequest';
+import {ApplicationResourceRequest} from './ApplicationResourceRequest';
 
 export class ApplicationActionRequest
-    extends CmsApplicationResourceRequest<void> {
+    extends ApplicationResourceRequest<void> {
 
     private applicationKeys: ApplicationKey[];
 
