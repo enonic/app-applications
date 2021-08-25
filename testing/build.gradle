@@ -20,17 +20,15 @@ configurations {
 
 ext {
     unpackDir = "$buildDir/install"
-    screenshotsDir = "$buildDir/screenshots"
     distroDir = "$unpackDir/enonic-xp-generic-$version"
     deployDir = "$distroDir/home/deploy"
-    seleniumDir = "$projectDir/test-applications/selenium"
-    mochaResultsDir = "$buildDir/mochawesome-report"
     appDir = "$projectDir/test-applications"
     xpHome = "$distroDir/home"
     configDir = "$xpHome/config"
     xpServer = new ServerInstance()
-    appFile = "$distroDir/system/40/app-applications-${version}.jar"
-    appUrl = project.hasProperty('appUrl') ? appUrl : "file:///$projectDir/../build/libs/app-applications.jar"
+    appName = "app-applications"
+    appFile = "$distroDir/system/40/${appName}-${version}.jar"
+    appUrl = project.hasProperty('appUrl') ? appUrl : "file:///$projectDir/../build/libs/${appName}.jar"
 }
 
 dependencies {
