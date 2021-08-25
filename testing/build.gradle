@@ -18,10 +18,6 @@ configurations {
     distro
 }
 
-enonic {
-    publishRepo = 'inhouse'
-}
-
 ext {
     unpackDir = "$buildDir/install"
     screenshotsDir = "$buildDir/screenshots"
@@ -58,14 +54,11 @@ task copyConfig( type: Copy ) {
 }
 
 task copyApps( type: Copy ) {
-    println '*********************************************************'
-    println '* task started:copyApps  *'
-    println '*********************************************************'
     println appDir
     from file( appDir )
     include '*.jar'
     into file( deployDir )
-    mustRunAfter 'startServer'
+    mustRunAfter unpackDistro
 }
 
 task deployApp( type: DefaultTask ) {
@@ -97,7 +90,7 @@ task stopServer {
 }
 
 task testApplicationsApp( type: NpmTask,
-                          dependsOn: [npmInstall, startServer, copyConfig, copyApps, deployApp] ) {
+                          dependsOn: [npmInstall, unpackDistro, copyConfig, copyApps, deployApp, startServer] ) {
     args = ['test']
     finalizedBy stopServer
 }
