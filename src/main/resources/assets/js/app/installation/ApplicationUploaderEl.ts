@@ -1,10 +1,10 @@
 import {Application} from 'lib-admin-ui/application/Application';
 import {UploaderEl, UploaderElConfig} from 'lib-admin-ui/ui/uploader/UploaderEl';
-import {UriHelper} from 'lib-admin-ui/util/UriHelper';
 import {AEl} from 'lib-admin-ui/dom/AEl';
 import {Element} from 'lib-admin-ui/dom/Element';
 import {ApplicationInstallResultJson} from '../resource/json/ApplicationInstallResultJson';
 import {ApplicationInstallResult} from '../resource/ApplicationInstallResult';
+import {UrlHelper} from '../util/UrlHelper';
 
 export class ApplicationUploaderEl
     extends UploaderEl<Application> {
@@ -14,7 +14,7 @@ export class ApplicationUploaderEl
     constructor(config: UploaderElConfig) {
 
         if (config.url == null) {
-            config.url = UriHelper.getRestUri('application/install');
+            config.url = UrlHelper.getRestUri('application/install');
         }
 
         if (config.allowExtensions == null) {
@@ -47,7 +47,7 @@ export class ApplicationUploaderEl
     }
 
     createResultItem(value: string): Element {
-        return new AEl().setUrl(UriHelper.getRestUri('application/' + value), '_blank');
+        return new AEl().setUrl(UrlHelper.getRestUri(`application/${value}`), '_blank');
     }
 
     protected getErrorMessage(): string {
