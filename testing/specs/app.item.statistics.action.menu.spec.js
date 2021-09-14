@@ -83,7 +83,7 @@ describe("Item Statistics Panel 'Action Menu' spec", function () {
             await appBrowsePanel.clickOnCheckboxAndSelectRowByDisplayName(APP_DISPLAY_NAME2);
             //2. Click on 'Stop' menu button in action menu:
             await appStatisticPanel.clickOnActionDropDownMenu();
-            await appStatisticPanel.waitForStopMenuItemVisible();
+            await appStatisticPanel.pause(200);
             await appStatisticPanel.clickOnStopActionMenuItem();
             await appBrowsePanel.pause(2000);
             //3. Verify applications state:
