@@ -97,10 +97,14 @@ class ApplicationItemStatisticsPanel extends Page {
         return this.getTextInDisplayedElements(xpath.siteDataHeaders);
     }
 
-    clickOnStopActionMenuItem() {
-        return this.clickOnElement(xpath.stopActionMenuItem).catch(err => {
+    async clickOnStopActionMenuItem() {
+        try {
+            await this.waitForElementDisplayed(xpath.stopActionMenuItem, appConst.mediumTimeout);
+            return await this.clickOnElement(xpath.stopActionMenuItem);
+        } catch (err) {
+            await this.saveScreenshot("err_stop_menu_item");
             throw new Error("Error when clicking on Stop menu item");
-        })
+        }
     }
 
     clickOnStartActionMenuItem() {
