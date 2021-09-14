@@ -9,15 +9,15 @@ const AppStatisticPanel = require('../page_objects/applications/application.item
 describe("Item Statistics Panel 'Action Menu' spec", function () {
     this.timeout(appConstants.SUITE_TIMEOUT);
     webDriverHelper.setupBrowser();
-    const APP_DISPLAY_NAME = 'First Selenium App';
-    const APP_DISPLAY_NAME2 = 'Second Selenium App';
+    const FIRST_APP = 'First Selenium App';
+    const SECOND_APP = 'Second Selenium App';
 
     it(`WHEN started application is selected THEN expected label should be displayed in the drop-down button AND 'Stop' menu item should be hidden`,
         async () => {
             let appBrowsePanel = new AppBrowsePanel();
             let appStatisticPanel = new AppStatisticPanel();
             //1. Select the application:
-            await appBrowsePanel.clickOnRowByDisplayName(APP_DISPLAY_NAME);
+            await appBrowsePanel.clickOnRowByDisplayName(FIRST_APP);
             //2. Verify the info in Statistics Panel:
             let result = await appStatisticPanel.getDropDownButtonText();
             studioUtils.saveScreenshot("application_action_menu_collapsed");
@@ -32,7 +32,7 @@ describe("Item Statistics Panel 'Action Menu' spec", function () {
             let appBrowsePanel = new AppBrowsePanel();
             let appStatisticPanel = new AppStatisticPanel();
             //1. Select the application
-            await appBrowsePanel.clickOnRowByDisplayName(APP_DISPLAY_NAME);
+            await appBrowsePanel.clickOnRowByDisplayName(FIRST_APP);
             //2. Click on dropdown handle and expand the menu in Statistics Panel:
             await appStatisticPanel.clickOnActionDropDownMenu();
             let isVisible = await appStatisticPanel.waitForStopMenuItemVisible();
@@ -45,14 +45,14 @@ describe("Item Statistics Panel 'Action Menu' spec", function () {
             let appBrowsePanel = new AppBrowsePanel();
             let appStatisticPanel = new AppStatisticPanel();
             //1. Select the app and expand he menu:
-            await appBrowsePanel.clickOnRowByDisplayName(APP_DISPLAY_NAME);
+            await appBrowsePanel.clickOnRowByDisplayName(FIRST_APP);
             await appStatisticPanel.clickOnActionDropDownMenu();
             await appStatisticPanel.waitForStopMenuItemVisible();
             //2. Stop the app:
             await appStatisticPanel.clickOnStopActionMenuItem();
             await appBrowsePanel.pause(2000);
-            let state = await appBrowsePanel.getApplicationState(APP_DISPLAY_NAME);
-            studioUtils.saveScreenshot("action_menu_app_stopped");
+            let state = await appBrowsePanel.getApplicationState(FIRST_APP);
+            await studioUtils.saveScreenshot("action_menu_app_stopped");
             assert.strictEqual(state, 'stopped', 'The application should be `stopped`');
         });
 
@@ -61,14 +61,14 @@ describe("Item Statistics Panel 'Action Menu' spec", function () {
             let appBrowsePanel = new AppBrowsePanel();
             let appStatisticPanel = new AppStatisticPanel();
             //1. Select the app and expand he menu:
-            await appBrowsePanel.clickOnRowByDisplayName(APP_DISPLAY_NAME);
+            await appBrowsePanel.clickOnRowByDisplayName(FIRST_APP);
             //2. Start the app:
             await appStatisticPanel.clickOnActionDropDownMenu();
             await appStatisticPanel.waitForStartMenuItemVisible();
             await appStatisticPanel.clickOnStartActionMenuItem();
             await appBrowsePanel.pause(2000);
-            let state = await appBrowsePanel.getApplicationState(APP_DISPLAY_NAME);
-            studioUtils.saveScreenshot("action_menu_app_started");
+            let state = await appBrowsePanel.getApplicationState(FIRST_APP);
+            await studioUtils.saveScreenshot("action_menu_app_started");
             assert.strictEqual(state, 'started', 'The application should be `started`');
         });
 
@@ -78,19 +78,19 @@ describe("Item Statistics Panel 'Action Menu' spec", function () {
         async () => {
             let appBrowsePanel = new AppBrowsePanel();
             let appStatisticPanel = new AppStatisticPanel();
+            await restartTestApp();
             //1. Select two applications and expand the menu in Statistics Panel:
-            await appBrowsePanel.clickOnCheckboxAndSelectRowByDisplayName(APP_DISPLAY_NAME);
-            await appBrowsePanel.clickOnCheckboxAndSelectRowByDisplayName(APP_DISPLAY_NAME2);
+            await appBrowsePanel.clickOnCheckboxAndSelectRowByDisplayName(FIRST_APP);
+            await appBrowsePanel.clickOnCheckboxAndSelectRowByDisplayName(SECOND_APP);
             //2. Click on 'Stop' menu button in action menu:
             await appStatisticPanel.clickOnActionDropDownMenu();
-            await appStatisticPanel.pause(200);
             await appStatisticPanel.clickOnStopActionMenuItem();
             await appBrowsePanel.pause(2000);
             //3. Verify applications state:
-            let state1 = await appBrowsePanel.getApplicationState(APP_DISPLAY_NAME);
-            studioUtils.saveScreenshot("action_menu_multiselect");
+            let state1 = await appBrowsePanel.getApplicationState(FIRST_APP);
+            await studioUtils.saveScreenshot("action_menu_multiselect");
             assert.strictEqual(state1, 'started', "The application should be 'started'");
-            let state2 = await appBrowsePanel.getApplicationState(APP_DISPLAY_NAME2);
+            let state2 = await appBrowsePanel.getApplicationState(SECOND_APP);
             assert.strictEqual(state2, 'stopped', "The application should be 'stopped'");
 
         });
@@ -101,3 +101,14 @@ describe("Item Statistics Panel 'Action Menu' spec", function () {
         return console.log('specification is starting: ' + this.title);
     });
 });
+
+function restartTestApp() {
+    let appBrowsePanel = new AppBrowsePanel();
+    return appBrowsePanel.getApplicationState(appConstants.TEST_APPLICATIONS.SECOND_APP).then(result => {
+        if (result === 'stopped') {
+            return appBrowsePanel.clickOnCheckboxAndSelectRowByDisplayName(appConst.TEST_APPLICATIONS.THIRD_APP).then(() => {
+                return appBrowsePanel.clickOnStartButton();
+            })
+        }
+    });
+}

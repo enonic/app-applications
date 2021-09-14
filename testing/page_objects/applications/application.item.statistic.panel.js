@@ -129,11 +129,16 @@ class ApplicationItemStatisticsPanel extends Page {
         }, {timeout: appConst.mediumTimeout, timeoutMsg: "Expected state should be " + state});
     }
 
-    clickOnActionDropDownMenu() {
-        let selector = xpath.main + xpath.dropDownButton;
-        return this.clickOnElement(selector).catch(err => {
+    async clickOnActionDropDownMenu() {
+        try {
+            let selector = xpath.main + xpath.dropDownButton;
+            await this.waitForElementDisplayed(selector, appConst.mediumTimeout);
+            await this.clickOnElement(selector);
+            return await this.pause(300);
+        } catch (err) {
+            await this.saveScreenshot("err_action_dropdown");
             throw new Error('error when clicking on action menu: ' + err);
-        })
+        }
     }
 
     waitForStopMenuItemVisible() {
