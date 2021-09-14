@@ -5,7 +5,7 @@ module.exports = Object.freeze({
     shortTimeout: 2000,
     TIMEOUT_10: 10000,
     TIMEOUT_1: 1000,
-    SUITE_TIMEOUT: 280000,
+    SUITE_TIMEOUT: 200000,
     installAppTimeout: 60000,
     APPLICATION_TITLE: `Applications - Enonic XP Admin`,
     DELETE_INBOUND_MESSAGE: 'The content you are about to delete has inbound references. Please verify them before deletion.',

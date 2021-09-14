@@ -68,7 +68,7 @@ async function uiTests() {
         }
     });
     await runTests();
-    seleniumChildProcess.kill();
+    await seleniumChildProcess.kill();
 }
 
 uiTests();
