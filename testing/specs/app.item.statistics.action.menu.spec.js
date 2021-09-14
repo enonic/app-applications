@@ -106,7 +106,7 @@ function restartTestApp() {
     let appBrowsePanel = new AppBrowsePanel();
     return appBrowsePanel.getApplicationState(appConstants.TEST_APPLICATIONS.SECOND_APP).then(result => {
         if (result === 'stopped') {
-            return appBrowsePanel.clickOnCheckboxAndSelectRowByDisplayName(appConstants.TEST_APPLICATIONS.THIRD_APP).then(() => {
+            return appBrowsePanel.clickOnRowByDisplayName(appConstants.TEST_APPLICATIONS.SECOND_APP).then(() => {
                 return appBrowsePanel.clickOnStartButton();
             })
         }
