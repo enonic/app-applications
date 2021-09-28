@@ -9,7 +9,7 @@ const appConst = require('../libs/app_const');
 describe('Install app dialog, search input spec.', function () {
     this.timeout(appConst.SUITE_TIMEOUT);
     webDriverHelper.setupBrowser();
-    const not_existing = 'http://test.com';
+    const not_existing = 'https://repo.enonic.com/public/com/enonic/app/not-existing/0.0.0/not-existing-0.0.0.jar';
     const CONTENT_VIEWER_APP_URL = 'https://repo.enonic.com/public/com/enonic/app/contentviewer/1.5.2/contentviewer-1.5.2.jar';
 
     const local_file = "file:c:/";
