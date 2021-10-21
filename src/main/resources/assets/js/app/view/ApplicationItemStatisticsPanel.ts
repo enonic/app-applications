@@ -73,8 +73,8 @@ export class ApplicationItemStatisticsPanel
         if (!!this.actionMenu) {
             const app: Application = this.getItem();
             this.actionMenu.setLabel(this.getLocalizedState(app.getState()));
-            this.startAction.setEnabled(!app.isStarted());
-            this.stopAction.setEnabled(app.isStarted());
+            this.startAction.setVisible(!app.isStarted());
+            this.stopAction.setVisible(app.isStarted());
         }
     }
 
