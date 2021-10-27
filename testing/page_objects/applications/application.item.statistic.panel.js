@@ -103,7 +103,7 @@ class ApplicationItemStatisticsPanel extends Page {
             return await this.clickOnElement(xpath.stopActionMenuItem);
         } catch (err) {
             await this.saveScreenshot("err_stop_menu_item");
-            throw new Error("Error when clicking on Stop menu item");
+            throw new Error("Error when clicking on Stop menu item" + err);
         }
     }
 
