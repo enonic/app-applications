@@ -51,6 +51,7 @@ module.exports = {
         '@typescript-eslint/no-implied-eval': ['off'],
         '@typescript-eslint/no-empty-function': ['off'],
         '@typescript-eslint/no-empty-interface': ['off'],
+        '@typescript-eslint/no-unsafe-argument': ['off'],
 
         // === CUSTOM RULES ===
 
