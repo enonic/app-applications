@@ -12,8 +12,8 @@ const xpath = {
     parts: "//ul[@class='data-list' and descendant::li[text()='Part']]//span",
     applicationDataHeaders: "//li[@class='list-header']",
     idProviderApplicationsHeaders: `//div[contains(@id,'ItemDataGroup') and descendant::h2[text()='ID Provider Applications']]//li[@class='list-header']`,
-    stopActionMenuItem: `//div[contains(@id,'ActionMenu')]//li[contains(@id,'ActionMenuItem') and text()='Stop']`,
-    startActionMenuItem: `//div[contains(@id,'ActionMenu')]//li[contains(@id,'ActionMenuItem') and text()='Start']`,
+    stopActionMenuItem: `//div[contains(@id,'ActionMenu')]//li[contains(@id,'MenuItem') and text()='Stop']`,
+    startActionMenuItem: `//div[contains(@id,'ActionMenu')]//li[contains(@id,'MenuItem') and text()='Start']`,
     siteDataHeaders: "//div[contains(@id,'ApplicationItemStatisticsPanel')]/div[contains(@class,'application-data-container')]/div[contains(@class,'site')]//li[contains(@class,'list-header')]",
 };
 
@@ -103,7 +103,7 @@ class ApplicationItemStatisticsPanel extends Page {
             return await this.clickOnElement(xpath.stopActionMenuItem);
         } catch (err) {
             await this.saveScreenshot("err_stop_menu_item");
-            throw new Error("Error when clicking on Stop menu item");
+            throw new Error("Error when clicking on Stop menu item" + err);
         }
     }
 

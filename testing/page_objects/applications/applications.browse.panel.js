@@ -403,7 +403,7 @@ class AppBrowsePanel extends Page {
         try {
             await this.waitForElementNotDisplayed(this.selectionPanelToggler, appConst.mediumTimeout);
         } catch (err) {
-            this.saveScreenshot("err_selection_toggler_should_not_visible");
+            await this.saveScreenshot("err_selection_toggler_should_not_visible");
             throw new Error("Selection toggler should not be visible")
         }
     }
