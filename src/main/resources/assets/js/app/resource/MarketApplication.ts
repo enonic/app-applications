@@ -4,6 +4,7 @@ import {IDentifiable} from 'lib-admin-ui/IDentifiable';
 import {ProgressBar} from 'lib-admin-ui/ui/ProgressBar';
 import {i18n} from 'lib-admin-ui/util/Messages';
 import {MarketApplicationJson} from './json/MarketApplicationJson';
+import {Element} from 'lib-admin-ui/dom/Element';
 
 export class MarketApplication
     implements IDentifiable {
@@ -93,7 +94,7 @@ export class MarketApplication
         return this.versions;
     }
 
-    public setStatus(status: MarketAppStatus) {
+    public setStatus(status: MarketAppStatus): void {
         this.status = status;
     }
 
@@ -101,7 +102,7 @@ export class MarketApplication
         return this.status;
     }
 
-    public setProgress(progress: number) {
+    public setProgress(progress: number): void {
         this.progress = progress;
     }
 
@@ -151,7 +152,7 @@ export class MarketAppStatusFormatter {
         return status;
     }
 
-    public static createStatusElement(appStatus: MarketAppStatus, progress?: number) {
+    public static createStatusElement(appStatus: MarketAppStatus, progress?: number): Element {
         if (appStatus === MarketAppStatus.INSTALLING) {
             return new ProgressBar(progress);
         }

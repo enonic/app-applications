@@ -21,11 +21,11 @@ export class MarketApplicationMetadata
         return this.totalHits;
     }
 
-    setHits(hits: number) {
+    setHits(hits: number): void {
         this.hits = hits;
     }
 
-    setTotalHits(totalHits: number) {
+    setTotalHits(totalHits: number): void {
         this.totalHits = totalHits;
     }
 
