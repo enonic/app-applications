@@ -1,6 +1,6 @@
 import * as Q from 'q';
-import {MarketApplicationResponse} from 'lib-admin-ui/application/MarketApplicationResponse';
-import {ListMarketApplicationsRequest} from 'lib-admin-ui/application/ListMarketApplicationsRequest';
+import {ListMarketApplicationsRequest} from './ListMarketApplicationsRequest';
+import {MarketApplicationResponse} from './MarketApplicationResponse';
 
 export class MarketApplicationFetcher {
 

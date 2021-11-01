@@ -1,9 +1,9 @@
 import {TreeNode} from 'lib-admin-ui/ui/treegrid/TreeNode';
 import {GridColumn, GridColumnBuilder} from 'lib-admin-ui/ui/grid/GridColumn';
-import {MarketApplication, MarketAppStatus, MarketAppStatusFormatter} from 'lib-admin-ui/application/MarketApplication';
 import {MarketAppViewer} from './MarketAppViewer';
 import {AEl} from 'lib-admin-ui/dom/AEl';
 import {Application} from 'lib-admin-ui/application/Application';
+import {MarketApplication, MarketAppStatus, MarketAppStatusFormatter} from '../../resource/MarketApplication';
 
 export class MarketAppsTreeGridHelper {
 

@@ -2,8 +2,8 @@ import * as Q from 'q';
 import {Viewer} from 'lib-admin-ui/ui/Viewer';
 import {NamesAndIconView, NamesAndIconViewBuilder} from 'lib-admin-ui/app/NamesAndIconView';
 import {AEl} from 'lib-admin-ui/dom/AEl';
-import {MarketApplication} from 'lib-admin-ui/application/MarketApplication';
 import {NamesAndIconViewSize} from 'lib-admin-ui/app/NamesAndIconViewSize';
+import {MarketApplication} from '../../resource/MarketApplication';
 
 export class MarketAppViewer
     extends Viewer<MarketApplication> {
