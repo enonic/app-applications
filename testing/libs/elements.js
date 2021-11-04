@@ -2,6 +2,7 @@
  * Created on 02.12.2017.
  */
 module.exports = Object.freeze({
+    NOTIFICATION_TEXT: "//div[@class='notification-text']",
     FORM_VIEW: "//div[contains(@id,'FormView')]",
     CONTENT_SELECTOR: "//div[contains(@id,'ContentSelector')]",
     NAMES_VIEW_BY_NAME: "//div[contains(@id,'NamesView') and child::p[contains(@class,'sub-name') and contains(.,'%s')]]",
