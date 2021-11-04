@@ -130,7 +130,7 @@ export class InstallAppDialog
 
             this.getBody().addClass('mask-wrapper');
 
-            this.clearButton.addClass('clear-button');
+            this.clearButton.addClass('clear-button icon-close');
             this.applicationInput.appendChild(this.clearButton);
             this.applicationInput.getUploader().addDropzone(this.dropzoneContainer.getDropzone().getId());
 
