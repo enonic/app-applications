@@ -14,7 +14,7 @@ export class ApplicationBrowseItemPanel
     }
 
     private createBackButton() {
-        let backButton = new DivEl('application-item-statistics-panel-back-button');
+        let backButton = new DivEl('application-item-statistics-panel-back-button icon-arrow-left');
         backButton.onClicked(() => {
             this.addClass('hidden');
         });
