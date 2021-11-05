@@ -1,5 +1,6 @@
 const webDriverHelper = require('../libs/WebDriverHelper');
 const appConst = require('../libs/app_const');
+const lib = require('../libs/elements');
 const fs = require('fs');
 const path = require('path');
 
@@ -99,7 +100,7 @@ class Page {
     saveScreenshot(name) {
         let screenshotsDir = path.join(__dirname, '/../build/mochawesome-report/screenshots/');
         if (!fs.existsSync(screenshotsDir)) {
-            fs.mkdirSync(screenshotsDir, { recursive: true });
+            fs.mkdirSync(screenshotsDir, {recursive: true});
         }
         return this.browser.saveScreenshot(screenshotsDir + name + '.png').then(() => {
             console.log('screenshot is saved ' + name);
@@ -167,7 +168,7 @@ class Page {
 
     async waitForNotificationMessage() {
         try {
-            let notificationXpath = "//div[contains(@id,'NotificationContainer')]//div[@class='notification-content']";
+            let notificationXpath = "//div[contains(@id,'NotificationContainer')]" + lib.NOTIFICATION_TEXT;
             await this.getBrowser().waitUntil(async () => {
                 return await this.isElementDisplayed(notificationXpath);
             }, {timeout: appConst.mediumTimeout});
@@ -180,7 +181,7 @@ class Page {
     }
 
     waitForExpectedNotificationMessage(expectedMessage) {
-        let selector = `//div[contains(@id,'NotificationMessage')]//div[contains(@class,'notification-content') and contains(.,'${expectedMessage}')]`;
+        let selector = `//div[contains(@id,'NotificationMessage')]//div[contains(@class,'notification-text') and contains(.,'${expectedMessage}')]`;
         return this.waitForElementDisplayed(selector, appConst.mediumTimeout).catch(err => {
             this.saveScreenshot('err_notification_mess');
             throw new Error('expected notification message was not shown! ' + err);
@@ -188,7 +189,7 @@ class Page {
     }
 
     waitForErrorNotificationMessage() {
-        let selector = `//div[contains(@id,'NotificationMessage') and @class='notification error']//div[contains(@class,'notification-content')]`;
+        let selector = `//div[contains(@id,'NotificationMessage') and @class='notification error']` + lib.NOTIFICATION_TEXT;
         return this.waitForElementDisplayed(selector, appConst.mediumTimeout).then(() => {
             return this.getText(selector);
         })
