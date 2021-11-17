@@ -1,8 +1,8 @@
-import {ApplicationJson} from 'lib-admin-ui/application/json/ApplicationJson';
+import {ApplicationInstalledJson} from './ApplicationInstalledJson';
 
 export interface ApplicationInstallResultJson {
 
-    applicationInstalledJson: ApplicationJson;
+    applicationInstalledJson: ApplicationInstalledJson;
 
     failure: string;
 }
