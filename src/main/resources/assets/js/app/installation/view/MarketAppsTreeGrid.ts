@@ -17,9 +17,13 @@ import {MarketHelper} from 'lib-admin-ui/application/MarketHelper';
 import {MarketAppsTreeGridHelper} from './MarketAppsTreeGridHelper';
 import {InstallUrlApplicationRequest} from '../../resource/InstallUrlApplicationRequest';
 import {ApplicationInstallResult} from '../../resource/ApplicationInstallResult';
-import {GetApplicationRequest} from '../../resource/GetApplicationRequest';
+import {ApplicationKey} from 'lib-admin-ui/application/ApplicationKey';
 
 declare let CONFIG;
+
+interface GridEventData {
+    row: number;
+}
 
 export class MarketAppsTreeGrid
     extends TreeGrid<MarketApplication> {
@@ -51,18 +55,19 @@ export class MarketAppsTreeGrid
         this.installedApplications = [];
         this.loadingStartedListeners = [];
 
+        this.initListeners();
+    }
+
+    private initListeners(): void {
         this.subscribeAndManageInstallClick();
-        this.subscribeOnUninstallEvent();
-        this.subscribeOnInstallEvent();
+        this.subscribeOnApplicationEvents();
 
         this.onShown(() => {
-            if (this.loading) {
-                return;
+            if (!this.loading) {
+                this.reload().then(() => {
+                    this.getGrid().resizeCanvas();
+                });
             }
-
-            this.reload().then(() => {
-                this.getGrid().resizeCanvas();
-            });
         });
     }
 
@@ -79,18 +84,6 @@ export class MarketAppsTreeGrid
         });
     }
 
-    private subscribeOnUninstallEvent() { // set status of market app to NOT_INSTALLED if it was uninstalled
-        ApplicationEvent.on((event: ApplicationEvent) => {
-            if (ApplicationEventType.UNINSTALLED === event.getEventType()) {
-                let nodeToUpdate = this.getRoot().getNodeByDataIdFromCurrent(event.getApplicationKey().toString());
-                if (!!nodeToUpdate) {
-                    (nodeToUpdate.getData()).setStatus(MarketAppStatus.NOT_INSTALLED);
-                    this.reload();
-                }
-            }
-        });
-    }
-
     private findNodeByAppUrl(url: string): TreeNode<MarketApplication> {
         let nodes: TreeNode<MarketApplication>[] = this.getGrid().getDataView().getItems();
         for (let i = 0; i < nodes.length; i++) {
@@ -102,10 +95,8 @@ export class MarketAppsTreeGrid
         return null;
     }
 
-    private subscribeOnInstallEvent() { // update status of market app
+    private subscribeOnApplicationEvents() { // update status of market app
         ApplicationEvent.on((event: ApplicationEvent) => {
-
-            let nodeToUpdate;
 
             if (MarketAppsTreeGrid.debug) {
                 console.debug('MarketAppsTreeGrid: app event', event.getEventType(), event.getProgress());
@@ -113,111 +104,96 @@ export class MarketAppsTreeGrid
 
             switch (event.getEventType()) {
             case ApplicationEventType.PROGRESS:
-
-                //TODO: send appKey from backend instead of looking for it!
-                nodeToUpdate = this.findNodeByAppUrl(event.getApplicationUrl());
-                if (!!nodeToUpdate) {
-
-                    if (MarketAppsTreeGrid.debug) {
-                        console.debug('MarketAppsTreeGrid: progress', event.getApplicationUrl(), event.getProgress());
-                    }
-
-                    let app = <MarketApplication>nodeToUpdate.getData();
-                    app.setProgress(event.getProgress());
-
-                    let row = this.getGrid().getDataView().getRowById(nodeToUpdate.getId());
-                    if (row > -1) {
-                        let cell = this.getGrid().getColumnIndex('appStatus');
-                        this.getGrid().updateCell(row, cell);
-                    }
-                }
+                this.handleApplicationProgress(event.getApplicationUrl(), event.getProgress());
                 break;
             case ApplicationEventType.INSTALLED:
-
-                nodeToUpdate = this.getRoot().getCurrentRoot().findNode(event.getApplicationKey().toString());
-                if (!!nodeToUpdate) {
-
-                    if (MarketAppsTreeGrid.debug) {
-                        console.debug('MarketAppsTreeGrid: installed', event.getApplicationUrl(), event.getProgress());
-                    }
-
-                    const app = <MarketApplication>nodeToUpdate.getData();
-                    app.setStatus(MarketAppStatus.INSTALLED);
-
-                    new GetApplicationRequest(event.getApplicationKey(), true).sendAndParse()
-                        .then((application: Application) => {
-                            if (application) {
-                                const marketApplication: MarketApplication = <MarketApplication>nodeToUpdate.getData();
-
-                                if (MarketHelper.installedAppCanBeUpdated(marketApplication, application)) {
-                                    marketApplication.setStatus(MarketAppStatus.OLDER_VERSION_INSTALLED);
-                                } else {
-                                    marketApplication.setStatus(MarketAppStatus.INSTALLED);
-                                }
-                                let row = this.getGrid().getDataView().getRowById(nodeToUpdate.getId());
-                                if (row > -1) {
-                                    this.getGrid().updateRow(row);
-                                }
-                            }
-                        });
-                }
+                // Since Market App ID and Application key may differ, handle it in InstallUrlApplicationRequest response
+                break;
+            case ApplicationEventType.UNINSTALLED:
+                this.handleApplicationUninstalled(event.getApplicationKey());
                 break;
             }
         });
+    }
+
+    private handleApplicationProgress(appUrl: string, progress: number): void {
+        // TODO: send appKey from backend instead of looking for it!
+        const nodeToUpdate = this.findNodeByAppUrl(appUrl);
+        if (!nodeToUpdate) {
+            return;
+        }
+
+        if (MarketAppsTreeGrid.debug) {
+            console.debug(`MarketAppsTreeGrid: progress ${progress}`);
+        }
+
+        let app = nodeToUpdate.getData();
+        app.setProgress(progress);
+
+        let row = this.getGrid().getDataView().getRowById(nodeToUpdate.getId());
+        if (row > -1) {
+            let cell = this.getGrid().getColumnIndex('appStatus');
+            this.getGrid().updateCell(row, cell);
+        }
+    }
+
+    private handleApplicationInstalled(row: number): void {
+        const nodeToUpdate = this.getItem(row);
+        if (!nodeToUpdate) {
+            return;
+        }
+
+        if (MarketAppsTreeGrid.debug) {
+            console.debug('MarketAppsTreeGrid: installed');
+        }
+
+        const marketApplication = nodeToUpdate.getData();
+        const url = marketApplication.getLatestVersionDownloadUrl();
+        const oldStatus = marketApplication.getStatus();
+
+        marketApplication.setStatus(MarketAppStatus.INSTALLING);
+        this.getGrid().updateRow(row);
+
+        void new InstallUrlApplicationRequest(url)
+            .sendAndParse().then((result: ApplicationInstallResult) => {
+                if (result.getFailure()) {
+                    throw result.getFailure();
+                }
+
+                if (MarketHelper.installedAppCanBeUpdated(marketApplication, result.getApplication())) {
+                    marketApplication.setStatus(MarketAppStatus.OLDER_VERSION_INSTALLED);
+                } else {
+                    marketApplication.setStatus(MarketAppStatus.INSTALLED);
+                }
+            }).catch((reason: any) => {
+                marketApplication.setStatus(oldStatus);
+                DefaultErrorHandler.handle(reason);
+            }).finally(() => {
+                this.getGrid().updateRow(row);
+            });
+    }
+
+    private handleApplicationUninstalled(appKey: ApplicationKey): void {
+        let nodeToUpdate = this.getRoot().getNodeByDataIdFromCurrent(appKey.toString());
+        if (nodeToUpdate) {
+            nodeToUpdate.getData().setStatus(MarketAppStatus.NOT_INSTALLED);
+            this.reload();
+        }
     }
 
     private subscribeAndManageInstallClick() {
-        this.getGrid().subscribeOnClick((event, data) => {
-            const node = this.getItem(data.row);
-            const app = node.getData();
-            const url = app.getLatestVersionDownloadUrl();
-            const {target} = event;
-            const status = app.getStatus();
+        this.getGrid().subscribeOnClick(({target}, data) => {
             const elem = Element.fromHtmlElement(target.tagName.toLowerCase() === 'a' ? target : target.parentElement);
-
-            if ((elem.hasClass(MarketAppStatusFormatter.statusInstallCssClass) ||
-                 elem.hasClass(MarketAppStatusFormatter.statusUpdateCssClass))) {
-
-                app.setStatus(MarketAppStatus.INSTALLING);
-
-                let row = this.getGrid().getDataView().getRowById(node.getId());
-                if (row > -1) {
-                    this.getGrid().updateCell(row, this.getGrid().getColumnIndex('appStatus'));
-                }
-
-                if (MarketAppsTreeGrid.debug) {
-                    console.debug('MarketAppsTreeGrid: starting install', url, elem);
-                }
-
-                new InstallUrlApplicationRequest(url)
-                    .sendAndParse().then((result: ApplicationInstallResult) => {
-                    // ApplicationEvent.un(progressHandler);
-                    if (!result.getFailure()) {
-
-                        elem.removeClass(MarketAppStatusFormatter.statusInstallCssClass + ' ' +
-                                         MarketAppStatusFormatter.statusUpdateCssClass);
-                        elem.addClass(MarketAppStatusFormatter.getStatusCssClass(MarketAppStatus.INSTALLED));
-
-                    } else {
-                        elem.removeChildren();
-                        elem.appendChild(MarketAppStatusFormatter.createStatusElement(status));
-                        app.setStatus(status);
-                        if (row > -1) {
-                            this.getGrid().updateCell(row, this.getGrid().getColumnIndex('appStatus'));
-                        }
-                        DefaultErrorHandler.handle(result.getFailure());
-                    }
-
-                }).catch((reason: any) => {
-                    elem.removeChildren();
-                    elem.appendChild(MarketAppStatusFormatter.createStatusElement(status));
-                    DefaultErrorHandler.handle(reason);
-                });
+            const canInstall = elem.hasClass(MarketAppStatusFormatter.statusInstallCssClass) ||
+                               elem.hasClass(MarketAppStatusFormatter.statusUpdateCssClass);
+            if (!canInstall) {
+                return;
             }
+
+            const {row} = (data as GridEventData);
+            this.handleApplicationInstalled(row);
         });
     }
-
-
 
     isEmptyNode(node: TreeNode<MarketApplication>): boolean {
         const data = node.getData();

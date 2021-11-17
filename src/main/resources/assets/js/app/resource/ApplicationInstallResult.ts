@@ -12,7 +12,8 @@ export class ApplicationInstallResult
 
     static fromJson(json: ApplicationInstallResultJson): ApplicationInstallResult {
         let result = new ApplicationInstallResult();
-        result.application = json.applicationInstalledJson ? Application.fromJson(json.applicationInstalledJson) : null;
+        const applicationJson = json.applicationInstalledJson?.application;
+        result.application = applicationJson ? Application.fromJson(applicationJson) : null;
         result.failure = json.failure;
         return result;
     }
