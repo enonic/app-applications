@@ -16,7 +16,7 @@ import {ApplicationInstallResult} from '../../resource/ApplicationInstallResult'
 export class ApplicationInput
     extends CompositeFormInputEl {
 
-    private static LAST_KEY_PRESS_TIMEOUT: number = 300;
+    private static LAST_KEY_PRESS_TIMEOUT: number = 100;
 
     private textInput: InputEl;
 
@@ -117,10 +117,6 @@ export class ApplicationInput
         return this;
     }
 
-    public hasMatchInEntry(entry: string): boolean {
-        return entry.toLowerCase().indexOf(this.getValue().toLowerCase()) > -1;
-    }
-
     getTextInput(): InputEl {
         return this.textInput;
     }
@@ -128,6 +124,7 @@ export class ApplicationInput
     reset(): ApplicationInput {
         this.textInput.reset();
         this.applicationUploaderEl.reset();
+        this.notifyTextValueChanged();
         return this;
     }
 
