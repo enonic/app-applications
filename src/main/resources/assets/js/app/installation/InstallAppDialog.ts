@@ -13,8 +13,6 @@ import {UploadFailedEvent} from 'lib-admin-ui/ui/uploader/UploadFailedEvent';
 import {NotifyManager} from 'lib-admin-ui/notify/NotifyManager';
 import {UploadStartedEvent} from 'lib-admin-ui/ui/uploader/UploadStartedEvent';
 import {DivEl} from 'lib-admin-ui/dom/DivEl';
-import {TreeNode} from 'lib-admin-ui/ui/treegrid/TreeNode';
-import {MarketApplication} from 'lib-admin-ui/application/MarketApplication';
 
 export class InstallAppDialog
     extends ModalDialog {
@@ -34,6 +32,8 @@ export class InstallAppDialog
             title: i18n('dialog.install'),
             class: 'install-application-dialog'
         });
+
+        this.marketAppsTreeGrid.reload();
     }
 
     protected initElements() {
@@ -47,23 +47,39 @@ export class InstallAppDialog
 
         this.dropzoneContainer = new DropzoneContainer(true);
 
-        this.marketAppsTreeGrid = new MarketAppsTreeGrid();
+        this.marketAppsTreeGrid = new MarketAppsTreeGrid((item, args) => {
+            if (!item.isVisible()) {
+                return false;
+            }
+
+            const marketApp = item.getData();
+            if (marketApp.isEmpty()) {
+                // true for an empty app because it is the empty node that triggers loading
+                return true;
+            }
+
+            const inputValue = args?.searchString?.toLowerCase() || '';
+
+            const displayName = marketApp.getDisplayName().toLowerCase();
+            const description = marketApp.getDescription().toLowerCase();
+
+            return displayName.indexOf(inputValue) >= 0 || description.indexOf(inputValue) >= 0;
+        });
     }
 
     protected postInitElements() {
         super.postInitElements();
-
         this.setElementToFocusOnShow(this.applicationInput);
-        this.marketAppsTreeGrid.setNodesFilter(this.filterNodes.bind(this));
     }
 
     protected initListeners() {
         super.initListeners();
 
         this.applicationInput.onTextValueChanged(() => {
-            this.clearButton.setVisible(!StringHelper.isEmpty(this.applicationInput.getValue()));
-            this.marketAppsTreeGrid.mask();
-            this.marketAppsTreeGrid.reload();
+            const searchString = this.applicationInput.getValue();
+            const hasValue = !StringHelper.isEmpty(searchString);
+            this.clearButton.setVisible(hasValue);
+            this.marketAppsTreeGrid.setFilterArgs({searchString});
         });
 
         this.applicationInput.onAppInstallStarted(() => {
@@ -106,7 +122,6 @@ export class InstallAppDialog
 
         this.clearButton.onClicked(() => {
             this.applicationInput.reset();
-            this.marketAppsTreeGrid.reload();
             this.clearButton.hide();
             this.applicationInput.getTextInput().giveFocus();
         });
@@ -116,6 +131,24 @@ export class InstallAppDialog
 
         this.onShown(() => {
             this.clearButton.hide();
+        });
+
+        this.marketAppsTreeGrid.onShown(() => {
+            const isLoading = this.hasClass('loading');
+            if (isLoading) {
+                this.marketAppsTreeGrid.mask();
+            }
+        });
+
+        this.marketAppsTreeGrid.onRowCountChanged((event, data) => {
+            const isLoading = this.hasClass('loading');
+            if (!isLoading) {
+                if (data.current < 1) {
+                    this.statusMessage.showNoResult();
+                } else {
+                    this.statusMessage.hide();
+                }
+            }
         });
     }
 
@@ -203,28 +236,6 @@ export class InstallAppDialog
         if (this.applicationInput) {
             this.applicationInput.reset();
         }
-    }
-
-    private filterNodes(nodes: TreeNode<MarketApplication>[]): TreeNode<MarketApplication>[] {
-        let items = nodes;
-        if (this.applicationInput && !StringHelper.isEmpty(this.applicationInput.getValue())) {
-            items = nodes.filter((node: TreeNode<MarketApplication>) => {
-                return this.nodePassesFilterCondition(node);
-            });
-        }
-
-        return items;
-    }
-
-    private nodePassesFilterCondition(node: TreeNode<MarketApplication>): boolean {
-        const app: MarketApplication = node.getData();
-        // true for empty app because empty app is empty node that triggers loading
-        return app.isEmpty() ? true : this.appHasFilterEntry(app);
-    }
-
-    private appHasFilterEntry(app: MarketApplication): boolean {
-        return this.applicationInput.hasMatchInEntry(app.getDisplayName()) ||
-               this.applicationInput.hasMatchInEntry(app.getDescription());
     }
 }
 

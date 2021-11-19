@@ -34,6 +34,13 @@ export class ApplicationBrowsePanel
         this.registerEvents();
     }
 
+    private static sendApplicationActionRequest(action: string, applications: Application[]) {
+        const applicationKeys: ApplicationKey[] = ApplicationKey.fromApplications(applications);
+        new ApplicationActionRequest(applicationKeys, action)
+            .sendAndParse()
+            .catch(DefaultErrorHandler.handle).done();
+    }
+
     protected createToolbar(): Toolbar {
         const toolbar: Toolbar = new Toolbar();
         const readonlyMode: boolean = CONFIG.readonlyMode === 'true';
@@ -68,20 +75,13 @@ export class ApplicationBrowsePanel
         return readonlyMode ? null : super.getBrowseActions();
     }
 
-    private sendApplicationActionRequest(action: string, applications: Application[]) {
-        const applicationKeys: ApplicationKey[] = ApplicationKey.fromApplications(applications);
-        new ApplicationActionRequest(applicationKeys, action)
-            .sendAndParse()
-            .catch(DefaultErrorHandler.handle).done();
-    }
-
     private registerEvents() {
         StopApplicationEvent.on((event: StopApplicationEvent) =>
-            this.sendApplicationActionRequest('stop', event.getApplications()));
+            ApplicationBrowsePanel.sendApplicationActionRequest('stop', event.getApplications()));
         StartApplicationEvent.on((event: StartApplicationEvent) =>
-            this.sendApplicationActionRequest('start', event.getApplications()));
+            ApplicationBrowsePanel.sendApplicationActionRequest('start', event.getApplications()));
         UninstallApplicationEvent.on((event: UninstallApplicationEvent) =>
-            this.sendApplicationActionRequest('uninstall', event.getApplications()));
+            ApplicationBrowsePanel.sendApplicationActionRequest('uninstall', event.getApplications()));
 
         ApplicationEvent.on((event: ApplicationEvent) => {
             this.handleAppEvent(event);
@@ -97,13 +97,19 @@ export class ApplicationBrowsePanel
             return;
         }
 
-        if (ApplicationEventType.INSTALLED === event.getEventType()) {
+        switch (event.getEventType()) {
+        case ApplicationEventType.INSTALLED:
             this.handleAppInstalledEvent(event);
-        } else if (ApplicationEventType.UNINSTALLED === event.getEventType()) {
+            return;
+        case ApplicationEventType.UNINSTALLED:
             this.handleAppUninstalledEvent(event);
-        } else if (ApplicationEventType.STOPPED === event.getEventType()) {
+            return;
+        case ApplicationEventType.STOPPED:
             this.handleAppStoppedEvent(event);
-        } else if (event.isNeedToUpdateApplication() && event.getApplicationKey()) {
+            return;
+        }
+
+        if (event.isNeedToUpdateApplication() && event.getApplicationKey()) {
             this.treeGrid.updateApplicationNode(event.getApplicationKey());
         }
     }
