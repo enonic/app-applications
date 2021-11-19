@@ -109,4 +109,17 @@ export class MarketAppsTreeGridHelper {
 
         return 0;
     }
+
+    public static compareAppsByStatus(app1: MarketApplication, app2: MarketApplication): number {
+        if ((app1.getStatus() === MarketAppStatus.OLDER_VERSION_INSTALLED) &&
+            (app2.getStatus() === MarketAppStatus.OLDER_VERSION_INSTALLED)) {
+            return app1.getDisplayName().localeCompare(app2.getDisplayName());
+        }
+
+        if (app1.getStatus() === MarketAppStatus.OLDER_VERSION_INSTALLED) {
+            return -1;
+        }
+
+        return 1;
+    }
 }
