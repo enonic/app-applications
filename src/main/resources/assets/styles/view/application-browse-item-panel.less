@@ -1,38 +1,81 @@
 .application-browse-item-panel {
 
-  .application-item-statistics-panel-back-button {
+  .application-item-statistics-toolbar {
     display: none;
-    font-size: 20px;
+    height: 44px;
+    padding: 0 0 0 44px;
+    background-color: @admin-black;
+  }
+
+  .application-item-statistics-panel-back-button {
     position: absolute;
-    top: 5px;
-    left: 5px;
+    left: 0;
+    width: 44px;
+    height: 44px;
+    line-height: 44px;
+    text-align: center;
+    font-size: 20px;
     cursor: pointer;
+
+    &::before {
+      color: @admin-white;
+    }
   }
 }
 
 body._360-540, body._240-360, body._0-240 {
 
   .application-browse-item-panel {
-    left: 100%;
-    background-color: @admin-white;
+    display: initial !important;
     position: fixed !important;
-    height: inherit !important;
-    display: inherit !important;
-    z-index: 2502;
+    left: 100%;
+    width: 100% !important;
+    background-color: @admin-white;
     transition: left 0.3s linear;
+    z-index: 2502;
 
     &:not(.no-selection):not(.hidden) {
+      left: 0;
+    }
 
-      left: 0%;
+    .application-item-statistics-toolbar {
+      display: block;
+    }
 
-      .application-item-statistics-panel-back-button {
-        display: block;
+    .header {
+      padding: 16px;
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+
+      img {
+        margin-right: 8px;
+        height: 32px;
+        width: 32px;
       }
+
+      h1 {
+        flex: 1 0 auto;
+        width: calc(100% - 48px);
+        margin: 0;
+        font-size: 22px;
+        line-height: 28px;
+      }
+
+      h4 {
+        flex: 1 0 auto;
+        width: 100%;
+      }
+    }
+
+    .application-data-container {
+      padding: 0 16px;
     }
 
     .action-menu-wrapper {
       background-color: @admin-bg-light-gray;
-      padding: 3px 0 10px 0;
+      padding: 8px 0;
+      margin-bottom: 8px;
 
       .action-menu {
         width: 100px;
@@ -40,36 +83,7 @@ body._360-540, body._240-360, body._0-240 {
         margin: 0 auto;
         top: 0;
         right: 0;
-
-        .drop-down-button {
-          padding: 4px 5px;
-
-          &:before {
-            top: 5px;
-          }
-        }
       }
     }
-
-    .header {
-      padding: 4px 10px 0 10px;
-      display: flex;
-      justify-content: center;
-
-      img {
-        margin-left: 4px;
-        margin-right: 10px;
-        height: 32px;
-        width: 32px;
-      }
-
-      h1 {
-        margin: 0;
-        font-size: 22px;
-        line-height: 28px;
-      }
-    }
-
   }
-
 }
