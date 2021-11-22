@@ -10,16 +10,28 @@ export class ApplicationBrowseItemPanel
     constructor() {
         super();
         this.addClass('application-browse-item-panel');
-        this.createBackButton();
+
+        this.initElements();
     }
 
-    private createBackButton() {
-        let backButton = new DivEl('application-item-statistics-panel-back-button icon-arrow-left');
+    protected initElements(): void {
+        const toolbar = this.createItemStatisticsToolbar();
+        const backButton = this.createBackButton();
+        toolbar.appendChild(backButton);
+        this.itemStatisticsPanel.appendChild(toolbar);
+    }
+
+    private createItemStatisticsToolbar(): DivEl {
+        return new DivEl('application-item-statistics-toolbar');
+    }
+
+    private createBackButton(): DivEl {
+        const backButton = new DivEl('application-item-statistics-panel-back-button icon-arrow-left2');
         backButton.onClicked(() => {
             this.addClass('hidden');
         });
 
-        this.itemStatisticsPanel.appendChild(backButton);
+        return backButton;
     }
 
     togglePreviewForItem(item?: Application) {
