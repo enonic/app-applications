@@ -104,12 +104,7 @@ export class InstallAppDialog
 
         this.marketAppsTreeGrid.onLoaded(() => {
             this.statusMessage.reset();
-
-            if (this.marketAppsTreeGrid.isDataViewEmpty()) {
-                this.statusMessage.showNoResult();
-            } else {
-                this.statusMessage.hide();
-            }
+            this.toggleStatusMessage(this.marketAppsTreeGrid.isDataViewEmpty());
             this.removeClass('loading');
             this.notifyResize();
         });
@@ -143,13 +138,24 @@ export class InstallAppDialog
         this.marketAppsTreeGrid.onRowCountChanged((event, data) => {
             const isLoading = this.hasClass('loading');
             if (!isLoading) {
-                if (data.current < 1) {
-                    this.statusMessage.showNoResult();
-                } else {
-                    this.statusMessage.hide();
-                }
+                this.toggleStatusMessage(data.current < 1);
             }
         });
+    }
+
+    private toggleStatusMessage(showStatus: boolean) {
+        if (showStatus) {
+            this.statusMessage.showNoResult();
+            if (this.getBody().isVisible()) {
+                this.getBody().hide();
+            }
+        } else {
+            this.statusMessage.hide();
+            if (!this.getBody().isVisible()) {
+                this.getBody().show();
+                this.marketAppsTreeGrid.getGrid().resizeCanvas();
+            }
+        }
     }
 
     updateInstallApplications(installApplications: Application[]) {

@@ -77,7 +77,6 @@ export class MarketAppsTreeGrid
                 this.getCurrentData();
                 const marketApps = this.getRoot().getAllNodes().map(node => node.getData());
                 this.updateAppsStatuses(marketApps);
-                this.invalidate();
             }
         });
     }
