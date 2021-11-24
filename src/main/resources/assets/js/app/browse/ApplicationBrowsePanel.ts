@@ -75,6 +75,13 @@ export class ApplicationBrowsePanel
         return readonlyMode ? null : super.getBrowseActions();
     }
 
+    protected updatePreviewItem() {
+        super.updatePreviewItem();
+
+        const hasHighlighted = this.treeGrid.hasHighlightedNode();
+        this.getBrowseItemPanel().toggleClass('highlighted', hasHighlighted);
+    }
+
     private registerEvents() {
         StopApplicationEvent.on((event: StopApplicationEvent) =>
             ApplicationBrowsePanel.sendApplicationActionRequest('stop', event.getApplications()));

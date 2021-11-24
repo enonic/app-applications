@@ -11,6 +11,8 @@ import {UploadItem} from 'lib-admin-ui/ui/uploader/UploadItem';
 import {ApplicationTreeGridHelper} from './ApplicationTreeGridHelper';
 import {ListApplicationsRequest} from '../resource/ListApplicationsRequest';
 import {GetApplicationRequest} from '../resource/GetApplicationRequest';
+import {ResponsiveRanges} from 'lib-admin-ui/ui/responsive/ResponsiveRanges';
+import {Body} from 'lib-admin-ui/dom/Body';
 
 declare const CONFIG;
 
@@ -22,8 +24,14 @@ export class ApplicationTreeGrid
             .setColumnConfig(ApplicationTreeGridHelper.generateColumnsConfig())
             .prependClasses('application-grid');
 
-        const readonlyMode: boolean = CONFIG.readonlyMode === 'true';
+        const columns = builder.getColumns().slice(0);
+        const updateColumns = () => {
+            const checkSelIsMoved = ResponsiveRanges._540_720.isFitOrSmaller(Body.get().getEl().getWidth());
+            this.setColumns(columns.slice(0), checkSelIsMoved);
+        };
+        builder.setColumnUpdater(updateColumns);
 
+        const readonlyMode = CONFIG.readonlyMode === 'true';
         builder.setCheckableRows(!readonlyMode);
 
         super(builder);
