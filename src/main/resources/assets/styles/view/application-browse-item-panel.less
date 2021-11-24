@@ -23,7 +23,10 @@
   }
 }
 
-body._360-540, body._240-360, body._0-240 {
+body._540-720,
+body._360-540,
+body._240-360,
+body._0-240 {
 
   .application-browse-item-panel {
     display: initial !important;
@@ -34,7 +37,7 @@ body._360-540, body._240-360, body._0-240 {
     transition: left 0.3s linear;
     z-index: 2502;
 
-    &:not(.no-selection):not(.hidden) {
+    &:not(.no-selection):not(.hidden).highlighted {
       left: 0;
     }
 
