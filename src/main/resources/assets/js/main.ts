@@ -11,6 +11,7 @@ import {AppHelper} from 'lib-admin-ui/util/AppHelper';
 import {ServerEventsListener} from 'lib-admin-ui/event/ServerEventsListener';
 import {i18nInit} from 'lib-admin-ui/util/MessagesInitializer';
 import {i18n} from 'lib-admin-ui/util/Messages';
+import {InstalledAppChangedEvent} from './app/installation/InstalledAppChangedEvent';
 
 declare const CONFIG;
 
@@ -55,6 +56,10 @@ function startApplication() {
     InstallAppPromptEvent.on((event) => {
         installAppDialog.updateInstallApplications(event.getInstalledApplications());
         installAppDialog.open();
+    });
+
+    InstalledAppChangedEvent.on((event) => {
+        installAppDialog.updateInstallApplications(event.getInstalledApplications());
     });
 
 }

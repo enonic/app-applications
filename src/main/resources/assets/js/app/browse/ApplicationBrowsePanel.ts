@@ -19,6 +19,7 @@ import {UploadItem} from 'lib-admin-ui/ui/uploader/UploadItem';
 import {Toolbar} from 'lib-admin-ui/ui/toolbar/Toolbar';
 import {DivEl} from 'lib-admin-ui/dom/DivEl';
 import {SpanEl} from 'lib-admin-ui/dom/SpanEl';
+import {InstalledAppChangedEvent} from '../installation/InstalledAppChangedEvent';
 
 declare const CONFIG;
 
@@ -127,7 +128,9 @@ export class ApplicationBrowsePanel
                 const installedApp: Application = this.treeGrid.getByApplicationKey(event.getApplicationKey());
                 const installedAppName: string = installedApp ? installedApp.getDisplayName() : event.getApplicationKey().toString();
                 showFeedback(i18n('notify.installed', installedAppName));
-                this.treeGrid.reload();
+                this.treeGrid.reload().then(() => {
+                    new InstalledAppChangedEvent(this.treeGrid.getDefaultData()).fire();
+                });
             }, 200);
         });
     }
@@ -137,6 +140,7 @@ export class ApplicationBrowsePanel
         const uninstalledAppName: string = uninstalledApp ? uninstalledApp.getDisplayName() : event.getApplicationKey().toString();
         showFeedback(i18n('notify.uninstalled', uninstalledAppName));
         this.treeGrid.deleteNodeByDataId(event.getApplicationKey().toString());
+        new InstalledAppChangedEvent(this.treeGrid.getDefaultData()).fire();
     }
 
     private handleAppStoppedEvent(event: ApplicationEvent) {
