@@ -202,12 +202,12 @@ export class MarketAppsTreeGrid
         return !data.getAppKey();
     }
 
-    sortNodeChildren(node: TreeNode<MarketApplication>) {
-        this.initData(this.getRoot().getCurrentRoot().treeToList());
-    }
-
     updateInstallApplications(installApplications: Application[]) {
         this.installedApplications = installApplications;
+
+        const apps = this.updateAndSortApps(this.getDefaultData());
+
+        super.initData(this.dataToTreeNodes(apps, this.getRoot().getDefaultRoot()));
     }
 
     fetchChildren(): Q.Promise<MarketApplication[]> {
@@ -215,13 +215,9 @@ export class MarketAppsTreeGrid
         this.hideErrorPanelIfVisible();
 
         return MarketApplicationFetcher.fetchApps(CONFIG.xpVersion).then((data: MarketApplicationResponse) => {
-            const loadedApps: MarketApplication[] = data.getApplications();
-            this.updateAppsStatuses(loadedApps);
-            loadedApps.sort(MarketAppsTreeGridHelper.compareAppsByStatus);
-
-            this.getRoot().getCurrentRoot().setMaxChildren(data.getMetadata().getTotalHits());
-
-            return loadedApps;
+            const totalHits = data.getMetadata().getTotalHits();
+            this.getRoot().getCurrentRoot().setMaxChildren(totalHits);
+            return this.updateAndSortApps(data.getApplications());
         }).catch((reason: any) => {
             const status500Message = i18n('market.error.500');
             const defaultErrorMessage = i18n('market.error.default');
@@ -229,6 +225,11 @@ export class MarketAppsTreeGrid
             DefaultErrorHandler.handle(exception);
             return [];
         });
+    }
+
+    private updateAndSortApps(apps: MarketApplication[]): MarketApplication[] {
+        this.updateAppsStatuses(apps);
+        return apps.sort(MarketAppsTreeGridHelper.compareAppsByStatusAndDisplayName);
     }
 
     private hideErrorPanelIfVisible() {
