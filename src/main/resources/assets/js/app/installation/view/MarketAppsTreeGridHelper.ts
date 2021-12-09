@@ -110,16 +110,15 @@ export class MarketAppsTreeGridHelper {
         return 0;
     }
 
-    public static compareAppsByStatus(app1: MarketApplication, app2: MarketApplication): number {
-        if ((app1.getStatus() === MarketAppStatus.OLDER_VERSION_INSTALLED) &&
-            (app2.getStatus() === MarketAppStatus.OLDER_VERSION_INSTALLED)) {
+    public static compareAppsByStatusAndDisplayName(app1: MarketApplication, app2: MarketApplication): number {
+        if (app1.getStatus() === app2.getStatus()) {
             return app1.getDisplayName().localeCompare(app2.getDisplayName());
-        }
-
-        if (app1.getStatus() === MarketAppStatus.OLDER_VERSION_INSTALLED) {
+        } else if (app1.getStatus() === MarketAppStatus.OLDER_VERSION_INSTALLED) {
             return -1;
+        } else if (app2.getStatus() === MarketAppStatus.OLDER_VERSION_INSTALLED) {
+            return 1;
         }
 
-        return 1;
+        return app1.getDisplayName().localeCompare(app2.getDisplayName());
     }
 }
