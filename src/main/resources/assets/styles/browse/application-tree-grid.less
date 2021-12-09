@@ -24,10 +24,6 @@
 
         .@{_COMMON_PREFIX}wrapper {
           flex-shrink: 0;
-
-          &::before {
-            display: none;
-          }
         }
       }
     }
@@ -49,8 +45,8 @@
     }
   }
 
-  .application-viewer {
-    &.local .names-and-icon-view .@{_COMMON_PREFIX}wrapper:before {
+  .application-viewer.local {
+    .names-and-icon-view .@{_COMMON_PREFIX}wrapper::before {
       content: "L";
       background: @admin-blue;
       color: @admin-white;
