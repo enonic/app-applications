@@ -71,8 +71,8 @@ class InstallAppDialog extends Page {
     waitForInstallLink(appName) {
         const selector = XPATH.installLinkByName(appName);
         return this.waitForElementDisplayed(selector, appConst.mediumTimeout).catch(err => {
-            this.saveScreenshot('err_install_link_load');
-            throw new Error('Install link was not loaded! ' + err);
+            this.saveScreenshot(appConst.generateRandomName('err_install_link'));
+            throw new Error(`Install link is not displayed for!  ` + err);
         })
     }
 
@@ -83,7 +83,7 @@ class InstallAppDialog extends Page {
             await this.pause(400);
             return await this.clickOnElement(selector);
         } catch (err) {
-            throw new Error(`Couldn't find install link for app ${appName}` + " " + err);
+            throw new Error(`Couldn't find install link for app ` + " " + err);
         }
     }
 
@@ -92,7 +92,7 @@ class InstallAppDialog extends Page {
         const selector = lib.slickRowByDisplayName(XPATH.container, appName) + "//a[@class='installed']";
         return this.waitForElementDisplayed(selector, appConst.longTimeout).catch(err => {
             this.saveScreenshot('err_find_installed_status');
-            throw new Error(`Couldn't find 'Installed' label for the app ${appName}` + " " + err);
+            throw new Error(`Couldn't find 'Installed' label for the app` + " " + err);
         });
     }
 

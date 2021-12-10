@@ -26,11 +26,14 @@ class UninstallAppDialog extends Page {
         return this.getText(XPATH.content);
     }
 
-    waitForOpened() {
-        return this.waitForElementDisplayed(XPATH.container, appConst.mediumTimeout).catch(err => {
+    async waitForOpened() {
+        try {
+            await this.waitForElementDisplayed(XPATH.container, appConst.mediumTimeout);
+            return await this.pause(500);
+        } catch (err) {
             this.saveScreenshot('err_load_uninstall_dialog');
             throw new Error('Uninstall dialog was not loaded! ' + err);
-        });
+        }
     }
 
     async clickOnYesButton() {
@@ -42,13 +45,13 @@ class UninstallAppDialog extends Page {
     clickOnCancelButtonTop() {
         return this.clickOnElement(this.cancelButtonTop).catch(err => {
             this.saveScreenshot('err_uninstall_dialog_cancel');
-            throw new Error('Error when try click on cancel button ' + err);
+            throw new Error("Error when click on Cancel button " + err);
         })
     }
 
     clickOnNoButton() {
         return this.clickOnElement(this.noButton).catch(err => {
-            throw new Error('Error when try click on no button ' + err);
+            throw new Error("Error when click on 'No' button " + err);
         })
     }
 
@@ -69,7 +72,7 @@ class UninstallAppDialog extends Page {
     isNoButtonDisplayed() {
         return this.waitForElementDisplayed(this.noButton, appConst.mediumTimeout).catch(err => {
             this.saveScreenshot('err_uninstall_dialog_no_button');
-            throw new Error('Uninstall Dialog No button is not visible ' + err);
+            throw new Error('Uninstall Dialog -  No button is not visible ' + err);
         });
     }
 }

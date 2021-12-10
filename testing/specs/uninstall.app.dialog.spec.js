@@ -11,6 +11,8 @@ describe('Uninstall Application dialog specification', function () {
     this.timeout(70000);
     webDriverHelper.setupBrowser();
 
+    const AUDIT_LOG_APP_NAME = "Audit log browser";
+
     it("WHEN uninstall dialog is opened THEN expected title and buttons should be present",
         async () => {
             let uninstallAppDialog = new UninstallAppDialog();
@@ -67,6 +69,37 @@ describe('Uninstall Application dialog specification', function () {
             //6. Verify that install button is enabled
             await appBrowsePanel.waitForInstallButtonEnabled();
             await appBrowsePanel.waitForStartButtonDisabled();
+        });
+
+    //Verify issue https://github.com/enonic/app-applications/issues/585
+    //Install app dialog won't get refreshed after app install/uninstall #585
+    it("GIVEN an application has been uninstalled WHEN 'Install App' dialog has been reopened THEN 'Install' link should be displayed for the application",
+        async () => {
+            let appBrowsePanel = new AppBrowsePanel();
+            let installDialog = new InstallAppDialog();
+            let uninstallAppDialog = new UninstallAppDialog();
+            await appBrowsePanel.clickOnInstallButton();
+            await installDialog.waitForOpened();
+            await installDialog.waitForSpinnerNotVisible();
+            //1. Install the "Audit log browser" app:
+            await installDialog.clickOnInstallAppLink(AUDIT_LOG_APP_NAME);
+            let visible = await installDialog.waitForAppInstalled(AUDIT_LOG_APP_NAME);
+            assert.isTrue(visible, `'${AUDIT_LOG_APP_NAME}' should've been installed by now`);
+            await installDialog.clickOnCancelButtonTop();
+            await installDialog.waitForClosed();
+            //2. Uninstall the "Audit log browser" application
+            await appBrowsePanel.clickOnRowByDisplayName(AUDIT_LOG_APP_NAME);
+            await appBrowsePanel.clickOnUninstallButton();
+            await uninstallAppDialog.waitForOpened();
+            await uninstallAppDialog.clickOnYesButton();
+            await appBrowsePanel.waitForNotificationMessage();
+            //3. Reopen 'Install App' dialog:
+            await appBrowsePanel.clickOnInstallButton();
+            await installDialog.waitForOpened();
+            await installDialog.pause(400);
+            await studioUtils.saveScreenshot("upp_install_check");
+            //4. Verify that 'Install' link is displayed for "Audit log browser" application
+            await installDialog.waitForInstallLink(AUDIT_LOG_APP_NAME);
         });
 
     beforeEach(() => studioUtils.navigateToApplicationsApp());
