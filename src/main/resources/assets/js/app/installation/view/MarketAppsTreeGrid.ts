@@ -71,14 +71,18 @@ export class MarketAppsTreeGrid
     private initListeners(): void {
         this.subscribeAndManageInstallClick();
         this.subscribeOnApplicationEvents();
-
         this.onShown(() => {
             if (!this.loading) {
                 this.getCurrentData();
                 const marketApps = this.getRoot().getAllNodes().map(node => node.getData());
                 this.updateAppsStatuses(marketApps);
+
+                // Closing the install app dialog is resetting the listeners.
+                // This addition will re-add them properly.
+                this.addEnterEventListenerOnInstallElements();
             }
         });
+        this.onLoaded(() => { this.addEnterEventListenerOnInstallElements(); });
     }
 
     doRender(): Q.Promise<boolean> {
@@ -118,6 +122,13 @@ export class MarketAppsTreeGrid
                 break;
             case ApplicationEventType.INSTALLED:
                 // Since Market App ID and Application key may differ, handle it in InstallUrlApplicationRequest response
+
+                // Timeout let the event addition occur after "ApplicationCache on ApplicationEvent"
+                // which is resetting the events;
+                setTimeout(() => {
+                    this.addEnterEventListenerOnInstallElements();
+                }, 1000);
+
                 break;
             case ApplicationEventType.UNINSTALLED:
                 // No need to reload grid on uninstall event to update state
@@ -298,5 +309,16 @@ export class MarketAppsTreeGrid
 
     onRowCountChanged(listener: (eventData: Slick.EventData, args: RowCountChangedEventData) => void): void {
         this.getGridData().onRowCountChanged(listener);
+    }
+
+    private addEnterEventListenerOnInstallElements() {
+        const handleEnterEvent = (e:KeyboardEvent) =>
+            e.key === 'Enter' && (<HTMLElement> e.target).click();
+
+        const installElements: Array<HTMLElement> =
+            Array.prototype.slice.call(document.getElementsByClassName('install'));
+
+        installElements.forEach((el: HTMLElement) =>
+            el.addEventListener('keydown', handleEnterEvent));
     }
 }
