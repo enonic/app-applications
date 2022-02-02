@@ -17,6 +17,7 @@ import {MarketHelper} from 'lib-admin-ui/application/MarketHelper';
 import {MarketAppsTreeGridHelper} from './MarketAppsTreeGridHelper';
 import {InstallUrlApplicationRequest} from '../../resource/InstallUrlApplicationRequest';
 import {ApplicationInstallResult} from '../../resource/ApplicationInstallResult';
+import {KeyHelper} from 'lib-admin-ui/ui/KeyHelper';
 
 declare let CONFIG;
 
@@ -76,13 +77,8 @@ export class MarketAppsTreeGrid
                 this.getCurrentData();
                 const marketApps = this.getRoot().getAllNodes().map(node => node.getData());
                 this.updateAppsStatuses(marketApps);
-
-                // Closing the install app dialog is resetting the listeners.
-                // This addition will re-add them properly.
-                this.addEnterEventListenerOnInstallElements();
             }
         });
-        this.onLoaded(() => { this.addEnterEventListenerOnInstallElements(); });
     }
 
     doRender(): Q.Promise<boolean> {
@@ -122,13 +118,6 @@ export class MarketAppsTreeGrid
                 break;
             case ApplicationEventType.INSTALLED:
                 // Since Market App ID and Application key may differ, handle it in InstallUrlApplicationRequest response
-
-                // Timeout let the event addition occur after "ApplicationCache on ApplicationEvent"
-                // which is resetting the events;
-                setTimeout(() => {
-                    this.addEnterEventListenerOnInstallElements();
-                }, 1000);
-
                 break;
             case ApplicationEventType.UNINSTALLED:
                 // No need to reload grid on uninstall event to update state
@@ -205,6 +194,14 @@ export class MarketAppsTreeGrid
 
             const {row} = (data as GridEventData);
             this.handleApplicationInstalled(row);
+        });
+
+        this.getGrid().setOnKeyDown((event) => {
+            if (KeyHelper.isEnterKey(event)) {
+                if (event.target.tagName.toLowerCase() === 'a') {
+                    event.target.click();
+                }
+            }
         });
     }
 
@@ -309,16 +306,5 @@ export class MarketAppsTreeGrid
 
     onRowCountChanged(listener: (eventData: Slick.EventData, args: RowCountChangedEventData) => void): void {
         this.getGridData().onRowCountChanged(listener);
-    }
-
-    private addEnterEventListenerOnInstallElements() {
-        const handleEnterEvent = (e:KeyboardEvent) =>
-            e.key === 'Enter' && (<HTMLElement> e.target).click();
-
-        const installElements: Array<HTMLElement> =
-            Array.prototype.slice.call(document.getElementsByClassName('install'));
-
-        installElements.forEach((el: HTMLElement) =>
-            el.addEventListener('keydown', handleEnterEvent));
     }
 }
