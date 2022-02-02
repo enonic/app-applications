@@ -17,6 +17,7 @@ import {MarketHelper} from 'lib-admin-ui/application/MarketHelper';
 import {MarketAppsTreeGridHelper} from './MarketAppsTreeGridHelper';
 import {InstallUrlApplicationRequest} from '../../resource/InstallUrlApplicationRequest';
 import {ApplicationInstallResult} from '../../resource/ApplicationInstallResult';
+import {KeyHelper} from 'lib-admin-ui/ui/KeyHelper';
 
 declare let CONFIG;
 
@@ -71,7 +72,6 @@ export class MarketAppsTreeGrid
     private initListeners(): void {
         this.subscribeAndManageInstallClick();
         this.subscribeOnApplicationEvents();
-
         this.onShown(() => {
             if (!this.loading) {
                 this.getCurrentData();
@@ -194,6 +194,14 @@ export class MarketAppsTreeGrid
 
             const {row} = (data as GridEventData);
             this.handleApplicationInstalled(row);
+        });
+
+        this.getGrid().setOnKeyDown((event) => {
+            if (KeyHelper.isEnterKey(event)) {
+                if (event.target.tagName.toLowerCase() === 'a') {
+                    event.target.click();
+                }
+            }
         });
     }
 
