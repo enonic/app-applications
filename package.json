@@ -28,7 +28,7 @@
     "browserslist-config-enonic": "^1.0.6",
     "circular-dependency-plugin": "^5.2.2",
     "css-loader": "^6.6.0",
-    "cssnano": "^5.0.16",
+    "cssnano": "^5.0.17",
     "enonic-admin-artifacts": "^1.8.1",
     "eslint": "^8.8.0",
     "less": "^4.1.2",
