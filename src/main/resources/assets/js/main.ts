@@ -12,13 +12,18 @@ import {ServerEventsListener} from 'lib-admin-ui/event/ServerEventsListener';
 import {i18nInit} from 'lib-admin-ui/util/MessagesInitializer';
 import {i18n} from 'lib-admin-ui/util/Messages';
 import {InstalledAppChangedEvent} from './app/installation/InstalledAppChangedEvent';
-
-declare const CONFIG;
+import {CONFIG} from 'lib-admin-ui/util/Config';
 
 const body = Body.get();
 
 function getApplication(): Application {
-    const application = new Application('applications', 'Applications', 'AM', CONFIG.appIconUrl);
+    const assetsUri: string = CONFIG.getString('assetsUri');
+    const application = new Application(
+        CONFIG.getString('appId'),
+        i18n('admin.tool.displayName'),
+        i18n('app.abbr'),
+        `${assetsUri}/icons/icon-white.svg`
+    );
     application.setPath(Path.fromString('/'));
     application.setWindow(window);
 
@@ -64,12 +69,16 @@ function startApplication() {
 
 }
 
-const renderListener = () => {
-    i18nInit(CONFIG.i18nUrl).then(() => startApplication());
-    body.unRendered(renderListener);
-};
-if (body.isRendered()) {
-    renderListener();
-} else {
-    body.onRendered(renderListener);
-}
+(async () => {
+    if (!document.currentScript) {
+        throw 'Legacy browsers are not supported';
+    }
+    const configServiceUrl = document.currentScript.getAttribute('data-config-service-url');
+    if (!configServiceUrl) {
+        throw 'Unable to fetch app config';
+    }
+    await CONFIG.init(configServiceUrl);
+    await i18nInit(CONFIG.getString('services.i18nUrl'));
+    startApplication();
+})();
+

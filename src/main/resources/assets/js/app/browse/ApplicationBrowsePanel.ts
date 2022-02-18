@@ -20,8 +20,7 @@ import {Toolbar} from 'lib-admin-ui/ui/toolbar/Toolbar';
 import {DivEl} from 'lib-admin-ui/dom/DivEl';
 import {SpanEl} from 'lib-admin-ui/dom/SpanEl';
 import {InstalledAppChangedEvent} from '../installation/InstalledAppChangedEvent';
-
-declare const CONFIG;
+import {CONFIG} from 'lib-admin-ui/util/Config';
 
 export class ApplicationBrowsePanel
     extends BrowsePanel {
@@ -44,7 +43,7 @@ export class ApplicationBrowsePanel
 
     protected createToolbar(): Toolbar {
         const toolbar: Toolbar = new Toolbar();
-        const readonlyMode: boolean = CONFIG.readonlyMode === 'true';
+        const readonlyMode: boolean = CONFIG.isTrue('readonlyMode');
 
         toolbar.toggleClass('read-only', readonlyMode);
         if (readonlyMode) {
@@ -72,7 +71,7 @@ export class ApplicationBrowsePanel
     }
 
     protected getBrowseActions(): TreeGridActions<Application> {
-        const readonlyMode: boolean = CONFIG.readonlyMode === 'true';
+        const readonlyMode: boolean = CONFIG.isTrue('readonlyMode');
         return readonlyMode ? null : super.getBrowseActions();
     }
 

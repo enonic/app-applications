@@ -38,25 +38,8 @@
 </head>
 <body>
 
-<!-- Configuration -->
-<script type="text/javascript">
-    var CONFIG = {
-        appId: '{{appId}}',
-        xpVersion: '{{xpVersion}}',
-        appIconUrl: '{{assetsUri}}/icons/icon-white.svg',
-        adminUrl: '{{adminUrl}}',
-        launcherUrl: '{{launcherUrl}}',
-        i18nUrl: '{{i18nUrl}}',
-        launcher: {
-            container: '.appbar'
-        },
-        marketUrl: '{{marketUrl}}',
-        readonlyMode: '{{readonlyMode}}'
-    };
-</script>
-
 <!-- App javascript -->
-<script type="text/javascript" src="{{assetsUri}}/js/bundle.js"></script>
+<script type="text/javascript" src="{{assetsUri}}/js/bundle.js" data-config-service-url="{{configServiceUrl}}"></script>
 
 <!-- Append the launcher -->
 <script type="text/javascript" src="{{launcherPath}}" async></script>
