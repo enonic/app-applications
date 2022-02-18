@@ -1,30 +1,22 @@
-var admin = require('/lib/xp/admin');
-var mustache = require('/lib/mustache');
-var portal = require('/lib/xp/portal');
-
-function getMarketUrl() {
-    var marketConfigBean = __.newBean('com.enonic.xp.app.main.GetMarketConfigBean');
-    return __.toNativeObject(marketConfigBean.getMarketUrl());
-}
+const admin = require('/lib/xp/admin');
+const mustache = require('/lib/mustache');
+const portal = require('/lib/xp/portal');
+const i18n = require('/lib/xp/i18n');
 
 function handleGet() {
-    var view = resolve('./main.html');
-    var readonlyMode = app.config['readonlyMode'] === 'true' || false;
+    const view = resolve('./main.html');
 
-    var params = {
-        adminUrl: admin.getBaseUri(),
-        adminAssetsUri: admin.getAssetsUri(),
+    const params = {
         assetsUri: portal.assetUrl({
             path: ''
         }),
-        appName: 'Applications',
-        appId: app.name,
-        xpVersion: app.version,
+        appName: i18n.localize({
+            key: 'admin.tool.displayName',
+            bundles: ['i18n/phrases'],
+            locale: admin.getLocales()
+        }),
         launcherPath: admin.getLauncherPath(),
-        launcherUrl: admin.getLauncherUrl(),
-        i18nUrl: portal.serviceUrl({service: 'i18n'}),
-        marketUrl: getMarketUrl(),
-        readonlyMode: readonlyMode
+        configServiceUrl: portal.serviceUrl({service: 'config'})
     };
 
     return {

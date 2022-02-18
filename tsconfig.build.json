@@ -1,11 +1,17 @@
 {
   "compilerOptions": {
     "module": "commonjs",
-      "sourceMap": true,
-      "types": [
-          "core-js",
-          "q"
-      ]
+    "target": "es5",
+    "sourceMap": true,
+    "types": [
+        "core-js",
+        "q"
+    ],
+    "lib": [
+      "es2015",
+      "es2015.promise",
+      "dom"
+    ]
   },
   "exclude": [
     "build/**/*",

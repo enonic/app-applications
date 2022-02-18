@@ -12,8 +12,7 @@ import {ApplicationItemStatisticsHeader} from './ApplicationItemStatisticsHeader
 import {Action} from 'lib-admin-ui/ui/Action';
 import {StartApplicationEvent} from '../browse/StartApplicationEvent';
 import {StopApplicationEvent} from '../browse/StopApplicationEvent';
-
-declare const CONFIG;
+import {CONFIG} from 'lib-admin-ui/util/Config';
 
 export class ApplicationItemStatisticsPanel
     extends ItemStatisticsPanel {
@@ -37,7 +36,7 @@ export class ApplicationItemStatisticsPanel
     }
 
     private addActionMenu() {
-        const readonlyMode: boolean = CONFIG.readonlyMode === 'true';
+        const readonlyMode: boolean = CONFIG.isTrue('readonlyMode');
 
         if (readonlyMode) {
             return;

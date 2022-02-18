@@ -13,8 +13,7 @@ import {ListApplicationsRequest} from '../resource/ListApplicationsRequest';
 import {GetApplicationRequest} from '../resource/GetApplicationRequest';
 import {ResponsiveRanges} from 'lib-admin-ui/ui/responsive/ResponsiveRanges';
 import {Body} from 'lib-admin-ui/dom/Body';
-
-declare const CONFIG;
+import {CONFIG} from 'lib-admin-ui/util/Config';
 
 export class ApplicationTreeGrid
     extends TreeGrid<Application> {
@@ -31,7 +30,7 @@ export class ApplicationTreeGrid
         };
         builder.setColumnUpdater(updateColumns);
 
-        const readonlyMode = CONFIG.readonlyMode === 'true';
+        const readonlyMode = CONFIG.isTrue('readonlyMode');
         builder.setCheckableRows(!readonlyMode);
 
         super(builder);

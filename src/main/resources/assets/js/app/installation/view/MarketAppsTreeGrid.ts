@@ -18,8 +18,7 @@ import {MarketAppsTreeGridHelper} from './MarketAppsTreeGridHelper';
 import {InstallUrlApplicationRequest} from '../../resource/InstallUrlApplicationRequest';
 import {ApplicationInstallResult} from '../../resource/ApplicationInstallResult';
 import {KeyHelper} from 'lib-admin-ui/ui/KeyHelper';
-
-declare let CONFIG;
+import {CONFIG} from 'lib-admin-ui/util/Config';
 
 interface GridEventData {
     row: number;
@@ -222,7 +221,7 @@ export class MarketAppsTreeGrid
         this.notifyLoadingStarted();
         this.hideErrorPanelIfVisible();
 
-        return MarketApplicationFetcher.fetchApps(CONFIG.xpVersion).then((data: MarketApplicationResponse) => {
+        return MarketApplicationFetcher.fetchApps(CONFIG.getString('xpVersion')).then((data: MarketApplicationResponse) => {
             const totalHits = data.getMetadata().getTotalHits();
             this.getRoot().getCurrentRoot().setMaxChildren(totalHits);
             return this.updateAndSortApps(data.getApplications());
