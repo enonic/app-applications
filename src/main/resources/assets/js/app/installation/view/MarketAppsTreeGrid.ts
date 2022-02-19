@@ -221,7 +221,7 @@ export class MarketAppsTreeGrid
         this.notifyLoadingStarted();
         this.hideErrorPanelIfVisible();
 
-        return MarketApplicationFetcher.fetchApps(CONFIG.getString('xpVersion')).then((data: MarketApplicationResponse) => {
+        return MarketApplicationFetcher.fetchApps().then((data: MarketApplicationResponse) => {
             const totalHits = data.getMetadata().getTotalHits();
             this.getRoot().getCurrentRoot().setMaxChildren(totalHits);
             return this.updateAndSortApps(data.getApplications());
