@@ -23,6 +23,10 @@ function handleGet() {
             services: {
                 i18nUrl: portal.serviceUrl({service: 'i18n'}),
             },
+            toolUri: admin.getToolUrl(
+                app.name,
+                'main'
+            ),
             xpVersion: app.version
         }
     };
