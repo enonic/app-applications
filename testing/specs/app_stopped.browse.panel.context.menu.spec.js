@@ -18,7 +18,7 @@ describe(`Applications Grid context menu, application is stopped`, function () {
                 await appBrowsePanel.clickOnStopButton();
             }
             state = await appBrowsePanel.getApplicationState(appConst.TEST_APPLICATIONS.SECOND_APP);
-            assert.equal(state, 'stopped', 'state should be `stopped`');
+            assert.equal(state, 'stopped', "Application state should be 'stopped'");
         });
 
     it(`WHEN right click on the stopped application THEN 'Start' menu item should be enabled`,
