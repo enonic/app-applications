@@ -57,7 +57,7 @@ describe('Application Browse Panel, multiple selection in grid', function () {
             //`Start` button gets disabled:
             await appBrowsePanel.waitForStartButtonDisabled();
             let result = await appBrowsePanel.isStopButtonEnabled();
-            assert.isTrue(result, "'Stop' button gets enabled");
+            assert.isTrue(result, "'Stop' button in browse toolbar should be enabled");
             let statisticPanel = new StatisticPanel();
             //'Started' status should be displayed in Statistic Panel:
             await statisticPanel.waitForApplicationStatus("Started");

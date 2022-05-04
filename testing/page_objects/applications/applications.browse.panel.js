@@ -367,7 +367,7 @@ class AppBrowsePanel extends Page {
         let stateXpath = XPATH.appStateByName(appName);
         return this.getText(stateXpath).catch(err => {
             console.log("Failed to get app-state " + appName + '  ' + err);
-            throw new Error('App-state was not found' + err);
+            throw new Error('App-state was not found: ' + err);
         });
     }
 
