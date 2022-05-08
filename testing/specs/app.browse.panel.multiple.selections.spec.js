@@ -8,7 +8,10 @@ const studioUtils = require('../libs/studio.utils.js');
 
 describe('Application Browse Panel, multiple selection in grid', function () {
     this.timeout(appConst.SUITE_TIMEOUT);
-    webDriverHelper.setupBrowser();
+
+    if (typeof browser === "undefined") {
+        webDriverHelper.setupBrowser();
+    }
 
     it(`GIVEN two started applications are checked WHEN Stop button has been pressed THEN Stop gets disabled AND Start gets enabled`,
         async () => {

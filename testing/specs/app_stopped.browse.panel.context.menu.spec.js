@@ -7,7 +7,10 @@ const appConst = require('../libs/app_const');
 
 describe(`Applications Grid context menu, application is stopped`, function () {
     this.timeout(appConst.SUITE_TIMEOUT);
-    webDriverHelper.setupBrowser();
+
+    if (typeof browser === "undefined") {
+        webDriverHelper.setupBrowser();
+    }
 
     it(`GIVEN existing an application is selected WHEN 'Stop' button has been clicked THEN the application gets stopped`,
         async () => {

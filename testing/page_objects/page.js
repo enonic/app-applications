@@ -5,8 +5,13 @@ const fs = require('fs');
 const path = require('path');
 
 class Page {
+
     constructor() {
-        this.browser = webDriverHelper.browser;
+        if (typeof browser !== "undefined") {
+            this.browser = browser;
+        } else {
+            this.browser = webDriverHelper.browser;
+        }
     }
 
     getBrowser() {

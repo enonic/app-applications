@@ -8,7 +8,10 @@ const AppStatisticPanel = require('../page_objects/applications/application.item
 
 describe("Item Statistics Panel 'Action Menu' spec", function () {
     this.timeout(appConstants.SUITE_TIMEOUT);
-    webDriverHelper.setupBrowser();
+
+    if (typeof browser === "undefined") {
+        webDriverHelper.setupBrowser();
+    }
     const FIRST_APP = 'First Selenium App';
     const SECOND_APP = 'Second Selenium App';
 
@@ -20,7 +23,7 @@ describe("Item Statistics Panel 'Action Menu' spec", function () {
             await appBrowsePanel.clickOnRowByDisplayName(FIRST_APP);
             //2. Verify the info in Statistics Panel:
             let result = await appStatisticPanel.getDropDownButtonText();
-            studioUtils.saveScreenshot("application_action_menu_collapsed");
+            await studioUtils.saveScreenshot("application_action_menu_collapsed");
             assert.strictEqual(result, 'Started', 'correct label should be displayed on the drop-down button');
 
             let isVisible = await appStatisticPanel.waitForStopMenuItemVisible();

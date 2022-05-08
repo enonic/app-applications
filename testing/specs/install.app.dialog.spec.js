@@ -11,7 +11,10 @@ const appConst = require('../libs/app_const');
 
 describe('Install Application Dialog specification', function () {
     this.timeout(appConst.SUITE_TIMEOUT);
-    webDriverHelper.setupBrowser();
+
+    if (typeof browser === "undefined") {
+        webDriverHelper.setupBrowser();
+    }
 
     const CHUCK_NORRIS_APP_DISPLAY_NAME = 'Chuck Norris';
 

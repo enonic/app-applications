@@ -7,7 +7,10 @@ const AppBrowsePanel = require('../page_objects/applications/applications.browse
 
 describe('Applications Browse panel - `Selection Toggler` spec', function () {
     this.timeout(appConst.SUITE_TIMEOUT);
-    webDriverHelper.setupBrowser();
+
+    if (typeof browser === "undefined") {
+        webDriverHelper.setupBrowser();
+    }
 
     it(`WHEN applications grid is loaded(no selections) THEN 'selection toggler' should not be displayed`,
         async () => {
