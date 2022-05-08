@@ -7,7 +7,10 @@ const appConst = require('../libs/app_const');
 
 describe("Tests for Applications Grid context menu", function () {
     this.timeout(appConst.SUITE_TIMEOUT);
-    webDriverHelper.setupBrowser();
+
+    if (typeof browser === "undefined") {
+        webDriverHelper.setupBrowser();
+    }
 
     it("Context menu should not be visible initially", async () => {
         let appBrowsePanel = new AppBrowsePanel();

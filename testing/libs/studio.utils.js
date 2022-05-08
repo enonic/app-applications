@@ -2,18 +2,25 @@ const LauncherPanel = require('../page_objects/launcher.panel');
 const HomePage = require('../page_objects/home.page');
 const LoginPage = require('../page_objects/login.page');
 const appConst = require("./app_const");
-const webDriverHelper = require("./WebDriverHelper");
 const BrowsePanel = require('../page_objects/applications/applications.browse.panel');
 const addContext = require('mochawesome/addContext');
 const fs = require('fs');
 const path = require('path');
+const webDriverHelper = require('./WebDriverHelper');
 
 module.exports = {
 
+    getBrowser() {
+        if (typeof browser !== "undefined") {
+            return browser;
+        } else {
+           return webDriverHelper.browser;
+        }
+    },
     async doCloseCurrentBrowserTab() {
-        let title = await webDriverHelper.browser.getTitle();
+        let title = await this.getBrowser().getTitle();
         if (title != 'Enonic XP Home') {
-            await webDriverHelper.browser.closeWindow();
+            await this.getBrowser().closeWindow();
             return await this.doSwitchToHome();
         }
     },
@@ -56,21 +63,21 @@ module.exports = {
             return await this.doSwitchToApplicationsBrowsePanel();
         } catch (err) {
             console.log('tried to navigate to applications app, but: ' + err);
-            this.saveScreenshot("err_navigate_to_applications");
+            await this.saveScreenshot(appConst.generateRandomName("err_navigate_to_applications"));
             throw new Error('error when navigate to Applications app ' + err);
         }
     },
     async doSwitchToApplicationsBrowsePanel() {
         let browsePanel = new BrowsePanel();
         console.log('testUtils:switching to Applications app...');
-        await webDriverHelper.browser.switchWindow(appConst.APPLICATION_TITLE);
+        await this.getBrowser().switchWindow(appConst.APPLICATION_TITLE);
         console.log("switched to Applications app...");
         await browsePanel.waitForSpinnerNotVisible();
         return await browsePanel.waitForGridLoaded(appConst.mediumTimeout);
     },
     doSwitchToHome() {
         console.log('testUtils:switching to Home page...');
-        return webDriverHelper.browser.switchWindow("Enonic XP Home").then(() => {
+        return this.getBrowser().switchWindow("Enonic XP Home").then(() => {
             console.log("switched to Home Page...");
         }).then(() => {
             let homePage = new HomePage();
@@ -79,7 +86,7 @@ module.exports = {
     },
     doSwitchToLoginPage() {
         console.log('testUtils:switching to Home page...');
-        return webDriverHelper.browser.switchWindow("Enonic XP - Login").then(() => {
+        return this.getBrowser().switchWindow("Enonic XP - Login").then(() => {
             console.log("switched to Login Page...");
         }).then(() => {
             let loginPage = new LoginPage();
@@ -87,8 +94,8 @@ module.exports = {
         });
     },
     switchAndCheckTitle: function (handle, reqTitle) {
-        return webDriverHelper.browser.switchWindow(handle).then(() => {
-            return webDriverHelper.browser.getTitle().then(title => {
+        return this.getBrowser().switchWindow(handle).then(() => {
+            return this.getBrowser().getTitle().then(title => {
                 return title == reqTitle;
             })
         });
@@ -106,9 +113,9 @@ module.exports = {
 
         let screenshotsDir = path.join(__dirname, '/../build/mochawesome-report/screenshots/');
         if (!fs.existsSync(screenshotsDir)) {
-            fs.mkdirSync(screenshotsDir, { recursive: true });
+            fs.mkdirSync(screenshotsDir, {recursive: true});
         }
-        return webDriverHelper.browser.saveScreenshot(screenshotsDir + name + '.png').then(() => {
+        return this.getBrowser().saveScreenshot(screenshotsDir + name + '.png').then(() => {
             if (that) {
                 addContext(that, 'screenshots/' + name + '.png');
             }

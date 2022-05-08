@@ -8,7 +8,10 @@ const AppStatisticPanel = require('../page_objects/applications/application.item
 
 describe('Applications Browse panel - selection of items spec', function () {
     this.timeout(appConst.SUITE_TIMEOUT);
-    webDriverHelper.setupBrowser();
+
+    if (typeof browser === "undefined") {
+        webDriverHelper.setupBrowser();
+    }
     //Content Studio should not be installed!
     const TOTAL_NUMBER_OF_APPLICATIONS = 5;
 

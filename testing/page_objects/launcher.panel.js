@@ -14,7 +14,7 @@ class LauncherPanel extends Page {
     }
 
     get applicationsLink() {
-        return XPATH.container + `//a[contains(@data-id,'app.applications')]`;
+        return XPATH.container + `//a[contains(@data-id,'app.applications')]//p[@class='app-name']`;
     }
 
     get usersLink() {
@@ -27,6 +27,7 @@ class LauncherPanel extends Page {
 
     async clickOnApplicationsLink() {
         await this.waitForElementDisplayed(this.applicationsLink, appConst.mediumTimeout);
+        await this.pause(300);
         return await this.clickOnElement(this.applicationsLink);
     }
 

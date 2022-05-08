@@ -9,7 +9,10 @@ const AppStatisticPanel = require('../page_objects/applications/application.item
 
 describe('Uninstall Application dialog specification', function () {
     this.timeout(70000);
-    webDriverHelper.setupBrowser();
+
+    if (typeof browser === "undefined") {
+        webDriverHelper.setupBrowser();
+    }
 
     const AUDIT_LOG_APP_NAME = "Audit log browser";
 

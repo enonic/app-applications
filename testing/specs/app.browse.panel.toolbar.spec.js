@@ -9,7 +9,10 @@ const appConst = require('../libs/app_const');
 
 describe('Application Browse Panel, check buttons in the toolbar', function () {
     this.timeout(70000);
-    webDriverHelper.setupBrowser();
+
+    if (typeof browser === "undefined") {
+        webDriverHelper.setupBrowser();
+    }
 
     const appDisplayName1InGrid = 'Content Viewer App';//This displayName should be in grid
     const appDisplayName1 = 'Content viewer';//This displayName should be in Uninstall modal dialog

@@ -13,7 +13,10 @@ const Apps = {
 
 describe('Tests for Applications Item Statistics Panel', function () {
     this.timeout(appConstants.SUITE_TIMEOUT);
-    webDriverHelper.setupBrowser();
+
+    if (typeof browser === "undefined") {
+        webDriverHelper.setupBrowser();
+    }
 
     //Verifies : https://github.com/enonic/app-applications/issues/259
     //Toolbar and Statistics panel is not correctly updated after stopping/starting an application #259
