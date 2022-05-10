@@ -4,7 +4,8 @@
   "author": "Hauruseu Siarhei",
   "license": "ISC",
   "scripts": {
-    "test": "node ./tasks/test.js"
+    "test": "node ./tasks/test.js",
+    "test:firefox": "npx wdio ./wdio.conf.js"
   },
   "devDependencies": {
     "assert": "^2.0.0",
@@ -25,6 +26,7 @@
     "@wdio/cli": "^7.19.7",
     "@wdio/dot-reporter": "^7.19.7",
     "@wdio/mocha-framework": "^7.19.7",
-    "@wdio/selenium-standalone-service": "^7.19.5"
+    "@wdio/selenium-standalone-service": "^7.19.5",
+    "wdio-html-nice-reporter": "^7.8.7"
   }
 }

@@ -1,3 +1,5 @@
+
+const {ReportAggregator, HtmlReporter} = require('wdio-html-nice-reporter');
 exports.config = {
 
     //
@@ -51,7 +53,7 @@ exports.config = {
     coloredLogs: true,
     //
     // Saves a screenshot to a given path if a command fails.
-    screenshotPath: './errorShots/',
+    //screenshotPath: './errorShots/',
     //
     // Set a base URL in order to shorten url command calls. If your `url` parameter starts
     // with `/`, the base url gets prepended, not including the path portion of your baseUrl.
@@ -60,7 +62,7 @@ exports.config = {
     baseUrl: 'http://localhost:8080/admin/tool',
     //
     // Default timeout for all waitForXXX commands.
-    waitforTimeout: 150000,
+    waitforTimeout: 2000,
     //
     // Default timeout in milliseconds for request
     // if Selenium Grid doesn't send response
@@ -101,14 +103,28 @@ exports.config = {
     services: ['geckodriver'],
 
     framework: 'mocha',
+    mochaOpts: {
+        timeout: 70000
+    },
     //
     // Test reporter for stdout.
     // The only one supported by default is 'dot'
     // see also: http://webdriver.io/guide/testrunner/reporters.html
-    // reporters: ['dot','mochawesome', {
-    //     outputDir: __dirname+"/build/results"
-    // }],
-    reporters: ['dot'],
+
+    reporters: ['spec',
+        ["html-nice", {
+            outputDir: './build/mochawesome-report/',
+            filename: 'report.html',
+            reportTitle: 'Suite Report Title',
+            linkScreenshots: true,
+            //to show the report in a browser when done
+            showInBrowser: true,
+            collapseTests: false,
+            //to turn on screenshots after every test
+            useOnAfterCommandForScreenshot: false,
+        }
+        ]
+   ],
     outputDir: __dirname+"/build",
 
     //
@@ -204,4 +220,22 @@ exports.config = {
     // Gets executed after all workers got shut down and the process is about to exit.
     // onComplete: function(exitCode, config, capabilities) {
     // }
+    onPrepare: function (config, capabilities) {
+
+        reportAggregator = new ReportAggregator({
+            outputDir: './build/mochawesome-report/',
+            filename: 'report.html',
+            reportTitle: 'App Applications Report',
+            browserName : capabilities.browserName,
+            collapseTests: true
+        });
+        reportAggregator.clean() ;
+    },
+
+    onComplete: function(exitCode, config, capabilities, results) {
+        (async () => {
+            await reportAggregator.createReport();
+        })();
+    },
+
 };

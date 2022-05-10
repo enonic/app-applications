@@ -92,6 +92,17 @@ task testApplicationsApp( type: NpmTask,
     finalizedBy stopServer
 }
 
+task testApplicationsAppFirefoxLocally( type: NpmTask,
+                          dependsOn: [npmInstall] ) {
+    args = ['run-script', 'test:firefox']
+}
+
+task testApplicationsAppFirefox( type: NpmTask,
+                                        dependsOn: [npmInstall, unpackDistro, copyConfig, copyApps, deployApp, startServer] ) {
+    args = ['run-script', 'test:firefox']
+    finalizedBy stopServer
+}
+
 task testApplicationsAppLocally( type: NpmTask, dependsOn: [npmInstall] ) {
     args = ['test']
 }
