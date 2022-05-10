@@ -59,8 +59,8 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew build -Pcom.enonic.xp.app.production=true
 
-      - name: Run Base Selenium Tests
-        run: ./gradlew :testing:testApplicationsApp
+      - name: Run Selenium Tests
+        run: ./gradlew :testing:testApplicationsAppFirefox
 
       - name: Slack Notification
         uses: rtCamp/action-slack-notify@v2
