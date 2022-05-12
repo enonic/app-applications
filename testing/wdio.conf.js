@@ -97,7 +97,7 @@ exports.config = {
         }
         ]
    ],
-    outputDir: __dirname+"/build",
+    outputDir: __dirname+"/build/mochawesome-report/",
 
     //
     // Options to be passed to Mocha.
