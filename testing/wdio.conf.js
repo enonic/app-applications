@@ -35,7 +35,8 @@ exports.config = {
                 "--headless", "--disable-gpu", "--no-sandbox",
                 "--lang=en",
                 '--disable-extensions',
-                'window-size=1970,1100'
+                "--width=1920",
+                "--height=1000"
             ]
         }
 
@@ -72,7 +73,20 @@ exports.config = {
     connectionRetryCount: 3,
     // Make sure you have the wdio adapter package for the specific framework installed
     // before running any tests.
-    services: ['geckodriver'],
+    services: [ 'geckodriver',
+        // service options
+        [ {
+            // OPTIONAL: Arguments passed to geckdriver executable.
+            // Check geckodriver --help for all options. Example:
+            // ['--log=debug', '--binary=/var/ff50/firefox']
+            // Default: empty array
+            args: ['--log=info'],
+
+            // The path where the output of the Geckodriver server should
+            // be stored (uses the config.outputDir by default when not set).
+            logs: './build/mochawesome-report/'
+        }]
+    ],
 
     framework: 'mocha',
     mochaOpts: {
