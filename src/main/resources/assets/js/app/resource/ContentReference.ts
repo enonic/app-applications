@@ -1,5 +1,5 @@
 import {ContentReferenceJson} from './json/ContentReferencesJson';
-import {ContentTypeName} from 'lib-admin-ui/schema/content/ContentTypeName';
+import {ContentTypeName} from '@enonic/lib-admin-ui/schema/content/ContentTypeName';
 
 export class ContentReference {
 

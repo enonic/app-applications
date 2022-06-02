@@ -1,6 +1,6 @@
-import {ApplicationBasedName} from 'lib-admin-ui/application/ApplicationBasedName';
-import {assertNotNull} from 'lib-admin-ui/util/Assert';
-import {ApplicationKey} from 'lib-admin-ui/application/ApplicationKey';
+import {ApplicationBasedName} from '@enonic/lib-admin-ui/application/ApplicationBasedName';
+import {assertNotNull} from '@enonic/lib-admin-ui/util/Assert';
+import {ApplicationKey} from '@enonic/lib-admin-ui/application/ApplicationKey';
 
 export class RelationshipTypeName
     extends ApplicationBasedName {

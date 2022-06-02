@@ -1,7 +1,7 @@
 import * as Q from 'q';
-import {MarketApplicationResponse} from 'lib-admin-ui/application/MarketApplicationResponse';
-import {ListMarketApplicationsRequest} from 'lib-admin-ui/application/ListMarketApplicationsRequest';
-import {CONFIG} from 'lib-admin-ui/util/Config';
+import {MarketApplicationResponse} from '@enonic/lib-admin-ui/application/MarketApplicationResponse';
+import {ListMarketApplicationsRequest} from '@enonic/lib-admin-ui/application/ListMarketApplicationsRequest';
+import {CONFIG} from '@enonic/lib-admin-ui/util/Config';
 
 export class MarketApplicationFetcher {
 

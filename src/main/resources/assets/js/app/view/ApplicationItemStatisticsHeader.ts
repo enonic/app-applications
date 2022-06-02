@@ -1,5 +1,5 @@
-import {ItemStatisticsHeader} from 'lib-admin-ui/app/view/ItemStatisticsHeader';
-import {Application} from 'lib-admin-ui/application/Application';
+import {ItemStatisticsHeader} from '@enonic/lib-admin-ui/app/view/ItemStatisticsHeader';
+import {Application} from '@enonic/lib-admin-ui/application/Application';
 
 export class ApplicationItemStatisticsHeader
     extends ItemStatisticsHeader {

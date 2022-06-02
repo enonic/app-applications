@@ -1,19 +1,19 @@
 import * as Q from 'q';
 import {ApplicationBrowseActions} from './ApplicationBrowseActions';
-import {TreeNode} from 'lib-admin-ui/ui/treegrid/TreeNode';
-import {Application, ApplicationUploadMock} from 'lib-admin-ui/application/Application';
-import {ApplicationKey} from 'lib-admin-ui/application/ApplicationKey';
-import {TreeGrid} from 'lib-admin-ui/ui/treegrid/TreeGrid';
-import {TreeGridBuilder} from 'lib-admin-ui/ui/treegrid/TreeGridBuilder';
-import {TreeGridContextMenu} from 'lib-admin-ui/ui/treegrid/TreeGridContextMenu';
-import {DefaultErrorHandler} from 'lib-admin-ui/DefaultErrorHandler';
-import {UploadItem} from 'lib-admin-ui/ui/uploader/UploadItem';
+import {TreeNode} from '@enonic/lib-admin-ui/ui/treegrid/TreeNode';
+import {Application, ApplicationUploadMock} from '@enonic/lib-admin-ui/application/Application';
+import {ApplicationKey} from '@enonic/lib-admin-ui/application/ApplicationKey';
+import {TreeGrid} from '@enonic/lib-admin-ui/ui/treegrid/TreeGrid';
+import {TreeGridBuilder} from '@enonic/lib-admin-ui/ui/treegrid/TreeGridBuilder';
+import {TreeGridContextMenu} from '@enonic/lib-admin-ui/ui/treegrid/TreeGridContextMenu';
+import {DefaultErrorHandler} from '@enonic/lib-admin-ui/DefaultErrorHandler';
+import {UploadItem} from '@enonic/lib-admin-ui/ui/uploader/UploadItem';
 import {ApplicationTreeGridHelper} from './ApplicationTreeGridHelper';
 import {ListApplicationsRequest} from '../resource/ListApplicationsRequest';
 import {GetApplicationRequest} from '../resource/GetApplicationRequest';
-import {ResponsiveRanges} from 'lib-admin-ui/ui/responsive/ResponsiveRanges';
-import {Body} from 'lib-admin-ui/dom/Body';
-import {CONFIG} from 'lib-admin-ui/util/Config';
+import {ResponsiveRanges} from '@enonic/lib-admin-ui/ui/responsive/ResponsiveRanges';
+import {Body} from '@enonic/lib-admin-ui/dom/Body';
+import {CONFIG} from '@enonic/lib-admin-ui/util/Config';
 
 export class ApplicationTreeGrid
     extends TreeGrid<Application> {

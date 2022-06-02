@@ -1,6 +1,6 @@
 import * as Q from 'q';
-import {ApplicationKey} from 'lib-admin-ui/application/ApplicationKey';
-import {HttpMethod} from 'lib-admin-ui/rest/HttpMethod';
+import {ApplicationKey} from '@enonic/lib-admin-ui/application/ApplicationKey';
+import {HttpMethod} from '@enonic/lib-admin-ui/rest/HttpMethod';
 import {ApplicationResourceRequest} from './ApplicationResourceRequest';
 
 export class ApplicationActionRequest

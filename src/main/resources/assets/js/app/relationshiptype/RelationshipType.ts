@@ -1,8 +1,8 @@
 import {RelationshipTypeName} from './RelationshipTypeName';
 import {RelationshipTypeJson} from './RelationshipTypeJson';
-import {Schema, SchemaBuilder} from 'lib-admin-ui/schema/Schema';
-import {Equitable} from 'lib-admin-ui/Equitable';
-import {ObjectHelper} from 'lib-admin-ui/ObjectHelper';
+import {Schema, SchemaBuilder} from '@enonic/lib-admin-ui/schema/Schema';
+import {Equitable} from '@enonic/lib-admin-ui/Equitable';
+import {ObjectHelper} from '@enonic/lib-admin-ui/ObjectHelper';
 
 export class RelationshipType
     extends Schema

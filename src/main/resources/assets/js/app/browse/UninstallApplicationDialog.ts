@@ -1,9 +1,9 @@
 import {UninstallApplicationEvent} from './UninstallApplicationEvent';
-import {i18n} from 'lib-admin-ui/util/Messages';
-import {Application} from 'lib-admin-ui/application/Application';
-import {Action} from 'lib-admin-ui/ui/Action';
-import {ModalDialog} from 'lib-admin-ui/ui/dialog/ModalDialog';
-import {H6El} from 'lib-admin-ui/dom/H6El';
+import {i18n} from '@enonic/lib-admin-ui/util/Messages';
+import {Application} from '@enonic/lib-admin-ui/application/Application';
+import {Action} from '@enonic/lib-admin-ui/ui/Action';
+import {ModalDialog} from '@enonic/lib-admin-ui/ui/dialog/ModalDialog';
+import {H6El} from '@enonic/lib-admin-ui/dom/H6El';
 
 export class UninstallApplicationDialog
     extends ModalDialog {

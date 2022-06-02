@@ -1,8 +1,8 @@
 import {ApplicationResourceRequest} from './ApplicationResourceRequest';
 import {ApplicationInstallResult} from './ApplicationInstallResult';
-import {HttpMethod} from 'lib-admin-ui/rest/HttpMethod';
+import {HttpMethod} from '@enonic/lib-admin-ui/rest/HttpMethod';
 import {ApplicationInstallResultJson} from './json/ApplicationInstallResultJson';
-import {JsonResponse} from 'lib-admin-ui/rest/JsonResponse';
+import {JsonResponse} from '@enonic/lib-admin-ui/rest/JsonResponse';
 
 
 export class InstallUrlApplicationRequest

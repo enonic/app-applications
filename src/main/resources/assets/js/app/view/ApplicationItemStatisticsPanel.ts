@@ -2,17 +2,17 @@ import {ApplicationBrowseActions} from '../browse/ApplicationBrowseActions';
 import {GetApplicationInfoRequest} from '../resource/GetApplicationInfoRequest';
 import {ApplicationInfo} from '../resource/ApplicationInfo';
 import {ApplicationDataContainer} from './ApplicationDataContainer';
-import {ItemStatisticsPanel} from 'lib-admin-ui/app/view/ItemStatisticsPanel';
-import {ActionMenu} from 'lib-admin-ui/ui/menu/ActionMenu';
-import {i18n} from 'lib-admin-ui/util/Messages';
-import {DivEl} from 'lib-admin-ui/dom/DivEl';
-import {Application} from 'lib-admin-ui/application/Application';
-import {DefaultErrorHandler} from 'lib-admin-ui/DefaultErrorHandler';
+import {ItemStatisticsPanel} from '@enonic/lib-admin-ui/app/view/ItemStatisticsPanel';
+import {ActionMenu} from '@enonic/lib-admin-ui/ui/menu/ActionMenu';
+import {i18n} from '@enonic/lib-admin-ui/util/Messages';
+import {DivEl} from '@enonic/lib-admin-ui/dom/DivEl';
+import {Application} from '@enonic/lib-admin-ui/application/Application';
+import {DefaultErrorHandler} from '@enonic/lib-admin-ui/DefaultErrorHandler';
 import {ApplicationItemStatisticsHeader} from './ApplicationItemStatisticsHeader';
-import {Action} from 'lib-admin-ui/ui/Action';
+import {Action} from '@enonic/lib-admin-ui/ui/Action';
 import {StartApplicationEvent} from '../browse/StartApplicationEvent';
 import {StopApplicationEvent} from '../browse/StopApplicationEvent';
-import {CONFIG} from 'lib-admin-ui/util/Config';
+import {CONFIG} from '@enonic/lib-admin-ui/util/Config';
 
 export class ApplicationItemStatisticsPanel
     extends ItemStatisticsPanel {

@@ -1,8 +1,8 @@
 import {ApplicationItemStatisticsPanel} from '../view/ApplicationItemStatisticsPanel';
-import {BrowseItemPanel} from 'lib-admin-ui/app/browse/BrowseItemPanel';
-import {Application} from 'lib-admin-ui/application/Application';
-import {ItemStatisticsPanel} from 'lib-admin-ui/app/view/ItemStatisticsPanel';
-import {DivEl} from 'lib-admin-ui/dom/DivEl';
+import {BrowseItemPanel} from '@enonic/lib-admin-ui/app/browse/BrowseItemPanel';
+import {Application} from '@enonic/lib-admin-ui/application/Application';
+import {ItemStatisticsPanel} from '@enonic/lib-admin-ui/app/view/ItemStatisticsPanel';
+import {DivEl} from '@enonic/lib-admin-ui/dom/DivEl';
 
 export class ApplicationBrowseItemPanel
     extends BrowseItemPanel {

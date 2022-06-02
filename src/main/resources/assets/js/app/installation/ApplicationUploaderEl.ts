@@ -1,7 +1,7 @@
-import {Application} from 'lib-admin-ui/application/Application';
-import {UploaderEl, UploaderElConfig} from 'lib-admin-ui/ui/uploader/UploaderEl';
-import {AEl} from 'lib-admin-ui/dom/AEl';
-import {Element} from 'lib-admin-ui/dom/Element';
+import {Application} from '@enonic/lib-admin-ui/application/Application';
+import {UploaderEl, UploaderElConfig} from '@enonic/lib-admin-ui/ui/uploader/UploaderEl';
+import {AEl} from '@enonic/lib-admin-ui/dom/AEl';
+import {Element} from '@enonic/lib-admin-ui/dom/Element';
 import {ApplicationInstallResultJson} from '../resource/json/ApplicationInstallResultJson';
 import {ApplicationInstallResult} from '../resource/ApplicationInstallResult';
 import {UrlHelper} from '../util/UrlHelper';

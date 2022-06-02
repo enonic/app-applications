@@ -1,5 +1,5 @@
 import {BaseDescriptor} from './BaseDescriptor';
-import {ApplicationKey} from 'lib-admin-ui/application/ApplicationKey';
+import {ApplicationKey} from '@enonic/lib-admin-ui/application/ApplicationKey';
 import {AdminToolDescriptorJson} from './json/AdminToolDescriptorJson';
 
 export class AdminToolDescriptor {

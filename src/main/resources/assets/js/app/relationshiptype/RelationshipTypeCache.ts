@@ -1,9 +1,9 @@
 import {RelationshipType, RelationshipTypeBuilder} from './RelationshipType';
 import {RelationshipTypeName} from './RelationshipTypeName';
-import {ApplicationEvent, ApplicationEventType} from 'lib-admin-ui/application/ApplicationEvent';
-import {ApplicationKey} from 'lib-admin-ui/application/ApplicationKey';
-import {ClassHelper} from 'lib-admin-ui/ClassHelper';
-import {Cache} from 'lib-admin-ui/cache/Cache';
+import {ApplicationEvent, ApplicationEventType} from '@enonic/lib-admin-ui/application/ApplicationEvent';
+import {ApplicationKey} from '@enonic/lib-admin-ui/application/ApplicationKey';
+import {ClassHelper} from '@enonic/lib-admin-ui/ClassHelper';
+import {Cache} from '@enonic/lib-admin-ui/cache/Cache';
 
 export class RelationshipTypeCache
     extends Cache<RelationshipType, RelationshipTypeName> {

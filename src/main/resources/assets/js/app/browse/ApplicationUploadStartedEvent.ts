@@ -1,7 +1,7 @@
-import {UploadItem} from 'lib-admin-ui/ui/uploader/UploadItem';
-import {ClassHelper} from 'lib-admin-ui/ClassHelper';
-import {Application} from 'lib-admin-ui/application/Application';
-import {Event} from 'lib-admin-ui/event/Event';
+import {UploadItem} from '@enonic/lib-admin-ui/ui/uploader/UploadItem';
+import {ClassHelper} from '@enonic/lib-admin-ui/ClassHelper';
+import {Application} from '@enonic/lib-admin-ui/application/Application';
+import {Event} from '@enonic/lib-admin-ui/event/Event';
 
 export class ApplicationUploadStartedEvent
     extends Event {
