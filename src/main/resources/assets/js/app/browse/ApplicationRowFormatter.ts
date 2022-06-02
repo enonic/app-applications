@@ -1,9 +1,9 @@
-import {TreeNode} from 'lib-admin-ui/ui/treegrid/TreeNode';
-import {ApplicationViewer} from 'lib-admin-ui/application/ApplicationViewer';
-import {Application, ApplicationUploadMock} from 'lib-admin-ui/application/Application';
-import {DivEl} from 'lib-admin-ui/dom/DivEl';
-import {ObjectHelper} from 'lib-admin-ui/ObjectHelper';
-import {ProgressBar} from 'lib-admin-ui/ui/ProgressBar';
+import {TreeNode} from '@enonic/lib-admin-ui/ui/treegrid/TreeNode';
+import {ApplicationViewer} from '@enonic/lib-admin-ui/application/ApplicationViewer';
+import {Application, ApplicationUploadMock} from '@enonic/lib-admin-ui/application/Application';
+import {DivEl} from '@enonic/lib-admin-ui/dom/DivEl';
+import {ObjectHelper} from '@enonic/lib-admin-ui/ObjectHelper';
+import {ProgressBar} from '@enonic/lib-admin-ui/ui/ProgressBar';
 
 export class ApplicationRowFormatter {
 

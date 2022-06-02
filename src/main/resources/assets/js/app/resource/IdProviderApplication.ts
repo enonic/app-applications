@@ -1,5 +1,5 @@
 import {ApplicationIdProviderJson, IdProviderApplicationJson} from './json/IdProviderApplicationJson';
-import {IdProviderMode} from 'lib-admin-ui/security/IdProviderMode';
+import {IdProviderMode} from '@enonic/lib-admin-ui/security/IdProviderMode';
 
 export class IdProviderApplication {
 

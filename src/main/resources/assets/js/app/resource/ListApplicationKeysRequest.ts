@@ -1,5 +1,5 @@
-import {ApplicationKey} from 'lib-admin-ui/application/ApplicationKey';
-import {JsonResponse} from 'lib-admin-ui/rest/JsonResponse';
+import {ApplicationKey} from '@enonic/lib-admin-ui/application/ApplicationKey';
+import {JsonResponse} from '@enonic/lib-admin-ui/rest/JsonResponse';
 import {ApplicationResourceRequest} from './ApplicationResourceRequest';
 
 export class ListApplicationKeysRequest

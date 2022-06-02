@@ -6,21 +6,21 @@ import {StartApplicationEvent} from './StartApplicationEvent';
 import {UninstallApplicationEvent} from './UninstallApplicationEvent';
 import {ApplicationUploadStartedEvent} from './ApplicationUploadStartedEvent';
 import {ApplicationActionRequest} from '../resource/ApplicationActionRequest';
-import {BrowsePanel} from 'lib-admin-ui/app/browse/BrowsePanel';
-import {Application} from 'lib-admin-ui/application/Application';
-import {DefaultErrorHandler} from 'lib-admin-ui/DefaultErrorHandler';
-import {ApplicationKey} from 'lib-admin-ui/application/ApplicationKey';
-import {TreeGridActions} from 'lib-admin-ui/ui/treegrid/actions/TreeGridActions';
-import {ApplicationEvent, ApplicationEventType} from 'lib-admin-ui/application/ApplicationEvent';
-import {showFeedback} from 'lib-admin-ui/notify/MessageBus';
-import {i18n} from 'lib-admin-ui/util/Messages';
-import {ServerEventsConnection} from 'lib-admin-ui/event/ServerEventsConnection';
-import {UploadItem} from 'lib-admin-ui/ui/uploader/UploadItem';
-import {Toolbar} from 'lib-admin-ui/ui/toolbar/Toolbar';
-import {DivEl} from 'lib-admin-ui/dom/DivEl';
-import {SpanEl} from 'lib-admin-ui/dom/SpanEl';
+import {BrowsePanel} from '@enonic/lib-admin-ui/app/browse/BrowsePanel';
+import {Application} from '@enonic/lib-admin-ui/application/Application';
+import {DefaultErrorHandler} from '@enonic/lib-admin-ui/DefaultErrorHandler';
+import {ApplicationKey} from '@enonic/lib-admin-ui/application/ApplicationKey';
+import {TreeGridActions} from '@enonic/lib-admin-ui/ui/treegrid/actions/TreeGridActions';
+import {ApplicationEvent, ApplicationEventType} from '@enonic/lib-admin-ui/application/ApplicationEvent';
+import {showFeedback} from '@enonic/lib-admin-ui/notify/MessageBus';
+import {i18n} from '@enonic/lib-admin-ui/util/Messages';
+import {ServerEventsConnection} from '@enonic/lib-admin-ui/event/ServerEventsConnection';
+import {UploadItem} from '@enonic/lib-admin-ui/ui/uploader/UploadItem';
+import {Toolbar} from '@enonic/lib-admin-ui/ui/toolbar/Toolbar';
+import {DivEl} from '@enonic/lib-admin-ui/dom/DivEl';
+import {SpanEl} from '@enonic/lib-admin-ui/dom/SpanEl';
 import {InstalledAppChangedEvent} from '../installation/InstalledAppChangedEvent';
-import {CONFIG} from 'lib-admin-ui/util/Config';
+import {CONFIG} from '@enonic/lib-admin-ui/util/Config';
 
 export class ApplicationBrowsePanel
     extends BrowsePanel {

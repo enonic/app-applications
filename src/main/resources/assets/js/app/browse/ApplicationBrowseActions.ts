@@ -4,9 +4,9 @@ import {StartApplicationAction} from './StartApplicationAction';
 import {StopApplicationAction} from './StopApplicationAction';
 import {InstallApplicationAction} from './InstallApplicationAction';
 import {UninstallApplicationAction} from './UninstallApplicationAction';
-import {TreeGridActions} from 'lib-admin-ui/ui/treegrid/actions/TreeGridActions';
-import {Application} from 'lib-admin-ui/application/Application';
-import {Action} from 'lib-admin-ui/ui/Action';
+import {TreeGridActions} from '@enonic/lib-admin-ui/ui/treegrid/actions/TreeGridActions';
+import {Application} from '@enonic/lib-admin-ui/application/Application';
+import {Action} from '@enonic/lib-admin-ui/ui/Action';
 
 export class ApplicationBrowseActions implements TreeGridActions<Application> {
 

@@ -3,16 +3,16 @@ import {ApplicationInput} from './view/ApplicationInput';
 import {MarketAppsTreeGrid} from './view/MarketAppsTreeGrid';
 import {ApplicationUploaderEl} from './ApplicationUploaderEl';
 import {ApplicationUploadStartedEvent} from '../browse/ApplicationUploadStartedEvent';
-import {Application} from 'lib-admin-ui/application/Application';
-import {ModalDialog} from 'lib-admin-ui/ui/dialog/ModalDialog';
-import {DropzoneContainer} from 'lib-admin-ui/ui/uploader/UploaderEl';
-import {ButtonEl} from 'lib-admin-ui/dom/ButtonEl';
-import {i18n} from 'lib-admin-ui/util/Messages';
-import {StringHelper} from 'lib-admin-ui/util/StringHelper';
-import {UploadFailedEvent} from 'lib-admin-ui/ui/uploader/UploadFailedEvent';
-import {NotifyManager} from 'lib-admin-ui/notify/NotifyManager';
-import {UploadStartedEvent} from 'lib-admin-ui/ui/uploader/UploadStartedEvent';
-import {DivEl} from 'lib-admin-ui/dom/DivEl';
+import {Application} from '@enonic/lib-admin-ui/application/Application';
+import {ModalDialog} from '@enonic/lib-admin-ui/ui/dialog/ModalDialog';
+import {DropzoneContainer} from '@enonic/lib-admin-ui/ui/uploader/UploaderEl';
+import {ButtonEl} from '@enonic/lib-admin-ui/dom/ButtonEl';
+import {i18n} from '@enonic/lib-admin-ui/util/Messages';
+import {StringHelper} from '@enonic/lib-admin-ui/util/StringHelper';
+import {UploadFailedEvent} from '@enonic/lib-admin-ui/ui/uploader/UploadFailedEvent';
+import {NotifyManager} from '@enonic/lib-admin-ui/notify/NotifyManager';
+import {UploadStartedEvent} from '@enonic/lib-admin-ui/ui/uploader/UploadStartedEvent';
+import {DivEl} from '@enonic/lib-admin-ui/dom/DivEl';
 
 export class InstallAppDialog
     extends ModalDialog {

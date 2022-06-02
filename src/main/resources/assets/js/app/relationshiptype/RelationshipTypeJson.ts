@@ -1,4 +1,4 @@
-import {SchemaJson} from 'lib-admin-ui/schema/SchemaJson';
+import {SchemaJson} from '@enonic/lib-admin-ui/schema/SchemaJson';
 
 export interface RelationshipTypeJson
     extends SchemaJson {

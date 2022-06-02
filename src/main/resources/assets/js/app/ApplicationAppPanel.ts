@@ -1,8 +1,8 @@
 import {ApplicationBrowsePanel} from './browse/ApplicationBrowsePanel';
-import {AppPanel} from 'lib-admin-ui/app/AppPanel';
-import {Path} from 'lib-admin-ui/rest/Path';
-import {ShowBrowsePanelEvent} from 'lib-admin-ui/app/ShowBrowsePanelEvent';
-import {Application} from 'lib-admin-ui/application/Application';
+import {AppPanel} from '@enonic/lib-admin-ui/app/AppPanel';
+import {Path} from '@enonic/lib-admin-ui/rest/Path';
+import {ShowBrowsePanelEvent} from '@enonic/lib-admin-ui/app/ShowBrowsePanelEvent';
+import {Application} from '@enonic/lib-admin-ui/application/Application';
 
 export class ApplicationAppPanel
     extends AppPanel {

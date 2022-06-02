@@ -14,8 +14,8 @@
     "fix": "eslint --fix **/*.ts"
   },
   "dependencies": {
+    "@enonic/lib-admin-ui": "file:./.xp/dev/lib-admin-ui",
     "jquery": "^3.6.0",
-    "lib-admin-ui": "file:./.xp/dev/lib-admin-ui",
     "q": "^1.5.1"
   },
   "devDependencies": {

@@ -5,9 +5,9 @@ import {ApplicationTask} from './ApplicationTask';
 import {IdProviderApplication} from './IdProviderApplication';
 import {AdminToolDescriptor} from './AdminToolDescriptor';
 import {RelationshipType} from '../relationshiptype/RelationshipType';
-import {ContentTypeSummary} from 'lib-admin-ui/schema/content/ContentTypeSummary';
-import {MacroDescriptor} from 'lib-admin-ui/macro/MacroDescriptor';
-import {Widget} from 'lib-admin-ui/content/Widget';
+import {ContentTypeSummary} from '@enonic/lib-admin-ui/schema/content/ContentTypeSummary';
+import {MacroDescriptor} from '@enonic/lib-admin-ui/macro/MacroDescriptor';
+import {Widget} from '@enonic/lib-admin-ui/content/Widget';
 import {BaseDescriptor} from './BaseDescriptor';
 
 export class ApplicationInfo {
