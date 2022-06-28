@@ -16,5 +16,6 @@ go to '/testing' folder and run:
   2. `gradle testApplicationsAppLocally  --project-cache-dir d:/cache
   3.  gradle testApplicationsAppFirefox
 
-### Reporting
+Switch tests to FF in Github - replace  'testApplicationsApp' in 'gradle.yaml'
+ run: ./gradlew :testing:testApplicationsAppFirefox
 
