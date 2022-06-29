@@ -53,11 +53,6 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew build -Pcom.enonic.xp.app.production=true
 
-      - name: Run Selenium Tests
-        id: selenium
-        if: github.event.head_commit.message != 'Updated to next SNAPSHOT version'
-        run: ./gradlew :testing:testApplicationsApp
-
       - name: Slack Notification
         uses: rtCamp/action-slack-notify@v2
         if: failure()
