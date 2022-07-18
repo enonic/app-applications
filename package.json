@@ -22,7 +22,7 @@
     "@types/core-js": "^2.5.5",
     "@types/q": "^1.5.5",
     "@typescript-eslint/eslint-plugin": "^5.30.5",
-    "@typescript-eslint/parser": "^5.30.5",
+    "@typescript-eslint/parser": "^5.30.6",
     "autoprefixer": "^10.4.7",
     "browserslist": "^4.21.1",
     "browserslist-config-enonic": "^1.0.7",
