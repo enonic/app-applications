@@ -30,7 +30,7 @@
     "css-loader": "^6.7.1",
     "cssnano": "^5.1.12",
     "enonic-admin-artifacts": "^1.8.2",
-    "eslint": "^8.19.0",
+    "eslint": "^8.20.0",
     "less": "^4.1.3",
     "less-loader": "^11.0.0",
     "mini-css-extract-plugin": "^2.6.1",
