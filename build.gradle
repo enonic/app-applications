@@ -119,16 +119,6 @@ test {
 if ( hasProperty( 'env' ) )
 {
     addBuildDependency()
-    applyExcludedTasks()
-}
-
-def applyExcludedTasks() {
-    if ( isLibAdminUiIncluded() )
-    {
-        IncludedBuild libAdminUi = gradle.includedBuild( 'lib-admin-ui' )
-        def excludedTasks = gradle.startParameter.getExcludedTaskNames().findAll( { it == 'lint' || it == 'test' } )
-        libAdminUi.getLoadedSettings().getStartParameter().setExcludedTaskNames( excludedTasks )
-    }
 }
 
 def addBuildDependency() {
