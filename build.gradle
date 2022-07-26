@@ -53,7 +53,7 @@ repositories {
 
 node {
     download = true
-    version = '16.15.0'
+    version = '16.16.0'
 }
 
 task copyDevResources {
@@ -125,7 +125,7 @@ if ( hasProperty( 'env' ) )
 def applyExcludedTasks() {
     if ( isLibAdminUiIncluded() )
     {
-        def libAdminUi = gradle.includedBuild( 'lib-admin-ui' )
+        IncludedBuild libAdminUi = gradle.includedBuild( 'lib-admin-ui' )
         def excludedTasks = gradle.startParameter.getExcludedTaskNames().findAll( { it == 'lint' || it == 'test' } )
         libAdminUi.getLoadedSettings().getStartParameter().setExcludedTaskNames( excludedTasks )
     }
