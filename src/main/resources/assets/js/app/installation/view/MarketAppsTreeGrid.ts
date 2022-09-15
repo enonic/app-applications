@@ -18,13 +18,14 @@ import {MarketAppsTreeGridHelper} from './MarketAppsTreeGridHelper';
 import {InstallUrlApplicationRequest} from '../../resource/InstallUrlApplicationRequest';
 import {ApplicationInstallResult} from '../../resource/ApplicationInstallResult';
 import {KeyHelper} from '@enonic/lib-admin-ui/ui/KeyHelper';
-import {CONFIG} from '@enonic/lib-admin-ui/util/Config';
+import {ConfirmationDialog} from '@enonic/lib-admin-ui/ui/dialog/ConfirmationDialog';
 
 interface GridEventData {
     row: number;
 }
 
-interface RowCountChangedEventData extends Slick.EventData {
+interface RowCountChangedEventData
+    extends Slick.EventData {
     previous: number;
     current: number;
 }
@@ -43,6 +44,8 @@ export class MarketAppsTreeGrid
     public static debug: boolean = false;
 
     private loadingStartedListeners: { (): void; }[];
+
+    private updateConfirmationDialog?: ConfirmationDialog;
 
     constructor(filter: MarketAppsTreeGridFilter) {
 
@@ -146,34 +149,76 @@ export class MarketAppsTreeGrid
         }
     }
 
-    private handleApplicationInstalled(row: number): void {
-        const nodeToUpdate = this.getItem(row);
-        if (!nodeToUpdate) {
+    private installAppByRow(row: number): void {
+        const marketApplication: MarketApplication = this.getItem(row)?.getData();
+
+        if (!marketApplication) {
             return;
         }
 
-        if (MarketAppsTreeGrid.debug) {
-            console.debug('MarketAppsTreeGrid: installed');
+        if (this.isMajorVersionUpdate(marketApplication)) {
+            this.showUpdateConfirmationDialog(marketApplication, row);
+        } else {
+            this.doInstallApp(marketApplication, row);
+        }
+    }
+
+    private isMajorVersionUpdate(marketApplication: MarketApplication): boolean {
+        const installedApp: Application =
+            this.installedApplications.find((app: Application) => app.getApplicationKey().equals(marketApplication.getAppKey()));
+
+        if (!installedApp) {
+            return false;
         }
 
-        const marketApplication = nodeToUpdate.getData();
-        const url = marketApplication.getLatestVersionDownloadUrl();
-        const oldStatus = marketApplication.getStatus();
+        const installedAppMajorVersion: number = +installedApp.getVersion().split('.')[0];
+        const marketAppMajorVersion: number = +marketApplication.getLatestVersion().split('.')[0];
 
+        return marketAppMajorVersion > installedAppMajorVersion;
+    }
+
+    private showUpdateConfirmationDialog(marketApplication: MarketApplication, row: number): void {
+        const installedApp: Application =
+            this.installedApplications.find((app: Application) => app.getApplicationKey().equals(marketApplication.getAppKey()));
+
+        if (!this.updateConfirmationDialog) {
+            this.updateConfirmationDialog = new ConfirmationDialog();
+            this.updateConfirmationDialog.addClass('confirm-upgrade-dialog');
+        }
+
+        this.updateConfirmationDialog.setHeading(
+            i18n('dialog.confirm.update.title',
+                `${marketApplication.getDisplayName()} ${installedApp.getVersion()}`,
+                marketApplication.getLatestVersion())
+        );
+        this.updateConfirmationDialog.setQuestion(this.generateConfirmationQuestion(marketApplication), false);
+        this.updateConfirmationDialog.setYesCallback(() => this.doInstallApp(marketApplication, row));
+        this.updateConfirmationDialog.open();
+    }
+
+    private generateConfirmationQuestion(marketApplication: MarketApplication): string {
+        const linkTitle: string = i18n('dialog.confirm.update.question.link');
+        const linkHtml: string = `<a href="${marketApplication.getUrl()}" target="_blank">${linkTitle}</a>`;
+        const part1: string = i18n('dialog.confirm.update.question.part1', marketApplication.getDisplayName());
+        const part2: string = i18n('dialog.confirm.update.question.part2');
+        return `${part1} ${linkHtml} ${part2}`;
+    }
+
+    private doInstallApp(marketApplication: MarketApplication, row: number): void {
+        const oldStatus: MarketAppStatus = marketApplication.getStatus();
         marketApplication.setStatus(MarketAppStatus.INSTALLING);
         this.getGrid().updateRow(row);
 
-        void new InstallUrlApplicationRequest(url)
+        void new InstallUrlApplicationRequest(marketApplication.getLatestVersionDownloadUrl())
             .sendAndParse().then((result: ApplicationInstallResult) => {
                 if (result.getFailure()) {
                     throw result.getFailure();
                 }
 
-                if (MarketHelper.installedAppCanBeUpdated(marketApplication, result.getApplication())) {
-                    marketApplication.setStatus(MarketAppStatus.OLDER_VERSION_INSTALLED);
-                } else {
-                    marketApplication.setStatus(MarketAppStatus.INSTALLED);
-                }
+                const status: MarketAppStatus = MarketHelper.installedAppCanBeUpdated(marketApplication, result.getApplication())
+                                                ? MarketAppStatus.OLDER_VERSION_INSTALLED
+                                                : MarketAppStatus.INSTALLED;
+                marketApplication.setStatus(status);
             }).catch((reason: any) => {
                 marketApplication.setStatus(oldStatus);
                 DefaultErrorHandler.handle(reason);
@@ -184,7 +229,7 @@ export class MarketAppsTreeGrid
 
     private subscribeAndManageInstallClick() {
         this.getGrid().subscribeOnClick(({target}, data) => {
-            const elem = Element.fromHtmlElement(target.tagName.toLowerCase() === 'a' ? target : target.parentElement);
+            const elem: Element = Element.fromHtmlElement(target.tagName.toLowerCase() === 'a' ? target : target.parentElement);
             const canInstall = elem.hasClass(MarketAppStatusFormatter.statusInstallCssClass) ||
                                elem.hasClass(MarketAppStatusFormatter.statusUpdateCssClass);
             if (!canInstall) {
@@ -192,7 +237,7 @@ export class MarketAppsTreeGrid
             }
 
             const {row} = (data as GridEventData);
-            this.handleApplicationInstalled(row);
+            this.installAppByRow(row);
         });
 
         this.getGrid().setOnKeyDown((event) => {
