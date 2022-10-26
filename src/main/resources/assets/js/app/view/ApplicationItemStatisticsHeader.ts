@@ -14,8 +14,6 @@ export class ApplicationItemStatisticsHeader
         if (item.hasDescription()) {
             this.setHeaderSubtitle(item.getDescription(), 'app-description');
         }
-
-        this.appendToHeaderPath(item.getName(), 'parent-path');
     }
 
 }
