@@ -95,8 +95,13 @@ export class ApplicationTreeGrid
     }
 
     appendUploadNode(item: UploadItem<Application>) {
+        if (this.isItemUploading(item)) {
+            return;
+        }
+
         const appMock: ApplicationUploadMock = new ApplicationUploadMock(item);
         const parent: TreeNode<Application> = this.getRoot().getDefaultRoot();
+
         const uploadNode: TreeNode<Application> = this.dataToTreeNode(<Application><unknown>appMock, this.getRoot().getDefaultRoot());
         this.insertNodeToParentNode(uploadNode, parent, 0);
 
@@ -123,4 +128,17 @@ export class ApplicationTreeGrid
         });
     }
 
+    private isItemUploading(newItemToUpload: UploadItem<Application>): boolean {
+        const parent: TreeNode<Application> = this.getRoot().getDefaultRoot();
+        const itemsBeingUploaded: ApplicationUploadMock[] = parent.getChildren().filter(this.isMockUploadNode).map(this.getUploadMock);
+        return itemsBeingUploaded.some((item: ApplicationUploadMock) => newItemToUpload.getName() === item.getName());
+    }
+
+    private isMockUploadNode(node: TreeNode<Application>): boolean {
+        return node.getData() instanceof ApplicationUploadMock;
+    }
+
+    private getUploadMock(node: TreeNode<Application>): ApplicationUploadMock {
+        return <any>node.getData();
+    }
 }

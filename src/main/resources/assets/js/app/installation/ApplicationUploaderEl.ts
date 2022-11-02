@@ -5,6 +5,7 @@ import {Element} from '@enonic/lib-admin-ui/dom/Element';
 import {ApplicationInstallResultJson} from '../resource/json/ApplicationInstallResultJson';
 import {ApplicationInstallResult} from '../resource/ApplicationInstallResult';
 import {UrlHelper} from '../util/UrlHelper';
+import {UploadItem} from '@enonic/lib-admin-ui/ui/uploader/UploadItem';
 
 export class ApplicationUploaderEl
     extends UploaderEl<Application> {
@@ -52,5 +53,9 @@ export class ApplicationUploaderEl
 
     protected getErrorMessage(): string {
         return 'The application could not be installed';
+    }
+
+    protected isAllowedToUpload(id: number, name: string): boolean {
+        return !this.uploadedItems.some((item: UploadItem<Application>) => item.getFileName() === name);
     }
 }
