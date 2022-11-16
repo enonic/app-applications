@@ -47,7 +47,7 @@ describe("Item Statistics Panel 'Action Menu' spec", function () {
         async () => {
             let appBrowsePanel = new AppBrowsePanel();
             let appStatisticPanel = new AppStatisticPanel();
-            //1. Select the app and expand he menu:
+            //1. Select the app and expand the menu:
             await appBrowsePanel.clickOnRowByDisplayName(FIRST_APP);
             await appStatisticPanel.clickOnActionDropDownMenu();
             await appStatisticPanel.waitForStopMenuItemVisible();

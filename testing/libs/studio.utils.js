@@ -63,8 +63,9 @@ module.exports = {
             return await this.doSwitchToApplicationsBrowsePanel();
         } catch (err) {
             console.log('tried to navigate to applications app, but: ' + err);
-            await this.saveScreenshot(appConst.generateRandomName("err_navigate_to_applications"));
-            throw new Error('error when navigate to Applications app ' + err);
+            let screenshot = appConst.generateRandomName("err_navigate_to_applications");
+            await this.saveScreenshot(screenshot);
+            throw new Error('Error during navigate to Applications app, screenshot: ' + screenshot + "  " + err);
         }
     },
     async doSwitchToApplicationsBrowsePanel() {
