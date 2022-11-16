@@ -14,7 +14,7 @@ class LauncherPanel extends Page {
     }
 
     get applicationsLink() {
-        return XPATH.container + `//a[contains(@data-id,'app.applications')]//p[@class='app-name']`;
+        return XPATH.container + "//a[contains(@href,'com.enonic.xp.app.applications')]";
     }
 
     get usersLink() {
@@ -26,9 +26,15 @@ class LauncherPanel extends Page {
     }
 
     async clickOnApplicationsLink() {
-        await this.waitForElementDisplayed(this.applicationsLink, appConst.mediumTimeout);
-        await this.pause(300);
-        return await this.clickOnElement(this.applicationsLink);
+        try {
+            await this.waitForElementDisplayed(this.applicationsLink, appConst.mediumTimeout);
+            await this.pause(300);
+            return await this.clickOnElement(this.applicationsLink);
+        }catch(err){
+            //TODO workaround for issue with applications link in Launcher Panel
+            let element = await this.findElement(this.applicationsLink);
+            return await element.click();
+        }
     }
 
     clickOnLogoutLink() {
@@ -37,18 +43,6 @@ class LauncherPanel extends Page {
 
     waitForPanelDisplayed(ms) {
         return this.waitForElementDisplayed(XPATH.container, ms).catch(err => {
-            return false;
-        })
-    }
-
-    isApplicationsLinkDisplayed() {
-        return this.waitForElementDisplayed(this.applicationsLink, appConst.shortTimeout).catch(err => {
-            return false;
-        })
-    }
-
-    isUsersLinkDisplayed() {
-        return this.waitForElementDisplayed(this.usersLink, appConst.shortTimeout).catch(err => {
             return false;
         })
     }
