@@ -1,7 +1,24 @@
 {
-  "extends": "./tsconfig.build",
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "es5",
+    "sourceMap": true,
+    "types": [
+      "q"
+    ],
+    "lib": [
+      "es2015",
+      "es2015.promise",
+      "dom"
+    ]
+  },
   "files": [
     "./src/main/resources/assets/js/main.ts"
+  ],
+  "exclude": [
+    "build/**/*",
+    "out/**/*",
+    "node_modules/*"
   ],
   "include": [
     "src/**/*",

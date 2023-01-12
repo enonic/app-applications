@@ -1,8 +1,8 @@
-import {RelationshipTypeName} from './RelationshipTypeName';
-import {RelationshipTypeJson} from './RelationshipTypeJson';
-import {Schema, SchemaBuilder} from '@enonic/lib-admin-ui/schema/Schema';
 import {Equitable} from '@enonic/lib-admin-ui/Equitable';
 import {ObjectHelper} from '@enonic/lib-admin-ui/ObjectHelper';
+import {Schema, SchemaBuilder} from '@enonic/lib-admin-ui/schema/Schema';
+import {RelationshipTypeJson} from './RelationshipTypeJson';
+import {RelationshipTypeName} from './RelationshipTypeName';
 
 export class RelationshipType
     extends Schema
@@ -92,8 +92,8 @@ export class RelationshipTypeBuilder
     allowedToTypes: string[];
 
     constructor(source?: RelationshipType) {
+        super(source);
         if (source) {
-            super(source);
             this.fromSemantic = source.getFromSemantic();
             this.toSemantic = source.getToSemantic();
             this.allowedFromTypes = source.getAllowedFromTypes();
