@@ -1,11 +1,11 @@
 .application-item-statistics-panel {
   overflow-x: auto;
   overflow-y: scroll;
+  display: flex;
+  flex-direction: column;
 
   .action-menu {
-    position: absolute;
-    top: 35px;
-    right: 35px;
+    position: relative;
   }
 
   .header {
@@ -13,6 +13,7 @@
     padding: 35px;
     color: @admin-font-gray3;
     margin: 0;
+    display: flex;
 
     img {
       height: 64px;
@@ -22,12 +23,12 @@
 
     .path {
       padding: 4px 0 0 0;
-      font-size: 18px;
-      line-height: 24px;
+      font-size: 14px;
+      line-height: 20px;
+    }
 
-      .parent-path, .path-name {
-        display: none;
-      }
+    &.no-description {
+      align-items: center;
     }
   }
 
@@ -42,6 +43,7 @@
   }
   .application-data-container {
     padding: 0 35px;
+    flex-grow: 1;
 
     .item-data-group {
       display: flex;
