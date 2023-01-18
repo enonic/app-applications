@@ -1,4 +1,3 @@
-import {ApplicationBrowseActions} from '../browse/ApplicationBrowseActions';
 import {GetApplicationInfoRequest} from '../resource/GetApplicationInfoRequest';
 import {ApplicationInfo} from '../resource/ApplicationInfo';
 import {ApplicationDataContainer} from './ApplicationDataContainer';
@@ -13,6 +12,7 @@ import {Action} from '@enonic/lib-admin-ui/ui/Action';
 import {StartApplicationEvent} from '../browse/StartApplicationEvent';
 import {StopApplicationEvent} from '../browse/StopApplicationEvent';
 import {CONFIG} from '@enonic/lib-admin-ui/util/Config';
+import * as Q from 'q';
 
 export class ApplicationItemStatisticsPanel
     extends ItemStatisticsPanel {
@@ -101,7 +101,6 @@ export class ApplicationItemStatisticsPanel
     doRender(): Q.Promise<boolean> {
         return super.doRender().then((rendered) => {
             this.appendChild(this.header);
-            this.appendChild(this.applicationDataContainer);
 
             if (this.actionMenu) {
                 const actionMenuWrapper: DivEl = new DivEl('action-menu-wrapper');
@@ -109,6 +108,8 @@ export class ApplicationItemStatisticsPanel
 
                 this.appendChild(actionMenuWrapper);
             }
+
+            this.appendChild(this.applicationDataContainer);
 
             return rendered;
         });

@@ -1,11 +1,23 @@
 .application-item-statistics-panel {
   overflow-x: auto;
   overflow-y: scroll;
+  display: flex;
+  flex-direction: column;
 
   .action-menu {
-    position: absolute;
-    top: 35px;
-    right: 35px;
+    position: relative;
+
+    .drop-down-button {
+      display: flex;
+      flex-direction: row-reverse;
+      justify-content: flex-end;
+      color: @admin-bg-dark-gray;
+    }
+
+    .drop-down-button,
+    ul li {
+      padding-left: 45%;
+    }
   }
 
   .header {
@@ -13,6 +25,7 @@
     padding: 35px;
     color: @admin-font-gray3;
     margin: 0;
+    display: flex;
 
     img {
       height: 64px;
@@ -22,12 +35,12 @@
 
     .path {
       padding: 4px 0 0 0;
-      font-size: 18px;
-      line-height: 24px;
+      font-size: 14px;
+      line-height: 20px;
+    }
 
-      .parent-path, .path-name {
-        display: none;
-      }
+    &.no-description {
+      align-items: center;
     }
   }
 
@@ -42,6 +55,7 @@
   }
   .application-data-container {
     padding: 0 35px;
+    flex-grow: 1;
 
     .item-data-group {
       display: flex;
@@ -52,6 +66,60 @@
       h2 {
         flex: 1 100%;
         color: @admin-font-gray2;
+      }
+    }
+  }
+}
+
+body._540-720,
+body._360-540,
+body._240-360,
+body._0-240 {
+  .application-item-statistics-panel {
+    .header {
+      padding: 16px;
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+
+      img {
+        margin-right: 10px;
+        height: 44px;
+        width: 44px;
+      }
+
+      h1 {
+        flex: 1 0 auto;
+        width: 100%;
+        margin: 0;
+        font-size: 22px;
+        line-height: 28px;
+      }
+
+      h4 {
+        flex: 1 0 auto;
+        width: 100%;
+      }
+    }
+
+    .application-data-container {
+      padding: 0 16px;
+    }
+
+    .action-menu-wrapper {
+      background-color: @admin-bg-light-gray;
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+
+      .action-menu {
+        margin: 0;
+
+        ul {
+          top: auto;
+          bottom: -4px;
+          padding: 4px 4px 44px 4px;
+        }
       }
     }
   }
