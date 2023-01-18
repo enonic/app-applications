@@ -3,19 +3,15 @@
   .application-item-statistics-toolbar {
     display: none;
     height: 44px;
-    padding: 0 0 0 44px;
+    padding: 0 0 0 12px;
     background-color: @admin-black;
   }
 
   .application-item-statistics-panel-back-button {
-    position: absolute;
-    left: 0;
-    width: 44px;
-    height: 44px;
     line-height: 44px;
-    text-align: center;
     font-size: 20px;
     cursor: pointer;
+    width: 20px;
 
     &::before {
       color: @admin-white;
@@ -43,50 +39,6 @@ body._0-240 {
 
     .application-item-statistics-toolbar {
       display: block;
-    }
-
-    .header {
-      padding: 16px;
-      display: flex;
-      justify-content: center;
-      flex-wrap: wrap;
-
-      img {
-        margin-right: 8px;
-        height: 32px;
-        width: 32px;
-      }
-
-      h1 {
-        flex: 1 0 auto;
-        width: calc(100% - 48px);
-        margin: 0;
-        font-size: 22px;
-        line-height: 28px;
-      }
-
-      h4 {
-        flex: 1 0 auto;
-        width: 100%;
-      }
-    }
-
-    .application-data-container {
-      padding: 0 16px;
-    }
-
-    .action-menu-wrapper {
-      background-color: @admin-bg-light-gray;
-      padding: 8px 0;
-      margin-bottom: 8px;
-
-      .action-menu {
-        width: 100px;
-        position: relative;
-        margin: 0 auto;
-        top: 0;
-        right: 0;
-      }
     }
   }
 }
