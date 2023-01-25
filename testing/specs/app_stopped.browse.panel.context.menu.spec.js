@@ -8,7 +8,7 @@ const appConst = require('../libs/app_const');
 describe(`Applications Grid context menu, application is stopped`, function () {
     this.timeout(appConst.SUITE_TIMEOUT);
 
-    if (typeof browser === "undefined") {
+    if (typeof browser === 'undefined') {
         webDriverHelper.setupBrowser();
     }
 
@@ -30,7 +30,7 @@ describe(`Applications Grid context menu, application is stopped`, function () {
             await appBrowsePanel.rightClickOnRowByDisplayName(appConst.TEST_APPLICATIONS.SECOND_APP);
             await appBrowsePanel.waitForContextMenuDisplayed();
             studioUtils.saveScreenshot("start_menu_item2");
-            //'Start menu item should be enabled'
+            // 'Start menu item should be enabled'
             await appBrowsePanel.waitForContextMenuItemEnabled('Start');
         });
 
@@ -39,9 +39,9 @@ describe(`Applications Grid context menu, application is stopped`, function () {
             let appBrowsePanel = new AppBrowsePanel();
             await appBrowsePanel.rightClickOnRowByDisplayName(appConst.TEST_APPLICATIONS.SECOND_APP);
             await appBrowsePanel.waitForContextMenuDisplayed();
-            //'Stop menu item should be disabled', otherwise exception will be thrown
+            // 'Stop menu item should be disabled', otherwise exception will be thrown
             await appBrowsePanel.waitForContextMenuItemDisabled('Stop');
-            //this application is local - Uninstall button should be disabled:
+            // this application is local - Uninstall button should be disabled:
             await appBrowsePanel.waitForContextMenuItemDisabled('Uninstall');
         });
 

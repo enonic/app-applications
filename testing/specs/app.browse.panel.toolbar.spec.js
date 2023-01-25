@@ -10,7 +10,7 @@ const appConst = require('../libs/app_const');
 describe('Application Browse Panel, check buttons in the toolbar', function () {
     this.timeout(70000);
 
-    if (typeof browser === "undefined") {
+    if (typeof browser === 'undefined') {
         webDriverHelper.setupBrowser();
     }
 
@@ -37,24 +37,27 @@ describe('Application Browse Panel, check buttons in the toolbar', function () {
         async () => {
             let appBrowsePanel = new AppBrowsePanel();
             let installAppDialog = new InstallAppDialog();
+            // 1. Open Install modal dialog
             await appBrowsePanel.clickOnInstallButton();
             await installAppDialog.waitForGridLoaded();
             await installAppDialog.waitForInstallLink(appDisplayName1);
-            //Install two applications and close the modal dialog:
+            // 2. Install two applications and close the modal dialog:
             await installAppDialog.pause(500);
             await installAppDialog.clickOnInstallAppLink(appDisplayName1);
+            // 3. Wait for installed
             await installAppDialog.waitForAppInstalled(appDisplayName1);
             await installAppDialog.waitForInstallLink(appDisplayName2);
             await installAppDialog.clickOnInstallAppLink(appDisplayName2);
             await installAppDialog.waitForAppInstalled(appDisplayName2);
+            // 4. Close the dialog
             await installAppDialog.clickOnCancelButtonTop();
             await installAppDialog.waitForClosed(2000);
 
-            studioUtils.saveScreenshot("chuck_norris_installed");
+            await studioUtils.saveScreenshot('chuck_norris_installed');
             let result = await appBrowsePanel.isAppByDescriptionDisplayed(appDescription1);
-            assert.isTrue(result, appDescription1 + "  application should be present");
+            assert.isTrue(result, appDescription1 + '  application should be present');
             result = await appBrowsePanel.isAppByDescriptionDisplayed(appDescription2);
-            assert.isTrue(result, appDescription2 + "  application should be present");
+            assert.isTrue(result, appDescription2 + '  application should be present');
         });
 
     it('WHEN An installed application is selected or unselected THEN the toolbar buttons must be updated',
@@ -62,8 +65,8 @@ describe('Application Browse Panel, check buttons in the toolbar', function () {
             let appBrowsePanel = new AppBrowsePanel();
             //1. select the application:
             await appBrowsePanel.clickOnRowByDescription(appDescription1);
-            studioUtils.saveScreenshot("chuck_norris_selected");
-            //"Uninstall" button gets enabled:
+            studioUtils.saveScreenshot('chuck_norris_selected');
+            // "Uninstall" button gets enabled:
             await appBrowsePanel.waitForUninstallButtonEnabled();
             await appBrowsePanel.waitForStopButtonEnabled();
             await appBrowsePanel.waitForStartButtonDisabled();
@@ -79,26 +82,26 @@ describe('Application Browse Panel, check buttons in the toolbar', function () {
             let appBrowsePanel = new AppBrowsePanel();
             //1. Click on Select All checkbox:
             await appBrowsePanel.clickOnSelectAll();
-            assert.isTrue(await appBrowsePanel.isRowByIndexSelected(0), "First row should be selected(blue)");
-            assert.isTrue(await appBrowsePanel.isRowByIndexSelected(1), "Second row should be selected(blue)");
+            assert.isTrue(await appBrowsePanel.isRowByIndexSelected(0), 'First row should be selected(blue)');
+            assert.isTrue(await appBrowsePanel.isRowByIndexSelected(1), 'Second row should be selected(blue)');
             //2. click on 'Select all/Unselect all' checkbox, the checkbox gets unchecked:
             await appBrowsePanel.clickOnSelectAll();
-            assert.isFalse(await appBrowsePanel.isRowByIndexSelected(0), "First row should be unselected");
-            assert.isFalse(await appBrowsePanel.isRowByIndexSelected(1), "Second row should be unselected");
+            assert.isFalse(await appBrowsePanel.isRowByIndexSelected(0), 'First row should be unselected');
+            assert.isFalse(await appBrowsePanel.isRowByIndexSelected(1), 'Second row should be unselected');
         });
 
     it("WHEN Two existing applications have been checked THEN 'Selection Controller' gets partial",
         async () => {
             let appBrowsePanel = new AppBrowsePanel();
-            //1. Select 2 applications:
+            // 1. Select 2 applications:
             await appBrowsePanel.clickOnCheckboxAndSelectRowByDisplayName(appDisplayName1InGrid);
             await appBrowsePanel.clickOnCheckboxAndSelectRowByDisplayName(appDisplayName2);
-            //2. Verify that Selection Controller checkbox gets partial:
+            // 2. Verify that Selection Controller checkbox gets partial:
             await appBrowsePanel.isSelectionControllerSelected();
             await appBrowsePanel.waitForSelectionControllerPartial();
         });
 
-    //Verifies issue#145 "Selection Controller remains checked after uninstalling applications."
+    // Verifies issue#145 "Selection Controller remains checked after uninstalling applications."
     it('GIVEN Two existing applications are filtered (Show Selection has been clicked )WHEN both application have uninstalled THEN Selection Toggler get not visible AND Selection checkbox gets unselected',
         async () => {
             let appBrowsePanel = new AppBrowsePanel();
@@ -113,7 +116,7 @@ describe('Application Browse Panel, check buttons in the toolbar', function () {
             await uninstallAppDialog.waitForOpened();
             await uninstallAppDialog.clickOnYesButton();
             await appBrowsePanel.waitForNotificationMessage();
-            studioUtils.saveScreenshot("show_selection_issue");
+            await studioUtils.saveScreenshot('show_selection_issue');
 
             //4. Verify that 'Selection Toggler' is not visible:
             await appBrowsePanel.waitForSelectionTogglerNotVisible();

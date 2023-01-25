@@ -3,7 +3,7 @@ const appConst = require('../../libs/app_const');
 
 const xpath = {
     main: "//div[contains(@id,'ApplicationItemStatisticsPanel')]",
-    title: "//div[contains(@id,'ItemStatisticsHeader')]/h1[contains(@class,'title')]",
+    title: "//div[contains(@id,'ApplicationItemStatisticsHeader')]//h1[contains(@class,'title')]",
     dropDownButton: "//div[contains(@id,'ActionMenu')]//div[contains(@class,'drop-down-button')]",
     dataContainer: "//div[contains(@class,'application-data-container')]",
     siteItemDataGroup: "//div[contains(@id,'ItemDataGroup') and child::h2[contains(.,'Site')]]",

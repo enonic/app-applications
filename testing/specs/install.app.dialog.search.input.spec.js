@@ -9,7 +9,7 @@ const appConst = require('../libs/app_const');
 describe('Install app dialog, search input spec.', function () {
     this.timeout(appConst.SUITE_TIMEOUT);
 
-    if (typeof browser === "undefined") {
+    if (typeof browser === 'undefined') {
         webDriverHelper.setupBrowser();
     }
     const not_existing = 'https://repo.enonic.com/public/com/enonic/app/not-existing/0.0.0/not-existing-0.0.0.jar';
@@ -21,17 +21,17 @@ describe('Install app dialog, search input spec.', function () {
         async () => {
             let appBrowsePanel = new AppBrowsePanel();
             let installDialog = new InstallDialog();
-            //1. Open Install Dialog
+            // 1. Open Install Dialog
             await appBrowsePanel.clickOnInstallButton();
             await installDialog.waitForOpened();
-            //2. Wait for the spinner disappears:
+            // 2. Wait for the spinner disappears:
             await installDialog.waitForSpinnerNotVisible();
             await installDialog.pause(1000);
-            //3. Type a URL of not existing app:
+            // 3. Type a URL of not existing app:
             await installDialog.typeSearchTextAndEnter(not_existing);
-            //4. Verify that validation message appears:
+            // 4. Verify that validation message appears:
             let message = await installDialog.getErrorValidationMessage();
-            studioUtils.saveScreenshot("url_not_exist");
+            await studioUtils.saveScreenshot("url_not_exist");
             assert.isTrue(message.includes('Failed to process application from'), 'expected notification message should appear');
         });
 
@@ -39,19 +39,19 @@ describe('Install app dialog, search input spec.', function () {
         async () => {
             let appBrowsePanel = new AppBrowsePanel();
             let installDialog = new InstallDialog();
-            //1. Open Install Dialog
+            // 1. Open Install Dialog
             await appBrowsePanel.clickOnInstallButton();
             await installDialog.waitForOpened();
-            //2. Wait for the spinner disappears:
+            // 2. Wait for the spinner disappears:
             await installDialog.waitForSpinnerNotVisible();
             await installDialog.pause(500);
-            //3.Type a path to the local file:
+            // 3.Type a path to the local file:
             await installDialog.typeSearchTextAndEnter(local_file);
             await installDialog.waitForSpinnerNotVisible();
-            //4. Verify the expected warning:
+            // 4. Verify the expected warning:
             await installDialog.waitForApplicationNotFoundMessage();
             let message = await installDialog.applicationNotFoundMessage();
-            studioUtils.saveScreenshot("app_not_found");
+            await studioUtils.saveScreenshot('app_not_found');
             assert.isTrue(message.includes('No applications found'), "'No applications found' - message should appear");
         });
 
@@ -62,12 +62,12 @@ describe('Install app dialog, search input spec.', function () {
             await appBrowsePanel.clickOnInstallButton();
             await installDialog.waitForSpinnerNotVisible();
             await installDialog.waitForOpened();
-            //Type a correct URL for the app:
+            // Type a correct URL for the app:
             await installDialog.typeSearchTextAndEnter(CONTENT_VIEWER_APP_URL);
             await installDialog.waitForClosed(45000);
 
             let message = await installDialog.waitForNotificationMessage();
-            studioUtils.saveScreenshot("app_url_installed");
+            await studioUtils.saveScreenshot('app_url_installed');
             assert.isTrue(message.includes('Application \'Content Viewer App\' installed successfully'),
                 'expected notification message should appear');
         });

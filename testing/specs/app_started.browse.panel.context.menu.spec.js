@@ -51,11 +51,11 @@ describe("Tests for Applications Grid context menu", function () {
             await appBrowsePanel.rightClickOnRowByDisplayName(appConst.TEST_APPLICATIONS.THIRD_APP);
             await appBrowsePanel.waitForContextMenuDisplayed();
             studioUtils.saveScreenshot("app_context_menu2");
-            //2. Verify state of all menu items:
+            // 2. Verify state of all menu items:
             await appBrowsePanel.waitForContextMenuItemDisabled('Start');
-            //'Stop' menu item should be enabled'
+            // 'Stop' menu item should be enabled'
             await appBrowsePanel.waitForContextMenuItemEnabled('Stop');
-            //'Uninstall' menu item should be disabled, because the application is local.
+            // 'Uninstall' menu item should be disabled, because the application is local.
             await appBrowsePanel.waitForContextMenuItemDisabled('Uninstall');
         });
 

@@ -14,7 +14,7 @@ const Apps = {
 describe('Tests for Applications Item Statistics Panel', function () {
     this.timeout(appConstants.SUITE_TIMEOUT);
 
-    if (typeof browser === "undefined") {
+    if (typeof browser === 'undefined') {
         webDriverHelper.setupBrowser();
     }
 
@@ -24,35 +24,35 @@ describe('Tests for Applications Item Statistics Panel', function () {
         async () => {
             let appBrowsePanel = new AppBrowsePanel();
             let appStatisticPanel = new AppStatisticPanel();
-            //1. Stop the existing started app:
+            // 1. Stop the existing started app:
             await appBrowsePanel.clickOnRowByDisplayName(Apps.firstApp);
             await studioUtils.stopSelectedApp(Apps.firstApp);
-            //2. Verify that expected appName should be displayed in Statistics Panel:
+            // 2. Verify that expected appName should be displayed in Statistics Panel:
             let actualName = await appStatisticPanel.getApplicationName();
             assert.strictEqual(actualName, Apps.firstApp, `Application should be "${Apps.firstApp}".`);
 
             let actualHeaders = await appStatisticPanel.getApplicationDataHeaders();
-            //3. Verify that expected application's item-data should be displayed in Statistics Panel:
+            // 3. Verify that expected application's item-data should be displayed in Statistics Panel:
             assert.strictEqual(actualHeaders[0], 'Installed');
             assert.strictEqual(actualHeaders[1], 'Version');
             assert.strictEqual(actualHeaders[2], 'Key');
             assert.strictEqual(actualHeaders[3], 'System Required');
         });
 
-    //Verifies: Toolbar and Statistics panel is not correctly updated after stopping/starting an application #259
+    // Verifies: Toolbar and Statistics panel is not correctly updated after stopping/starting an application #259
     it('GIVEN existing stopped application is selected WHEN the application has been started THEN should display app-info for the running selected application',
         async () => {
             let appBrowsePanel = new AppBrowsePanel();
             let appStatisticPanel = new AppStatisticPanel();
-            //1. Start the existing stopped app:
+            // 1. Start the existing stopped app:
             await appBrowsePanel.clickOnRowByDisplayName(Apps.firstApp);
             await studioUtils.startSelectedApp(Apps.firstApp);
-            //2. Verify that expected appName should be displayed in Statistics Panel:
+            // 2. Verify that expected appName should be displayed in Statistics Panel:
             let actualName = await appStatisticPanel.getApplicationName();
             assert.strictEqual(actualName, Apps.firstApp, `Application should be "${Apps.firstApp}".`);
 
             let actualHeaders = await appStatisticPanel.getApplicationDataHeaders();
-            //3. Verify that expected application's item-data should be displayed in Statistics Panel:
+            // 3. Verify that expected application's item-data should be displayed in Statistics Panel:
             assert.strictEqual(actualHeaders[0], 'Installed');
             assert.strictEqual(actualHeaders[1], 'Version');
             assert.strictEqual(actualHeaders[2], 'Key');
@@ -63,10 +63,10 @@ describe('Tests for Applications Item Statistics Panel', function () {
         async () => {
             let appBrowsePanel = new AppBrowsePanel();
             let appStatisticPanel = new AppStatisticPanel();
-            //1. Select existing started app:
+            // 1. Select existing started app:
             await appBrowsePanel.clickOnRowByDisplayName(Apps.firstApp);
             let headers = await appStatisticPanel.getSiteDataHeaders();
-            //3. Verify that expected application's site-info should be displayed in Statistics Panel:
+            // 3. Verify that expected application's site-info should be displayed in Statistics Panel:
             assert.strictEqual(headers[0], 'Content Types');
             assert.strictEqual(headers[1], 'Page');
             assert.strictEqual(headers[2], 'Part');
@@ -87,10 +87,10 @@ describe('Tests for Applications Item Statistics Panel', function () {
         async () => {
             let appBrowsePanel = new AppBrowsePanel();
             let appStatisticPanel = new AppStatisticPanel();
-            //1. Select the application:
+            // 1. Select the application:
             await appBrowsePanel.clickOnRowByDisplayName(Apps.firstApp);
-            studioUtils.saveScreenshot("application_content_types_parts");
-            //2. Verify that Site data group is displayed:
+            await studioUtils.saveScreenshot('application_content_types_parts');
+            // 2. Verify that Site data group is displayed:
             await appStatisticPanel.waitForSiteItemDataGroupDisplayed();
             let contentTypes = await appStatisticPanel.getContentTypes();
             assert.equal(contentTypes.length, 3, 'Content Types list should not be empty');
@@ -114,7 +114,7 @@ describe('Tests for Applications Item Statistics Panel', function () {
             assert.strictEqual(appName, Apps.firstApp, 'Application name should be displayed for stopped application');
             //2. Verify that site-info  gets not visible in stopped application:
             let headers = await appStatisticPanel.getSiteDataHeaders();
-            studioUtils.saveScreenshot("application_stopped");
+            await studioUtils.saveScreenshot('application_stopped');
             assert.strictEqual(headers.length, 0, 'Stopped application should not have site data');
         });
 

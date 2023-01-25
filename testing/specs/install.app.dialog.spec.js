@@ -12,7 +12,7 @@ const appConst = require('../libs/app_const');
 describe('Install Application Dialog specification', function () {
     this.timeout(appConst.SUITE_TIMEOUT);
 
-    if (typeof browser === "undefined") {
+    if (typeof browser === 'undefined') {
         webDriverHelper.setupBrowser();
     }
 
@@ -27,7 +27,7 @@ describe('Install Application Dialog specification', function () {
         let actualMessage = await dialog.getPlaceholderMessage();
         assert.equal(actualMessage, 'Search Enonic Market, paste url or upload directly',
             'expected message should be in the placeholder');
-        studioUtils.saveScreenshot("install_dialog_default_focus");
+        await studioUtils.saveScreenshot('install_dialog_default_focus');
         let isFocused = await dialog.isDefaultFocused();
         //assert.isTrue(result, 'Focus should be in the `filter input` by default');
     });
@@ -35,28 +35,28 @@ describe('Install Application Dialog specification', function () {
     it('GIVEN install dialog is opened WHEN Esc key has been pressed THEN dialog closes', async () => {
         let appBrowsePanel = new AppBrowsePanel();
         let dialog = new InstallDialog();
-        //1. Open Install dialog
+        // 1. Open Install dialog
         await appBrowsePanel.clickOnInstallButton();
         await dialog.waitForOpened();
         await dialog.waitForSpinnerNotVisible();
-        studioUtils.saveScreenshot("install_esc_key_test1");
-        //2. press the ESC key:
+        await studioUtils.saveScreenshot('install_esc_key_test1');
+        // 2. press the ESC key:
         await appBrowsePanel.pressEscKey();
-        studioUtils.saveScreenshot("install_esc_key_test2");
-        //3. Verify that dialog is closedL
+        await studioUtils.saveScreenshot('install_esc_key_test2');
+        // 3. Verify that dialog is closedL
         await dialog.waitForClosed(2000);
     });
 
     it('WHEN dialog is opened THEN applications should be present in the grid AND applications are sorted by a name', async () => {
         let appBrowsePanel = new AppBrowsePanel();
         let dialog = new InstallDialog();
-        //1. Open Install Dialog:
+        // 1. Open Install Dialog:
         await appBrowsePanel.clickOnInstallButton();
         await dialog.waitForSpinnerNotVisible();
         await dialog.waitForGridLoaded();
         await dialog.waitForApplicationDisplayed('ADFS ID Provider');
         let names = await dialog.getApplicationNames();
-        studioUtils.saveScreenshot("install_dlg_sorted");
+        await studioUtils.saveScreenshot('install_dlg_sorted');
         assert.isAbove(names.length, 0, 'There should be apps in the grid');
         assert.isTrue(names.includes('ADFS ID Provider'), 'Auth0 ID Provider this application should be second');
     });
@@ -67,7 +67,7 @@ describe('Install Application Dialog specification', function () {
         await appBrowsePanel.clickOnInstallButton();
         await dialog.waitForOpened();
         await dialog.waitForSpinnerNotVisible();
-        //Type a name in the search input:
+        // Type a name in the search input:
         await dialog.typeSearchText(CHUCK_NORRIS_APP_DISPLAY_NAME);
         await dialog.waitForApplicationDisplayed('Chuck Norris');
         let names = await dialog.getApplicationNames();
@@ -81,20 +81,20 @@ describe('Install Application Dialog specification', function () {
         await appBrowsePanel.clickOnInstallButton();
         await dialog.waitForOpened();
         await dialog.waitForSpinnerNotVisible();
-        //1. Install the app:
+        // 1. Install the app:
         await dialog.clickOnInstallAppLink(CHUCK_NORRIS_APP_DISPLAY_NAME);
         let visible = await dialog.waitForAppInstalled(CHUCK_NORRIS_APP_DISPLAY_NAME);
         assert.isTrue(visible, `'${CHUCK_NORRIS_APP_DISPLAY_NAME}' should've been installed by now`);
         await dialog.clickOnCancelButtonTop();
         await dialog.waitForClosed();
-        //2. Check the app in grid:
+        // 2. Check the app in grid:
         visible = await appBrowsePanel.isAppByDescriptionDisplayed(CHUCK_NORRIS_APP_DISPLAY_NAME);
         assert.isTrue(visible, `'${CHUCK_NORRIS_APP_DISPLAY_NAME}' application should've been present in the grid`);
         let message = await appBrowsePanel.waitForNotificationMessage();
         assert.equal(message, 'Application \'Chuck Norris\' installed successfully', `Incorrect notification message [${message}]`)
     });
 
-    //verifies  https://github.com/enonic/app-applications/issues/8
+    // verifies  https://github.com/enonic/app-applications/issues/8
     it("GIVEN existing installed application WHEN install dialog has been opened THEN 'Installed' status should be displayed near the application",
         async () => {
             let appBrowsePanel = new AppBrowsePanel();
@@ -107,23 +107,23 @@ describe('Install Application Dialog specification', function () {
             assert.isTrue(result, `'${CHUCK_NORRIS_APP_DISPLAY_NAME}' should be with Installed status`);
         });
 
-    //Verifies issue https://github.com/enonic/app-applications/issues/241
-    //Install Dialog - application's status is not updated after installing an application in filtered grid #241
+    // Verifies issue https://github.com/enonic/app-applications/issues/241
+    // Install Dialog - application's status is not updated after installing an application in filtered grid #241
     it("GIVEN an application is installed in filtered grid WHEN Install dialog has been reopened THEN the application should be with 'Installed' status",
         async () => {
             let appBrowsePanel = new AppBrowsePanel();
             let installAppDialog = new InstallDialog();
             let uninstallDialog = new UninstallDialog();
-            //1. Precondition - uninstall the application
+            // 1. Precondition - uninstall the application
             await appBrowsePanel.clickOnCheckboxAndSelectRowByDisplayName(CHUCK_NORRIS_APP_DISPLAY_NAME);
             await appBrowsePanel.clickOnUninstallButton();
             await uninstallDialog.waitForOpened();
             await uninstallDialog.clickOnYesButton();
             await appBrowsePanel.waitForNotificationMessage();
-            //2. Select an application and click on 'Show Selections' button:
+            // 2. Select an application and click on 'Show Selections' button:
             await appBrowsePanel.clickOnCheckboxAndSelectRowByDisplayName(appConst.TEST_APPLICATIONS.FIRST_APP);
             await appBrowsePanel.clickOnSelectionToggler();
-            //3. Install the app in Filtered grid and close the modal dialog:
+            // 3. Install the app in Filtered grid and close the modal dialog:
             await appBrowsePanel.clickOnInstallButton();
             await installAppDialog.waitForOpened();
             await installAppDialog.waitForSpinnerNotVisible();
@@ -131,11 +131,11 @@ describe('Install Application Dialog specification', function () {
             await installAppDialog.waitForAppInstalled(CHUCK_NORRIS_APP_DISPLAY_NAME);
             await installAppDialog.clickOnCancelButtonTop();
             await installAppDialog.waitForClosed(1000);
-            //4. Reopen 'Install App' Dialog:
+            // 4. Reopen 'Install App' Dialog:
             await appBrowsePanel.clickOnInstallButton();
             await installAppDialog.waitForOpened();
             await installAppDialog.waitForSpinnerNotVisible();
-            //5.Verify that status of the application is 'Installed':
+            // 5.Verify that status of the application is 'Installed':
             await installAppDialog.waitForApplicationInstalled(CHUCK_NORRIS_APP_DISPLAY_NAME);
         });
 
