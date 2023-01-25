@@ -8,7 +8,7 @@ const AppBrowsePanel = require('../page_objects/applications/applications.browse
 describe('Applications Browse panel - `Selection Toggler` spec', function () {
     this.timeout(appConst.SUITE_TIMEOUT);
 
-    if (typeof browser === "undefined") {
+    if (typeof browser === 'undefined') {
         webDriverHelper.setupBrowser();
     }
 
@@ -30,47 +30,47 @@ describe('Applications Browse panel - `Selection Toggler` spec', function () {
     it("WHEN two application are checked THEN '2' should appear in 'selection toggler'",
         async () => {
             let appBrowsePanel = new AppBrowsePanel();
-            //1. Check two applications:
+            // 1. Check two applications:
             await appBrowsePanel.clickOnCheckboxAndSelectRowByDisplayName(appConst.TEST_APPLICATIONS.FIRST_APP);
             await appBrowsePanel.clickOnCheckboxAndSelectRowByDisplayName(appConst.TEST_APPLICATIONS.SECOND_APP);
-            //2. Selection ogler ges visible:
+            // 2. Selection ogler ges visible:
             await appBrowsePanel.waitForSelectionTogglerVisible();
             await appBrowsePanel.pause(500);
             let result = await appBrowsePanel.getNumberInSelectionToggler();
-            studioUtils.saveScreenshot("2_app_selected");
+            await studioUtils.saveScreenshot("2_app_selected");
             assert.equal(result, 2, ' 2 should be present on the button');
         });
 
     it(`GIVEN two application are checked WHEN 'show selection' has been clicked THEN two applications should be in the filtered grid`,
         async () => {
             let appBrowsePanel = new AppBrowsePanel();
-            //1.Check two apps:
+            // 1.Check two apps:
             await appBrowsePanel.clickOnCheckboxAndSelectRowByDisplayName(appConst.TEST_APPLICATIONS.FIRST_APP);
             await appBrowsePanel.clickOnCheckboxAndSelectRowByDisplayName(appConst.TEST_APPLICATIONS.SECOND_APP);
             await appBrowsePanel.waitForSelectionTogglerVisible();
-            //2. Click on Selection Togler:
+            // 2. Click on Selection Togler:
             await appBrowsePanel.clickOnSelectionToggler();
             await appBrowsePanel.pause(1000);
             let names = await appBrowsePanel.getApplicationDisplayNames();
-            studioUtils.saveScreenshot("show_selection");
+            await studioUtils.saveScreenshot('show_selection');
             assert.equal(names.length, 2, 'two applications should be in the filtered grid');
         });
 
     it(`GIVEN 'show selection' is clicked WHEN 'hide selection' has been clicked THEN original grid should be restored`,
         async () => {
             let appBrowsePanel = new AppBrowsePanel();
-            //1. Two apps are checked:
+            // 1. Two apps are checked:
             await appBrowsePanel.clickOnCheckboxAndSelectRowByDisplayName(appConst.TEST_APPLICATIONS.FIRST_APP);
             await appBrowsePanel.clickOnCheckboxAndSelectRowByDisplayName(appConst.TEST_APPLICATIONS.SECOND_APP);
             await appBrowsePanel.waitForSelectionTogglerVisible();
-            //2. Click on 'Show selection' (toggler)
+            // 2. Click on 'Show selection' (toggler)
             await appBrowsePanel.clickOnSelectionToggler();
             await appBrowsePanel.pause(1000);
-            //3. Click on 'Hide selection' (toggler)
+            // 3. Click on 'Hide selection' (toggler)
             await appBrowsePanel.clickOnSelectionToggler();
             await appBrowsePanel.pause(1000);
             let names = await appBrowsePanel.getApplicationDisplayNames();
-            studioUtils.saveScreenshot("hide_selection");
+            await studioUtils.saveScreenshot('hide_selection');
             assert.isTrue(names.length > 2, 'original grid should be restored');
         });
 

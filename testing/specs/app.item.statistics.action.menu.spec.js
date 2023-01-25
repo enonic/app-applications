@@ -9,7 +9,7 @@ const AppStatisticPanel = require('../page_objects/applications/application.item
 describe("Item Statistics Panel 'Action Menu' spec", function () {
     this.timeout(appConstants.SUITE_TIMEOUT);
 
-    if (typeof browser === "undefined") {
+    if (typeof browser === 'undefined') {
         webDriverHelper.setupBrowser();
     }
     const FIRST_APP = 'First Selenium App';
