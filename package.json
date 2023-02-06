@@ -21,7 +21,7 @@
   },
   "devDependencies": {
     "@enonic/eslint-config": "^1.1.0",
-    "@swc/core": "^1.3.30",
+    "@swc/core": "^1.3.32",
     "@types/q": "^1.5.4",
     "@typescript-eslint/eslint-plugin": "^5.49.0",
     "@typescript-eslint/parser": "^5.49.0",
