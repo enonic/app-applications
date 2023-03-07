@@ -13,7 +13,7 @@ describe('Install app dialog, search input spec.', function () {
         webDriverHelper.setupBrowser();
     }
     const not_existing = 'https://repo.enonic.com/public/com/enonic/app/not-existing/0.0.0/not-existing-0.0.0.jar';
-    const CONTENT_VIEWER_APP_URL = 'https://repo.enonic.com/public/com/enonic/app/contentviewer/1.5.2/contentviewer-1.5.2.jar';
+    const LOG_BROWSER_APP_URL = 'https://repo.enonic.com/public/com/enonic/app/logbrowser/2.0.0/logbrowser-2.0.0.jar';
 
     const local_file = "file:c:/";
 
@@ -63,12 +63,12 @@ describe('Install app dialog, search input spec.', function () {
             await installDialog.waitForSpinnerNotVisible();
             await installDialog.waitForOpened();
             // Type a correct URL for the app:
-            await installDialog.typeSearchTextAndEnter(CONTENT_VIEWER_APP_URL);
+            await installDialog.typeSearchTextAndEnter(LOG_BROWSER_APP_URL);
             await installDialog.waitForClosed(45000);
 
             let message = await installDialog.waitForNotificationMessage();
             await studioUtils.saveScreenshot('app_url_installed');
-            assert.isTrue(message.includes('Application \'Content Viewer App\' installed successfully'),
+            assert.isTrue(message.includes('Application \'Log Browser\' installed successfully'),
                 'expected notification message should appear');
         });
 
