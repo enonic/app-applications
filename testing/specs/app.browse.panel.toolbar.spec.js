@@ -14,22 +14,22 @@ describe('Application Browse Panel, check buttons in the toolbar', function () {
         webDriverHelper.setupBrowser();
     }
 
-    const appDisplayName1InGrid = 'Content Viewer App';//This displayName should be in grid
-    const appDisplayName1 = 'Content viewer';//This displayName should be in Uninstall modal dialog
-    const appDisplayName2 = 'Chuck Norris';
+    const appDisplayName1InGrid = 'Content Viewer App'; // This displayName should be in grid
+    const appDisplayName1 = 'Content viewer'; // This displayName should be in Uninstall modal dialog
+    const appDisplayName2 = 'Auth0 ID Provider';
     const appDescription1 = 'Inspect your content object JSON';
-    const appDescription2 = 'A Chuck Norris fact widget';
+    const appDescription2 = 'Add Auth0 authentication to your Enonic XP installation';
 
     it('WHEN app browse panel is loaded  AND no selections THEN only `Install` button should be enabled',
         async () => {
             let appBrowsePanel = new AppBrowsePanel();
-            //'Install' button should be enabled:
+            // 'Install' button should be enabled:
             await appBrowsePanel.waitForInstallButtonEnabled();
             // `Start` button should be disabled
             await appBrowsePanel.isStartButtonEnabled();
-            //`Stop` button should be disabled
+            // `Stop` button should be disabled
             await appBrowsePanel.isStopButtonEnabled();
-            //Uninstall` button should be disabled
+            // Uninstall` button should be disabled
             await appBrowsePanel.isUninstallButtonEnabled();
         });
 
@@ -53,7 +53,7 @@ describe('Application Browse Panel, check buttons in the toolbar', function () {
             await installAppDialog.clickOnCancelButtonTop();
             await installAppDialog.waitForClosed(2000);
 
-            await studioUtils.saveScreenshot('chuck_norris_installed');
+            await studioUtils.saveScreenshot('provider_installed');
             let result = await appBrowsePanel.isAppByDescriptionDisplayed(appDescription1);
             assert.isTrue(result, appDescription1 + '  application should be present');
             result = await appBrowsePanel.isAppByDescriptionDisplayed(appDescription2);
@@ -65,7 +65,7 @@ describe('Application Browse Panel, check buttons in the toolbar', function () {
             let appBrowsePanel = new AppBrowsePanel();
             //1. select the application:
             await appBrowsePanel.clickOnRowByDescription(appDescription1);
-            studioUtils.saveScreenshot('chuck_norris_selected');
+            await studioUtils.saveScreenshot('chuck_norris_selected');
             // "Uninstall" button gets enabled:
             await appBrowsePanel.waitForUninstallButtonEnabled();
             await appBrowsePanel.waitForStopButtonEnabled();
@@ -80,7 +80,7 @@ describe('Application Browse Panel, check buttons in the toolbar', function () {
     it('WHEN The select all checkbox is selected/unselected THEN the rows should be selected/unselected',
         async () => {
             let appBrowsePanel = new AppBrowsePanel();
-            //1. Click on Select All checkbox:
+            //1. Click on 'Select All' checkbox:
             await appBrowsePanel.clickOnSelectAll();
             assert.isTrue(await appBrowsePanel.isRowByIndexSelected(0), 'First row should be selected(blue)');
             assert.isTrue(await appBrowsePanel.isRowByIndexSelected(1), 'Second row should be selected(blue)');
