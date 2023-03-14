@@ -33,11 +33,14 @@ class InstallAppDialog extends Page {
         return XPATH.container + lib.CANCEL_BUTTON_TOP;
     }
 
-    waitForAppInstalled(appName) {
-        return this.waitForElementDisplayed(XPATH.installedStatusByName(appName), appConst.installAppTimeout).catch(err => {
-            this.saveScreenshot('err_installed_status');
-            throw new Error("Install App Dialog - Application status should be Installed: " + appName + " " + err);
-        })
+    async waitForAppInstalled(appName) {
+        try {
+            return await this.waitForElementDisplayed(XPATH.installedStatusByName(appName), appConst.installAppTimeout)
+        } catch (err) {
+            let screenshot = appConst.generateRandomName('err_inst_status');
+            await this.saveScreenshot(screenshot);
+            throw new Error('Install App Dialog - Application status should be Installed: screenshot ' + screenshot + ' ' + err);
+        }
     }
 
     waitForOpened() {

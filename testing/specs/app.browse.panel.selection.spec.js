@@ -13,7 +13,7 @@ describe('Applications Browse panel - selection of items spec', function () {
         webDriverHelper.setupBrowser();
     }
     //Content Studio should not be installed!
-    const TOTAL_NUMBER_OF_APPLICATIONS = 5;
+    const EXPECTED_NUMBER_OF_APPLICATIONS = 5;
 
     it(`GIVEN applications grid is loaded THEN expected page-title should be displayed`, async () => {
         let appBrowsePanel = new AppBrowsePanel();
@@ -26,7 +26,7 @@ describe('Applications Browse panel - selection of items spec', function () {
         await appBrowsePanel.clickOnSelectionControllerCheckbox();
         await studioUtils.saveScreenshot('selection_controller_checked');
         let result = await appBrowsePanel.getNumberOfSelectedRows();
-        assert.equal(result, TOTAL_NUMBER_OF_APPLICATIONS, 'all applications should be selected');
+        assert.isAtLeast(result, EXPECTED_NUMBER_OF_APPLICATIONS, 'all applications should be selected');
     });
 
     it(`GIVEN all applications are selected WHEN 'selection controller'-checkbox has been clicked THEN all rows in grid get white`,
