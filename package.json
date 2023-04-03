@@ -27,7 +27,7 @@
     "@typescript-eslint/parser": "^5.56.0",
     "browserslist-config-enonic": "^1.0.7",
     "circular-dependency-plugin": "^5.2.2",
-    "cssnano": "^5.1.15",
+    "cssnano": "^6.0.0",
     "enonic-admin-artifacts": "^1.8.3",
     "eslint": "^8.36.0",
     "mini-css-extract-plugin": "^2.7.5",
