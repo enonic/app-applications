@@ -24,7 +24,7 @@
     "wdio-geckodriver-service": "^4.1.1",
     "@wdio/cli": "^8.7.0",
     "@wdio/dot-reporter": "^8.6.8",
-    "@wdio/mocha-framework": "^8.6.8",
+    "@wdio/mocha-framework": "^8.7.0",
     "@wdio/selenium-standalone-service": "^8.6.8",
     "wdio-html-nice-reporter": "^8.1.0"
   },
