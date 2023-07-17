@@ -54,7 +54,7 @@ export class RelationshipType
             return false;
         }
 
-        let other = <RelationshipType>o;
+        const other: RelationshipType = o as RelationshipType;
 
         if (!ObjectHelper.stringEquals(this.fromSemantic, other.fromSemantic)) {
             return false;

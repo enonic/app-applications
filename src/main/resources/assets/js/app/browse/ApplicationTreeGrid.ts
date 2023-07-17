@@ -102,7 +102,7 @@ export class ApplicationTreeGrid
         const appMock: ApplicationUploadMock = new ApplicationUploadMock(item);
         const parent: TreeNode<Application> = this.getRoot().getDefaultRoot();
 
-        const uploadNode: TreeNode<Application> = this.dataToTreeNode(<Application><unknown>appMock, this.getRoot().getDefaultRoot());
+        const uploadNode: TreeNode<Application> = this.dataToTreeNode(appMock as unknown as Application, this.getRoot().getDefaultRoot());
         this.insertNodeToParentNode(uploadNode, parent, 0);
 
         const deleteUploadedNodeHandler = () => {
@@ -139,6 +139,6 @@ export class ApplicationTreeGrid
     }
 
     private getUploadMock(node: TreeNode<Application>): ApplicationUploadMock {
-        return <any>node.getData();
+        return node.getData() as unknown as ApplicationUploadMock;
     }
 }

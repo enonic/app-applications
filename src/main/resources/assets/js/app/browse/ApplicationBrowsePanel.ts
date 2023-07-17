@@ -52,7 +52,7 @@ export class ApplicationBrowsePanel
             const divEl = new DivEl('readonly-help').appendChildren(spanEl, spanEl2);
             toolbar.appendChild(divEl);
         } else {
-            const browseActions: ApplicationBrowseActions = <ApplicationBrowseActions> this.treeGrid.getContextMenu().getActions();
+            const browseActions: ApplicationBrowseActions = this.treeGrid.getContextMenu().getActions() as ApplicationBrowseActions;
             toolbar.addAction(browseActions.INSTALL_APPLICATION);
             toolbar.addAction(browseActions.UNINSTALL_APPLICATION);
             toolbar.addAction(browseActions.START_APPLICATION);

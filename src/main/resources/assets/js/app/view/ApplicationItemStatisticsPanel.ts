@@ -95,7 +95,7 @@ export class ApplicationItemStatisticsPanel
     }
 
     getItem(): Application {
-        return <Application>super.getItem();
+        return super.getItem() as Application;
     }
 
     doRender(): Q.Promise<boolean> {

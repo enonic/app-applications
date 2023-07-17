@@ -42,7 +42,7 @@ export class MarketAppsTreeGridHelper {
         const data: MarketApplication = node.getData();
 
         if (data.getAppKey()) {
-            let viewer: MarketAppViewer = <MarketAppViewer>node.getViewer('name');
+            let viewer: MarketAppViewer = node.getViewer('name') as MarketAppViewer;
             if (!viewer) {
                 viewer = new MarketAppViewer();
                 node.setViewer('name', viewer);

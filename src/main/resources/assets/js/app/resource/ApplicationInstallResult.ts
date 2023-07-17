@@ -40,7 +40,7 @@ export class ApplicationInstallResult
             return false;
         }
 
-        let other = <ApplicationInstallResult>o;
+        const other: ApplicationInstallResult = o as ApplicationInstallResult;
         return ObjectHelper.stringEquals(this.failure, other.failure) &&
                ObjectHelper.equals(this.application, other.application);
     }
