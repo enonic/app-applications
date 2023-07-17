@@ -43,7 +43,7 @@ export class MarketAppsTreeGrid
 
     public static debug: boolean = false;
 
-    private loadingStartedListeners: { (): void; }[];
+    private loadingStartedListeners: (() => void)[];
 
     private updateConfirmationDialog?: ConfirmationDialog;
 
@@ -97,9 +97,8 @@ export class MarketAppsTreeGrid
     }
 
     private findNodeByAppUrl(url: string): TreeNode<MarketApplication> {
-        let nodes: TreeNode<MarketApplication>[] = this.getGrid().getDataView().getItems();
-        for (let i = 0; i < nodes.length; i++) {
-            let node = nodes[i];
+        const nodes: TreeNode<MarketApplication>[] = this.getGrid().getDataView().getItems();
+        for (const node of nodes) {
             if (node.getData().getLatestVersionDownloadUrl() === url) {
                 return node;
             }
@@ -219,7 +218,7 @@ export class MarketAppsTreeGrid
                                                 ? MarketAppStatus.OLDER_VERSION_INSTALLED
                                                 : MarketAppStatus.INSTALLED;
                 marketApplication.setStatus(status);
-            }).catch((reason: any) => {
+            }).catch((reason) => {
                 marketApplication.setStatus(oldStatus);
                 DefaultErrorHandler.handle(reason);
             }).finally(() => {
@@ -270,7 +269,7 @@ export class MarketAppsTreeGrid
             const totalHits = data.getMetadata().getTotalHits();
             this.getRoot().getCurrentRoot().setMaxChildren(totalHits);
             return this.updateAndSortApps(data.getApplications());
-        }).catch((reason: any) => {
+        }).catch((reason) => {
             const status500Message = i18n('market.error.500');
             const defaultErrorMessage = i18n('market.error.default');
             const exception = new Exception(reason.getStatusCode() === 500 ? status500Message : defaultErrorMessage);

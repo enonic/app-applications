@@ -7,8 +7,8 @@ import {ProgressBar} from '@enonic/lib-admin-ui/ui/ProgressBar';
 
 export class ApplicationRowFormatter {
 
-    public static nameFormatter(row: number, cell: number, value: any, columnDef: any, node: TreeNode<Application>) {
-        let viewer: ApplicationViewer = <ApplicationViewer>node.getViewer('name');
+    public static nameFormatter(row: number, cell: number, value: unknown, columnDef: unknown, node: TreeNode<Application>) {
+        let viewer: ApplicationViewer = node.getViewer('name') as ApplicationViewer;
 
         if (!viewer) {
             viewer = new ApplicationViewer();
@@ -19,14 +19,14 @@ export class ApplicationRowFormatter {
         return viewer.toString();
     }
 
-    public static stateFormatter(row: number, cell: number, value: any, columnDef: any, node: TreeNode<Application>) {
+    public static stateFormatter(row: number, cell: number, value: unknown, columnDef: unknown, node: TreeNode<Application>) {
         const data: Application = node.getData();
         const statusEl: DivEl = new DivEl();
 
         if (data instanceof Application) {   // default node
-            statusEl.getEl().setText(value);
+            statusEl.getEl().setText(value as string);
         } else if (ObjectHelper.iFrameSafeInstanceOf(data, ApplicationUploadMock)) {   // uploading node
-            const status = new ProgressBar((<any>data).getUploadItem().getProgress());
+            const status = new ProgressBar((data as ApplicationUploadMock).getUploadItem().getProgress());
             statusEl.appendChild(status);
             statusEl.getEl().setWidth('100%');
         }

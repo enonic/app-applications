@@ -24,13 +24,13 @@ export class ApplicationInput
 
     private cancelAction: Action;
 
-    private textValueChangedListeners: {(): void}[] = [];
+    private textValueChangedListeners: (() => void)[] = [];
 
-    private appInstallStartedListeners: { (): void }[] = [];
+    private appInstallStartedListeners: (() => void)[] = [];
 
-    private appInstallFinishedListeners: {(): void}[] = [];
+    private appInstallFinishedListeners: (() => void)[] = [];
 
-    private appInstallFailedListeners: {(message: string): void}[] = [];
+    private appInstallFailedListeners: ((message: string) => void)[] = [];
 
     private static APPLICATION_ADDRESS_MASK: string = '^(http|https)://\\S+';
 
@@ -196,7 +196,7 @@ export class ApplicationInput
             }
 
             this.enable();
-        }).catch((reason: any) => {
+        }).catch((reason) => {
             DefaultErrorHandler.handle(reason);
             this.notifyAppInstallFailed(reason);
             this.enable();

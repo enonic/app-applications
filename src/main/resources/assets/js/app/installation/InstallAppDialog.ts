@@ -189,7 +189,7 @@ export class InstallAppDialog
     private initDragAndDropUploaderEvents() {
         let dragOverEl;
         this.onDragEnter((event: DragEvent) => {
-            const target = <HTMLElement> event.target;
+            const target = event.target as HTMLElement;
 
             if (!!dragOverEl || dragOverEl === this.getHTMLElement()) {
                 this.dropzoneContainer.show();
