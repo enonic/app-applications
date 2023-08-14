@@ -49,14 +49,15 @@ class AppBrowsePanel extends Page {
         return XPATH.container + XPATH.selectionPanelToggler;
     }
 
-    waitForGridLoaded(ms) {
-        return this.waitForElementDisplayed(XPATH.container + lib.GRID_CANVAS, ms).then(() => {
-            return this.waitForSpinnerNotVisible(appConst.mediumTimeout);
-        }).then(() => {
-            return console.log('applications browse panel is loaded')
-        }).catch(err => {
-            throw new Error(`applications browse panel is not loaded in ${ms}`);
-        });
+    async waitForGridLoaded(ms) {
+        try {
+            await this.waitForElementDisplayed(XPATH.container + lib.GRID_CANVAS, ms);
+            await this.waitForSpinnerNotVisible(appConst.mediumTimeout);
+            console.log('applications browse panel is loaded')
+        } catch (err) {
+            let screenshot = await this.saveScreenshotUniqueName('err_grid');
+            throw new Error(`Applications browse panel was not loaded, screenshot:` + screenshot + err);
+        }
     }
 
     waitForPanelDisplayed(ms) {
@@ -72,8 +73,8 @@ class AppBrowsePanel extends Page {
             await this.clickOnElement(nameXpath);
             return await this.pause(500);
         } catch (err) {
-            this.saveScreenshot("err_find_item");
-            throw Error(`Row with the name ${name} was not found.`)
+            let screenshot = await this.saveScreenshotUniqueName('err_grid_item');
+            throw Error(`Row with the app was not found, screenshot: ` + screenshot + ' ' + err);
         }
     }
 
@@ -84,8 +85,8 @@ class AppBrowsePanel extends Page {
             await this.clickOnElement(nameXpath);
             return await this.pause(500);
         } catch (err) {
-            this.saveScreenshot('err_click_on_app');
-            throw Error('Error when clicking on the row with the name ' + displayName + '  ' + err);
+            let screenshot = await this.saveScreenshotUniqueName('err_click_on_app');
+            throw Error('Error when clicking on the row, screenshot: ' + screenshot + '  ' + err);
         }
     }
 
@@ -112,12 +113,13 @@ class AppBrowsePanel extends Page {
         });
     }
 
-    getNumberOfSelectedRows() {
-        return this.findElements(XPATH.selectedRows).then(result => {
+    async getNumberOfSelectedRows() {
+        try {
+            let result = await this.findElements(XPATH.selectedRows);
             return result.length;
-        }).catch(err => {
+        } catch (err) {
             throw new Error(`Error when getting selected rows ` + err);
-        });
+        }
     }
 
     waitForAppByDisplayNameDisplayed(appName) {
@@ -140,8 +142,8 @@ class AppBrowsePanel extends Page {
             await this.clickOnElement(this.selectionControllerCheckBox);
             return await this.pause(700);
         } catch (err) {
-            this.saveScreenshot('err_click_on_selection_controller');
-            throw new Error(`Error when clicking on Selection controller ` + err);
+            let screenshot = await this.saveScreenshotUniqueName('err_selection_controller');
+            throw new Error(`Error when clicking on Selection controller, screenshot: ` + screenshot + ' ' + err);
         }
     }
 
@@ -183,8 +185,8 @@ class AppBrowsePanel extends Page {
             await this.clickOnElement(XPATH.startButton);
             return await this.pause(1500);
         } catch (err) {
-            this.saveScreenshot('err_browsepanel_start');
-            throw new Error(`Start button is disabled! ` + err);
+            let screenshot = await this.saveScreenshotUniqueName('err_browsepanel_start');
+            throw new Error(`Start button is disabled!screenshot: ` + screenshot + ' ' + err);
         }
     }
 
@@ -194,7 +196,7 @@ class AppBrowsePanel extends Page {
             await this.clickOnElement(XPATH.stopButton);
             return await this.pause(1500);
         } catch (err) {
-            this.saveScreenshot('err_browsepanel_stop');
+            await this.saveScreenshot('err_browsepanel_stop');
             throw new Error(`Stop button is disabled!` + err);
         }
     }
@@ -236,7 +238,7 @@ class AppBrowsePanel extends Page {
             await this.doRightClick(nameXpath);
             return await this.pause(500);
         } catch (err) {
-            this.saveScreenshot('err_open_context_menu');
+            await this.saveScreenshot('err_open_context_menu');
             throw Error("Error when do right click on the row:" + err);
         }
     }
@@ -281,7 +283,7 @@ class AppBrowsePanel extends Page {
             await this.clickOnElement(checkboxXpath);
             return await this.pause(500);
         } catch (err) {
-            this.saveScreenshot('err_selecta_ll_checkbox');
+            await this.saveScreenshot('err_selecta_ll_checkbox');
             throw Error('Select all checkbox was not found')
         }
     }

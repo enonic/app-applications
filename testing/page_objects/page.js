@@ -103,7 +103,7 @@ class Page {
     }
 
     saveScreenshot(name) {
-        let screenshotsDir = path.join(__dirname, '/../build/mochawesome-report/screenshots/');
+        let screenshotsDir = path.join(__dirname, '/../build/reports/screenshots/');
         if (!fs.existsSync(screenshotsDir)) {
             fs.mkdirSync(screenshotsDir, {recursive: true});
         }
@@ -112,6 +112,12 @@ class Page {
         }).catch(err => {
             console.log('screenshot was not saved ' + screenshotsDir + ' ' + err);
         })
+    }
+
+    async saveScreenshotUniqueName(namePart) {
+        let screenshotName = appConst.generateRandomName(namePart);
+        await this.saveScreenshot(screenshotName);
+        return screenshotName;
     }
 
     async isElementDisplayed(selector) {
