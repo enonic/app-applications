@@ -8,14 +8,13 @@ Before trying to run tests, you need to verify that the following software are i
 * Java 11 for building and running;
 * node.js installed on system;
 * Git installed on system;
-* Chrome browser installed on system.
 
-Run tests for app-admin-home.
-go to '/testing' folder and run:
-  1. `gradle testApplicationsApp
-  2. `gradle testApplicationsAppLocally  --project-cache-dir d:/cache
-  3.  gradle testApplicationsAppFirefox
 
-Switch tests to FF in Github - replace  'testApplicationsApp' in 'gradle.yaml'
- run: ./gradlew :testing:testApplicationsAppFirefox
+Run ui-tests for app-applications:
+  1.  gradlew w_testAppChrome - WDIO runner with chrome browser
+  3.  gradlew testAppFirefox  - WDIO runner with firefox browser
+
+Switch tests to FF in Github - replace  'w_testAppChrome' in 'gradle.yaml' to 
+
+ run: ./gradlew :testing:testAppFirefox
 

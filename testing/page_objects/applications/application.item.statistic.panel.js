@@ -28,12 +28,15 @@ class ApplicationItemStatisticsPanel extends Page {
         return xpath.main + xpath.dataContainer + xpath.siteItemDataGroup + xpath.parts;
     }
 
-    //Application data-group(Installed,Version,Key,System Required)
-    getApplicationDataHeaders() {
-        let selector = xpath.main + xpath.dataContainer + xpath.applicationItemDataGroup + xpath.applicationDataHeaders;
-        return this.getTextInElements(selector).catch(err => {
-            throw new Error('Error while getting application-data-headers: ' + err);
-        })
+    // Application data-group(Installed,Version,Key,System Required)
+    async getApplicationDataHeaders() {
+        try {
+            let selector = xpath.main + xpath.dataContainer + xpath.applicationItemDataGroup + xpath.applicationDataHeaders;
+            return await this.getTextInElements(selector);
+        } catch (err) {
+            let screenshot = this.saveScreenshotUniqueName('stat_panel');
+            throw new Error('Error while getting application-data-headers, screenshot: ' + screenshot + '  ' + err);
+        }
     }
 
     //return the application's name
@@ -46,7 +49,8 @@ class ApplicationItemStatisticsPanel extends Page {
         try {
             return await this.waitForElementDisplayed(xpath.title, appConst.mediumTimeout);
         } catch (err) {
-            throw  new Error("App Item Statistic Panel - application's name is not displayed in the panel " + err);
+            let screenshot = this.saveScreenshotUniqueName('stat_panel');
+            throw  new Error("App Statistic Panel - app name is not displayed in the panel, screenshot: " + screenshot + ' ' + err);
         }
     }
 
@@ -58,20 +62,20 @@ class ApplicationItemStatisticsPanel extends Page {
         try {
             return await this.waitForElementNotDisplayed(xpath.title, appConst.mediumTimeout);
         } catch (err) {
-            throw  new Error("App Item Statistic Panel - application's name should not be displayed in the panel " + err);
+            let screenshot = this.saveScreenshotUniqueName('stat_panel');
+            throw  new Error("App Statistic Panel - app name should not be displayed in the panel, screenshot: " + screenshot + ' ' + err);
         }
     }
 
-
-    //return list of names of content types
+    // return list of names of content types
     async getContentTypes() {
         try {
             //Wait for list of content types is displayed
             await this.waitForElementDisplayed(this.contentTypes, appConst.shortTimeout);
             return await this.getTextInElements(this.contentTypes);
         } catch (err) {
-            //otherwise returns empty list:
-            this.saveScreenshot(appConst.generateRandomName("content_types_list_empty"));
+            // otherwise returns empty list:
+            let screenshot = this.saveScreenshotUniqueName('content_types_list');
             return await this.getTextInElements(this.contentTypes);
         }
     }
@@ -83,7 +87,7 @@ class ApplicationItemStatisticsPanel extends Page {
             return await this.getTextInElements(this.parts);
         } catch (err) {
             //otherwise returns empty list:
-            this.saveScreenshot(appConst.generateRandomName("parts_list_empty"));
+            await this.saveScreenshot(appConst.generateRandomName("parts_list_empty"));
             return await this.getTextInElements(this.parts);
         }
     }
@@ -113,11 +117,14 @@ class ApplicationItemStatisticsPanel extends Page {
         })
     }
 
-    getDropDownButtonText() {
-        let selector = xpath.main + xpath.dropDownButton;
-        return this.getText(selector).catch(err => {
-            throw new Error('error while getting text from the button: ' + err);
-        })
+    async getDropDownButtonText() {
+        try {
+            let selector = xpath.main + xpath.dropDownButton;
+            return await this.getText(selector);
+        } catch (err) {
+            let screenshot = this.saveScreenshotUniqueName('stat_panel_dropdown_btn');
+            throw new Error('error while getting text from the button,screenshot: ' + screenshot + ' ' + err);
+        }
     }
 
     waitForApplicationStatus(state) {

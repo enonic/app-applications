@@ -10,7 +10,7 @@ group = 'com.enonic.xp.js_testing'
 
 repositories {
     mavenCentral()
-    xp.enonicRepo('dev')
+    xp.enonicRepo( 'dev' )
 }
 
 configurations {
@@ -27,7 +27,7 @@ ext {
     xpServer = new ServerInstance()
     appName = "app-applications"
     appFile = "$distroDir/system/40/${appName}-${version}.jar"
-    appUrl = project.hasProperty('appUrl') ? appUrl : "file:///$projectDir/../build/libs/${appName}.jar"
+    appUrl = project.hasProperty( 'appUrl' ) ? appUrl : "file:///$projectDir/../build/libs/${appName}.jar"
 }
 
 dependencies {
@@ -73,7 +73,7 @@ task deployApp( type: DefaultTask ) {
     mustRunAfter unpackDistro
 }
 
-task startServer(dependsOn: unpackDistro) {
+task startServer( dependsOn: unpackDistro ) {
     doLast {
         xpServer.installDir = file( distroDir )
         xpServer.start()
@@ -86,24 +86,19 @@ task stopServer {
     }
 }
 
-task testApplicationsApp( type: NpmTask,
-                          dependsOn: [npmInstall, unpackDistro, copyConfig, copyApps, deployApp, startServer] ) {
-    args = ['test']
-    finalizedBy stopServer
-}
-
-task testApplicationsAppFirefoxLocally( type: NpmTask,
-                          dependsOn: [npmInstall] ) {
-    args = ['run-script', 'test:firefox']
-}
-
-task testApplicationsAppFirefox( type: NpmTask,
-                                        dependsOn: [npmInstall, unpackDistro, copyConfig, copyApps, deployApp, startServer] ) {
+task testAppFirefox( type: NpmTask,
+                                 dependsOn: [npmInstall, unpackDistro, copyConfig, copyApps, deployApp, startServer] ) {
     args = ['run-script', 'test:firefox']
     finalizedBy stopServer
 }
 
-task testApplicationsAppLocally( type: NpmTask, dependsOn: [npmInstall] ) {
-    args = ['test']
+task w_testAppChrome( type: NpmTask,
+                    dependsOn: [npmInstall, unpackDistro, copyConfig, copyApps, deployApp, startServer] ) {
+    args = ['run-script', 'test_apps:wdio_chrome']
+    finalizedBy stopServer
 }
+task w_testAppChromeLocal( type: NpmTask, dependsOn: [npmInstall] ) {
+    args = ['run-script', 'test_apps:wdio_chrome']
+}
+
 
