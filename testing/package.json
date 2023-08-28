@@ -21,7 +21,7 @@
     "@wdio/cli": "^8.15.5",
     "@wdio/dot-reporter": "^8.15.0",
     "@wdio/mocha-framework": "^8.15.4",
-    "@wdio/concise-reporter": "^8.15.0",
+    "@wdio/concise-reporter": "^8.15.7",
     "wdio-timeline-reporter": "^5.1.4"
   },
   "engines": {
