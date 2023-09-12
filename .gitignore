@@ -1,6 +1,7 @@
 .DS_Store
 build/
 target/
+/.enonic
 .gradle/
 node_modules/
 *.iws
