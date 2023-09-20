@@ -36,7 +36,7 @@ router.all(`/${GETTER_ROOT}/{path:.+}`, (r: Request) => {
 
 function getMarketUrl() {
     const marketConfigBean = __.newBean<{
-    getMarketUrl: () => unknown
+    getMarketUrl: () => string
 }>('com.enonic.xp.app.main.GetMarketConfigBean');
     return __.toNativeObject(marketConfigBean.getMarketUrl());
 }
