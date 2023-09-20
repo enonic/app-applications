@@ -10,7 +10,7 @@ import {
 
 function getMarketUrl() {
     const marketConfigBean = __.newBean<{
-        getMarketUrl: () => any
+        getMarketUrl: () => unknown
     }>('com.enonic.xp.app.main.GetMarketConfigBean');
     return __.toNativeObject(marketConfigBean.getMarketUrl());
 }

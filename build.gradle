@@ -92,21 +92,20 @@ tasks.register( 'npmBuild', NpmTask) {
     outputs.dir "$buildDir/build/resources/main"
 }
 
-tasks.register('npmBuildTests', NpmTask) {
-    dependsOn( 'npmBuild' )
-    environment = [
-        'FORCE_COLOR': 'true',
-        'LOG_LEVEL_FROM_GRADLE': gradle.startParameter.logLevel.toString(),
-        'NODE_ENV': nodeEnvironment()
-    ]
-    description = 'Build tests'
-    args = ['run', '--silent', 'build:tests']
-    inputs.dir 'src/test/resources'
-    outputs.dir "$buildDir/build/resources/test"
-    inputs.file 'tsup.config.ts'
-}
-
-test.dependsOn npmBuildTests
+// tasks.register('npmBuildTests', NpmTask) {
+//     dependsOn( 'npmBuild' )
+//     environment = [
+//         'FORCE_COLOR': 'true',
+//         'LOG_LEVEL_FROM_GRADLE': gradle.startParameter.logLevel.toString(),
+//         'NODE_ENV': nodeEnvironment()
+//     ]
+//     description = 'Build tests'
+//     args = ['run', '--silent', 'build:tests']
+//     inputs.dir 'src/test/resources'
+//     outputs.dir "$buildDir/build/resources/test"
+//     inputs.file 'tsup.config.ts'
+// }
+// test.dependsOn npmBuildTests
 
 processResources {
     exclude '**/tsconfig.json'

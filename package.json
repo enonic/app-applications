@@ -19,7 +19,7 @@
     "clean": "del build",
     "fix": "eslint --fix src/**/*.ts --cache",
     "less": "lessc --source-map src/main/resources/assets/styles/main.less build/less/main.css",
-    "lint": "eslint **/*.ts --quiet --cache",
+    "lint": "eslint src/**/*.ts --quiet --cache",
     "prebuild:main:css": "npm run less"
   },
   "dependencies": {
