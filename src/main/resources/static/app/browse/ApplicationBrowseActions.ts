@@ -1,4 +1,4 @@
-import * as Q from 'q';
+import Q from 'q';
 import {ApplicationTreeGrid} from './ApplicationTreeGrid';
 import {StartApplicationAction} from './StartApplicationAction';
 import {StopApplicationAction} from './StopApplicationAction';

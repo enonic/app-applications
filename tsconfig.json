@@ -1,28 +1,28 @@
 {
-  "compilerOptions": {
-    "module": "commonjs",
-    "target": "es5",
-    "sourceMap": true,
-    "types": [
-      "q"
+    "compilerOptions": {
+        "declaration": false,
+        "lib": [
+            "es2015",
+            "es2015.promise",
+            "dom"
+        ],
+        "module": "commonjs",
+        "sourceMap": true,
+        // We set target in tsup.config.ts instead
+        // "target": "es5",
+        "types": [
+            "q"
+        ],
+    },
+    "exclude": [
+        "**/*.d.ts",
+        "build/**/*",
+        "out/**/*",
+        "node_modules/*",
+        "src/main/resources/**/*"
     ],
-    "lib": [
-      "es2015",
-      "es2015.promise",
-      "dom"
+    "include": [
+        "../lib-admin-ui/src/main/resources/assets/admin/common/js/_**/*.ts",
+        ".xp/dev/lib-admin-ui/**/*.ts"
     ]
-  },
-  "files": [
-    "./src/main/resources/assets/js/main.ts"
-  ],
-  "exclude": [
-    "build/**/*",
-    "out/**/*",
-    "node_modules/*"
-  ],
-  "include": [
-    "src/**/*",
-    "../lib-admin-ui/src/main/resources/assets/admin/common/js/_**/*.ts",
-    ".xp/dev/lib-admin-ui/**/*.ts"
-  ]
 }

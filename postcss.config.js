@@ -9,4 +9,7 @@ const plugins = Object.assign(
     isProd ? {cssnano: {}} : {}
 );
 
-module.exports = {plugins};
+module.exports = {
+    map: !isProd,
+    plugins
+};

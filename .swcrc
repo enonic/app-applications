@@ -16,7 +16,7 @@
   },
   "exclude": [
     ".*\\.d\\.ts$",
-    "/lib/"
+    // "/lib/" // TODO: Why was this line here?
   ],
   "module": {
     "type": "commonjs",

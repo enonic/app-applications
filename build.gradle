@@ -33,14 +33,22 @@ dependencies {
     implementation "com.enonic.xp:jaxrs-api:${xpVersion}"
     implementation "com.enonic.xp:admin-api:${xpVersion}"
     implementation "com.enonic.xp:portal-api:${xpVersion}"
+
     include "com.enonic.xp:lib-admin:${xpVersion}"
+    include "com.enonic.xp:lib-io:${xpVersion}"
+
     include "com.enonic.lib:lib-admin-ui:${libAdminUiVersion}"
     devResources "com.enonic.lib:lib-admin-ui:${libAdminUiVersion}"
+
     include "com.enonic.lib:lib-mustache:2.1.0"
+    include 'com.enonic.lib:lib-router:3.1.0'
+    include 'com.enonic.lib:lib-static:1.0.3'
+
     testImplementation "org.junit.jupiter:junit-jupiter-api:5.9.1"
     testImplementation "org.mockito:mockito-core:4.8.0"
     testImplementation( testFixtures( "com.enonic.xp:jaxrs-impl:${xpVersion}" ) )
     testImplementation( testFixtures( "com.enonic.xp:core-app:${xpVersion}" ) )
+
     testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:5.9.1"
 }
 
@@ -54,6 +62,10 @@ repositories {
     mavenCentral()
 }
 
+tasks.withType(Copy) {
+    includeEmptyDirs = false
+}
+
 tasks.register('lint', NpmTask ) {
     group "verification"
     dependsOn( 'npmInstall' )
@@ -62,33 +74,58 @@ tasks.register('lint', NpmTask ) {
 }
 
 check.configure {
-    dependsOn( 'lint' )
+    dependsOn( 'lint', 'npmCheck' )
 }
 
-tasks.register('webpack', NpmTask ) {
-    dependsOn( 'npmInstall' )
-    environment = ['NODE_ENV': nodeEnvironment()]
+tasks.register( 'npmBuild', NpmTask) {
+    dependsOn npmInstall
     description = 'Build UI resources (ts, css, etc).'
+    environment = [
+        'FORCE_COLOR': 'true',
+        'LOG_LEVEL_FROM_GRADLE': gradle.startParameter.logLevel.toString(),
+        'NODE_ENV': nodeEnvironment()
+    ]
     args = ['run', 'build']
     inputs.dir '.xp/dev'
-    inputs.dir 'src/main/resources/assets'
-    inputs.file 'webpack.config.js'
-    outputs.dir "$buildDir/build/resources/main/assets"
+    inputs.dir 'src/main/resources'
+    inputs.file 'tsup.config.ts'
+    outputs.dir "$buildDir/build/resources/main"
 }
 
-jar {
-    exclude 'assets/**/*.ts'
+tasks.register('npmBuildTests', NpmTask) {
+    dependsOn( 'npmBuild' )
+    environment = [
+        'FORCE_COLOR': 'true',
+        'LOG_LEVEL_FROM_GRADLE': gradle.startParameter.logLevel.toString(),
+        'NODE_ENV': nodeEnvironment()
+    ]
+    description = 'Build tests'
+    args = ['run', '--silent', 'build:tests']
+    inputs.dir 'src/test/resources'
+    outputs.dir "$buildDir/build/resources/test"
+    inputs.file 'tsup.config.ts'
+}
+
+test.dependsOn npmBuildTests
+
+processResources {
+    exclude '**/tsconfig.json'
+    exclude '**/*.ts'
     exclude 'assets/**/*.less'
-    exclude 'assets/styles/*.js'
+    exclude 'assets/**/*.woff'
+    exclude 'assets/**/*.woff2'
 
     if ( isProd() )
     {
         exclude 'assets/**/*.map'
     }
+}
 
+jar {
     outputs.dir "$buildDir/resources/main"
 
-    dependsOn ( 'webpack', 'test', 'javadoc' )
+    dependsOn += test
+    dependsOn += npmBuild
 }
 
 test {

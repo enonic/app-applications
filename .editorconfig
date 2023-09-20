@@ -12,3 +12,7 @@ indent_style = space
 
 [{*.less,package.json,*.yml}]
 indent_size = 2
+
+[tsup/*.ts]
+indent_size = 4
+indent_style = tab
