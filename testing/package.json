@@ -18,7 +18,7 @@
     "@wdio/spec-reporter": "^8.16.9",
     "chromedriver": "^116.0.0",
     "geckodriver": "^4.2.1",
-    "@wdio/cli": "^8.16.10",
+    "@wdio/cli": "^8.16.12",
     "@wdio/dot-reporter": "^8.16.7",
     "@wdio/mocha-framework": "^8.16.10",
     "@wdio/concise-reporter": "^8.16.7",
