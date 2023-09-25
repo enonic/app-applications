@@ -20,7 +20,7 @@
     "geckodriver": "^4.2.1",
     "@wdio/cli": "^8.16.10",
     "@wdio/dot-reporter": "^8.16.7",
-    "@wdio/mocha-framework": "^8.16.10",
+    "@wdio/mocha-framework": "^8.16.12",
     "@wdio/concise-reporter": "^8.16.7",
     "wdio-timeline-reporter": "^5.1.4"
   },
