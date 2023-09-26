@@ -53,8 +53,9 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew build -Pcom.enonic.xp.app.production=true
       - uses: actions/upload-artifact@v3
-        with: app-applications
-        path: build/libs/app-applications.jar
+        with:
+         name: app-applications
+         path: build/libs/app-applications.jar
 
       - run: |
           set -ex
