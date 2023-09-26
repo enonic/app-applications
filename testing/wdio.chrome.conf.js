@@ -52,8 +52,7 @@ exports.config = {
     // Set directory to store all logs into
     outputDir: "./build/reports/logs/",
 
-    reporters: ['spec','concise',
-        ['timeline', { outputDir: './build/reports/timeline' }]
+    reporters: ['spec', ['timeline', { outputDir: './build/reports/timeline' }]
     ],
 
     // Hook that gets executed before the suite starts
