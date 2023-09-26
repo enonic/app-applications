@@ -34,7 +34,7 @@ class ApplicationItemStatisticsPanel extends Page {
             let selector = xpath.main + xpath.dataContainer + xpath.applicationItemDataGroup + xpath.applicationDataHeaders;
             return await this.getTextInElements(selector);
         } catch (err) {
-            let screenshot = this.saveScreenshotUniqueName('stat_panel');
+            let screenshot = await this.saveScreenshotUniqueName('stat_panel');
             throw new Error('Error while getting application-data-headers, screenshot: ' + screenshot + '  ' + err);
         }
     }
@@ -49,7 +49,7 @@ class ApplicationItemStatisticsPanel extends Page {
         try {
             return await this.waitForElementDisplayed(xpath.title, appConst.mediumTimeout);
         } catch (err) {
-            let screenshot = this.saveScreenshotUniqueName('stat_panel');
+            let screenshot = await this.saveScreenshotUniqueName('stat_panel');
             throw  new Error("App Statistic Panel - app name is not displayed in the panel, screenshot: " + screenshot + ' ' + err);
         }
     }
@@ -62,7 +62,7 @@ class ApplicationItemStatisticsPanel extends Page {
         try {
             return await this.waitForElementNotDisplayed(xpath.title, appConst.mediumTimeout);
         } catch (err) {
-            let screenshot = this.saveScreenshotUniqueName('stat_panel');
+            let screenshot = await this.saveScreenshotUniqueName('stat_panel');
             throw  new Error("App Statistic Panel - app name should not be displayed in the panel, screenshot: " + screenshot + ' ' + err);
         }
     }
@@ -70,35 +70,99 @@ class ApplicationItemStatisticsPanel extends Page {
     // return list of names of content types
     async getContentTypes() {
         try {
-            //Wait for list of content types is displayed
-            await this.waitForElementDisplayed(this.contentTypes, appConst.shortTimeout);
+            // Wait for list of content types is displayed
+            await this.waitForElementDisplayed(this.contentTypes, appConst.mediumTimeout);
             return await this.getTextInElements(this.contentTypes);
         } catch (err) {
             // otherwise returns empty list:
-            let screenshot = this.saveScreenshotUniqueName('content_types_list');
-            return await this.getTextInElements(this.contentTypes);
+            let screenshot = await this.saveScreenshotUniqueName('content_types_list');
+            return [];
+        }
+    }
+
+    async waitForContentTypesHeaderNotDisplayed() {
+        try {
+            let locator = xpath.main + "//ul[@class='data-list' and descendant::li[text()='Content Types']]";
+            await this.waitForElementNotDisplayed(locator, appConst.mediumTimeout);
+        } catch (err) {
+            let screenshot = await this.saveScreenshotUniqueName('content_types_header');
+            throw new Error('Content Types header should not be displayed in the statistics panel, screenshot:' + screenshot + ' ' + err);
+        }
+    }
+
+    async waitForContentTypesHeaderDisplayed() {
+        try {
+            let locator = xpath.main + "//ul[@class='data-list' and descendant::li[text()='Content Types']]";
+            await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
+        } catch (err) {
+            let screenshot = await this.saveScreenshotUniqueName('content_types_header');
+            throw new Error('Content Types header should  be displayed in the statistics panel, screenshot:' + screenshot + ' ' + err);
         }
     }
 
     async getParts() {
         try {
-            //Wait for list of content types is displayed
+            // Wait for list of content types is displayed
             await this.waitForElementDisplayed(this.parts, appConst.shortTimeout);
             return await this.getTextInElements(this.parts);
         } catch (err) {
-            //otherwise returns empty list:
-            await this.saveScreenshot(appConst.generateRandomName("parts_list_empty"));
-            return await this.getTextInElements(this.parts);
+            // otherwise returns empty list:
+            await this.saveScreenshotUniqueName(appConst.generateRandomName('parts_list_empty'));
+            return [];
         }
     }
+
+    async waitForPartHeaderNotDisplayed() {
+        try {
+            let locator = xpath.main + "//ul[@class='data-list' and descendant::li[text()='Part']]";
+            await this.waitForElementNotDisplayed(locator, appConst.mediumTimeout);
+        } catch (err) {
+            let screenshot = await this.saveScreenshotUniqueName('content_types_header');
+            throw new Error('Parts header should not be displayed in the statistics panel, screenshot:' + screenshot + ' ' + err);
+        }
+    }
+
+    async waitForPartHeaderDisplayed() {
+        try {
+            let locator = xpath.main + "//ul[@class='data-list' and descendant::li[text()='Part']]";
+            await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
+        } catch (err) {
+            let screenshot = await this.saveScreenshotUniqueName('content_types_header');
+            throw new Error('Parts header should  be displayed in the statistics panel, screenshot:' + screenshot + ' ' + err);
+        }
+    }
+
 
     getProviderDataHeaders() {
         return this.getTextInDisplayedElements(xpath.idProviderApplicationsHeaders);
     }
 
+    async waitForProviderDataDisplayed() {
+        try {
+            return await this.waitForElementDisplayed(xpath.idProviderApplicationsHeaders, appConst.mediumTimeout);
+        } catch (err) {
+            let screenshot = await this.saveScreenshotUniqueName('err_provider_data');
+            throw new Error('Provider data should be displayed in the statistics panel, screenshot: ' + screenshot + ' ' + err);
+        }
+    }
+
     // Expected list of headers: Content Types, Page, Part, Layout,Relationship Types
-    getSiteDataHeaders() {
-        return this.getTextInDisplayedElements(xpath.siteDataHeaders);
+    async getSiteDataHeaders() {
+        try {
+            return this.getTextInDisplayedElements(xpath.siteDataHeaders);
+        } catch (err) {
+            let screenshot = await this.saveScreenshotUniqueName('err_site_data_info');
+            throw new Error("Statistics panel - Site data headers, screenshot: " + screenshot + ' ' + err);
+        }
+    }
+
+    async waitForSiteDataDisplayed() {
+        try {
+            return await this.waitForElementDisplayed(xpath.siteDataHeaders, appConst.mediumTimeout);
+        } catch (err) {
+            let screenshot = await this.saveScreenshotUniqueName('err_site_data');
+            throw new Error('Site data should be displayed in the statistics panel, screenshot: ' + screenshot + ' ' + err);
+        }
     }
 
     async clickOnStopActionMenuItem() {
@@ -106,7 +170,7 @@ class ApplicationItemStatisticsPanel extends Page {
             await this.waitForElementDisplayed(xpath.stopActionMenuItem, appConst.mediumTimeout);
             return await this.clickOnElement(xpath.stopActionMenuItem);
         } catch (err) {
-            await this.saveScreenshot("err_stop_menu_item");
+            await this.saveScreenshot('err_stop_menu_item');
             throw new Error("Error when clicking on Stop menu item" + err);
         }
     }
@@ -119,10 +183,11 @@ class ApplicationItemStatisticsPanel extends Page {
 
     async getDropDownButtonText() {
         try {
-            let selector = xpath.main + xpath.dropDownButton;
-            return await this.getText(selector);
+            let locator = xpath.main + xpath.dropDownButton;
+            await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
+            return await this.getText(locator);
         } catch (err) {
-            let screenshot = this.saveScreenshotUniqueName('stat_panel_dropdown_btn');
+            let screenshot = await this.saveScreenshotUniqueName('stat_panel_dropdown_btn');
             throw new Error('error while getting text from the button,screenshot: ' + screenshot + ' ' + err);
         }
     }
@@ -150,7 +215,7 @@ class ApplicationItemStatisticsPanel extends Page {
 
     waitForStopMenuItemVisible() {
         return this.waitForElementDisplayed(xpath.stopActionMenuItem, appConst.shortTimeout).catch(err => {
-            this.saveScreenshot("stop_menu_item_not_visible");
+            this.saveScreenshot('stop_menu_item_not_visible');
             return false;
         })
     }

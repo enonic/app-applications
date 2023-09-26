@@ -15,7 +15,7 @@ describe('Install app dialog, search input spec.', function () {
     const not_existing = 'https://repo.enonic.com/public/com/enonic/app/not-existing/0.0.0/not-existing-0.0.0.jar';
     const LOG_BROWSER_APP_URL = 'https://repo.enonic.com/public/com/enonic/app/logbrowser/2.0.0/logbrowser-2.0.0.jar';
 
-    const local_file = "file:c:/";
+    const LOCAL_FILE = "file:c:/";
 
     it(`GIVEN 'install app' dialog is opened WHEN not existing URL has been typed THEN expected validation message should appear`,
         async () => {
@@ -46,7 +46,7 @@ describe('Install app dialog, search input spec.', function () {
             await installDialog.waitForSpinnerNotVisible();
             await installDialog.pause(500);
             // 3.Type a path to the local file:
-            await installDialog.typeSearchTextAndEnter(local_file);
+            await installDialog.typeSearchTextAndEnter(LOCAL_FILE);
             await installDialog.waitForSpinnerNotVisible();
             // 4. Verify the expected warning:
             await installDialog.waitForApplicationNotFoundMessage();
