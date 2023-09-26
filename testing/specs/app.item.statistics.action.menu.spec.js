@@ -19,9 +19,9 @@ describe("Item Statistics Panel 'Action Menu' spec", function () {
         async () => {
             let appBrowsePanel = new AppBrowsePanel();
             let appStatisticPanel = new AppStatisticPanel();
-            //1. Select the application:
+            // 1. Select the application:
             await appBrowsePanel.clickOnRowByDisplayName(FIRST_APP);
-            //2. Verify the info in Statistics Panel:
+            // 2. Verify the status in Statistics Panel:
             let result = await appStatisticPanel.getDropDownButtonText();
             await studioUtils.saveScreenshot("application_action_menu_collapsed");
             assert.strictEqual(result, 'Started', 'correct label should be displayed on the drop-down button');
@@ -64,20 +64,21 @@ describe("Item Statistics Panel 'Action Menu' spec", function () {
         async () => {
             let appBrowsePanel = new AppBrowsePanel();
             let appStatisticPanel = new AppStatisticPanel();
-            //1. Select the app and expand he menu:
+            // 1. Select the app and expand the menu:
             await appBrowsePanel.clickOnRowByDisplayName(FIRST_APP);
-            //2. Start the app:
+            // 2. Start the app:
             await appStatisticPanel.clickOnActionDropDownMenu();
             await appStatisticPanel.waitForStartMenuItemVisible();
             await appStatisticPanel.clickOnStartActionMenuItem();
             await appBrowsePanel.pause(2000);
+            // 3. Verify that the app is started:
             let state = await appBrowsePanel.getApplicationState(FIRST_APP);
-            await studioUtils.saveScreenshot("action_menu_app_started");
+            await studioUtils.saveScreenshot('action_menu_app_started');
             assert.strictEqual(state, 'started', 'The application should be `started`');
         });
 
-    //Verifies issue https://github.com/enonic/app-applications/issues/336
-    //Start/Stop action in Application Statistics Panel starts/stops all selected applications #336
+    // Verifies issue https://github.com/enonic/app-applications/issues/336
+    // Start/Stop action in Application Statistics Panel starts/stops all selected applications #336
     it(`GIVEN two started applications are selected WHEN Stop menu-item has been clicked THEN last selected application should be stopped`,
         async () => {
             let appBrowsePanel = new AppBrowsePanel();
