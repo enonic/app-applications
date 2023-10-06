@@ -8,8 +8,10 @@
         "moduleResolution": "node",
         "lib": [
             "DOM",
-            "ES2020",
-            "ES2015.Promise"
+            // lib-admin-ui uses an old version of slickgrid that doesn't support fat arrow
+            "es5",
+            // "ES2020",
+            // "ES2015.Promise"
         ],
         "paths": {},
         "rootDir": ".",
@@ -23,6 +25,7 @@
 
         // WARNING: This causes sourcemaps to fail! Must be set in tsup/static.ts instead
         // "target": "ES2020", // Modern browsers
+        "target": "es5", // lib-admin-ui uses an old version of slickgrid that doesn't support fat arrow
 
         "types": [
             "q",

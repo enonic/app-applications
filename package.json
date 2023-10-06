@@ -25,7 +25,7 @@
   "dependencies": {
     "@enonic/lib-admin-ui": "file:./.xp/dev/lib-admin-ui",
     "jquery": "^3.7.1",
-    "jquery-ui": "^1.13.2",
+    "jquery-ui-dist": "^1.13.2",
     "q": "^1.5.1"
   },
   "devDependencies": {

@@ -20,23 +20,16 @@ export default function buildStaticConfig(): Options {
 		entry: {
 			'app-applications-bundle': 'src/main/resources/static/main.ts',
 		},
-		// esbuildOptions(options, context) {
-		// 	// options.banner = {
-		// 	//     js: `const jQuery = window.$;` // jQuery UI Tabbable requires this
-		// 	// };
-		// 	// options.external = [
-		// 	//     'jquery'
-		// 	// ]
-		// 	// options.sourcemap = 'external'; // Shows the line in the transpiled code, not the source
-		// 	// options.sourcemap = 'both'; // // Shows the line in the transpiled code, not the source
-		// },
+		esbuildOptions(options, context) {
+			options.keepNames = true;
+		},
 		esbuildPlugins: [
 			CopyWithHashPlugin({
 				context: 'node_modules',
 				manifest: `node_modules-manifest.json`,
 				patterns: [
 					'jquery/dist/*.*',
-					'jquery-ui/dist/*.*',
+					'jquery-ui-dist/*.*',
 				]
 			}),
 			TsupPluginManifest({
@@ -74,7 +67,8 @@ export default function buildStaticConfig(): Options {
 		sourcemap: process.env.NODE_ENV === 'development',
 
 		// INFO: Sourcemaps works when target is set here, rather than in tsconfig.json
-		target: 'es2020',
+		// target: 'es2020',
+		target: 'es5', // lib-admin-ui uses and old version of slickgrid that can't handle fat arrow functions
 
 		tsconfig: 'src/main/resources/static/tsconfig.json',
 	};
