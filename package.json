@@ -12,7 +12,6 @@
     "build:main:css": "postcss -o build/resources/main/assets/styles/main.css build/less/main.css",
     "build:main:server": "tsup -d build/resources/main",
     "build:main:static": "tsup -d build/resources/main/static",
-    "build:tests": "tsup -d build/resources/test",
     "check:types": "concurrently -g -r --timings npm:check:types:*",
     "check:types:server": "npx tsc --noEmit -p src/main/resources/tsconfig.json",
     "check:types:static": "npx tsc --noEmit -p src/main/resources/static/tsconfig.json",
