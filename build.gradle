@@ -66,6 +66,17 @@ tasks.withType(Copy).configureEach {
     includeEmptyDirs = false
 }
 
+tasks.register('npmCheck', NpmTask) {
+    dependsOn( 'npmInstall' )
+    args = [
+            'run',
+            'check:types'
+    ]
+    environment = [
+            'FORCE_COLOR': 'true',
+    ]
+}
+
 tasks.register('lint', NpmTask ) {
     group "verification"
     dependsOn( 'npmInstall' )
