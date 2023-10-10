@@ -10,8 +10,14 @@
             "DOM",
             // lib-admin-ui uses an old version of slickgrid that doesn't support fat arrow
             "es5",
+
+            // Even though target is currently es5 for slickgrid using 'Array.find' should work.
+            "ES2015.Core", // https://github.com/Microsoft/TypeScript/blob/main/src/lib/es2015.core.d.ts
+
+            // Even though target is currently es5 for slickgrid using 'async' should work.
+            "ES2015.Promise" // https://github.com/microsoft/TypeScript/blob/main/src/lib/es2015.promise.d.ts
+
             // "ES2020",
-            // "ES2015.Promise"
         ],
         "paths": {},
         "rootDir": ".",
