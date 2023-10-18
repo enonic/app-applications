@@ -1,4 +1,4 @@
-import * as Q from 'q';
+import Q from 'q';
 import {MarketApplicationFetcher} from '../../resource/MarketApplicationFetcher';
 import {i18n} from '@enonic/lib-admin-ui/util/Messages';
 import {Application} from '@enonic/lib-admin-ui/application/Application';

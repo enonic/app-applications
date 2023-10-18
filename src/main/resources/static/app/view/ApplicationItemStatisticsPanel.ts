@@ -12,7 +12,7 @@ import {Action} from '@enonic/lib-admin-ui/ui/Action';
 import {StartApplicationEvent} from '../browse/StartApplicationEvent';
 import {StopApplicationEvent} from '../browse/StopApplicationEvent';
 import {CONFIG} from '@enonic/lib-admin-ui/util/Config';
-import * as Q from 'q';
+import Q from 'q';
 
 export class ApplicationItemStatisticsPanel
     extends ItemStatisticsPanel {

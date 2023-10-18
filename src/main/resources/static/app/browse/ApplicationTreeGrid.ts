@@ -1,4 +1,4 @@
-import * as Q from 'q';
+import Q from 'q';
 import {ApplicationBrowseActions} from './ApplicationBrowseActions';
 import {TreeNode} from '@enonic/lib-admin-ui/ui/treegrid/TreeNode';
 import {Application, ApplicationUploadMock} from '@enonic/lib-admin-ui/application/Application';

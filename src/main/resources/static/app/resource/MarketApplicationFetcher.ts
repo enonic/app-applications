@@ -1,4 +1,4 @@
-import * as Q from 'q';
+import Q from 'q';
 import {MarketApplicationResponse} from '@enonic/lib-admin-ui/application/MarketApplicationResponse';
 import {ListMarketApplicationsRequest} from '@enonic/lib-admin-ui/application/ListMarketApplicationsRequest';
 import {CONFIG} from '@enonic/lib-admin-ui/util/Config';

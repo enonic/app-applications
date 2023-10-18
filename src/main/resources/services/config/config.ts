@@ -1,29 +1,35 @@
-/*global app, require*/
+import {
+    getBaseUri,
+    getToolUrl
+} from '/lib/xp/admin';
+import {
+    assetUrl,
+    serviceUrl
+} from '/lib/xp/portal';
 
-const admin = require('/lib/xp/admin');
-const portal = require('/lib/xp/portal');
 
 function getMarketUrl() {
-    const marketConfigBean = __.newBean('com.enonic.xp.app.main.GetMarketConfigBean');
+    const marketConfigBean = __.newBean<{
+        getMarketUrl: () => string
+    }>('com.enonic.xp.app.main.GetMarketConfigBean');
     return __.toNativeObject(marketConfigBean.getMarketUrl());
 }
 
-function handleGet() {
+export function get() {
     const readonlyMode = app.config['readonlyMode'] === 'true' || false;
-
     return {
         status: 200,
         contentType: 'application/json',
         body: {
-            adminUrl: admin.getBaseUri(),
+            adminUrl: getBaseUri(),
             appId: app.name,
-            assetsUri: portal.assetUrl({path: ''}),
+            assetsUri: assetUrl({path: ''}),
             marketUrl: getMarketUrl(),
             readonlyMode,
             services: {
-                i18nUrl: portal.serviceUrl({service: 'i18n'}),
+                i18nUrl: serviceUrl({service: 'i18n'}),
             },
-            toolUri: admin.getToolUrl(
+            toolUri: getToolUrl(
                 app.name,
                 'main'
             ),
@@ -31,5 +37,3 @@ function handleGet() {
         }
     };
 }
-
-exports.get = handleGet;
