@@ -22,8 +22,8 @@
     "prebuild:main:css": "npm run less"
   },
   "dependencies": {
+    "@enonic/legacy-slickgrid": "^0.0.1",
     "@enonic/lib-admin-ui": "file:./.xp/dev/lib-admin-ui",
-    "@enonic/legacy-slickgrid": "v0.0.1",
     "jquery": "^3.7.1",
     "jquery-ui-dist": "^1.13.2",
     "q": "^1.5.1"
