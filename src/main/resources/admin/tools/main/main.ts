@@ -17,7 +17,7 @@ import {
     serviceUrl
 } from '/lib/xp/portal';
 import {localize} from '/lib/xp/i18n';
-import {immutableGetter, getAdminUrl} from '/lib/applications/urlHelper';
+import {immutableGetter, getAdminUrl, getAdminNodeModuleUrl} from '/lib/applications/urlHelper';
 import {
 	// FILEPATH_MANIFEST_CJS,
 	FILEPATH_MANIFEST_NODE_MODULES,
@@ -56,14 +56,10 @@ function get(_request: Request): Response {
             path: ''
         }),
         configServiceUrl: serviceUrl({service: 'config'}),
-        jqueryUrl: getAdminUrl({
-            manifestPath: FILEPATH_MANIFEST_NODE_MODULES,
-            path: 'jquery/dist/jquery.min.js',
-        }, TOOL_NAME),
-        jqueryUiUrl: getAdminUrl({
-            manifestPath: FILEPATH_MANIFEST_NODE_MODULES,
-            path: 'jquery-ui-dist/jquery-ui.min.js',
-        }, TOOL_NAME),
+        jqueryUrl: getAdminNodeModuleUrl('jquery/dist/jquery.min.js', TOOL_NAME),
+        jqueryUiUrl: getAdminNodeModuleUrl('jquery-ui-dist/jquery-ui.min.js', TOOL_NAME),
+        legacySlickgridUrl: getAdminNodeModuleUrl('@enonic/legacy-slickgrid/index.js', TOOL_NAME),
+        qUrl: getAdminNodeModuleUrl('q/q.js', TOOL_NAME),
         launcherPath: getLauncherPath(),
     };
 

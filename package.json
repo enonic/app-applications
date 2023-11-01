@@ -11,10 +11,10 @@
     "build": "concurrently -c auto -g --timings npm:build:main:*",
     "build:main:css": "postcss -o build/resources/main/assets/styles/main.css build/less/main.css",
     "build:main:server": "tsup -d build/resources/main",
-    "build:main:static": "tsup -d build/resources/main/static",
+    "build:main:static": "tsup -d build/resources/main/_static",
     "check:types": "concurrently -g -r --timings npm:check:types:*",
     "check:types:server": "npx tsc --noEmit -p src/main/resources/tsconfig.json",
-    "check:types:static": "npx tsc --noEmit -p src/main/resources/static/tsconfig.json",
+    "check:types:static": "npx tsc --noEmit -p src/main/resources/_static/tsconfig.json",
     "clean": "del build",
     "fix": "eslint --fix src/**/*.ts --cache",
     "less": "lessc --source-map src/main/resources/assets/styles/main.less build/less/main.css",
@@ -23,6 +23,7 @@
   },
   "dependencies": {
     "@enonic/lib-admin-ui": "file:./.xp/dev/lib-admin-ui",
+    "@enonic/legacy-slickgrid": "v0.0.1",
     "jquery": "^3.7.1",
     "jquery-ui-dist": "^1.13.2",
     "q": "^1.5.1"
@@ -49,6 +50,7 @@
     "del-cli": "^5.1.0",
     "enonic-admin-artifacts": "^1.8.5",
     "esbuild-plugin-external-global": "^1.0.1",
+    "esbuild-plugin-globals": "^0.2.0",
     "eslint": "^8.51.0",
     "glob": "^10.3.4",
     "less-loader": "^11.1.3",

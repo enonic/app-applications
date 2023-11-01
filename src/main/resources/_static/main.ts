@@ -1,3 +1,21 @@
+import {Store} from '@enonic/lib-admin-ui/store/Store';
+import {StyleHelper} from '@enonic/lib-admin-ui/StyleHelper';
+
+import '@enonic/lib-admin-ui/form/inputtype/support/NoInputTypeFoundView';
+import '@enonic/lib-admin-ui/form/inputtype/checkbox/Checkbox';
+import '@enonic/lib-admin-ui/form/inputtype/combobox/ComboBox';
+import '@enonic/lib-admin-ui/form/inputtype/time/Date';
+import '@enonic/lib-admin-ui/form/inputtype/time/DateTime';
+import '@enonic/lib-admin-ui/form/inputtype/time/DateTimeRange';
+import '@enonic/lib-admin-ui/form/inputtype/time/Time';
+import '@enonic/lib-admin-ui/form/inputtype/number/Double';
+import '@enonic/lib-admin-ui/form/inputtype/number/Long';
+import '@enonic/lib-admin-ui/form/inputtype/geo/GeoPoint';
+import '@enonic/lib-admin-ui/form/inputtype/principal/PrincipalSelector';
+import '@enonic/lib-admin-ui/form/inputtype/radiobutton/RadioButton';
+import '@enonic/lib-admin-ui/form/inputtype/text/TextArea';
+import '@enonic/lib-admin-ui/form/inputtype/text/TextLine';
+
 import {Application} from '@enonic/lib-admin-ui/app/Application';
 import {ApplicationAppPanel} from './app/ApplicationAppPanel';
 import {InstallAppDialog} from './app/installation/InstallAppDialog';
@@ -5,7 +23,7 @@ import {InstallAppPromptEvent} from './app/installation/InstallAppPromptEvent';
 import {Body} from '@enonic/lib-admin-ui/dom/Body';
 import {Path} from '@enonic/lib-admin-ui/rest/Path';
 import {ConnectionDetector} from '@enonic/lib-admin-ui/system/ConnectionDetector';
-import {UriHelper} from '@enonic/lib-admin-ui/util/UriHelper';
+// import {UriHelper} from '@enonic/lib-admin-ui/util/UriHelper';
 import {AppBar} from '@enonic/lib-admin-ui/app/bar/AppBar';
 import {AppHelper} from '@enonic/lib-admin-ui/util/AppHelper';
 import {ServerEventsListener} from '@enonic/lib-admin-ui/event/ServerEventsListener';
@@ -13,6 +31,13 @@ import {i18nInit} from '@enonic/lib-admin-ui/util/MessagesInitializer';
 import {i18n} from '@enonic/lib-admin-ui/util/Messages';
 import {InstalledAppChangedEvent} from './app/installation/InstalledAppChangedEvent';
 import {CONFIG} from '@enonic/lib-admin-ui/util/Config';
+
+const hasJQuery = Store.instance().has('$');
+if (!hasJQuery) {
+    Store.instance().set('$', $);
+}
+
+StyleHelper.setCurrentPrefix(StyleHelper.ADMIN_PREFIX);
 
 const body = Body.get();
 

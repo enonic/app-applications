@@ -3,13 +3,11 @@ import type { Options } from '.';
 
 import CopyWithHashPlugin from '@enonic/esbuild-plugin-copy-with-hash';
 import TsupPluginManifest from '@enonic/tsup-plugin-manifest';
+import GlobalsPlugin from 'esbuild-plugin-globals';
 import {
-	DIR_DST,
+	DIR_DST_STATIC,
 	DIR_SRC_STATIC
 } from './constants';
-
-
-const DIR_DST_STATIC = `${DIR_DST}/static`;
 
 
 export default function buildStaticConfig(): Options {
@@ -18,18 +16,27 @@ export default function buildStaticConfig(): Options {
 		dts: false,
 		// entry,
 		entry: {
-			'app-applications-bundle': 'src/main/resources/static/main.ts',
+			'app-applications-bundle': `${DIR_SRC_STATIC}/main.ts`,
 		},
 		esbuildOptions(options, context) {
 			options.keepNames = true;
 		},
 		esbuildPlugins: [
+			GlobalsPlugin({
+				'@enonic/legacy-slickgrid.*'(modulename) {
+					return 'Slick';
+				},
+				'jquery': '$',
+				'q': 'Q',
+			}),
 			CopyWithHashPlugin({
 				context: 'node_modules',
 				manifest: `node_modules-manifest.json`,
 				patterns: [
+					'@enonic/legacy-slickgrid/index.js',
 					'jquery/dist/*.*',
 					'jquery-ui-dist/*.*',
+					'q/*.js',
 				]
 			}),
 			TsupPluginManifest({
@@ -57,10 +64,12 @@ export default function buildStaticConfig(): Options {
 
 		noExternal: [ // Same as dependencies in package.json
 			/@enonic\/lib-admin-ui.*/,
-			// 'jquery', // This will bundle jQuery into the bundle
+			// These need to be listed here for esbuildPluginExternalGlobal to work
+			/@enonic\/legacy-slickgrid.*/,
+			'jquery',
 			'q'
 		],
-		outDir: 'build/resources/main/static',
+		outDir: DIR_DST_STATIC,
 		platform: 'browser',
 		silent: ['QUIET', 'WARN'].includes(process.env.LOG_LEVEL_FROM_GRADLE||''),
 		splitting: false,
@@ -70,6 +79,6 @@ export default function buildStaticConfig(): Options {
 		// target: 'es2020',
 		target: 'es5', // lib-admin-ui uses and old version of slickgrid that can't handle fat arrow functions
 
-		tsconfig: 'src/main/resources/static/tsconfig.json',
-	};
+		tsconfig: `${DIR_SRC_STATIC}/tsconfig.json`,
+	} as Options;
 }
