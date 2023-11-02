@@ -37,7 +37,7 @@ describe('Applications Browse panel - `Selection Toggler` spec', function () {
             await appBrowsePanel.waitForSelectionTogglerVisible();
             await appBrowsePanel.pause(500);
             let result = await appBrowsePanel.getNumberInSelectionToggler();
-            await studioUtils.saveScreenshot("2_app_selected");
+            await studioUtils.saveScreenshot('2_app_selected');
             assert.equal(result, 2, ' 2 should be present on the button');
         });
 

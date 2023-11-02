@@ -21,7 +21,7 @@ jobs:
         env:
           ACTUAL_REF: ${{ github.event.client_payload.ref || github.ref }}
 
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           ref: ${{ github.event.client_payload.ref || github.ref }}
 
@@ -37,7 +37,7 @@ jobs:
     needs: publish_vars
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           ref: ${{ github.event.client_payload.ref || github.ref }}
 
@@ -52,16 +52,18 @@ jobs:
 
       - name: Build with Gradle
         run: ./gradlew build -Pcom.enonic.xp.app.production=true
+      - uses: actions/upload-artifact@v3
+        with:
+          name: app-applications
+          path: build/libs/app-applications.jar
+
       - run: |
           set -ex
-          wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-          sudo apt install ./google-chrome-stable_current_amd64.deb
       - name: Run Selenium Tests
         id: selenium
         if: github.event.head_commit.message != 'Updated to next SNAPSHOT version'
-        run: ./gradlew :testing:testApplicationsApp
+        run: ./gradlew :testing:w_testAppChrome
 
-        
       - name: Slack Notification
         uses: rtCamp/action-slack-notify@v2
         if: failure()
@@ -79,7 +81,7 @@ jobs:
         with:
           name: ui-test-report
           path: |
-            testing/build/mochawesome-report
+            testing/build/reports
 
       - uses: codecov/codecov-action@v3.1.4
 

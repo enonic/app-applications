@@ -99,10 +99,11 @@ describe('Install Application Dialog specification', function () {
         async () => {
             let appBrowsePanel = new AppBrowsePanel();
             let installAppDialog = new InstallDialog();
+            // 1. Open Install modal dialog:
             await appBrowsePanel.clickOnInstallButton();
             await installAppDialog.waitForOpened();
             await installAppDialog.waitForSpinnerNotVisible();
-            //'Installed' button appears in the modal dialog:
+            // Verify that 'Installed' button is displayed in the modal dialog:
             let result = await installAppDialog.waitForApplicationInstalled(CHUCK_NORRIS_APP_DISPLAY_NAME);
             assert.isTrue(result, `'${CHUCK_NORRIS_APP_DISPLAY_NAME}' should be with Installed status`);
         });

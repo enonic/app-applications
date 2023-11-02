@@ -3,7 +3,6 @@ const HomePage = require('../page_objects/home.page');
 const LoginPage = require('../page_objects/login.page');
 const appConst = require("./app_const");
 const BrowsePanel = require('../page_objects/applications/applications.browse.panel');
-const addContext = require('mochawesome/addContext');
 const fs = require('fs');
 const path = require('path');
 const webDriverHelper = require('./WebDriverHelper');
@@ -14,7 +13,7 @@ module.exports = {
         if (typeof browser !== "undefined") {
             return browser;
         } else {
-           return webDriverHelper.browser;
+            return webDriverHelper.browser;
         }
     },
     async doCloseCurrentBrowserTab() {
@@ -110,17 +109,12 @@ module.exports = {
         return await loginPage.pause(1500);
     },
 
-    saveScreenshot: function (name, that) {
-
-        let screenshotsDir = path.join(__dirname, '/../build/mochawesome-report/screenshots/');
+    saveScreenshot (name, that) {
+        let screenshotsDir = path.join(__dirname, '/../build/reports/screenshots/');
         if (!fs.existsSync(screenshotsDir)) {
             fs.mkdirSync(screenshotsDir, {recursive: true});
         }
         return this.getBrowser().saveScreenshot(screenshotsDir + name + '.png').then(() => {
-            if (that) {
-                addContext(that, 'screenshots/' + name + '.png');
-            }
-
             return console.log('screenshot saved ' + name);
         }).catch(err => {
             return console.log('screenshot was not saved ' + screenshotsDir + 'utils  ' + err);

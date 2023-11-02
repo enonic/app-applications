@@ -19,9 +19,9 @@ describe("Item Statistics Panel 'Action Menu' spec", function () {
         async () => {
             let appBrowsePanel = new AppBrowsePanel();
             let appStatisticPanel = new AppStatisticPanel();
-            //1. Select the application:
+            // 1. Select the application:
             await appBrowsePanel.clickOnRowByDisplayName(FIRST_APP);
-            //2. Verify the info in Statistics Panel:
+            // 2. Verify the status in Statistics Panel:
             let result = await appStatisticPanel.getDropDownButtonText();
             await studioUtils.saveScreenshot("application_action_menu_collapsed");
             assert.strictEqual(result, 'Started', 'correct label should be displayed on the drop-down button');
@@ -34,12 +34,13 @@ describe("Item Statistics Panel 'Action Menu' spec", function () {
         async () => {
             let appBrowsePanel = new AppBrowsePanel();
             let appStatisticPanel = new AppStatisticPanel();
-            //1. Select the application
+            // 1. Select the application
             await appBrowsePanel.clickOnRowByDisplayName(FIRST_APP);
-            //2. Click on dropdown handle and expand the menu in Statistics Panel:
+            // 2. Click on dropdown handle and expand the menu in Statistics Panel:
             await appStatisticPanel.clickOnActionDropDownMenu();
+            // 3. Verify that Stop menu items gets visible:
             let isVisible = await appStatisticPanel.waitForStopMenuItemVisible();
-            studioUtils.saveScreenshot("action_menu_is_expanded");
+            await studioUtils.saveScreenshot("action_menu_is_expanded");
             assert.isTrue(isVisible, "'Stop' menu item should appear");
         });
 
@@ -47,11 +48,11 @@ describe("Item Statistics Panel 'Action Menu' spec", function () {
         async () => {
             let appBrowsePanel = new AppBrowsePanel();
             let appStatisticPanel = new AppStatisticPanel();
-            //1. Select the app and expand the menu:
+            // 1. Select the app and expand the menu:
             await appBrowsePanel.clickOnRowByDisplayName(FIRST_APP);
             await appStatisticPanel.clickOnActionDropDownMenu();
             await appStatisticPanel.waitForStopMenuItemVisible();
-            //2. Stop the app:
+            // 2. Stop the app:
             await appStatisticPanel.clickOnStopActionMenuItem();
             await appBrowsePanel.pause(2000);
             let state = await appBrowsePanel.getApplicationState(FIRST_APP);
@@ -63,39 +64,39 @@ describe("Item Statistics Panel 'Action Menu' spec", function () {
         async () => {
             let appBrowsePanel = new AppBrowsePanel();
             let appStatisticPanel = new AppStatisticPanel();
-            //1. Select the app and expand he menu:
+            // 1. Select the app and expand the menu:
             await appBrowsePanel.clickOnRowByDisplayName(FIRST_APP);
-            //2. Start the app:
+            // 2. Start the app:
             await appStatisticPanel.clickOnActionDropDownMenu();
             await appStatisticPanel.waitForStartMenuItemVisible();
             await appStatisticPanel.clickOnStartActionMenuItem();
             await appBrowsePanel.pause(2000);
+            // 3. Verify that the app is started:
             let state = await appBrowsePanel.getApplicationState(FIRST_APP);
-            await studioUtils.saveScreenshot("action_menu_app_started");
+            await studioUtils.saveScreenshot('action_menu_app_started');
             assert.strictEqual(state, 'started', 'The application should be `started`');
         });
 
-    //Verifies issue https://github.com/enonic/app-applications/issues/336
-    //Start/Stop action in Application Statistics Panel starts/stops all selected applications #336
+    // Verifies issue https://github.com/enonic/app-applications/issues/336
+    // Start/Stop action in Application Statistics Panel starts/stops all selected applications #336
     it(`GIVEN two started applications are selected WHEN Stop menu-item has been clicked THEN last selected application should be stopped`,
         async () => {
             let appBrowsePanel = new AppBrowsePanel();
             let appStatisticPanel = new AppStatisticPanel();
             await restartTestApp();
-            //1. Select two applications and expand the menu in Statistics Panel:
+            // 1. Select two applications and expand the menu in Statistics Panel:
             await appBrowsePanel.clickOnCheckboxAndSelectRowByDisplayName(FIRST_APP);
             await appBrowsePanel.clickOnCheckboxAndSelectRowByDisplayName(SECOND_APP);
-            //2. Click on 'Stop' menu button in action menu:
+            // 2. Click on 'Stop' menu button in action menu:
             await appStatisticPanel.clickOnActionDropDownMenu();
             await appStatisticPanel.clickOnStopActionMenuItem();
             await appBrowsePanel.pause(2000);
-            //3. Verify applications state:
+            // 3. Verify applications state:
             let state1 = await appBrowsePanel.getApplicationState(FIRST_APP);
             await studioUtils.saveScreenshot("action_menu_multiselect");
             assert.strictEqual(state1, 'started', "The application should be 'started'");
             let state2 = await appBrowsePanel.getApplicationState(SECOND_APP);
             assert.strictEqual(state2, 'stopped', "The application should be 'stopped'");
-
         });
 
     beforeEach(() => studioUtils.navigateToApplicationsApp());

@@ -29,7 +29,7 @@ describe(`Applications Grid context menu, application is stopped`, function () {
             let appBrowsePanel = new AppBrowsePanel();
             await appBrowsePanel.rightClickOnRowByDisplayName(appConst.TEST_APPLICATIONS.SECOND_APP);
             await appBrowsePanel.waitForContextMenuDisplayed();
-            studioUtils.saveScreenshot("start_menu_item2");
+            await studioUtils.saveScreenshot('start_menu_item2');
             // 'Start menu item should be enabled'
             await appBrowsePanel.waitForContextMenuItemEnabled('Start');
         });
