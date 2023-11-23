@@ -86,16 +86,27 @@ task stopServer {
     }
 }
 
+task cleanup(type: Delete) {
+    delete './build/reports/allure'
+}
+
+task generateReportAndStopServer( type: NpmTask ) {
+    args = ['run-script', 'allure-report']
+    finalizedBy cleanup
+    finalizedBy stopServer
+}
+
+
 task testAppFirefox( type: NpmTask,
                                  dependsOn: [npmInstall, unpackDistro, copyConfig, copyApps, deployApp, startServer] ) {
     args = ['run-script', 'test:firefox']
-    finalizedBy stopServer
+    finalizedBy generateReportAndStopServer
 }
 
 task w_testAppChrome( type: NpmTask,
                     dependsOn: [npmInstall, unpackDistro, copyConfig, copyApps, deployApp, startServer] ) {
     args = ['run-script', 'test_apps:wdio_chrome']
-    finalizedBy stopServer
+    finalizedBy generateReportAndStopServer
 }
 task w_testAppChromeLocal( type: NpmTask, dependsOn: [npmInstall] ) {
     args = ['run-script', 'test_apps:wdio_chrome']
