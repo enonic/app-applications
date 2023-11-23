@@ -1,5 +1,4 @@
 const path = require('path');
-const {TimelineService} = require('wdio-timeline-reporter/timeline-service');
 const PropertiesReader = require('properties-reader');
 const file = path.join(__dirname, '/browser.properties');
 const properties = PropertiesReader(file);
@@ -41,9 +40,6 @@ exports.config = {
     // Default request retries count
     connectionRetryCount: 3,
 
-    //services: ['chromedriver'],
-    services: [[TimelineService]],
-
     framework: 'mocha',
     mochaOpts: {
         ui: 'bdd',
@@ -52,7 +48,8 @@ exports.config = {
     // Set directory to store all logs into
     outputDir: "./build/reports/logs/",
 
-    reporters: ['spec', ['timeline', { outputDir: './build/reports/timeline' }]
+    reporters: ['concise',
+        ['allure', {outputDir: './build/reports/allure', disableWebdriverStepsReporting: true, disableWebdriverScreenshotsReporting: true,}],
     ],
 
     // Hook that gets executed before the suite starts
