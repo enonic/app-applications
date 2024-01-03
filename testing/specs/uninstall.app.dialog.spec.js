@@ -1,14 +1,14 @@
-const chai = require('chai');
-const assert = chai.assert;
+const assert = require('node:assert');
 const webDriverHelper = require('../libs/WebDriverHelper');
 const AppBrowsePanel = require('../page_objects/applications/applications.browse.panel');
 const UninstallAppDialog = require('../page_objects/applications/uninstall.app.dialog');
 const InstallAppDialog = require('../page_objects/applications/install.app.dialog');
 const studioUtils = require('../libs/studio.utils.js');
 const AppStatisticPanel = require('../page_objects/applications/application.item.statistic.panel');
+const appConst = require('../libs/app_const');
 
 describe('Uninstall Application dialog specification', function () {
-    this.timeout(70000);
+    this.timeout(appConst.SUITE_TIMEOUT);
 
     if (typeof browser === 'undefined') {
         webDriverHelper.setupBrowser();
@@ -25,9 +25,9 @@ describe('Uninstall Application dialog specification', function () {
             assert.equal(dialogMessage, 'Are you sure you want to uninstall selected application(s)?',
                 'Expected message should be in the dialog message');
             // "Yes button should be visible"
-            await uninstallAppDialog.isYesButtonDisplayed();
+            await uninstallAppDialog.waitForYesButtonDisplayed();
             // "No button should be visible"
-            await uninstallAppDialog.isNoButtonDisplayed();
+            await uninstallAppDialog.waitForNoButtonDisplayed();
         });
 
     it("GIVEN uninstall dialog is opened WHEN 'Cancel-top' button has been pressed THEN modal dialog closes",
@@ -86,8 +86,8 @@ describe('Uninstall Application dialog specification', function () {
             await installDialog.waitForSpinnerNotVisible();
             // 1. Install the "Audit log browser" app:
             await installDialog.clickOnInstallAppLink(AUDIT_LOG_APP_NAME);
-            let visible = await installDialog.waitForAppInstalled(AUDIT_LOG_APP_NAME);
-            assert.isTrue(visible, `'${AUDIT_LOG_APP_NAME}' should've been installed by now`);
+            let isVisible = await installDialog.waitForAppInstalled(AUDIT_LOG_APP_NAME);
+            assert.ok(isVisible, `'${AUDIT_LOG_APP_NAME}' should've been installed by now`);
             await installDialog.clickOnCancelButtonTop();
             await installDialog.waitForClosed();
             // 2. Uninstall the "Audit log browser" application

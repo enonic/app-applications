@@ -91,17 +91,19 @@ class InstallAppDialog extends Page {
     }
 
     //checks that 'installed' status appeared
-    waitForApplicationInstalled(appName) {
-        const selector = lib.slickRowByDisplayName(XPATH.container, appName) + "//a[@class='installed']";
-        return this.waitForElementDisplayed(selector, appConst.longTimeout).catch(err => {
-            this.saveScreenshot('err_find_installed_status');
-            throw new Error(`Couldn't find 'Installed' label for the app` + " " + err);
-        });
+    async waitForApplicationInstalled(appName) {
+        try {
+            const selector = lib.slickRowByDisplayName(XPATH.container, appName) + "//a[@class='installed']";
+            return await this.waitForElementDisplayed(selector, appConst.longTimeout)
+        } catch (err) {
+            let screenshot = await this.saveScreenshotUniqueName('err_find_installed_status');
+            throw new Error(`Couldn't find 'Installed' label for the app, screenshot:` + screenshot + " " + err);
+        }
     }
 
     isCancelButtonTopDisplayed() {
         return this.isElementDisplayed(this.cancelButton).catch(err => {
-            throw new Error('error- Cancel button top is not displayed ' + err);
+            throw new Error('Error  Cancel button top is not displayed ' + err);
         })
     }
 

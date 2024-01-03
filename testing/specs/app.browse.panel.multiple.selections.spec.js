@@ -1,5 +1,4 @@
-const chai = require('chai');
-const assert = chai.assert;
+const assert = require('node:assert');
 const webDriverHelper = require('../libs/WebDriverHelper');
 const AppBrowsePanel = require('../page_objects/applications/applications.browse.panel');
 const appConst = require('../libs/app_const');
@@ -21,13 +20,13 @@ describe('Application Browse Panel, multiple selection in grid', function () {
             // 1. Select 2 apps (started)
             await appBrowsePanel.clickOnCheckboxAndSelectRowByDisplayName(appConst.TEST_APPLICATIONS.THIRD_APP);
             await appBrowsePanel.clickOnCheckboxAndSelectRowByDisplayName(appConst.TEST_APPLICATIONS.FIRST_APP);
-            // 2. Click on Stop button:
+            // 2. Click on 'Stop' button:
             await appBrowsePanel.clickOnStopButton();
             // 3. Verify that Start button gets enabled:
             await appBrowsePanel.waitForStartButtonEnabled();
-            // 4. Stop button should be disabled:
-            let result = await appBrowsePanel.isStopButtonEnabled();
-            assert.isFalse(result, "'Stop' button should be disabled");
+            // 4. 'Stop' button should be disabled:
+            let isEnabled = await appBrowsePanel.isStopButtonEnabled();
+            assert.ok(isEnabled === false, "'Stop' button should be disabled");
             let statisticPanel = new StatisticPanel();
             // 5. 'Stopped' status should be displayed in Statistic Panel
             await statisticPanel.waitForApplicationStatus('Stopped');
@@ -61,8 +60,9 @@ describe('Application Browse Panel, multiple selection in grid', function () {
             await appBrowsePanel.clickOnStartButton();
             //`Start` button gets disabled:
             await appBrowsePanel.waitForStartButtonDisabled();
-            let result = await appBrowsePanel.isStopButtonEnabled();
-            assert.isTrue(result, "'Stop' button in browse toolbar should be enabled");
+            // 'Stop' button is enabled:
+            let isEnabled = await appBrowsePanel.isStopButtonEnabled();
+            assert.ok(isEnabled, "'Stop' button in browse toolbar should be enabled");
             let statisticPanel = new StatisticPanel();
             //'Started' status should be displayed in Statistic Panel:
             await statisticPanel.waitForApplicationStatus('Started');
@@ -96,7 +96,7 @@ describe('Application Browse Panel, multiple selection in grid', function () {
             await studioUtils.saveScreenshot('all_apps_context_menu');
             // 3. Verify that Start and Stop menu items are enabled:
             await appBrowsePanel.waitForContextMenuItemEnabled('Start');
-            // 'Stop menu item should be enabled'
+            // 'Stop' menu item should be enabled'
             await appBrowsePanel.waitForContextMenuItemEnabled('Stop');
         });
 

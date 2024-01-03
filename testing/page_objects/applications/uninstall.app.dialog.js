@@ -62,18 +62,22 @@ class UninstallAppDialog extends Page {
         });
     }
 
-    isYesButtonDisplayed() {
-        return this.waitForElementDisplayed(this.yesButton, appConst.mediumTimeout).catch(err => {
-            this.saveScreenshot('err_uninstall_dialog_yes_button');
+    async waitForYesButtonDisplayed() {
+        try {
+            return await this.waitForElementDisplayed(this.yesButton, appConst.mediumTimeout)
+        } catch (err) {
+            await this.saveScreenshot('err_uninstall_dialog_yes_button');
             throw new Error('Uninstall Dialog Yes button is not visible ' + err);
-        });
+        }
     }
 
-    isNoButtonDisplayed() {
-        return this.waitForElementDisplayed(this.noButton, appConst.mediumTimeout).catch(err => {
-            this.saveScreenshot('err_uninstall_dialog_no_button');
+    async waitForNoButtonDisplayed() {
+        try {
+            return await this.waitForElementDisplayed(this.noButton, appConst.mediumTimeout)
+        } catch (err) {
+            await this.saveScreenshot('err_uninstall_dialog_no_button');
             throw new Error('Uninstall Dialog -  No button is not visible ' + err);
-        });
+        }
     }
 }
 
