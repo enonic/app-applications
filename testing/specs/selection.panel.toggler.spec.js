@@ -1,5 +1,4 @@
-const chai = require('chai');
-const assert = chai.assert;
+const assert = require('node:assert');
 const webDriverHelper = require('../libs/WebDriverHelper');
 const appConst = require('../libs/app_const');
 const studioUtils = require('../libs/studio.utils.js');
@@ -16,7 +15,7 @@ describe('Applications Browse panel - `Selection Toggler` spec', function () {
         async () => {
             let appBrowsePanel = new AppBrowsePanel();
             let isVisible = await appBrowsePanel.waitForSelectionTogglerVisible();
-            assert.isFalse(isVisible, "'selection toogler' should not be displayed");
+            assert.ok(isVisible === false, "'selection toogler' should not be displayed");
         });
 
     it(`WHEN existing application is checked THEN 'selection toggler' gets visible`,
@@ -24,7 +23,7 @@ describe('Applications Browse panel - `Selection Toggler` spec', function () {
             let appBrowsePanel = new AppBrowsePanel();
             await appBrowsePanel.clickOnCheckboxAndSelectRowByDisplayName(appConst.TEST_APPLICATIONS.FIRST_APP);
             let isVisible = await appBrowsePanel.waitForSelectionTogglerVisible();
-            assert.isTrue(isVisible, "'selection toogler' should be displayed");
+            assert.ok(isVisible, "'selection toogler' should be displayed");
         });
 
     it("WHEN two application are checked THEN '2' should appear in 'selection toggler'",
@@ -71,7 +70,7 @@ describe('Applications Browse panel - `Selection Toggler` spec', function () {
             await appBrowsePanel.pause(1000);
             let names = await appBrowsePanel.getApplicationDisplayNames();
             await studioUtils.saveScreenshot('hide_selection');
-            assert.isTrue(names.length > 2, 'original grid should be restored');
+            assert.ok(names.length > 2, 'original grid should be restored');
         });
 
     beforeEach(() => studioUtils.navigateToApplicationsApp());

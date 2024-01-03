@@ -1,5 +1,4 @@
-const chai = require('chai');
-const assert = chai.assert;
+const assert = require('node:assert');
 const webDriverHelper = require('../libs/WebDriverHelper');
 const AppBrowsePanel = require('../page_objects/applications/applications.browse.panel');
 const InstallAppDialog = require('../page_objects/applications/install.app.dialog');
@@ -8,7 +7,7 @@ const studioUtils = require('../libs/studio.utils.js');
 const appConst = require('../libs/app_const');
 
 describe('Application Browse Panel, check buttons in the toolbar', function () {
-    this.timeout(70000);
+    this.timeout(appConst.SUITE_TIMEOUT);
 
     if (typeof browser === 'undefined') {
         webDriverHelper.setupBrowser();
@@ -18,7 +17,7 @@ describe('Application Browse Panel, check buttons in the toolbar', function () {
     const appDisplayName1 = 'Content viewer'; // This displayName should be in Uninstall modal dialog
     const APP_2_DISPLAY_NAME = 'Auth0 ID Provider';
     const APP_1_DESCRIPTION = 'Inspect your content object JSON';
-    const APP_2_DSCRIPTION = 'Add Auth0 authentication to your Enonic XP installation';
+    const APP_2_DESCRIPTION = 'Add Auth0 authentication to your Enonic XP installation';
 
     it('WHEN app browse panel is loaded  AND no selections THEN only `Install` button should be enabled',
         async () => {
@@ -54,9 +53,9 @@ describe('Application Browse Panel, check buttons in the toolbar', function () {
             await installAppDialog.waitForClosed(2000);
             await studioUtils.saveScreenshot('provider_installed');
             let result = await appBrowsePanel.isAppByDescriptionDisplayed(APP_1_DESCRIPTION);
-            assert.isTrue(result, APP_1_DESCRIPTION + '  application should be present');
-            result = await appBrowsePanel.isAppByDescriptionDisplayed(APP_2_DSCRIPTION);
-            assert.isTrue(result, APP_2_DSCRIPTION + '  application should be present');
+            assert.ok(result, APP_1_DESCRIPTION + '  application should be present');
+            result = await appBrowsePanel.isAppByDescriptionDisplayed(APP_2_DESCRIPTION);
+            assert.ok(result, APP_2_DESCRIPTION + '  application should be present');
         });
 
     it('WHEN An installed application is selected or unselected THEN the toolbar buttons must be updated',
@@ -81,12 +80,12 @@ describe('Application Browse Panel, check buttons in the toolbar', function () {
             let appBrowsePanel = new AppBrowsePanel();
             // 1. Click on 'Select All' checkbox:
             await appBrowsePanel.clickOnSelectAll();
-            assert.isTrue(await appBrowsePanel.isRowByIndexSelected(0), 'First row should be selected(blue)');
-            assert.isTrue(await appBrowsePanel.isRowByIndexSelected(1), 'Second row should be selected(blue)');
+            assert.ok(await appBrowsePanel.isRowByIndexSelected(0), 'First row should be selected(blue)');
+            assert.ok(await appBrowsePanel.isRowByIndexSelected(1), 'Second row should be selected(blue)');
             // 2. click on 'Select all/Unselect all' checkbox, the checkbox gets unchecked:
             await appBrowsePanel.clickOnSelectAll();
-            assert.isFalse(await appBrowsePanel.isRowByIndexSelected(0), 'First row should be unselected');
-            assert.isFalse(await appBrowsePanel.isRowByIndexSelected(1), 'Second row should be unselected');
+            assert.ok(await appBrowsePanel.isRowByIndexSelected(0) === false, 'First row should be unselected');
+            assert.ok(await appBrowsePanel.isRowByIndexSelected(1) === false, 'Second row should be unselected');
         });
 
     it("WHEN Two existing applications have been checked THEN 'Selection Controller' gets partial",

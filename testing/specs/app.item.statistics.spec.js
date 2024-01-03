@@ -1,5 +1,4 @@
-const chai = require('chai');
-const assert = chai.assert;
+const assert = require('node:assert');
 const webDriverHelper = require('../libs/WebDriverHelper');
 const studioUtils = require('../libs/studio.utils');
 const appConstants = require('../libs/app_const');
@@ -52,7 +51,7 @@ describe('Tests for Applications Item Statistics Panel', function () {
             assert.strictEqual(actualName, Apps.firstApp, `Application should be "${Apps.firstApp}".`);
 
             let actualHeaders = await appStatisticPanel.getApplicationDataHeaders();
-            assert.isTrue(actualHeaders.length > 0, "app-info should be displayed in the statistics panel");
+            assert.ok(actualHeaders.length > 0, "app-info should be displayed in the statistics panel");
             // 3. Verify that expected application's item-data should be displayed in Statistics Panel:
             assert.strictEqual(actualHeaders[0], 'Installed');
             assert.strictEqual(actualHeaders[1], 'Version');
@@ -68,7 +67,7 @@ describe('Tests for Applications Item Statistics Panel', function () {
             await appBrowsePanel.clickOnRowByDisplayName(Apps.firstApp);
             await appStatisticPanel.waitForSiteDataDisplayed();
             let headers = await appStatisticPanel.getSiteDataHeaders();
-            assert.isTrue(headers.length > 0, "Site info should be displayed in the statistics panel");
+            assert.ok(headers.length > 0, "Site info should be displayed in the statistics panel");
             // 3. Verify that expected application's site-info should be displayed in Statistics Panel:
             assert.strictEqual(headers[0], 'Content Types', "Expected header should be present in statistics panel");
             assert.strictEqual(headers[1], 'Page', "Expected header should be present in statistics panel");
@@ -164,7 +163,7 @@ describe('Tests for Applications Item Statistics Panel', function () {
             // 2. Verify that Content types list is not empty:
             let contentTypes = await appStatisticPanel.getContentTypes();
             await studioUtils.saveScreenshot('application_started_again');
-            assert.isTrue(contentTypes.length > 0, 'Content Types list should not be empty');
+            assert.ok(contentTypes.length > 0, 'Content Types list should not be empty');
         });
     beforeEach(() => studioUtils.navigateToApplicationsApp());
     afterEach(() => studioUtils.doCloseCurrentBrowserTab());
