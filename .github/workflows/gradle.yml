@@ -50,52 +50,23 @@ jobs:
         uses: gradle/actions/setup-gradle@v3
 
       - name: Build with Gradle
-        run: ./gradlew --refresh-dependencies build -Pcom.enonic.xp.app.production=true
+        run: ./gradlew --refresh-dependencies build publish -Pcom.enonic.xp.app.production=true -PrepoKey=${{ needs.publish_vars.outputs.repo }} -PrepoUser=${{ secrets.ARTIFACTORY_USERNAME }} -PrepoPassword=${{ secrets.ARTIFACTORY_PASSWORD }}
 
       - uses: actions/upload-artifact@v4
         with:
           name: app-applications
           path: build/libs/app-applications.jar
 
-      - run: |
-          set -ex
-      - name: Run Selenium Tests
-        id: selenium
-        if: github.event.head_commit.message != 'Updated to next SNAPSHOT version'
-        run: ./gradlew --refresh-dependencies :testing:w_testAppChrome
-
-      - name: Slack Notification
-        uses: rtCamp/action-slack-notify@v2
-        if: failure()
-        env:
-          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-          SLACK_CHANNEL: notif-build-tests
-          SLACK_USERNAME: GitHub Actions
-          SLACK_TITLE: GitHub Action Failure in the Applications app
-          SLACK_MESSAGE: ${{job.container.id}}
-          SLACK_ICON: https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png
-          SLACK_COLOR: ${{ job.status }}
-
-      - uses: actions/upload-artifact@v4
-        if: always() && steps.selenium.conclusion != 'skipped'
-        with:
-          name: ui-test-report
-          path: |
-            testing/build/reports
-
       - uses: codecov/codecov-action@v4
+        continue-on-error: true
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
 
-      - name: Publish
-        if: needs.publish_vars.outputs.publish == 'true'
-        run: ./gradlew publish -Pcom.enonic.xp.app.production=true -PrepoKey=${{ needs.publish_vars.outputs.repo }} -PrepoUser=${{ secrets.ARTIFACTORY_USERNAME }} -PrepoPassword=${{ secrets.ARTIFACTORY_PASSWORD }}
-
   dispatch:
-    needs: [publish_vars, build]
+    needs: [ publish_vars, build ]
     strategy:
       matrix:
-        repo: ["enonic/xp-distro" ]
+        repo: [ "enonic/xp-distro" ]
     runs-on: ubuntu-latest
     if: needs.publish_vars.outputs.publish == 'true'
     steps:
@@ -107,3 +78,52 @@ jobs:
           event-type: app-applications
           client-payload: >
             {"ref": "${{ github.event.client_payload.ref || github.ref }}"}
+
+  selenium-test:
+    if: github.event.head_commit.message != 'Updated to next SNAPSHOT version'
+    strategy:
+      fail-fast: false
+      matrix:
+        suite: [ w_testAppChrome ]
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.client_payload.ref || github.ref }}
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: app-applications
+          path: build/libs/
+
+      - name: Run Selenium Tests
+        id: selenium
+        run: ./gradlew --refresh-dependencies :testing:${{ matrix.suite }}
+
+      - name: Slack Notification
+        uses: rtCamp/action-slack-notify@v2
+        if: failure()
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_CHANNEL: notif-build-tests
+          SLACK_USERNAME: GitHub Actions
+          SLACK_TITLE: GitHub Action Failure in Applications app
+          SLACK_MESSAGE: ${{job.container.id}}
+          SLACK_ICON: https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png
+          SLACK_COLOR: ${{ job.status }}
+
+      - uses: actions/upload-artifact@v4
+        if: always() && steps.selenium.conclusion != 'skipped'
+        with:
+          name: 'ui-test-report-${{ matrix.suite }}'
+          path: |
+            testing/build/reports
