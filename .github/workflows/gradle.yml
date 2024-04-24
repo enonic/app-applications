@@ -50,7 +50,7 @@ jobs:
         uses: gradle/actions/setup-gradle@v3
 
       - name: Build with Gradle
-        run: ./gradlew build -Pcom.enonic.xp.app.production=true
+        run: ./gradlew --refresh-dependencies build -Pcom.enonic.xp.app.production=true
 
       - uses: actions/upload-artifact@v4
         with:
@@ -62,7 +62,7 @@ jobs:
       - name: Run Selenium Tests
         id: selenium
         if: github.event.head_commit.message != 'Updated to next SNAPSHOT version'
-        run: ./gradlew :testing:w_testAppChrome
+        run: ./gradlew --refresh-dependencies :testing:w_testAppChrome
 
       - name: Slack Notification
         uses: rtCamp/action-slack-notify@v2
