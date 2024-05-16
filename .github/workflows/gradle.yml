@@ -2,8 +2,7 @@ name: Gradle Build
 
 on:
   push:
-  repository_dispatch:
-    types: [ lib-admin-ui, xp ]
+  workflow_dispatch:
 
 concurrency: build-${{ github.event.client_payload.ref || github.ref }}
 
@@ -81,14 +80,12 @@ jobs:
     runs-on: ubuntu-latest
     if: needs.publish_vars.outputs.publish == 'true'
     steps:
-      - name: Repository Dispatch
-        uses: peter-evans/repository-dispatch@v3
+      - name: Workflow Dispatch
+        uses: benc-uk/workflow-dispatch@v1
         with:
           token: ${{ secrets.REPO_ACCESS_TOKEN }}
-          repository: ${{ matrix.repo }}
-          event-type: app-applications
-          client-payload: >
-            {"ref": "${{ github.event.client_payload.ref || github.ref }}"}
+          repo: ${{ matrix.repo }}
+          workflow: gradle.yml
 
   selenium-test:
     if: github.event.head_commit.message != 'Updated to next SNAPSHOT version'
