@@ -5,7 +5,6 @@ plugins {
     id 'com.enonic.defaults'
     id 'com.enonic.xp.base'
     id 'com.github.node-gradle.node'
-    id "com.github.johnrengelman.processes" version "0.5.0"
 }
 group = 'com.enonic.xp.js_testing'
 
