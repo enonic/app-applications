@@ -81,8 +81,8 @@ tasks.register( 'startServer' ) {
         else {
             pb = new ProcessBuilder("${distroDir}/bin/server.sh")
         }
-        Map<String, String> env = pb.environment();
-        env.put("XP_HOME", "${xpHome}".toString());
+        Map<String, String> env = pb.environment()
+        env.put("XP_HOME", "${xpHome}".toString())
 
         def logsPath = layout.buildDirectory.dir("reports/logs").get()
         mkdir logsPath.asFile
