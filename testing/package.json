@@ -16,7 +16,7 @@
     "@wdio/cli": "^8.40.2",
     "@wdio/mocha-framework": "^8.40.2",
     "allure-commandline": "^2.30.0",
-    "@wdio/allure-reporter": "^8.39.0",
+    "@wdio/allure-reporter": "^9.0.4",
     "@wdio/concise-reporter": "^8.39.0"
   },
   "engines": {
