@@ -20,8 +20,10 @@ function handleGet() {
             assetsUri: portal.assetUrl({path: ''}),
             marketUrl: getMarketUrl(),
             readonlyMode,
-            services: {
-                i18nUrl: portal.serviceUrl({service: 'i18n'}),
+            apis: {
+                i18nUrl: portal.url({
+                    path: `/admin/${app.name}/main/_/${app.name}/i18n`,
+                }),
             },
             toolUri: admin.getToolUrl(
                 app.name,

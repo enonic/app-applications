@@ -1,3 +1,5 @@
+/*global app, require*/
+
 const admin = require('/lib/xp/admin');
 const mustache = require('/lib/mustache');
 const portal = require('/lib/xp/portal');
@@ -10,6 +12,7 @@ function getMarketUrl() {
 
 function handleGet() {
     const view = resolve('./main.html');
+    const toolBaseUrl = admin.getToolUrl(app.name, 'main');
 
     const params = {
         assetsUri: portal.assetUrl({
@@ -21,7 +24,9 @@ function handleGet() {
             locale: admin.getLocales()
         }),
         launcherPath: admin.getLauncherPath(),
-        configServiceUrl: portal.serviceUrl({service: 'config'})
+        configServiceUrl: `${toolBaseUrl}/_/${app.name}/config`,
+        toolBaseUrl: toolBaseUrl,
+        toolAppName: app.name,
     };
 
     const marketUrl = getMarketUrl();

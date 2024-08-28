@@ -78,7 +78,7 @@ function startApplication() {
         throw 'Unable to fetch app config';
     }
     await CONFIG.init(configServiceUrl);
-    await i18nInit(CONFIG.getString('services.i18nUrl'));
+    await i18nInit(CONFIG.getString('apis.i18nUrl'));
     startApplication();
 })();
 
