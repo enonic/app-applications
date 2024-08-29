@@ -1,11 +1,9 @@
 import * as Q from 'q';
-import {ApplicationBrowseActions} from './ApplicationBrowseActions';
 import {TreeNode} from '@enonic/lib-admin-ui/ui/treegrid/TreeNode';
 import {Application, ApplicationUploadMock} from '@enonic/lib-admin-ui/application/Application';
 import {ApplicationKey} from '@enonic/lib-admin-ui/application/ApplicationKey';
 import {TreeGrid} from '@enonic/lib-admin-ui/ui/treegrid/TreeGrid';
 import {TreeGridBuilder} from '@enonic/lib-admin-ui/ui/treegrid/TreeGridBuilder';
-import {TreeGridContextMenu} from '@enonic/lib-admin-ui/ui/treegrid/TreeGridContextMenu';
 import {DefaultErrorHandler} from '@enonic/lib-admin-ui/DefaultErrorHandler';
 import {UploadItem} from '@enonic/lib-admin-ui/ui/uploader/UploadItem';
 import {ApplicationTreeGridHelper} from './ApplicationTreeGridHelper';
@@ -34,12 +32,6 @@ export class ApplicationTreeGrid
         builder.setCheckableRows(!readonlyMode);
 
         super(builder);
-
-        if (!readonlyMode) {
-            this.setContextMenu(new TreeGridContextMenu(ApplicationBrowseActions.init(this)));
-        } else {
-            this.getToolbar().hideAndDisableSelectionToggler();
-        }
     }
 
     fetchRoot(): Q.Promise<Application[]> {
@@ -59,86 +51,4 @@ export class ApplicationTreeGrid
         return deferred.promise;
     }
 
-    private placeNode(data: Application) {
-        const parentNode: TreeNode<Application> = this.getRoot().getDefaultRoot();
-
-        let index: number = parentNode.getChildren().length;
-
-        for (let i = 0; i < index; i++) {
-            if (parentNode.getChildren()[i].getData().getDisplayName().localeCompare(data.getDisplayName()) >= 0) {
-                index = i;
-                break;
-            }
-        }
-
-        return this.insertDataToParentNode(data, parentNode, index);
-    }
-
-    updateApplicationNode(applicationKey: ApplicationKey) {
-        this.fetchByKey(applicationKey).then((data: Application) => {
-            this.updateNodeByData(data);
-        }).catch(DefaultErrorHandler.handle);
-    }
-
-    getByApplicationKey(applicationKey: ApplicationKey): Application {
-        const node: TreeNode<Application> = this.getRoot().getNodeByDataId(applicationKey.toString());
-
-        return !!node ? node.getData() : null;
-    }
-
-    placeApplicationNode(applicationKey: ApplicationKey): Q.Promise<void> {
-        return this.fetchByKey(applicationKey)
-            .then((data: Application) => {
-                this.placeNode(data);
-                return Q(null);
-            });
-    }
-
-    appendUploadNode(item: UploadItem<Application>) {
-        if (this.isItemUploading(item)) {
-            return;
-        }
-
-        const appMock: ApplicationUploadMock = new ApplicationUploadMock(item);
-        const parent: TreeNode<Application> = this.getRoot().getDefaultRoot();
-
-        const uploadNode: TreeNode<Application> = this.dataToTreeNode(appMock as unknown as Application, this.getRoot().getDefaultRoot());
-        this.insertNodeToParentNode(uploadNode, parent, 0);
-
-        const deleteUploadedNodeHandler = () => {
-            const nodeToRemove: TreeNode<Application> = this.getRoot().getCurrentRoot().findNode(appMock.getId());
-
-            if (nodeToRemove) {
-                this.deleteNode(uploadNode);
-                this.invalidate();
-            }
-        };
-
-        item.onProgress((progress: number) => {
-            this.invalidateNodes([uploadNode]);
-            if (progress === 100) {
-                deleteUploadedNodeHandler();
-            }
-        });
-
-        item.onUploadStopped(deleteUploadedNodeHandler);
-
-        item.onFailed(() => {
-            this.deleteNode(uploadNode);
-        });
-    }
-
-    private isItemUploading(newItemToUpload: UploadItem<Application>): boolean {
-        const parent: TreeNode<Application> = this.getRoot().getDefaultRoot();
-        const itemsBeingUploaded: ApplicationUploadMock[] = parent.getChildren().filter(this.isMockUploadNode).map(this.getUploadMock);
-        return itemsBeingUploaded.some((item: ApplicationUploadMock) => newItemToUpload.getName() === item.getName());
-    }
-
-    private isMockUploadNode(node: TreeNode<Application>): boolean {
-        return node.getData() instanceof ApplicationUploadMock;
-    }
-
-    private getUploadMock(node: TreeNode<Application>): ApplicationUploadMock {
-        return node.getData() as unknown as ApplicationUploadMock;
-    }
 }
