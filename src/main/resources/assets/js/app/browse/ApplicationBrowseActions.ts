@@ -1,5 +1,4 @@
 import * as Q from 'q';
-import {ApplicationTreeGrid} from './ApplicationTreeGrid';
 import {StartApplicationAction} from './StartApplicationAction';
 import {StopApplicationAction} from './StopApplicationAction';
 import {InstallApplicationAction} from './InstallApplicationAction';
@@ -7,6 +6,7 @@ import {UninstallApplicationAction} from './UninstallApplicationAction';
 import {TreeGridActions} from '@enonic/lib-admin-ui/ui/treegrid/actions/TreeGridActions';
 import {Application} from '@enonic/lib-admin-ui/application/Application';
 import {Action} from '@enonic/lib-admin-ui/ui/Action';
+import {SelectableListBoxWrapper} from '@enonic/lib-admin-ui/ui/selector/list/SelectableListBoxWrapper';
 
 export class ApplicationBrowseActions implements TreeGridActions<Application> {
 
@@ -17,24 +17,11 @@ export class ApplicationBrowseActions implements TreeGridActions<Application> {
 
     private allActions: Action[] = [];
 
-    private static INSTANCE: ApplicationBrowseActions;
-
-    static init(applicationTreeGrid: ApplicationTreeGrid): ApplicationBrowseActions {
-        ApplicationBrowseActions.INSTANCE = new ApplicationBrowseActions(applicationTreeGrid);
-        return ApplicationBrowseActions.INSTANCE;
-    }
-
-    static get(): ApplicationBrowseActions {
-        return ApplicationBrowseActions.INSTANCE;
-    }
-
-    constructor(applicationTreeGrid: ApplicationTreeGrid) {
-
-        this.START_APPLICATION = new StartApplicationAction(applicationTreeGrid);
-        this.STOP_APPLICATION = new StopApplicationAction(applicationTreeGrid);
-        this.INSTALL_APPLICATION = new InstallApplicationAction(applicationTreeGrid);
-        this.UNINSTALL_APPLICATION = new UninstallApplicationAction(applicationTreeGrid);
-
+    constructor(selectionWrapper: SelectableListBoxWrapper<Application>) {
+        this.START_APPLICATION = new StartApplicationAction(selectionWrapper);
+        this.STOP_APPLICATION = new StopApplicationAction(selectionWrapper);
+        this.INSTALL_APPLICATION = new InstallApplicationAction(selectionWrapper);
+        this.UNINSTALL_APPLICATION = new UninstallApplicationAction(selectionWrapper);
         this.INSTALL_APPLICATION.setEnabled(true);
 
         this.allActions.push(this.START_APPLICATION, this.STOP_APPLICATION, this.UNINSTALL_APPLICATION);
