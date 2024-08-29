@@ -21,7 +21,7 @@ describe('Uninstall Application dialog specification', function () {
             let uninstallAppDialog = new UninstallAppDialog();
             // 1. Select 'Chuck Norris' app and click on 'Uninstall' button:
             await openUninstallDialog();
-            let dialogMessage = await uninstallAppDialog.getHeader();
+            let dialogMessage = await uninstallAppDialog.getQuestion();
             assert.equal(dialogMessage, 'Are you sure you want to uninstall selected application(s)?',
                 'Expected message should be in the dialog message');
             // "Yes button should be visible"
@@ -112,40 +112,29 @@ describe('Uninstall Application dialog specification', function () {
     })
 });
 
-function openUninstallDialog() {
-    const chuckName = 'A Chuck Norris fact widget';
+async function openUninstallDialog() {
+    const description = 'A Chuck Norris fact widget';
     const chuckDisplayName = 'Chuck Norris';
     let appBrowsePanel = new AppBrowsePanel();
     let uninstallAppDialog = new UninstallAppDialog();
-    return appBrowsePanel.isAppByDescriptionDisplayed(chuckDisplayName).then(result => {
-        if (!result) {
-            return installApp(chuckDisplayName);
-        }
-    }).then(() => {
-        return appBrowsePanel.clickOnRowByDescription(chuckName);
-    }).then(() => {
-        return appBrowsePanel.clickOnUninstallButton();
-    }).then(() => {
-        return uninstallAppDialog.waitForOpened();
-    });
+    let result = await appBrowsePanel.isAppByDescriptionDisplayed(description);
+    if (!result) {
+        await installApp(chuckDisplayName);
+    }
+    await appBrowsePanel.clickOnRowByDescription(chuckDisplayName);
+    await appBrowsePanel.clickOnUninstallButton();
+    return await uninstallAppDialog.waitForOpened();
 }
 
-function installApp(displayName) {
+async function installApp(displayName) {
     let appBrowsePanel = new AppBrowsePanel();
     let installAppDialog = new InstallAppDialog();
-    return appBrowsePanel.clickOnInstallButton().then(() => {
-        return installAppDialog.waitForOpened();
-    }).then(() => {
-        return installAppDialog.typeSearchText(displayName);
-    }).then(() => {
-        return installAppDialog.pause(1000);
-    }).then(() => {
-        return installAppDialog.waitForApplicationDisplayed(displayName);
-    }).then(() => {
-        return installAppDialog.clickOnInstallAppLink(displayName);
-    }).then(() => {
-        return installAppDialog.waitForAppInstalled(displayName);
-    }).then(() => {
-        return installAppDialog.clickOnCancelButtonTop();
-    });
+    await appBrowsePanel.clickOnInstallButton();
+    await installAppDialog.waitForOpened();
+    await installAppDialog.typeSearchText(displayName);
+    await installAppDialog.pause(1000);
+    await installAppDialog.waitForApplicationDisplayed(displayName);
+    await installAppDialog.clickOnInstallAppLink(displayName);
+    await installAppDialog.waitForAppInstalled(displayName);
+    return await installAppDialog.clickOnCancelButtonTop();
 }
