@@ -1,51 +1,37 @@
 .market-app-tree-grid {
-  .grid {
-    .slick-cell {
-      padding-top: 15px;
-      height: 52px;
-      cursor: default;
+  .market-list-viewer {
+    display: grid;
+    grid-template-columns: 1fr 80px 100px;
+    padding: 8px 16px;
 
-      * {
+    .viewer {
+      overflow: hidden;
+
+      .names-and-icon-view {
         cursor: default;
-      }
 
-      &.app-name-and-icon {
-        margin-left: 10px;
-        flex-grow: 1;
+        .@{_COMMON_PREFIX}main-name {
+          font-size: 16px;
+          padding-bottom: 2px;
+          color: @admin-blue;
 
-        .viewer {
-          overflow: hidden;
+          a {
+            cursor: pointer !important;
+            text-decoration: none;
 
-          .names-and-icon-view {
-            cursor: default;
-
-            .@{_COMMON_PREFIX}main-name {
-              font-size: 16px;
-              padding-bottom: 2px;
-              color: @admin-blue;
-
-              a {
-                cursor: pointer !important;
-                text-decoration: none;
-
-                &:hover,
-                &:focus {
-                  text-decoration: underline;
-                }
-              }
+            &:hover,
+            &:focus {
+              text-decoration: underline;
             }
           }
         }
       }
+    }
 
-      &.version {
-        text-align: center;
-        color: @admin-black;
-        font-size: 12px;
-        flex-shrink: 0;
-        flex-basis: 90px;
-        justify-content: center;
-      }
+    .text-block {
+      display: flex;
+      align-items: center;
+      justify-content: center;
 
       &.app-status {
         text-align: center;
@@ -53,16 +39,17 @@
         flex-basis: 100px;
         justify-content: center;
 
-        a {
+        button {
           text-decoration: none;
+          background: none;
         }
 
         .install,
         .update {
-          font-size: 16px;
           cursor: pointer !important;
 
           span {
+            font-size: 16px;
             cursor: pointer !important;
           }
         }
@@ -73,7 +60,9 @@
             text-decoration: underline;
           }
 
-          color: @admin-green;
+          span {
+            color: @admin-green;
+          }
         }
 
         .update {
@@ -82,27 +71,30 @@
             text-decoration: underline;
           }
 
-          color: @input-dark-red;
+          span {
+            color: @input-dark-red;
+          }
         }
 
         .installing {
           width: 100%;
+          outline: none;
 
           .progress-bar {
             display: block;
             background-color: @admin-bg-light-gray;
+            margin-bottom: 0;
+            height: 12px;
           }
         }
 
         .installed {
-          opacity: 0.6;
-          font-size: 14px;
-          color: @admin-font-gray2;
+          span {
+            opacity: 0.6;
+            font-size: 14px;
+            color: @admin-font-gray2;
+          }
         }
-      }
-
-      .toggle.icon {
-        display: none;
       }
     }
   }

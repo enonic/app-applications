@@ -5,7 +5,6 @@ import {InstallAppPromptEvent} from './app/installation/InstallAppPromptEvent';
 import {Body} from '@enonic/lib-admin-ui/dom/Body';
 import {Path} from '@enonic/lib-admin-ui/rest/Path';
 import {ConnectionDetector} from '@enonic/lib-admin-ui/system/ConnectionDetector';
-import {UriHelper} from '@enonic/lib-admin-ui/util/UriHelper';
 import {AppBar} from '@enonic/lib-admin-ui/app/bar/AppBar';
 import {AppHelper} from '@enonic/lib-admin-ui/util/AppHelper';
 import {ServerEventsListener} from '@enonic/lib-admin-ui/event/ServerEventsListener';

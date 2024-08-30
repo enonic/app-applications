@@ -31,6 +31,10 @@ export class ApplicationsListViewer extends DivEl {
         this.stateBlock.setItem(application);
     }
 
+    getItem(): Application {
+        return this.itemViewer.getObject();
+    }
+
     doRender(): Q.Promise<boolean> {
         return super.doRender().then((rendered: boolean) => {
             this.appendChild(this.itemViewer);

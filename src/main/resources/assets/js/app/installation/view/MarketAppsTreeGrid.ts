@@ -1,14 +1,7 @@
-import * as Q from 'q';
 import {MarketApplicationFetcher} from '../../resource/MarketApplicationFetcher';
 import {i18n} from '@enonic/lib-admin-ui/util/Messages';
 import {Application} from '@enonic/lib-admin-ui/application/Application';
-import {Element} from '@enonic/lib-admin-ui/dom/Element';
-import {TreeGrid} from '@enonic/lib-admin-ui/ui/treegrid/TreeGrid';
-import {MarketApplication, MarketAppStatus, MarketAppStatusFormatter} from '@enonic/lib-admin-ui/application/MarketApplication';
-import {TreeNode} from '@enonic/lib-admin-ui/ui/treegrid/TreeNode';
-import {TreeGridBuilder} from '@enonic/lib-admin-ui/ui/treegrid/TreeGridBuilder';
-import {ResponsiveItem} from '@enonic/lib-admin-ui/ui/responsive/ResponsiveItem';
-import {ResponsiveManager} from '@enonic/lib-admin-ui/ui/responsive/ResponsiveManager';
+import {MarketApplication, MarketAppStatus} from '@enonic/lib-admin-ui/application/MarketApplication';
 import {ApplicationEvent, ApplicationEventType} from '@enonic/lib-admin-ui/application/ApplicationEvent';
 import {DefaultErrorHandler} from '@enonic/lib-admin-ui/DefaultErrorHandler';
 import {Exception} from '@enonic/lib-admin-ui/Exception';
@@ -17,27 +10,12 @@ import {MarketHelper} from '@enonic/lib-admin-ui/application/MarketHelper';
 import {MarketAppsTreeGridHelper} from './MarketAppsTreeGridHelper';
 import {InstallUrlApplicationRequest} from '../../resource/InstallUrlApplicationRequest';
 import {ApplicationInstallResult} from '../../resource/ApplicationInstallResult';
-import {KeyHelper} from '@enonic/lib-admin-ui/ui/KeyHelper';
 import {ConfirmationDialog} from '@enonic/lib-admin-ui/ui/dialog/ConfirmationDialog';
-
-interface GridEventData {
-    row: number;
-}
-
-interface RowCountChangedEventData
-    extends Slick.EventData {
-    previous: number;
-    current: number;
-}
-
-export type MarketAppsTreeGridFilter = (item: TreeNode<MarketApplication>, args: MarketAppsTreeGridFilterArgs) => boolean;
-
-export interface MarketAppsTreeGridFilterArgs {
-    searchString: string
-}
+import {ListBox} from '@enonic/lib-admin-ui/ui/selector/list/ListBox';
+import {MarketListViewer} from './MarketListViewer';
 
 export class MarketAppsTreeGrid
-    extends TreeGrid<MarketApplication> {
+    extends ListBox<MarketApplication> {
 
     private installedApplications: Application[];
 
@@ -45,65 +23,52 @@ export class MarketAppsTreeGrid
 
     private loadingStartedListeners: (() => void)[];
 
+    private loadingFinishedListeners: (() => void)[];
+
     private updateConfirmationDialog?: ConfirmationDialog;
 
-    constructor(filter: MarketAppsTreeGridFilter) {
+    private loading: boolean;
 
-        super(new TreeGridBuilder<MarketApplication>()
-            .setColumns(MarketAppsTreeGridHelper.generateColumns())
-            .setPartialLoadEnabled(true)
-            .setLoadBufferSize(2)
-            .setCheckableRows(false)
-            .setShowToolbar(false)
-            .setRowHeight(70)
-            .disableMultipleSelection(true)
-            .prependClasses('market-app-tree-grid')
-            .setSelectedCellCssClass('selected-sort-row')
-            .setQuietErrorHandling(true)
-            .setAutoLoad(false)
-        );
+    private searchString: string;
 
-        this.getGridData().setFilter(filter);
+    constructor() {
+        super('market-app-tree-grid');
 
         this.installedApplications = [];
         this.loadingStartedListeners = [];
+        this.loadingFinishedListeners = [];
 
         this.initListeners();
     }
 
     private initListeners(): void {
-        this.subscribeAndManageInstallClick();
         this.subscribeOnApplicationEvents();
         this.onShown(() => {
             if (!this.loading) {
-                this.getCurrentData();
-                const marketApps = this.getRoot().getAllNodes().map(node => node.getData());
-                this.updateAppsStatuses(marketApps);
+                this.updateAppsStatuses(this.getItems());
             }
         });
     }
 
-    doRender(): Q.Promise<boolean> {
-        return super.doRender().then((rendered) => {
-            this.initAvailableSizeChangeListener();
-            return rendered;
-        });
-    }
+    protected createItemView(item: MarketApplication, readOnly: boolean): MarketListViewer {
+        const viewer = new MarketListViewer();
+        viewer.setItem(item);
 
-    private initAvailableSizeChangeListener() {
-        ResponsiveManager.onAvailableSizeChanged(this, (item: ResponsiveItem) => {
-            this.getGrid().resizeCanvas();
-        });
-    }
-
-    private findNodeByAppUrl(url: string): TreeNode<MarketApplication> {
-        const nodes: TreeNode<MarketApplication>[] = this.getGrid().getDataView().getItems();
-        for (const node of nodes) {
-            if (node.getData().getLatestVersionDownloadUrl() === url) {
-                return node;
+        viewer.onActionButtonClicked(() => {
+            if (item.getStatus() === MarketAppStatus.NOT_INSTALLED || item.getStatus() === MarketAppStatus.OLDER_VERSION_INSTALLED) {
+                this.installApp(item);
             }
-        }
-        return null;
+        });
+
+        return viewer;
+    }
+
+    protected getItemId(item: MarketApplication): string {
+        return item.getId();
+    }
+
+    private findNodeByAppUrl(url: string): MarketApplication {
+        return this.getItems().find((app: MarketApplication) => app.getLatestVersionDownloadUrl() === url);
     }
 
     private subscribeOnApplicationEvents() { // update status of market app
@@ -128,9 +93,9 @@ export class MarketAppsTreeGrid
     }
 
     private handleApplicationProgress(appUrl: string, progress: number): void {
-        // TODO: send appKey from backend instead of looking for it!
-        const nodeToUpdate = this.findNodeByAppUrl(appUrl);
-        if (!nodeToUpdate) {
+        const app = this.findNodeByAppUrl(appUrl);
+
+        if (!app) {
             return;
         }
 
@@ -138,27 +103,16 @@ export class MarketAppsTreeGrid
             console.debug(`MarketAppsTreeGrid: progress ${progress}`);
         }
 
-        let app = nodeToUpdate.getData();
         app.setProgress(progress);
-
-        let row = this.getGrid().getDataView().getRowById(nodeToUpdate.getId());
-        if (row > -1) {
-            let cell = this.getGrid().getColumnIndex('appStatus');
-            this.getGrid().updateCell(row, cell);
-        }
+        const viewer: MarketListViewer = this.getItemView(app) as MarketListViewer;
+        viewer?.setItem(app);
     }
 
-    private installAppByRow(row: number): void {
-        const marketApplication: MarketApplication = this.getItem(row)?.getData();
-
-        if (!marketApplication) {
-            return;
-        }
-
+    private installApp(marketApplication: MarketApplication): void {
         if (this.isMajorVersionUpdate(marketApplication)) {
-            this.showUpdateConfirmationDialog(marketApplication, row);
+            this.showUpdateConfirmationDialog(marketApplication);
         } else {
-            this.doInstallApp(marketApplication, row);
+            this.doInstallApp(marketApplication);
         }
     }
 
@@ -176,7 +130,7 @@ export class MarketAppsTreeGrid
         return marketAppMajorVersion > installedAppMajorVersion;
     }
 
-    private showUpdateConfirmationDialog(marketApplication: MarketApplication, row: number): void {
+    private showUpdateConfirmationDialog(marketApplication: MarketApplication): void {
         const installedApp: Application =
             this.installedApplications.find((app: Application) => app.getApplicationKey().equals(marketApplication.getAppKey()));
 
@@ -191,7 +145,7 @@ export class MarketAppsTreeGrid
                 marketApplication.getLatestVersion())
         );
         this.updateConfirmationDialog.setQuestion(this.generateConfirmationQuestion(marketApplication), false);
-        this.updateConfirmationDialog.setYesCallback(() => this.doInstallApp(marketApplication, row));
+        this.updateConfirmationDialog.setYesCallback(() => this.doInstallApp(marketApplication));
         this.updateConfirmationDialog.open();
     }
 
@@ -203,10 +157,10 @@ export class MarketAppsTreeGrid
         return `${part1} ${linkHtml} ${part2}`;
     }
 
-    private doInstallApp(marketApplication: MarketApplication, row: number): void {
+    private doInstallApp(marketApplication: MarketApplication): void {
         const oldStatus: MarketAppStatus = marketApplication.getStatus();
         marketApplication.setStatus(MarketAppStatus.INSTALLING);
-        this.getGrid().updateRow(row);
+        this.replaceItems(marketApplication);
 
         void new InstallUrlApplicationRequest(marketApplication.getLatestVersionDownloadUrl())
             .sendAndParse().then((result: ApplicationInstallResult) => {
@@ -221,73 +175,38 @@ export class MarketAppsTreeGrid
             }).catch((reason) => {
                 marketApplication.setStatus(oldStatus);
                 DefaultErrorHandler.handle(reason);
-            }).finally(() => {
-                this.getGrid().updateRow(row);
             });
-    }
-
-    private subscribeAndManageInstallClick() {
-        this.getGrid().subscribeOnClick(({target}, data) => {
-            const elem: Element = Element.fromHtmlElement(target.tagName.toLowerCase() === 'a' ? target : target.parentElement);
-            const canInstall = elem.hasClass(MarketAppStatusFormatter.statusInstallCssClass) ||
-                               elem.hasClass(MarketAppStatusFormatter.statusUpdateCssClass);
-            if (!canInstall) {
-                return;
-            }
-
-            const {row} = (data as GridEventData);
-            this.installAppByRow(row);
-        });
-
-        this.getGrid().setOnKeyDown((event) => {
-            if (KeyHelper.isEnterKey(event)) {
-                if (event.target.tagName.toLowerCase() === 'a') {
-                    event.target.click();
-                }
-            }
-        });
-    }
-
-    isEmptyNode(node: TreeNode<MarketApplication>): boolean {
-        const data = node.getData();
-        return !data.getAppKey();
     }
 
     updateInstallApplications(installApplications: Application[]) {
         this.installedApplications = installApplications;
-
-        const apps = this.updateAndSortApps(this.getDefaultData());
-
-        super.initData(this.dataToTreeNodes(apps, this.getRoot().getDefaultRoot()));
+        const apps = this.updateAndSortApps(this.getItems());
+        this.setItems(apps);
     }
 
-    fetchChildren(): Q.Promise<MarketApplication[]> {
+    load(): void {
+        this.clearItems();
+        this.loading = true;
         this.notifyLoadingStarted();
-        this.hideErrorPanelIfVisible();
 
-        return MarketApplicationFetcher.fetchApps().then((data: MarketApplicationResponse) => {
-            const totalHits = data.getMetadata().getTotalHits();
-            this.getRoot().getCurrentRoot().setMaxChildren(totalHits);
-            return this.updateAndSortApps(data.getApplications());
+        MarketApplicationFetcher.fetchApps().then((data: MarketApplicationResponse) => {
+            const apps = this.updateAndSortApps(data.getApplications());
+            this.setItems(apps);
         }).catch((reason) => {
             const status500Message = i18n('market.error.500');
             const defaultErrorMessage = i18n('market.error.default');
             const exception = new Exception(reason.getStatusCode() === 500 ? status500Message : defaultErrorMessage);
             DefaultErrorHandler.handle(exception);
             return [];
+        }).finally(() => {
+          this.loading = false;
+          this.notifyLoadingFinished();
         });
     }
 
     private updateAndSortApps(apps: MarketApplication[]): MarketApplication[] {
         this.updateAppsStatuses(apps);
         return apps.sort(MarketAppsTreeGridHelper.compareAppsByStatusAndDisplayName);
-    }
-
-    private hideErrorPanelIfVisible() {
-        if (this.getErrorPanel().isVisible()) {
-            this.hideErrorPanel();
-            this.mask();
-        }
     }
 
     private updateAppsStatuses(applications: MarketApplication[]) {
@@ -312,23 +231,32 @@ export class MarketAppsTreeGrid
         });
     }
 
-    initData(nodes: TreeNode<MarketApplication>[]) {
-        super.initData(nodes);
-        this.getGrid().getCanvasNode().style.height = (`${70 * nodes.length}px`);
-        this.getGrid().resizeCanvas();
+    private filterItemsFunc(marketApp: MarketApplication, searchString: string): boolean {
+        if (!searchString || marketApp.isEmpty()) {
+            // true for an empty app because it is the empty node that triggers loading
+            return true;
+        }
+
+        const inputValue = searchString?.toLowerCase() || '';
+        const displayName = marketApp.getDisplayName().toLowerCase();
+        const description = marketApp.getDescription().toLowerCase();
+
+        return displayName.indexOf(inputValue) >= 0 || description.indexOf(inputValue) >= 0;
     }
 
-    getDataId(data: MarketApplication): string {
-        return data.getAppKey() ? data.getAppKey().toString() : '';
+    setSearchString(searchString: string): void {
+        this.searchString = searchString;
+        this.filterItems();
     }
 
-    setFilterArgs(args: MarketAppsTreeGridFilterArgs) {
-        this.getGridData().setFilterArgs(args);
-        this.getGridData().refresh();
+    private filterItems(): void {
+        this.getItems().forEach((item: MarketApplication) => {
+            this.filterItem(item, this.searchString);
+        });
     }
 
-    isDataViewEmpty(): boolean {
-        return this.getGrid().getDataView().getLength() === 0;
+    private filterItem(item: MarketApplication, searchString: string): void {
+        this.getItemView(item)?.setVisible(this.filterItemsFunc(item, searchString));
     }
 
     onLoadingStarted(listener: () => void) {
@@ -347,7 +275,19 @@ export class MarketAppsTreeGrid
         });
     }
 
-    onRowCountChanged(listener: (eventData: Slick.EventData, args: RowCountChangedEventData) => void): void {
-        this.getGridData().onRowCountChanged(listener);
+    onLoadingFinished(listener: () => void) {
+        this.loadingFinishedListeners.push(listener);
+    }
+
+    unLoadingFinished(listener: () => void) {
+        this.loadingFinishedListeners = this.loadingFinishedListeners.filter((curr) => {
+            return listener !== curr;
+        });
+    }
+
+    private notifyLoadingFinished() {
+        this.loadingFinishedListeners.forEach((listener) => {
+            listener();
+        });
     }
 }
