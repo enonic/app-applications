@@ -11,7 +11,7 @@ export class InstallApplicationAction
         super(i18n('action.install'));
         this.setEnabled(false);
         this.onExecuted(() => {
-            const installedApplications: Application[] = selectionWrapper.getSelectedItems();
+            const installedApplications: Application[] = selectionWrapper.getList().getItems();
             new InstallAppPromptEvent(installedApplications).fire();
         });
     }

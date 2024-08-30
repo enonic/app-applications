@@ -13,6 +13,7 @@ import {UploadFailedEvent} from '@enonic/lib-admin-ui/ui/uploader/UploadFailedEv
 import {NotifyManager} from '@enonic/lib-admin-ui/notify/NotifyManager';
 import {UploadStartedEvent} from '@enonic/lib-admin-ui/ui/uploader/UploadStartedEvent';
 import {DivEl} from '@enonic/lib-admin-ui/dom/DivEl';
+import {Mask} from '@enonic/lib-admin-ui/ui/mask/Mask';
 
 export class InstallAppDialog
     extends ModalDialog {
@@ -27,44 +28,26 @@ export class InstallAppDialog
 
     private marketAppsTreeGrid: MarketAppsTreeGrid;
 
+    private listMask: Mask;
+
     constructor() {
         super({
             title: i18n('dialog.install'),
             class: 'install-application-dialog'
         });
 
-        this.marketAppsTreeGrid.reload();
+        this.marketAppsTreeGrid.load();
     }
 
     protected initElements() {
         super.initElements();
 
         this.statusMessage = new StatusMessage();
-
         this.applicationInput = new ApplicationInput(this.getCancelAction(), 'large').setPlaceholder(i18n('dialog.install.search'));
-
         this.clearButton = new ButtonEl();
-
         this.dropzoneContainer = new DropzoneContainer(true);
-
-        this.marketAppsTreeGrid = new MarketAppsTreeGrid((item, args) => {
-            if (!item.isVisible()) {
-                return false;
-            }
-
-            const marketApp = item.getData();
-            if (marketApp.isEmpty()) {
-                // true for an empty app because it is the empty node that triggers loading
-                return true;
-            }
-
-            const inputValue = args?.searchString?.toLowerCase() || '';
-
-            const displayName = marketApp.getDisplayName().toLowerCase();
-            const description = marketApp.getDescription().toLowerCase();
-
-            return displayName.indexOf(inputValue) >= 0 || description.indexOf(inputValue) >= 0;
-        });
+        this.marketAppsTreeGrid = new MarketAppsTreeGrid();
+        this.listMask = new Mask(this.marketAppsTreeGrid);
     }
 
     protected postInitElements() {
@@ -79,32 +62,31 @@ export class InstallAppDialog
             const searchString = this.applicationInput.getValue();
             const hasValue = !StringHelper.isEmpty(searchString);
             this.clearButton.setVisible(hasValue);
-            this.marketAppsTreeGrid.setFilterArgs({searchString});
+            this.marketAppsTreeGrid.setSearchString(searchString);
         });
 
         this.applicationInput.onAppInstallStarted(() => {
-            this.marketAppsTreeGrid.mask();
+            this.listMask.show();
             this.statusMessage.showInstalling();
         });
 
         this.applicationInput.onAppInstallFinished(() => {
             this.clearButton.setVisible(!StringHelper.isEmpty(this.applicationInput.getValue()));
-            this.marketAppsTreeGrid.unmask();
+            this.listMask.hide();
         });
 
         this.applicationInput.onAppInstallFailed((message: string) => {
             this.clearButton.setVisible(!StringHelper.isEmpty(this.applicationInput.getValue()));
 
-            this.marketAppsTreeGrid.invalidate();
-            this.marketAppsTreeGrid.initData([]);
-            this.marketAppsTreeGrid.unmask();
+            this.marketAppsTreeGrid.clearItems();
+            this.listMask.hide();
 
             this.statusMessage.showFailed(message);
         });
 
-        this.marketAppsTreeGrid.onLoaded(() => {
+        this.marketAppsTreeGrid.onLoadingFinished(() => {
             this.statusMessage.reset();
-            this.toggleStatusMessage(this.marketAppsTreeGrid.isDataViewEmpty());
+            this.toggleStatusMessage(this.marketAppsTreeGrid.getItemCount() === 0);
             this.removeClass('loading');
             this.notifyResize();
         });
@@ -112,7 +94,7 @@ export class InstallAppDialog
         this.marketAppsTreeGrid.onLoadingStarted(() => {
             this.addClass('loading');
             this.statusMessage.showLoading();
-            this.marketAppsTreeGrid.mask();
+            this.listMask.show();
         });
 
         this.clearButton.onClicked(() => {
@@ -131,14 +113,14 @@ export class InstallAppDialog
         this.marketAppsTreeGrid.onShown(() => {
             const isLoading = this.hasClass('loading');
             if (isLoading) {
-                this.marketAppsTreeGrid.mask();
+                this.listMask.show();
             }
         });
 
-        this.marketAppsTreeGrid.onRowCountChanged((event, data) => {
+        this.marketAppsTreeGrid.onItemsAdded(() => {
             const isLoading = this.hasClass('loading');
             if (!isLoading) {
-                this.toggleStatusMessage(data.current < 1);
+                this.toggleStatusMessage(this.marketAppsTreeGrid.getItemCount() < 1);
             }
         });
     }
@@ -153,7 +135,6 @@ export class InstallAppDialog
             this.statusMessage.hide();
             if (!this.getBody().isVisible()) {
                 this.getBody().show();
-                this.marketAppsTreeGrid.getGrid().resizeCanvas();
             }
         }
     }
