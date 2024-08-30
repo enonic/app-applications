@@ -29,6 +29,8 @@ import {ApplicationsGridList} from './ApplicationsGridList';
 import {SelectableListBoxKeyNavigator} from '@enonic/lib-admin-ui/ui/selector/list/SelectableListBoxKeyNavigator';
 import {GetApplicationRequest} from '../resource/GetApplicationRequest';
 import * as Q from 'q';
+import {ApplicationsListViewer} from './ApplicationsListViewer';
+import {Element} from '@enonic/lib-admin-ui/dom/Element';
 
 export class ApplicationBrowsePanel
     extends BrowsePanel {
@@ -41,7 +43,7 @@ export class ApplicationBrowsePanel
 
     protected contextMenu: TreeGridContextMenu;
 
-    protected selectionWrapper: SelectableListBoxWrapper<Application>;
+    protected selectionWrapper: SelectionWrapperExt;
 
     protected keyNavigator: SelectableListBoxKeyNavigator<Application>;
 
@@ -110,7 +112,7 @@ export class ApplicationBrowsePanel
 
         this.treeListBox = new ApplicationsGridList();
 
-        this.selectionWrapper = new SelectableListBoxWrapper<Application>(this.treeListBox, {
+        this.selectionWrapper = new SelectionWrapperExt(this.treeListBox, {
             className: 'applications-list-box-wrapper',
             maxSelected: 0,
             checkboxPosition: 'left',
@@ -264,10 +266,28 @@ export class ApplicationBrowsePanel
     }
 
     protected enableSelectionMode(): void {
-        this.treeListBox.setItems(this.selectionWrapper.getSelectedItems());
+        this.selectionWrapper.filterSelectedItems();
     }
 
     protected disableSelectionMode(): void {
-        this.treeListBox.load();
+        this.selectionWrapper.resetFilter();
     }
 }
+
+class SelectionWrapperExt extends SelectableListBoxWrapper<Application> {
+
+    filterSelectedItems(): void {
+        const selectedItems = this.getSelectedItems();
+
+        this.itemsWrappers.forEach((itemWrapper: Element[], key: string) => {
+            itemWrapper[0].setVisible(selectedItems.some((item: Application) => item.getApplicationKey().getName() === key));
+        });
+    }
+
+    resetFilter(): void {
+        this.itemsWrappers.forEach((itemWrapper: Element[]) => {
+            itemWrapper[0].setVisible(true);
+        });
+    }
+}
+
