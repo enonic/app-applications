@@ -74,6 +74,5 @@ describe("Tests for Applications Grid context menu", function () {
     before(() => {
         return console.log('specification is starting: ' + this.title);
     });
-})
-;
+});
 
