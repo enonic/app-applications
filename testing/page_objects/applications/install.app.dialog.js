@@ -6,16 +6,16 @@ const lib = require('../../libs/elements');
 const appConst = require('../../libs/app_const');
 const XPATH = {
     container: `//div[contains(@id,'InstallAppDialog')]`,
-    grid: `//div[contains(@id,'MarketAppsTreeGrid')]`,
+    gridUL: `//ul[contains(@id,'MarketAppsTreeGrid')]`,
     filterInput: `//div[contains(@id,'ApplicationInput')]/input`,
-    appByDisplayName: function (displayName) {
+    appByDisplayName(displayName) {
         return `//div[contains(@id,'InstallAppDialog')]//div[contains(@id,'NamesView') and child::h6[contains(@class,'main-name')]]//a[contains(.,'${displayName}')]`
     },
-    installLinkByName: function (displayName) {
-        return `${lib.slickRowByDisplayName(XPATH.container, displayName)}//a[@class='install']`
+    installButtonByName(displayName) {
+        return `${lib.MARKET_MODAL_DIALOG.rowByDisplayName(XPATH.container, displayName)}//button/span[text()='Install']`
     },
-    installedStatusByName: function (displayName) {
-        return `${lib.slickRowByDisplayName(XPATH.container, displayName)}//a[@class='installed']`;
+    installedStatusByName(displayName) {
+        return `${lib.MARKET_MODAL_DIALOG.rowByDisplayName(XPATH.container, displayName)}//button/span[text()='Installed']`;
     }
 };
 
@@ -26,7 +26,7 @@ class InstallAppDialog extends Page {
     }
 
     get grid() {
-        return XPATH.container + XPATH.grid;
+        return XPATH.container + XPATH.gridUL;
     }
 
     get cancelButton() {
@@ -64,15 +64,17 @@ class InstallAppDialog extends Page {
         })
     }
 
-    waitForGridLoaded() {
-        return this.waitForElementDisplayed(this.grid + lib.H6_DISPLAY_NAME, appConst.longTimeout).catch(err => {
-            this.saveScreenshot('err_install_dialog_grid');
+    async waitForGridLoaded() {
+        try {
+            await this.waitForElementDisplayed(this.grid + lib.H6_DISPLAY_NAME, appConst.longTimeout)
+        } catch (err) {
+            await this.saveScreenshot('err_install_dialog_grid');
             throw new Error('Install App dialog, grid was not loaded! ' + err);
-        });
+        }
     }
 
     waitForInstallLink(appName) {
-        const selector = XPATH.installLinkByName(appName);
+        const selector = XPATH.installButtonByName(appName);
         return this.waitForElementDisplayed(selector, appConst.mediumTimeout).catch(err => {
             this.saveScreenshot(appConst.generateRandomName('err_install_link'));
             throw new Error(`Install link is not displayed for!  ` + err);
@@ -81,27 +83,29 @@ class InstallAppDialog extends Page {
 
     async clickOnInstallAppLink(appName) {
         try {
-            let selector = XPATH.installLinkByName(appName);
-            await this.waitForElementDisplayed(selector, appConst.mediumTimeout);
+            let locator = XPATH.installButtonByName(appName);
+            await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
             await this.pause(400);
-            return await this.clickOnElement(selector);
+            return await this.clickOnElement(locator);
         } catch (err) {
             throw new Error(`Couldn't find install link for app ` + " " + err);
         }
     }
 
     //checks that 'installed' status appeared
-    waitForApplicationInstalled(appName) {
-        const selector = lib.slickRowByDisplayName(XPATH.container, appName) + "//a[@class='installed']";
-        return this.waitForElementDisplayed(selector, appConst.longTimeout).catch(err => {
-            this.saveScreenshot('err_find_installed_status');
-            throw new Error(`Couldn't find 'Installed' label for the app` + " " + err);
-        });
+    async waitForApplicationInstalled(appName) {
+        try {
+            const locator = XPATH.installedStatusByName(XPATH.container, appName);
+            return await this.waitForElementDisplayed(locator, appConst.longTimeout)
+        } catch (err) {
+            let screenshot = await this.saveScreenshotUniqueName('err_find_installed_status');
+            throw new Error(`Couldn't find 'Installed' label for the app, screenshot:` + screenshot + " " + err);
+        }
     }
 
     isCancelButtonTopDisplayed() {
         return this.isElementDisplayed(this.cancelButton).catch(err => {
-            throw new Error('error- Cancel button top is not displayed ' + err);
+            throw new Error('Error - Cancel button top is not displayed ' + err);
         })
     }
 

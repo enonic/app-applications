@@ -1,5 +1,4 @@
-const chai = require('chai');
-const assert = chai.assert;
+const assert = require('node:assert');
 const webDriverHelper = require('../libs/WebDriverHelper');
 const AppBrowsePanel = require('../page_objects/applications/applications.browse.panel');
 const InstallDialog = require('../page_objects/applications/install.app.dialog');
@@ -31,8 +30,8 @@ describe('Install app dialog, search input spec.', function () {
             await installDialog.typeSearchTextAndEnter(not_existing);
             // 4. Verify that validation message appears:
             let message = await installDialog.getErrorValidationMessage();
-            await studioUtils.saveScreenshot("url_not_exist");
-            assert.isTrue(message.includes('Failed to process application from'), 'expected notification message should appear');
+            await studioUtils.saveScreenshot('url_not_exist');
+            assert.ok(message.includes('Failed to process application from'), 'expected notification message should appear');
         });
 
     it(`GIVEN 'install app' dialog is opened WHEN path to local file has been typed THEN expected warning message should appear`,
@@ -52,7 +51,7 @@ describe('Install app dialog, search input spec.', function () {
             await installDialog.waitForApplicationNotFoundMessage();
             let message = await installDialog.applicationNotFoundMessage();
             await studioUtils.saveScreenshot('app_not_found');
-            assert.isTrue(message.includes('No applications found'), "'No applications found' - message should appear");
+            assert.ok(message.includes('No applications found'), "'No applications found' - message should appear");
         });
 
     it(`GIVEN 'install app' dialog is opened WHEN actual URL has been typed and 'Enter' key pressed THEN application should be installed`,
@@ -64,11 +63,11 @@ describe('Install app dialog, search input spec.', function () {
             await installDialog.waitForOpened();
             // Type a correct URL for the app:
             await installDialog.typeSearchTextAndEnter(LOG_BROWSER_APP_URL);
-            await installDialog.waitForClosed(45000);
+            await installDialog.waitForClosed(40000);
 
             let message = await installDialog.waitForNotificationMessage();
             await studioUtils.saveScreenshot('app_url_installed');
-            assert.isTrue(message.includes('Application \'Log Browser\' installed successfully'),
+            assert.ok(message.includes("Application 'Log Browser' installed successfully"),
                 'expected notification message should appear');
         });
 

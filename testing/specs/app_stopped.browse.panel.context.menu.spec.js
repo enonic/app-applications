@@ -1,5 +1,4 @@
-const chai = require('chai');
-const assert = chai.assert;
+const assert = require('node:assert');
 const webDriverHelper = require('../libs/WebDriverHelper');
 const AppBrowsePanel = require('../page_objects/applications/applications.browse.panel');
 const studioUtils = require('../libs/studio.utils.js');

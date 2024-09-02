@@ -1,7 +1,6 @@
 /**
  */
-const chai = require('chai');
-const assert = chai.assert;
+const assert = require('node:assert');
 const webDriverHelper = require('../libs/WebDriverHelper');
 const AppBrowsePanel = require('../page_objects/applications/applications.browse.panel');
 const InstallDialog = require('../page_objects/applications/install.app.dialog');
@@ -57,8 +56,8 @@ describe('Install Application Dialog specification', function () {
         await dialog.waitForApplicationDisplayed('ADFS ID Provider');
         let names = await dialog.getApplicationNames();
         await studioUtils.saveScreenshot('install_dlg_sorted');
-        assert.isAbove(names.length, 0, 'There should be apps in the grid');
-        assert.isTrue(names.includes('ADFS ID Provider'), 'Auth0 ID Provider this application should be second');
+        assert.ok(names.length > 0, 'There should be apps in the grid');
+        assert.ok(names.includes('ADFS ID Provider'), 'Auth0 ID Provider this application should be second');
     });
 
     it('GIVEN install dialog is opened WHEN search text has been typed THEN apps should be filtered ', async () => {
@@ -71,7 +70,7 @@ describe('Install Application Dialog specification', function () {
         await dialog.typeSearchText(CHUCK_NORRIS_APP_DISPLAY_NAME);
         await dialog.waitForApplicationDisplayed('Chuck Norris');
         let names = await dialog.getApplicationNames();
-        assert.isTrue(names.length === 1, 'only one application should be displayed');
+        assert.ok(names.length === 1, 'only one application should be displayed');
         assert.equal(names[0], CHUCK_NORRIS_APP_DISPLAY_NAME, 'Chuck Norris app should be filtered');
     });
 
@@ -83,13 +82,14 @@ describe('Install Application Dialog specification', function () {
         await dialog.waitForSpinnerNotVisible();
         // 1. Install the app:
         await dialog.clickOnInstallAppLink(CHUCK_NORRIS_APP_DISPLAY_NAME);
-        let visible = await dialog.waitForAppInstalled(CHUCK_NORRIS_APP_DISPLAY_NAME);
-        assert.isTrue(visible, `'${CHUCK_NORRIS_APP_DISPLAY_NAME}' should've been installed by now`);
+        // 2. Verify that 'Installed' button appears in the list element in modal dialog:
+        await dialog.waitForAppInstalled(CHUCK_NORRIS_APP_DISPLAY_NAME);
+        // 3. Close the modal dialog:
         await dialog.clickOnCancelButtonTop();
         await dialog.waitForClosed();
-        // 2. Check the app in grid:
-        visible = await appBrowsePanel.isAppByDescriptionDisplayed(CHUCK_NORRIS_APP_DISPLAY_NAME);
-        assert.isTrue(visible, `'${CHUCK_NORRIS_APP_DISPLAY_NAME}' application should've been present in the grid`);
+        // 4. Verify the app in grid:
+        await appBrowsePanel.waitForAppByDescriptionDisplayed(CHUCK_NORRIS_APP_DISPLAY_NAME);
+        // 5. Verify the notification message:
         let message = await appBrowsePanel.waitForNotificationMessage();
         assert.equal(message, 'Application \'Chuck Norris\' installed successfully', `Incorrect notification message [${message}]`)
     });
@@ -105,7 +105,7 @@ describe('Install Application Dialog specification', function () {
             await installAppDialog.waitForSpinnerNotVisible();
             // Verify that 'Installed' button is displayed in the modal dialog:
             let result = await installAppDialog.waitForApplicationInstalled(CHUCK_NORRIS_APP_DISPLAY_NAME);
-            assert.isTrue(result, `'${CHUCK_NORRIS_APP_DISPLAY_NAME}' should be with Installed status`);
+            assert.ok(result, `'${CHUCK_NORRIS_APP_DISPLAY_NAME}' should be with Installed status`);
         });
 
     // Verifies issue https://github.com/enonic/app-applications/issues/241
