@@ -5,7 +5,8 @@
   "license": "ISC",
   "scripts": {
     "test_apps:wdio_chrome": "npx wdio ./wdio.chrome.conf.js",
-    "test:firefox": "npx wdio ./wdio.conf.js"
+    "test:firefox": "npx wdio ./wdio.conf.js",
+    "allure-report": "allure generate ./build/reports/allure --output ./build/reports/allure-report --clean --single-file"
   },
   "devDependencies": {
     "properties-reader": "^2.3.0",
