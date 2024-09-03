@@ -11,8 +11,8 @@ module.exports = Object.freeze({
     TEXT_INPUT: "//input[contains(@id,'TextInput')]",
     DROP_DOWN_HANDLE: "//button[contains(@id,'DropdownHandle')]",
     MARKET_MODAL_DIALOG: {
-        rowByDisplayName(container, displayName) {
-            return `${container}//div[contains(@id,'MarketListViewer') and (descendant::h6[contains(@class,'main-name') and contains(.,'${displayName}')])]`;
+        rowByDisplayName(displayName) {
+            return `//div[contains(@id,'MarketListViewer') and (descendant::h6[contains(@class,'main-name') and contains(.,'${displayName}')])]`;
         },
     },
     TREE_GRID: {
