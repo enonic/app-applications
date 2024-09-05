@@ -2,8 +2,8 @@ import {DivEl} from '@enonic/lib-admin-ui/dom/DivEl';
 import {MarketAppViewer} from './MarketAppViewer';
 import {SpanEl} from '@enonic/lib-admin-ui/dom/SpanEl';
 import * as Q from 'q';
-import {MarketApplication, MarketAppStatus, MarketAppStatusFormatter} from '@enonic/lib-admin-ui/application/MarketApplication';
 import {Button} from '@enonic/lib-admin-ui/ui/button/Button';
+import {MarketApplication, MarketAppStatus, MarketAppStatusFormatter} from '../../MarketApplication';
 
 export class MarketListViewer
     extends DivEl {
