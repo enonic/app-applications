@@ -1,18 +1,18 @@
 import {MarketApplicationFetcher} from '../../resource/MarketApplicationFetcher';
 import {i18n} from '@enonic/lib-admin-ui/util/Messages';
 import {Application} from '@enonic/lib-admin-ui/application/Application';
-import {MarketApplication, MarketAppStatus} from '@enonic/lib-admin-ui/application/MarketApplication';
 import {ApplicationEvent, ApplicationEventType} from '@enonic/lib-admin-ui/application/ApplicationEvent';
 import {DefaultErrorHandler} from '@enonic/lib-admin-ui/DefaultErrorHandler';
 import {Exception} from '@enonic/lib-admin-ui/Exception';
-import {MarketApplicationResponse} from '@enonic/lib-admin-ui/application/MarketApplicationResponse';
-import {MarketHelper} from '@enonic/lib-admin-ui/application/MarketHelper';
 import {MarketAppsTreeGridHelper} from './MarketAppsTreeGridHelper';
 import {InstallUrlApplicationRequest} from '../../resource/InstallUrlApplicationRequest';
 import {ApplicationInstallResult} from '../../resource/ApplicationInstallResult';
 import {ConfirmationDialog} from '@enonic/lib-admin-ui/ui/dialog/ConfirmationDialog';
 import {ListBox} from '@enonic/lib-admin-ui/ui/selector/list/ListBox';
 import {MarketListViewer} from './MarketListViewer';
+import {MarketApplication, MarketAppStatus} from '../../MarketApplication';
+import {MarketApplicationResponse} from '../../MarketApplicationResponse';
+import {MarketHelper} from '../../MarketHelper';
 
 export class MarketAppsTreeGrid
     extends ListBox<MarketApplication> {

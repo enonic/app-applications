@@ -1,9 +1,9 @@
 import {TreeNode} from '@enonic/lib-admin-ui/ui/treegrid/TreeNode';
 import {GridColumn, GridColumnBuilder} from '@enonic/lib-admin-ui/ui/grid/GridColumn';
-import {MarketApplication, MarketAppStatus, MarketAppStatusFormatter} from '@enonic/lib-admin-ui/application/MarketApplication';
 import {MarketAppViewer} from './MarketAppViewer';
 import {AEl} from '@enonic/lib-admin-ui/dom/AEl';
 import {Application} from '@enonic/lib-admin-ui/application/Application';
+import {MarketApplication, MarketAppStatus, MarketAppStatusFormatter} from '../../MarketApplication';
 
 export class MarketAppsTreeGridHelper {
 
