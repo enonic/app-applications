@@ -2,8 +2,8 @@ import * as Q from 'q';
 import {Viewer} from '@enonic/lib-admin-ui/ui/Viewer';
 import {NamesAndIconView, NamesAndIconViewBuilder} from '@enonic/lib-admin-ui/app/NamesAndIconView';
 import {AEl} from '@enonic/lib-admin-ui/dom/AEl';
-import {MarketApplication} from '@enonic/lib-admin-ui/application/MarketApplication';
 import {NamesAndIconViewSize} from '@enonic/lib-admin-ui/app/NamesAndIconViewSize';
+import {MarketApplication} from '../../MarketApplication';
 
 export class MarketAppViewer
     extends Viewer<MarketApplication> {
