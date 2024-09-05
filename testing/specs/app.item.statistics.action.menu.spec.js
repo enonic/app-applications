@@ -1,5 +1,4 @@
-const chai = require('chai');
-const assert = chai.assert;
+const assert = require('node:assert');
 const webDriverHelper = require('../libs/WebDriverHelper');
 const studioUtils = require('../libs/studio.utils');
 const appConstants = require('../libs/app_const');
@@ -23,11 +22,10 @@ describe("Item Statistics Panel 'Action Menu' spec", function () {
             await appBrowsePanel.clickOnRowByDisplayName(FIRST_APP);
             // 2. Verify the status in Statistics Panel:
             let result = await appStatisticPanel.getDropDownButtonText();
-            await studioUtils.saveScreenshot("application_action_menu_collapsed");
-            assert.strictEqual(result, 'Started', 'correct label should be displayed on the drop-down button');
-
-            let isVisible = await appStatisticPanel.waitForStopMenuItemVisible();
-            assert.isFalse(isVisible, '`Stop` menu item should not be visible, because the menu is collapsed');
+            await studioUtils.saveScreenshot('application_action_menu_collapsed');
+            assert.equal(result, 'Started', 'expected label should be displayed on the drop-down button');
+            // 3. 'Stop' button should be hidden in the menu-button
+            await appStatisticPanel.waitForStopMenuItemNotDisplayed();
         });
 
     it(`GIVEN started application is selected WHEN Click on dropdown handle, expand the menu THEN 'Stop' menu item gets visible`,
@@ -39,9 +37,7 @@ describe("Item Statistics Panel 'Action Menu' spec", function () {
             // 2. Click on dropdown handle and expand the menu in Statistics Panel:
             await appStatisticPanel.clickOnActionDropDownMenu();
             // 3. Verify that Stop menu items gets visible:
-            let isVisible = await appStatisticPanel.waitForStopMenuItemVisible();
-            await studioUtils.saveScreenshot("action_menu_is_expanded");
-            assert.isTrue(isVisible, "'Stop' menu item should appear");
+            await appStatisticPanel.waitForStopMenuItemVisible();
         });
 
     it(`GIVEN existing application is started WHEN Stop menu-item has been clicked THEN the application gets 'stopped'`,
