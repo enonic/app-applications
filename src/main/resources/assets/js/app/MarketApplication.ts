@@ -1,9 +1,9 @@
 import {IDentifiable} from '@enonic/lib-admin-ui/IDentifiable';
 import {ApplicationKey} from '@enonic/lib-admin-ui/application/ApplicationKey';
-import {MarketApplicationJson} from '@enonic/lib-admin-ui/application/json/MarketApplicationJson';
 import {i18n} from '@enonic/lib-admin-ui/util/Messages';
 import {ProgressBar} from '@enonic/lib-admin-ui/ui/ProgressBar';
 import {SpanEl} from '@enonic/lib-admin-ui/dom/SpanEl';
+import {MarketApplicationJson} from './json/MarketApplicationJson';
 
 export class MarketApplication implements IDentifiable {
 
