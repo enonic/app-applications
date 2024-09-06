@@ -1,5 +1,4 @@
 import {ApplicationBrowseActions} from './ApplicationBrowseActions';
-import {ApplicationTreeGrid} from './ApplicationTreeGrid';
 import {ApplicationBrowseItemPanel} from './ApplicationBrowseItemPanel';
 import {StopApplicationEvent} from './StopApplicationEvent';
 import {StartApplicationEvent} from './StartApplicationEvent';
@@ -29,7 +28,6 @@ import {ApplicationsGridList} from './ApplicationsGridList';
 import {SelectableListBoxKeyNavigator} from '@enonic/lib-admin-ui/ui/selector/list/SelectableListBoxKeyNavigator';
 import {GetApplicationRequest} from '../resource/GetApplicationRequest';
 import * as Q from 'q';
-import {ApplicationsListViewer} from './ApplicationsListViewer';
 import {Element} from '@enonic/lib-admin-ui/dom/Element';
 
 export class ApplicationBrowsePanel
@@ -46,8 +44,6 @@ export class ApplicationBrowsePanel
     protected selectionWrapper: SelectionWrapperExt;
 
     protected keyNavigator: SelectableListBoxKeyNavigator<Application>;
-
-    protected treeGrid: ApplicationTreeGrid;
 
     constructor() {
         super();
@@ -92,10 +88,6 @@ export class ApplicationBrowsePanel
         }
 
         return toolbar;
-    }
-
-    protected createTreeGrid(): ApplicationTreeGrid {
-        return new ApplicationTreeGrid();
     }
 
     protected createBrowseItemPanel(): ApplicationBrowseItemPanel {
