@@ -5,4 +5,11 @@
   <allow>
     <principal>role:system.admin</principal>
   </allow>
+  <apis>
+    <api>config</api>
+    <api>i18n</api>
+    <api>com.enonic.xp.app.main:launcher</api>
+    <api>com.enonic.xp.app.main:i18n</api>
+    <api>widget:</api>
+  </apis>
 </tool>
