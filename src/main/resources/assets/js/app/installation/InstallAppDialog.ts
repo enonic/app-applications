@@ -63,6 +63,7 @@ export class InstallAppDialog
             const hasValue = !StringHelper.isEmpty(searchString);
             this.clearButton.setVisible(hasValue);
             this.marketAppsTreeGrid.setSearchString(searchString);
+            this.updateStatusMessage();
         });
 
         this.applicationInput.onAppInstallStarted(() => {
@@ -128,15 +129,14 @@ export class InstallAppDialog
     private toggleStatusMessage(showStatus: boolean) {
         if (showStatus) {
             this.statusMessage.showNoResult();
-            if (this.getBody().isVisible()) {
-                this.getBody().hide();
-            }
         } else {
             this.statusMessage.hide();
-            if (!this.getBody().isVisible()) {
-                this.getBody().show();
-            }
         }
+    }
+
+    private updateStatusMessage(): void {
+        const itemsVisible = this.marketAppsTreeGrid.getItemViews().filter((item) => item.isVisible()).length;
+        this.toggleStatusMessage(itemsVisible === 0);
     }
 
     updateInstallApplications(installApplications: Application[]) {
@@ -206,6 +206,7 @@ export class InstallAppDialog
         this.resetFileInputWithUploader();
         super.show();
         this.statusMessage.reset();
+        this.updateStatusMessage();
     }
 
     hide() {
@@ -220,9 +221,7 @@ export class InstallAppDialog
     }
 
     private resetFileInputWithUploader() {
-        if (this.applicationInput) {
-            this.applicationInput.reset();
-        }
+        this.applicationInput?.reset();
     }
 }
 
