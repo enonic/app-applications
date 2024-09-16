@@ -1,9 +1,0 @@
-node_modules/
-build/
-testing/
-dist/
-out/
-.xp/
-**/*.js
-**/*.d.ts
-
