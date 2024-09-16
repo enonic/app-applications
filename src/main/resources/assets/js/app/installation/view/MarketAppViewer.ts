@@ -22,11 +22,10 @@ export class MarketAppViewer
         this.size = size;
     }
 
-    setObject(object: MarketApplication, relativePath: boolean = false): Q.Promise<boolean> {
+    setObject(object: MarketApplication, relativePath: boolean = false) {
         this.relativePath = relativePath;
-        super.setObject(object);
 
-        return Q(true);
+        super.setObject(object);
     }
 
     resolveDisplayName(object: MarketApplication): string {

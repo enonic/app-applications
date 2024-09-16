@@ -211,7 +211,7 @@ export class MarketAppsTreeGrid
         void new InstallUrlApplicationRequest(marketApplication.getLatestVersionDownloadUrl())
             .sendAndParse().then((result: ApplicationInstallResult) => {
                 if (result.getFailure()) {
-                    throw result.getFailure();
+                    throw Error(result.getFailure());
                 }
 
                 const status: MarketAppStatus = MarketHelper.installedAppCanBeUpdated(marketApplication, result.getApplication())
