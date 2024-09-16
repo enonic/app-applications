@@ -29,6 +29,7 @@ import {SelectableListBoxKeyNavigator} from '@enonic/lib-admin-ui/ui/selector/li
 import {GetApplicationRequest} from '../resource/GetApplicationRequest';
 import * as Q from 'q';
 import {Element} from '@enonic/lib-admin-ui/dom/Element';
+import {ApplicationsListViewer} from './ApplicationsListViewer';
 
 export class ApplicationBrowsePanel
     extends BrowsePanel {
@@ -57,6 +58,17 @@ export class ApplicationBrowsePanel
 
         this.treeListBox.whenShown(() => {
             this.treeListBox.load();
+        });
+
+        this.treeListBox.onItemsAdded((items: Application[], itemViews: ApplicationsListViewer[]) => {
+            items.forEach((item: Application, index) => {
+                const listElement = itemViews[index];
+
+                listElement?.onContextMenu((event: MouseEvent) => {
+                    event.preventDefault();
+                    this.contextMenu.showAt(event.clientX, event.clientY);
+                });
+            });
         });
     }
 
@@ -203,6 +215,7 @@ export class ApplicationBrowsePanel
             (item: Application) => item.getApplicationKey().getName() === event.getApplicationKey().getName());
 
         if (itemToRemove) {
+            this.selectionWrapper.deselect(itemToRemove);
             this.treeListBox.removeItems(itemToRemove);
         }
 
