@@ -1,5 +1,4 @@
-const chai = require('chai');
-const assert = chai.assert;
+const assert = require('node:assert');
 const webDriverHelper = require('../libs/WebDriverHelper');
 const appConst = require('../libs/app_const');
 const studioUtils = require('../libs/studio.utils.js');
@@ -27,8 +26,8 @@ describe('Applications Browse panel - selection of items spec', function () {
             let appBrowsePanel = new AppBrowsePanel();
             await appBrowsePanel.clickOnSelectionControllerCheckbox();
             await studioUtils.saveScreenshot('selection_controller_checked');
-            let result = await appBrowsePanel.getNumberOfSelectedRows();
-            assert.isAtLeast(result, EXPECTED_NUMBER_OF_APPLICATIONS, 'all applications should be selected');
+            let number = await appBrowsePanel.getNumberOfCheckedRows();
+            assert.ok(number >= EXPECTED_NUMBER_OF_APPLICATIONS, 'all applications should be selected');
         });
 
     it(`GIVEN all applications are selected WHEN 'selection controller'-checkbox has been clicked THEN all rows in grid get white`,
@@ -39,8 +38,8 @@ describe('Applications Browse panel - selection of items spec', function () {
             // 2. Click on the checkbox and unselect all apps:
             await appBrowsePanel.clickOnSelectionControllerCheckbox();
             await studioUtils.saveScreenshot('selection_controller_unchecked');
-            let numb = await appBrowsePanel.getNumberOfSelectedRows();
-            assert.equal(numb, 0, 'all applications should be unselected');
+            let number = await appBrowsePanel.getNumberOfCheckedRows();
+            assert.equal(number, 0, 'all applications should be unselected');
         });
 
     it(`WHEN applications grid is loaded THEN rows with applications should be present in the grid`,
@@ -48,7 +47,7 @@ describe('Applications Browse panel - selection of items spec', function () {
             let appBrowsePanel = new AppBrowsePanel();
             let result = await appBrowsePanel.getApplicationDisplayNames();
             await studioUtils.saveScreenshot('app_browse_application');
-            assert.isTrue(result.length > 0, 'rows with applications should be present in the grid');
+            assert.ok(result.length > 0, 'rows with applications should be present in the grid');
         });
 
     it(`GIVEN existing application is selected WHEN Arrow Down key has been pressed THEN the next application should be selected`,

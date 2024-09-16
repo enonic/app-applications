@@ -213,18 +213,31 @@ class ApplicationItemStatisticsPanel extends Page {
         }
     }
 
-    waitForStopMenuItemVisible() {
-        return this.waitForElementDisplayed(xpath.stopActionMenuItem, appConst.shortTimeout).catch(err => {
-            this.saveScreenshot('stop_menu_item_not_visible');
-            return false;
-        })
+    async waitForStopMenuItemVisible() {
+        try {
+            return await this.waitForElementDisplayed(xpath.stopActionMenuItem, appConst.shortTimeout)
+        } catch (err) {
+            let screenshot = await this.saveScreenshotUniqueName('stop_menu_item_not_visible');
+            throw new Error('Stop menu item should be displayed: screenshot' + screenshot + '  ' + err);
+        }
     }
 
-    waitForStartMenuItemVisible() {
-        return this.waitForElementDisplayed(xpath.startActionMenuItem, appConst.shortTimeout).catch(err => {
-            this.saveScreenshot("stop_menu_item_not_visible");
-            return false;
-        })
+    async waitForStopMenuItemNotDisplayed() {
+        try {
+            return await this.waitForElementNotDisplayed(xpath.stopActionMenuItem, appConst.shortTimeout)
+        } catch (err) {
+            let screenshot = await this.saveScreenshotUniqueName('stop_menu_item_visible');
+            throw new Error('Stop menu item should not be displayed: screenshot' + screenshot + '  ' + err);
+        }
+    }
+
+    async waitForStartMenuItemVisible() {
+        try {
+            return await this.waitForElementDisplayed(xpath.startActionMenuItem, appConst.shortTimeout)
+        } catch (err) {
+            let screenshot = await this.saveScreenshotUniqueName('start_menu_item_not_visible');
+            throw new Error('Start menu item should be displayed: screenshot' + screenshot + '  ' + err);
+        }
     }
 }
 

@@ -6,33 +6,31 @@ const LauncherPanel = require('../launcher.panel');
 const XPATH = {
     container: "//div[contains(@id,'ApplicationBrowsePanel')]",
     launcherButton: "//button[contains(@class,'launcher-button')]",
-    appGrid: "//div[contains(@class, 'application-grid')]",
+    applicationsGridListUL: "//ul[contains(@id,'ApplicationsGridList')]",
+    GRID_LIST_ITEM: "//li[contains(@class,'item-view-wrapper')]",
     toolbar: "//div[contains(@id,'Toolbar')]",
     contextMenu: "//ul[contains(@id,'TreeGridContextMenu')]",
-    treeGridToolbar: `//div[contains(@id,'TreeGridToolbar')]`,
+    treeGridToolbarDiv: `//div[contains(@id,'ListBoxToolbar')]`,
     installButton: `//div[contains(@id,'Toolbar')]/button[contains(@id, 'ActionButton') and child::span[contains(.,'Install')]]`,
     unInstallButton: `//div[contains(@id,'Toolbar')]/button[contains(@id, 'ActionButton') and child::span[contains(.,'Uninstall')]]`,
     stopButton: "//div[contains(@id,'Toolbar')]/button[contains(@id, 'ActionButton') and child::span[contains(.,'Stop')]]",
     startButton: `//div[contains(@id,'Toolbar')]/button[contains(@id, 'ActionButton') and child::span[contains(.,'Start')]]`,
-    selectAllCheckbox: "//div[@id='SelectionController']",
-    checkboxes: `(//div[contains(@class,'slick-cell-checkboxsel')])`,
-    appState: "//div[contains(@class,'state')]",
-    selectedRows: `//div[contains(@class,'slick-viewport')]//div[contains(@class,'slick-row') and child::div[contains(@class,'selected')]]`,
+    selectAllCheckbox: "//div[contains(@id,'ListSelectionController')]",
+    appState: "//div[contains(@id,'StatusBlock')]/span",
+    checkedRowLi: `//li[contains(@class,'checkbox-left selected checked')]`,
     selectionControllerCheckBox: `//div[contains(@id,'SelectionController')]`,
     selectionPanelToggler: "//button[contains(@id,'SelectionPanelToggler')]",
     numberInToggler: "//button[contains(@id,'SelectionPanelToggler')]/span",
-    appStateByName: displayName => `${lib.slickRowByDisplayName(XPATH.appGrid, displayName)}${XPATH.appState}`,
+    appStateByName: displayName => `${lib.TREE_GRID.rowByDisplayName(displayName)}${XPATH.appState}`,
     enabledContextMenuButton: name => {
         return `${XPATH.contextMenu}/li[contains(@id,'MenuItem') and not(contains(@class,'disabled')) and contains(.,'${name}')]`;
     },
     contextMenuItemByName: (name) => {
         return `${XPATH.contextMenu}/li[contains(@id,'MenuItem') and contains(.,'${name}')]`;
     },
-    rowByName: name => `//div[contains(@id,'NamesView') and child::p[contains(@class,'sub-name') and contains(.,'${name}')]]`,
-    rowByDisplayName:
-        displayName => `//div[contains(@id,'NamesView') and child::h6[contains(@class,'main-name') and contains(.,'${displayName}')]]`,
-    checkboxByDisplayName: displayName => `${lib.itemByDisplayName(
-        displayName)}/ancestor::div[contains(@class,'slick-row')]/div[contains(@class,'slick-cell-checkboxsel')]/label`,
+    rowByDescription: description => `//li[contains(@class,'item-view-wrapper') and (descendant::p[contains(@class,'sub-name') and contains(.,'${description}')])]`,
+    rowByDisplayName: displayName => `//li[contains(@class,'item-view-wrapper') and (descendant::h6[contains(@class,'main-name') and contains(.,'${displayName}')])]`,
+    checkboxByDisplayName: displayName => `${XPATH.rowByDisplayName(displayName)}` + lib.DIV.CHECKBOX_DIV + '/label',
 };
 
 class AppBrowsePanel extends Page {
@@ -51,7 +49,8 @@ class AppBrowsePanel extends Page {
 
     async waitForGridLoaded(ms) {
         try {
-            await this.waitForElementDisplayed(XPATH.container + lib.GRID_CANVAS, ms);
+            let timeout = typeof ms !== 'undefined' ? ms : appConst.mediumTimeout;
+            await this.waitForElementDisplayed(XPATH.applicationsGridListUL, timeout);
             await this.waitForSpinnerNotVisible(appConst.mediumTimeout);
             console.log('applications browse panel is loaded')
         } catch (err) {
@@ -60,15 +59,15 @@ class AppBrowsePanel extends Page {
         }
     }
 
-    waitForPanelDisplayed(ms) {
+    waitForToolbarDisplayed(ms) {
         return this.waitForElementDisplayed(XPATH.toolbar, ms).catch(() => {
             throw new Error(`Content browse panel was not loaded in  ${ms}`);
         });
     }
 
-    async clickOnRowByDescription(name) {
+    async clickOnRowByDescription(description) {
         try {
-            const nameXpath = XPATH.rowByName(name);
+            const nameXpath = XPATH.rowByDescription(description);
             await this.waitForElementDisplayed(nameXpath, appConst.shortTimeout);
             await this.clickOnElement(nameXpath);
             return await this.pause(500);
@@ -106,16 +105,27 @@ class AppBrowsePanel extends Page {
         });
     }
 
-    isAppByDescriptionDisplayed(descritption) {
-        return this.waitForElementDisplayed(XPATH.rowByName(descritption), appConst.shortTimeout).catch(() => {
-            console.log("item is not displayed:" + descritption);
-            return false;
-        });
+    async isAppByDescriptionDisplayed(description) {
+        try {
+            return await this.isElementDisplayed(XPATH.rowByDescription(description));
+        } catch (err) {
+            let screenshot = await this.saveScreenshotUniqueName('err_app_in_grid');
+            throw new Error(`Error occurred in isAppByDescriptionDisplayed, screenshot: ${screenshot} ` + err);
+        }
     }
 
-    async getNumberOfSelectedRows() {
+    async waitForAppByDescriptionDisplayed(description) {
         try {
-            let result = await this.findElements(XPATH.selectedRows);
+            return await this.waitForElementDisplayed(XPATH.rowByDescription(description), appConst.shortTimeout)
+        } catch (err) {
+            let screenshot = await this.saveScreenshotUniqueName('err_app_in_grid');
+            throw new Error(`Application should be displayed in the app-grid, screenshot: ${screenshot} ` + err);
+        }
+    }
+
+    async getNumberOfCheckedRows() {
+        try {
+            let result = await this.findElements(XPATH.checkedRowLi);
             return result.length;
         } catch (err) {
             throw new Error(`Error when getting selected rows ` + err);
@@ -129,10 +139,10 @@ class AppBrowsePanel extends Page {
         });
     }
 
-    waitForRowByNameVisible(name) {
-        const nameXpath = XPATH.rowByName(name);
+    waitForRowByDescriptionVisible(description) {
+        const nameXpath = XPATH.rowByDescription(description);
         return this.waitForElementDisplayed(nameXpath, appConst.mediumTimeout).catch(() => {
-            throw Error(`Row with the name ${name} is not visible in 3000ms.`)
+            throw Error(`Row with the name ${description} is not visible in 3000ms.`)
         })
     }
 
@@ -149,7 +159,7 @@ class AppBrowsePanel extends Page {
 
     //Wait for application with the description is not displayed in app-grid:
     waitForAppNotDisplayed(description) {
-        return this.waitForElementNotDisplayed(XPATH.rowByName(description), appConst.shortTimeout).catch(err => {
+        return this.waitForElementNotDisplayed(XPATH.rowByDescription(description), appConst.shortTimeout).catch(err => {
             console.log("item is still displayed:" + description + " " + err);
             return false;
         });
@@ -276,15 +286,15 @@ class AppBrowsePanel extends Page {
     }
 
     //clicks on 'select all' checkbox
-    async clickOnSelectAll() {
+    async clickOnSelectAllCheckbox() {
         try {
-            let checkboxXpath = XPATH.treeGridToolbar + XPATH.selectAllCheckbox;
+            let checkboxXpath = XPATH.treeGridToolbarDiv + XPATH.selectAllCheckbox;
             await this.waitForElementDisplayed(checkboxXpath, appConst.mediumTimeout);
             await this.clickOnElement(checkboxXpath);
             return await this.pause(500);
         } catch (err) {
-            await this.saveScreenshot('err_selecta_ll_checkbox');
-            throw Error('Select all checkbox was not found')
+            let screenshot = await this.saveScreenshotUniqueName('err_selecta_ll_checkbox');
+            throw Error(`Select all checkbox was not found, screenshot: ${screenshot}  ` + err);
         }
     }
 
@@ -337,10 +347,12 @@ class AppBrowsePanel extends Page {
         });
     }
 
-    isRowByIndexSelected(rowNumber) {
-        return this.getAttribute(XPATH.checkboxes + '[' + (rowNumber + 1) + ']', 'class').then(classAttributeValue => {
-            return classAttributeValue.indexOf('selected') !== -1;
-        });
+    async isRowByIndexChecked(rowNumber) {
+        let locator = `//li[contains(@class,'item-view-wrapper')]`;
+        await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
+        let listItems = await this.findElements(locator);
+        let attr = await listItems[rowNumber].getAttribute('class');
+        return attr.includes('checked');
     }
 
     //throw exception after the timeout
@@ -365,19 +377,24 @@ class AppBrowsePanel extends Page {
         });
     }
 
-    getApplicationState(appName) {
-        let stateXpath = XPATH.appStateByName(appName);
-        return this.getText(stateXpath).catch(err => {
-            console.log("Failed to get app-state " + appName + '  ' + err);
-            throw new Error('App-state was not found: ' + err);
-        });
+    async getApplicationState(appName) {
+        try {
+            let stateXpath = XPATH.appStateByName(appName);
+            await this.waitForElementDisplayed(stateXpath, appConst.mediumTimeout);
+            return await this.getText(stateXpath);
+        } catch (err) {
+            let screenshot = await this.saveScreenshotUniqueName('err_app_state');
+            throw new Error(`Error occurred during getting App-state screenshot: ${screenshot} ` + err);
+        }
     }
 
-    getApplicationDisplayNames() {
-        let displayNameXpath = lib.SLICK_ROW + lib.H6_DISPLAY_NAME;
-        return this.getTextInDisplayedElements(displayNameXpath).catch(err => {
-            throw new Error('Error when get App-display names')
-        });
+    async getApplicationDisplayNames() {
+        try {
+            let displayNameXpath = XPATH.applicationsGridListUL + XPATH.GRID_LIST_ITEM + lib.H6_DISPLAY_NAME;
+            return await this.getTextInDisplayedElements(displayNameXpath);
+        } catch (err) {
+            throw new Error('Error occurred in getApplicationDisplayNames')
+        }
     }
 
     async doOpenLauncherPanel() {
