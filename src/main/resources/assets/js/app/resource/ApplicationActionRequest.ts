@@ -16,7 +16,7 @@ export class ApplicationActionRequest
         this.addRequestPathElements(action);
     }
 
-    getParams(): Object {
+    getParams(): object {
         return {
             key: ApplicationKey.toStringArray(this.applicationKeys)
         };

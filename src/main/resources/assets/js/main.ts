@@ -71,11 +71,11 @@ function startApplication() {
 
 (async () => {
     if (!document.currentScript) {
-        throw 'Legacy browsers are not supported';
+        throw Error('Legacy browsers are not supported');
     }
     const configServiceUrl = document.currentScript.getAttribute('data-config-service-url');
     if (!configServiceUrl) {
-        throw 'Unable to fetch app config';
+        throw Error('Unable to fetch app config');
     }
     await CONFIG.init(configServiceUrl);
     await i18nInit(CONFIG.getString('apis.i18nUrl'));

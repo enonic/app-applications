@@ -18,7 +18,7 @@ export class InstallUrlApplicationRequest
         this.addRequestPathElements('installUrl');
     }
 
-    getParams(): Object {
+    getParams(): object {
         return {
             URL: this.applicationUrl
         };

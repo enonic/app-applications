@@ -15,7 +15,7 @@ export class GetApplicationInfoRequest
         this.addRequestPathElements('info');
     }
 
-    getParams(): Object {
+    getParams(): object {
         return {
             applicationKey: this.applicationKey.toString()
         };

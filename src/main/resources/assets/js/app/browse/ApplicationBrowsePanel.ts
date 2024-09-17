@@ -16,7 +16,7 @@ import {showFeedback} from '@enonic/lib-admin-ui/notify/MessageBus';
 import {i18n} from '@enonic/lib-admin-ui/util/Messages';
 import {ServerEventsConnection} from '@enonic/lib-admin-ui/event/ServerEventsConnection';
 import {UploadItem} from '@enonic/lib-admin-ui/ui/uploader/UploadItem';
-import {Toolbar} from '@enonic/lib-admin-ui/ui/toolbar/Toolbar';
+import {Toolbar, ToolbarConfig} from '@enonic/lib-admin-ui/ui/toolbar/Toolbar';
 import {DivEl} from '@enonic/lib-admin-ui/dom/DivEl';
 import {SpanEl} from '@enonic/lib-admin-ui/dom/SpanEl';
 import {InstalledAppChangedEvent} from '../installation/InstalledAppChangedEvent';
@@ -41,8 +41,8 @@ export class ApplicationBrowsePanel
             .catch(DefaultErrorHandler.handle).done();
     }
 
-    protected createToolbar(): Toolbar {
-        const toolbar: Toolbar = new Toolbar();
+    protected createToolbar(): Toolbar<ToolbarConfig> {
+        const toolbar: Toolbar<ToolbarConfig> = new Toolbar<ToolbarConfig>();
         const readonlyMode: boolean = CONFIG.isTrue('readonlyMode');
 
         toolbar.toggleClass('read-only', readonlyMode);
@@ -53,10 +53,12 @@ export class ApplicationBrowsePanel
             toolbar.appendChild(divEl);
         } else {
             const browseActions: ApplicationBrowseActions = this.treeGrid.getContextMenu().getActions() as ApplicationBrowseActions;
-            toolbar.addAction(browseActions.INSTALL_APPLICATION);
-            toolbar.addAction(browseActions.UNINSTALL_APPLICATION);
-            toolbar.addAction(browseActions.START_APPLICATION);
-            toolbar.addAction(browseActions.STOP_APPLICATION);
+            toolbar.addActions([
+                browseActions.INSTALL_APPLICATION,
+                browseActions.UNINSTALL_APPLICATION,
+                browseActions.START_APPLICATION,
+                browseActions.STOP_APPLICATION
+            ]);
         }
 
         return toolbar;
