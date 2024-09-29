@@ -46,7 +46,7 @@ export class ListMarketApplicationsRequest
         return UriHelper.appendUrlParams(this.url, this.params);
     }
 
-    protected createRequestData(): Object {
+    protected createRequestData(): object {
 
         if (this.ids && this.ids.length > 0) {
             this.params = {
@@ -64,7 +64,7 @@ export class ListMarketApplicationsRequest
             count: this.count
         };
 
-        return this.send().then((rawResponse: Object) => {
+        return this.send().then((rawResponse: object) => {
             const response = new JsonResponse<MarketApplicationsListJson>(rawResponse);
             return ListMarketApplicationsRequest.parseResponse(response);
         });
