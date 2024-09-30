@@ -40,10 +40,13 @@ class Page {
         if (elements.length === 0) {
             return [];
         }
-        let pr = await elements.map(el => el.isDisplayed());
-        return Promise.all(pr).then(result => {
-            return elements.filter((el, i) => result[i]);
-        });
+        return await this.doFilterDisplayedElements(elements);
+    }
+
+    async doFilterDisplayedElements(elements) {
+        let pr = await elements.map(async (el) => await el.isDisplayed());
+        let result = await Promise.all(pr);
+        return elements.filter((el, i) => result[i]);
     }
 
     pause(ms) {

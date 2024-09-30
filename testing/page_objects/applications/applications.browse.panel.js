@@ -243,7 +243,7 @@ class AppBrowsePanel extends Page {
 
     async rightClickOnRowByDisplayName(name) {
         try {
-            const nameXpath = XPATH.rowByDisplayName(name);
+            const nameXpath = XPATH.rowByDisplayName(name) + "//div[contains(@id,'ApplicationsListViewer')]";
             await this.waitForElementDisplayed(nameXpath, appConst.mediumTimeout);
             await this.doRightClick(nameXpath);
             return await this.pause(500);
