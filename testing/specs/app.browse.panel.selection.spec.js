@@ -26,7 +26,7 @@ describe('Applications Browse panel - selection of items spec', function () {
             let appBrowsePanel = new AppBrowsePanel();
             await appBrowsePanel.clickOnSelectionControllerCheckbox();
             await studioUtils.saveScreenshot('selection_controller_checked');
-            let number = await appBrowsePanel.getNumberOfSelectedRows();
+            let number = await appBrowsePanel.getNumberOfCheckedRows();
             assert.ok(number >= EXPECTED_NUMBER_OF_APPLICATIONS, 'all applications should be selected');
         });
 
@@ -38,7 +38,7 @@ describe('Applications Browse panel - selection of items spec', function () {
             // 2. Click on the checkbox and unselect all apps:
             await appBrowsePanel.clickOnSelectionControllerCheckbox();
             await studioUtils.saveScreenshot('selection_controller_unchecked');
-            let number = await appBrowsePanel.getNumberOfSelectedRows();
+            let number = await appBrowsePanel.getNumberOfCheckedRows();
             assert.equal(number, 0, 'all applications should be unselected');
         });
 
@@ -60,7 +60,7 @@ describe('Applications Browse panel - selection of items spec', function () {
             await appBrowsePanel.pressArrowDownKey();
             await studioUtils.saveScreenshot('arrow_down_key');
             let appName = await appStatisticPanel.getApplicationName();
-            assert.ok(appName, appConst.TEST_APPLICATIONS.FOURTH_APP, 'the next application should be selected');
+            assert.equal(appName, appConst.TEST_APPLICATIONS.FOURTH_APP, 'the next application should be selected');
         });
 
     it(`GIVEN existing application is selected WHEN Arrow Up key has been pressed THEN the next application should be selected`,
