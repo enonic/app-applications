@@ -5,7 +5,6 @@ import {InstallAppPromptEvent} from './app/installation/InstallAppPromptEvent';
 import {Body} from '@enonic/lib-admin-ui/dom/Body';
 import {Path} from '@enonic/lib-admin-ui/rest/Path';
 import {ConnectionDetector} from '@enonic/lib-admin-ui/system/ConnectionDetector';
-import {UriHelper} from '@enonic/lib-admin-ui/util/UriHelper';
 import {AppBar} from '@enonic/lib-admin-ui/app/bar/AppBar';
 import {AppHelper} from '@enonic/lib-admin-ui/util/AppHelper';
 import {ServerEventsListener} from '@enonic/lib-admin-ui/event/ServerEventsListener';
@@ -13,6 +12,7 @@ import {i18nInit} from '@enonic/lib-admin-ui/util/MessagesInitializer';
 import {i18n} from '@enonic/lib-admin-ui/util/Messages';
 import {InstalledAppChangedEvent} from './app/installation/InstalledAppChangedEvent';
 import {CONFIG} from '@enonic/lib-admin-ui/util/Config';
+import {JSONObject} from '@enonic/lib-admin-ui/types';
 
 const body = Body.get();
 
@@ -73,11 +73,15 @@ function startApplication() {
     if (!document.currentScript) {
         throw Error('Legacy browsers are not supported');
     }
-    const configServiceUrl = document.currentScript.getAttribute('data-config-service-url');
-    if (!configServiceUrl) {
-        throw Error('Unable to fetch app config');
+
+    const configScriptId = document.currentScript.getAttribute('data-config-script-id');
+    if (!configScriptId) {
+        throw Error('Missing \'data-config-script-id\' attribute');
     }
-    await CONFIG.init(configServiceUrl);
+
+    const configScriptEl: HTMLElement = document.getElementById(configScriptId);
+    CONFIG.setConfig(JSON.parse(configScriptEl.innerText) as JSONObject);
+
     await i18nInit(CONFIG.getString('apis.i18nUrl'));
     startApplication();
 })();
