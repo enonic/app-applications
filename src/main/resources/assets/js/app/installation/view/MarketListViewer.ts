@@ -4,9 +4,10 @@ import {SpanEl} from '@enonic/lib-admin-ui/dom/SpanEl';
 import * as Q from 'q';
 import {Button} from '@enonic/lib-admin-ui/ui/button/Button';
 import {MarketApplication, MarketAppStatus, MarketAppStatusFormatter} from '../../MarketApplication';
+import {LiEl} from '@enonic/lib-admin-ui/dom/LiEl';
 
 export class MarketListViewer
-    extends DivEl {
+    extends LiEl {
 
     private readonly marketViewer: MarketAppViewer;
 
