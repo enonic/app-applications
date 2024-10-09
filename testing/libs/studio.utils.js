@@ -13,7 +13,7 @@ module.exports = {
         if (typeof browser !== "undefined") {
             return browser;
         } else {
-           return webDriverHelper.browser;
+            return webDriverHelper.browser;
         }
     },
     async doCloseCurrentBrowserTab() {
@@ -62,9 +62,8 @@ module.exports = {
             return await this.doSwitchToApplicationsBrowsePanel();
         } catch (err) {
             console.log('tried to navigate to applications app, but: ' + err);
-            let screenshot = appConst.generateRandomName("err_navigate_to_applications");
-            await this.saveScreenshot(screenshot);
-            throw new Error('Error during navigate to Applications app, screenshot: ' + screenshot + "  " + err);
+            let screenshot = await this.saveScreenshotUniqueName('err_navigate_to_applications');
+            throw new Error(`Error during navigate to Applications app, screenshot: ${screenshot} ` + err);
         }
     },
     async doSwitchToApplicationsBrowsePanel() {
@@ -75,23 +74,19 @@ module.exports = {
         await browsePanel.waitForSpinnerNotVisible();
         return await browsePanel.waitForGridLoaded(appConst.mediumTimeout);
     },
-    doSwitchToHome() {
+    async doSwitchToHome() {
         console.log('testUtils:switching to Home page...');
-        return this.getBrowser().switchWindow("Enonic XP Home").then(() => {
-            console.log("switched to Home Page...");
-        }).then(() => {
-            let homePage = new HomePage();
-            return homePage.waitForLoaded(appConst.mediumTimeout);
-        });
+        await this.getBrowser().switchWindow("Enonic XP Home");
+        console.log("switched to Home Page...");
+        let homePage = new HomePage();
+        return await homePage.waitForLoaded(appConst.mediumTimeout);
     },
-    doSwitchToLoginPage() {
+    async doSwitchToLoginPage() {
         console.log('testUtils:switching to Home page...');
-        return this.getBrowser().switchWindow("Enonic XP - Login").then(() => {
-            console.log("switched to Login Page...");
-        }).then(() => {
-            let loginPage = new LoginPage();
-            return loginPage.waitForPageLoaded(appConst.mediumTimeout);
-        });
+        await this.getBrowser().switchWindow("Enonic XP - Login");
+        console.log("switched to Login Page...");
+        let loginPage = new LoginPage();
+        return await loginPage.waitForPageLoaded(appConst.mediumTimeout);
     },
     switchAndCheckTitle: function (handle, reqTitle) {
         return this.getBrowser().switchWindow(handle).then(() => {
@@ -109,7 +104,7 @@ module.exports = {
         return await loginPage.pause(1500);
     },
 
-    saveScreenshot (name, that) {
+    saveScreenshot(name, that) {
         let screenshotsDir = path.join(__dirname, '/../build/reports/screenshots/');
         if (!fs.existsSync(screenshotsDir)) {
             fs.mkdirSync(screenshotsDir, {recursive: true});
@@ -119,5 +114,10 @@ module.exports = {
         }).catch(err => {
             return console.log('screenshot was not saved ' + screenshotsDir + 'utils  ' + err);
         })
+    },
+    async saveScreenshotUniqueName(namePart) {
+        let screenshotName = appConst.generateRandomName(namePart);
+        await this.saveScreenshot(screenshotName);
+        return screenshotName;
     }
 };

@@ -22,7 +22,7 @@ describe("Item Statistics Panel 'Action Menu' spec", function () {
             await appBrowsePanel.clickOnRowByDisplayName(FIRST_APP);
             // 2. Verify the status in Statistics Panel:
             let result = await appStatisticPanel.getDropDownButtonText();
-            await studioUtils.saveScreenshot("application_action_menu_collapsed");
+            await studioUtils.saveScreenshot('application_action_menu_collapsed');
             assert.equal(result, 'Started', 'expected label should be displayed on the drop-down button');
             // 3. 'Stop' button should be hidden in the menu-button
             await appStatisticPanel.waitForStopMenuItemNotDisplayed();

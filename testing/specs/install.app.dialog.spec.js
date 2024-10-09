@@ -82,13 +82,14 @@ describe('Install Application Dialog specification', function () {
         await dialog.waitForSpinnerNotVisible();
         // 1. Install the app:
         await dialog.clickOnInstallAppLink(CHUCK_NORRIS_APP_DISPLAY_NAME);
-        let isVisible = await dialog.waitForAppInstalled(CHUCK_NORRIS_APP_DISPLAY_NAME);
-        assert.ok(isVisible, `'${CHUCK_NORRIS_APP_DISPLAY_NAME}' should've been installed by now`);
+        // 2. Verify that 'Installed' button appears in the list element in modal dialog:
+        await dialog.waitForAppInstalled(CHUCK_NORRIS_APP_DISPLAY_NAME);
+        // 3. Close the modal dialog:
         await dialog.clickOnCancelButtonTop();
         await dialog.waitForClosed();
-        // 2. Check the app in grid:
-        isVisible = await appBrowsePanel.isAppByDescriptionDisplayed(CHUCK_NORRIS_APP_DISPLAY_NAME);
-        assert.ok(isVisible, `'${CHUCK_NORRIS_APP_DISPLAY_NAME}' application should've been present in the grid`);
+        // 4. Verify the app in grid:
+        await appBrowsePanel.waitForAppByDescriptionDisplayed(CHUCK_NORRIS_APP_DISPLAY_NAME);
+        // 5. Verify the notification message:
         let message = await appBrowsePanel.waitForNotificationMessage();
         assert.equal(message, 'Application \'Chuck Norris\' installed successfully', `Incorrect notification message [${message}]`)
     });
