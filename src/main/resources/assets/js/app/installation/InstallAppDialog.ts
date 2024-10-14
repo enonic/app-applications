@@ -13,7 +13,7 @@ import {UploadFailedEvent} from '@enonic/lib-admin-ui/ui/uploader/UploadFailedEv
 import {NotifyManager} from '@enonic/lib-admin-ui/notify/NotifyManager';
 import {UploadStartedEvent} from '@enonic/lib-admin-ui/ui/uploader/UploadStartedEvent';
 import {DivEl} from '@enonic/lib-admin-ui/dom/DivEl';
-import {Mask} from '@enonic/lib-admin-ui/ui/mask/Mask';
+import {AppHelper} from '@enonic/lib-admin-ui/util/AppHelper';
 
 export class InstallAppDialog
     extends ModalDialog {
@@ -27,8 +27,6 @@ export class InstallAppDialog
     private clearButton: ButtonEl;
 
     private marketAppsTreeGrid: MarketAppsTreeGrid;
-
-    private listMask: Mask;
 
     constructor() {
         super({
@@ -47,10 +45,9 @@ export class InstallAppDialog
         this.clearButton = new ButtonEl();
         this.dropzoneContainer = new DropzoneContainer(true);
         this.marketAppsTreeGrid = new MarketAppsTreeGrid();
-        this.listMask = new Mask(this.marketAppsTreeGrid);
     }
 
-    protected postInitElements() {
+    protected postInitElements(): void {
         super.postInitElements();
         this.setElementToFocusOnShow(this.applicationInput);
     }
@@ -58,30 +55,26 @@ export class InstallAppDialog
     protected initListeners() {
         super.initListeners();
 
-        this.applicationInput.onTextValueChanged(() => {
+        const debouncedSearch = AppHelper.debounce(() => {
             const searchString = this.applicationInput.getValue();
             const hasValue = !StringHelper.isEmpty(searchString);
             this.clearButton.setVisible(hasValue);
             this.marketAppsTreeGrid.setSearchString(searchString);
-            this.updateStatusMessage();
-        });
+        }, 300);
+
+        this.applicationInput.onTextValueChanged(debouncedSearch);
 
         this.applicationInput.onAppInstallStarted(() => {
-            this.listMask.show();
             this.statusMessage.showInstalling();
         });
 
         this.applicationInput.onAppInstallFinished(() => {
             this.clearButton.setVisible(!StringHelper.isEmpty(this.applicationInput.getValue()));
-            this.listMask.hide();
         });
 
         this.applicationInput.onAppInstallFailed((message: string) => {
             this.clearButton.setVisible(!StringHelper.isEmpty(this.applicationInput.getValue()));
-
             this.marketAppsTreeGrid.clearItems();
-            this.listMask.hide();
-
             this.statusMessage.showFailed(message);
         });
 
@@ -95,7 +88,6 @@ export class InstallAppDialog
         this.marketAppsTreeGrid.onLoadingStarted(() => {
             this.addClass('loading');
             this.statusMessage.showLoading();
-            this.listMask.show();
         });
 
         this.clearButton.onClicked(() => {
@@ -109,13 +101,6 @@ export class InstallAppDialog
 
         this.onShown(() => {
             this.clearButton.hide();
-        });
-
-        this.marketAppsTreeGrid.onShown(() => {
-            const isLoading = this.hasClass('loading');
-            if (isLoading) {
-                this.listMask.show();
-            }
         });
 
         this.marketAppsTreeGrid.onItemsAdded(() => {
@@ -132,11 +117,6 @@ export class InstallAppDialog
         } else {
             this.statusMessage.hide();
         }
-    }
-
-    private updateStatusMessage(): void {
-        const itemsVisible = this.marketAppsTreeGrid.getItemViews().filter((item) => item.isVisible()).length;
-        this.toggleStatusMessage(itemsVisible === 0);
     }
 
     updateInstallApplications(installApplications: Application[]) {
@@ -203,21 +183,15 @@ export class InstallAppDialog
     }
 
     show() {
-        this.resetFileInputWithUploader();
         super.show();
         this.statusMessage.reset();
-        this.updateStatusMessage();
     }
 
     hide() {
         super.hide();
+        this.applicationInput.reset();
         this.statusMessage.reset();
         this.applicationInput.reset();
-    }
-
-    close() {
-        this.applicationInput.reset();
-        super.close();
     }
 
     private resetFileInputWithUploader() {

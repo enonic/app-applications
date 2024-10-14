@@ -31,6 +31,8 @@ export class MarketAppsTreeGrid
 
     private searchString: string;
 
+    private allItems: MarketApplication[] = [];
+
     constructor() {
         super('market-app-tree-grid');
 
@@ -180,8 +182,8 @@ export class MarketAppsTreeGrid
 
     updateInstallApplications(installApplications: Application[]) {
         this.installedApplications = installApplications;
-        const apps = this.updateAndSortApps(this.getItems());
-        this.setItems(apps);
+        this.updateAndSortApps(this.allItems);
+        this.setSearchString(this.searchString);
     }
 
     load(): void {
@@ -191,7 +193,7 @@ export class MarketAppsTreeGrid
 
         MarketApplicationFetcher.fetchApps().then((data: MarketApplicationResponse) => {
             const apps = this.updateAndSortApps(data.getApplications());
-            this.setItems(apps);
+            this.setAllItems(apps);
         }).catch((reason) => {
             const status500Message = i18n('market.error.500');
             const defaultErrorMessage = i18n('market.error.default');
@@ -202,6 +204,11 @@ export class MarketAppsTreeGrid
           this.loading = false;
           this.notifyLoadingFinished();
         });
+    }
+
+    private setAllItems(items: MarketApplication[]): void {
+        this.allItems = items;
+        this.setItems(this.allItems);
     }
 
     private updateAndSortApps(apps: MarketApplication[]): MarketApplication[] {
@@ -231,13 +238,13 @@ export class MarketAppsTreeGrid
         });
     }
 
-    private filterItemsFunc(marketApp: MarketApplication, searchString: string): boolean {
-        if (!searchString || marketApp.isEmpty()) {
+    private filterItemsFunc(marketApp: MarketApplication): boolean {
+        if (!this.searchString || marketApp.isEmpty()) {
             // true for an empty app because it is the empty node that triggers loading
             return true;
         }
 
-        const inputValue = searchString?.toLowerCase() || '';
+        const inputValue = this.searchString?.toLowerCase() || '';
         const displayName = marketApp.getDisplayName().toLowerCase();
         const description = marketApp.getDescription().toLowerCase();
 
@@ -250,13 +257,19 @@ export class MarketAppsTreeGrid
     }
 
     private filterItems(): void {
-        this.getItems().forEach((item: MarketApplication) => {
-            this.filterItem(item, this.searchString);
-        });
-    }
+        this.removeChildren();
 
-    private filterItem(item: MarketApplication, searchString: string): void {
-        this.getItemView(item)?.setVisible(this.filterItemsFunc(item, searchString));
+        this.itemViews.forEach((viewer: MarketListViewer, id: string) => {
+            const item = this.getItem(id);
+
+            if (item) {
+                const isToBeShown = this.filterItemsFunc(item);
+
+                if (isToBeShown) {
+                    this.appendChild(viewer);
+                }
+            }
+        });
     }
 
     onLoadingStarted(listener: () => void) {
