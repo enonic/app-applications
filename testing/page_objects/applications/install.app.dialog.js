@@ -46,8 +46,8 @@ class InstallAppDialog extends Page {
         try {
             await this.waitForElementDisplayed(this.grid, appConst.mediumTimeout);
         } catch (err) {
-            await this.saveScreenshot('err_load_install_dialog');
-            throw new Error('Install App dialog was not loaded! ' + err);
+            let screenshot = await this.saveScreenshotUniqueName('err_load_install_dialog');
+            throw new Error(`Install App dialog was not loaded! screenshot: ${screenshot}  ` + err);
         }
     }
 
@@ -55,9 +55,9 @@ class InstallAppDialog extends Page {
         try {
             return await this.waitForElementNotDisplayed(XPATH.container, ms)
         } catch (err) {
-            await this.saveScreenshot('err_install_dialog_close');
+            let screenshot = await this.saveScreenshotUniqueName('err_install_dialog_close');
             await this.clickOnCancelButtonTop();
-            throw new Error('Install Dialog was not closed! ' + err);
+            throw new Error(`Install Dialog was not closed! screenshot: ${screenshot} ` + err);
         }
     }
 
@@ -72,8 +72,8 @@ class InstallAppDialog extends Page {
         try {
             await this.waitForElementDisplayed(this.grid + lib.H6_DISPLAY_NAME, appConst.longTimeout)
         } catch (err) {
-            await this.saveScreenshot('err_install_dialog_grid');
-            throw new Error('Install App dialog, grid was not loaded! ' + err);
+            let screenshot = await this.saveScreenshotUniqueName('err_install_dialog_grid');
+            throw new Error(`Install App dialog, grid was not loaded! screenshot: ${screenshot}  ` + err);
         }
     }
 
@@ -82,8 +82,8 @@ class InstallAppDialog extends Page {
             const selector = XPATH.installButtonByName(appName);
             return await this.waitForElementDisplayed(selector, appConst.mediumTimeout);
         } catch (err) {
-            await this.saveScreenshotUniqueName('err_install_link');
-            throw new Error(`Install link is not displayed for!  ` + err);
+            let screenshot = await this.saveScreenshotUniqueName('err_install_link');
+            throw new Error(`Install link is not displayed for! screenshot: ${screenshot} ` + err);
         }
     }
 
@@ -94,7 +94,8 @@ class InstallAppDialog extends Page {
             await this.pause(400);
             return await this.clickOnElement(locator);
         } catch (err) {
-            throw new Error(`Couldn't find install link for app ` + " " + err);
+            let screenshot = await this.saveScreenshotUniqueName('err_find_installed_status');
+            throw new Error(`Couldn't find install link for app, ${screenshot} ` + err);
         }
     }
 
@@ -105,7 +106,7 @@ class InstallAppDialog extends Page {
             return await this.waitForElementDisplayed(locator, appConst.longTimeout)
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_find_installed_status');
-            throw new Error(`Couldn't find 'Installed' label for the app, screenshot:` + screenshot + " " + err);
+            throw new Error(`Couldn't find 'Installed' label for the app, screenshot: ${screenshot} ` + err);
         }
     }
 
@@ -115,14 +116,15 @@ class InstallAppDialog extends Page {
         })
     }
 
-    getErrorValidationMessage() {
-        let selector = XPATH.container + `//div[contains(@class,'status-message') and contains(@class,'failed')]`;
-        return this.waitForElementDisplayed(selector, appConst.longTimeout).then(() => {
-            return this.getText(selector);
-        }).catch(err => {
-            this.saveScreenshot('err_wait_for_validation_message');
-            throw new Error('Validation message is not visible after the interval  ' + err);
-        })
+    async getErrorValidationMessage() {
+        try {
+            let selector = XPATH.container + `//div[contains(@class,'status-message') and contains(@class,'failed')]`;
+            await this.waitForElementDisplayed(selector, appConst.longTimeout);
+            return await this.getText(selector);
+        } catch (err) {
+            let screenshot = this.saveScreenshotUniqueName('err_wait_for_validation_message');
+            throw new Error(`Validation message is not visible after the interval screenshot: ${screenshot}  ` + err);
+        }
     }
 
     async getApplicationNotFoundMessage() {
@@ -131,17 +133,19 @@ class InstallAppDialog extends Page {
             await this.waitForElementDisplayed(selector, appConst.longTimeout);
             return await this.getTextInDisplayedElements(selector);
         } catch (err) {
-            await this.saveScreenshot('err_app_not_found_message');
-            throw new Error("'Application not found' message is not visible  " + err);
+            let screenshot = await this.saveScreenshotUniqueName('err_app_not_found_message');
+            throw new Error(`'Application not found' message is not visible, screenshot: ${screenshot}  ` + err);
         }
     }
 
-    waitForApplicationNotFoundMessage() {
-        let selector = XPATH.container + `//div[contains(@class,'status-message') and contains(.,'No applications found')]`;
-        return this.waitForElementDisplayed(selector, appConst.mediumTimeout).catch(err => {
-            this.saveScreenshot('err_app_not_found_mess');
-            throw new Error('expected notification message was not displayed! ' + err);
-        })
+    async waitForApplicationNotFoundMessage() {
+        try {
+            let selector = XPATH.container + `//div[contains(@class,'status-message') and contains(.,'No applications found')]`;
+            await this.waitForElementDisplayed(selector, appConst.mediumTimeout)
+        } catch (err) {
+            let screenshot = await this.saveScreenshot('err_app_not_found_mess');
+            throw new Error(`expected notification message was not displayed! screenshot: ${screenshot}  ` + err);
+        }
     }
 
     getPlaceholderMessage() {

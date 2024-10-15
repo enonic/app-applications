@@ -12,7 +12,7 @@ module.exports = Object.freeze({
     DROP_DOWN_HANDLE: "//button[contains(@id,'DropdownHandle')]",
     MARKET_MODAL_DIALOG: {
         rowByDisplayName(displayName) {
-            return `//div[contains(@id,'MarketListViewer') and (descendant::h6[contains(@class,'main-name') and contains(.,'${displayName}')])]`;
+            return `//li[contains(@id,'MarketListViewer') and (descendant::h6[contains(@class,'main-name') and contains(.,'${displayName}')])]`;
         },
     },
     TREE_GRID: {
