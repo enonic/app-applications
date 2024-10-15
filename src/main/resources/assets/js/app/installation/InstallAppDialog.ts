@@ -60,6 +60,7 @@ export class InstallAppDialog
             const hasValue = !StringHelper.isEmpty(searchString);
             this.clearButton.setVisible(hasValue);
             this.marketAppsTreeGrid.setSearchString(searchString);
+            this.toggleNoItems(this.marketAppsTreeGrid.getChildren().length === 0);
         }, 300);
 
         this.applicationInput.onTextValueChanged(debouncedSearch);
@@ -80,7 +81,7 @@ export class InstallAppDialog
 
         this.marketAppsTreeGrid.onLoadingFinished(() => {
             this.statusMessage.reset();
-            this.toggleStatusMessage(this.marketAppsTreeGrid.getItemCount() === 0);
+            this.toggleNoItems(this.marketAppsTreeGrid.getItemCount() === 0);
             this.removeClass('loading');
             this.notifyResize();
         });
@@ -106,21 +107,29 @@ export class InstallAppDialog
         this.marketAppsTreeGrid.onItemsAdded(() => {
             const isLoading = this.hasClass('loading');
             if (!isLoading) {
-                this.toggleStatusMessage(this.marketAppsTreeGrid.getItemCount() < 1);
+                this.toggleNoItems(this.marketAppsTreeGrid.getItemCount() < 1);
             }
         });
     }
 
-    private toggleStatusMessage(showStatus: boolean) {
-        if (showStatus) {
+    private toggleNoItems(isEmpty: boolean) {
+        if (isEmpty) {
             this.statusMessage.showNoResult();
         } else {
             this.statusMessage.hide();
         }
     }
 
-    updateInstallApplications(installApplications: Application[]) {
-        this.marketAppsTreeGrid.updateInstallApplications(installApplications);
+    setInstalledApplications(installedApplications: Application[]) {
+        this.marketAppsTreeGrid.setInstalledApplications(installedApplications);
+    }
+
+    updateAppInstalled(installedApplication: Application) {
+        this.marketAppsTreeGrid.updateAppInstalled(installedApplication);
+    }
+
+    updateAppUninstalled(installedApplication: Application) {
+        this.marketAppsTreeGrid.updateAppUninstalled(installedApplication);
     }
 
     doRender(): Q.Promise<boolean> {

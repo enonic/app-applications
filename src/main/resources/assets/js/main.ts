@@ -10,9 +10,10 @@ import {AppHelper} from '@enonic/lib-admin-ui/util/AppHelper';
 import {ServerEventsListener} from '@enonic/lib-admin-ui/event/ServerEventsListener';
 import {i18nInit} from '@enonic/lib-admin-ui/util/MessagesInitializer';
 import {i18n} from '@enonic/lib-admin-ui/util/Messages';
-import {InstalledAppChangedEvent} from './app/installation/InstalledAppChangedEvent';
+import {AppInstalledEvent} from './app/installation/AppInstalledEvent';
 import {CONFIG} from '@enonic/lib-admin-ui/util/Config';
 import {JSONObject} from '@enonic/lib-admin-ui/types';
+import {AppUninstalledEvent} from './app/installation/AppUninstalledEvent';
 
 const body = Body.get();
 
@@ -59,12 +60,16 @@ function startApplication() {
     const installAppDialog = new InstallAppDialog();
 
     InstallAppPromptEvent.on((event) => {
-        installAppDialog.updateInstallApplications(event.getInstalledApplications());
+        installAppDialog.setInstalledApplications(event.getInstalledApplications());
         installAppDialog.open();
     });
 
-    InstalledAppChangedEvent.on((event) => {
-        installAppDialog.updateInstallApplications(event.getInstalledApplications());
+    AppInstalledEvent.on((event) => {
+        installAppDialog.updateAppInstalled(event.getApplication());
+    });
+
+    AppUninstalledEvent.on((event) => {
+       installAppDialog.updateAppUninstalled(event.getApplication());
     });
 
 }
