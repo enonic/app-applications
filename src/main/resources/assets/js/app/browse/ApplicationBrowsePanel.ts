@@ -18,7 +18,7 @@ import {UploadItem} from '@enonic/lib-admin-ui/ui/uploader/UploadItem';
 import {Toolbar, ToolbarConfig} from '@enonic/lib-admin-ui/ui/toolbar/Toolbar';
 import {DivEl} from '@enonic/lib-admin-ui/dom/DivEl';
 import {SpanEl} from '@enonic/lib-admin-ui/dom/SpanEl';
-import {InstalledAppChangedEvent} from '../installation/InstalledAppChangedEvent';
+import {AppInstalledEvent} from '../installation/AppInstalledEvent';
 import {CONFIG} from '@enonic/lib-admin-ui/util/Config';
 import {SelectableListBoxPanel} from '@enonic/lib-admin-ui/ui/panel/SelectableListBoxPanel';
 import {SelectableListBoxWrapper, SelectionMode} from '@enonic/lib-admin-ui/ui/selector/list/SelectableListBoxWrapper';
@@ -30,6 +30,7 @@ import {GetApplicationRequest} from '../resource/GetApplicationRequest';
 import * as Q from 'q';
 import {Element} from '@enonic/lib-admin-ui/dom/Element';
 import {ApplicationsListViewer} from './ApplicationsListViewer';
+import {AppUninstalledEvent} from '../installation/AppUninstalledEvent';
 
 export class ApplicationBrowsePanel
     extends BrowsePanel {
@@ -204,7 +205,7 @@ export class ApplicationBrowsePanel
             setTimeout(() => { // timeout lets grid to remove UploadMockNode so that its not counted in the toolbar
                 showFeedback(i18n('notify.installed', application.getDisplayName()));
                 this.treeListBox.addItems(application, false, 0);
-                new InstalledAppChangedEvent(this.treeListBox.getItems()).fire();
+                new AppInstalledEvent(application).fire();
             }, 200);
         }).catch(DefaultErrorHandler.handle);
     }
@@ -221,7 +222,7 @@ export class ApplicationBrowsePanel
             this.treeListBox.removeItems(itemToRemove);
         }
 
-        new InstalledAppChangedEvent(this.treeListBox.getItems()).fire();
+        new AppUninstalledEvent(uninstalledApp).fire();
     }
 
     private handleAppStoppedEvent(event: ApplicationEvent) {

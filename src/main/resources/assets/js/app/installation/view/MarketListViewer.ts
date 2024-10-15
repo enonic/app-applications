@@ -72,6 +72,8 @@ class StatusBlock extends DivEl {
 
     private readonly button: Button;
 
+    private item: MarketApplication;
+
     constructor(className?: string) {
         super('text-block ' + (className || ''));
 
@@ -82,6 +84,7 @@ class StatusBlock extends DivEl {
         const status: MarketAppStatus = item.getStatus();
         const progress: number = item.getProgress();
 
+        this.button.removeClass(this.getAllStatusClassesAsString());
         this.button.removeChildren();
         this.button.appendChild(MarketAppStatusFormatter.createStatusElement(status, progress));
         this.button.addClass(MarketAppStatusFormatter.getStatusCssClass(status));
@@ -89,6 +92,10 @@ class StatusBlock extends DivEl {
         if (status !== MarketAppStatus.NOT_INSTALLED && status !== MarketAppStatus.OLDER_VERSION_INSTALLED) {
             this.button.getEl().setTabIndex(-1);
         }
+    }
+
+    private getAllStatusClassesAsString(): string {
+        return `${MarketAppStatusFormatter.statusInstallCssClass} ${MarketAppStatusFormatter.statusInstalledCssClass} ${MarketAppStatusFormatter.statusInstallingCssClass} ${MarketAppStatusFormatter.statusUpdateCssClass}`;
     }
 
     onActionButtonClicked(listener: () => void): void {

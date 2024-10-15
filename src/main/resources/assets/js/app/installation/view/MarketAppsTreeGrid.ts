@@ -14,10 +14,16 @@ import {MarketApplication, MarketAppStatus} from '../../MarketApplication';
 import {MarketApplicationResponse} from '../../MarketApplicationResponse';
 import {MarketHelper} from '../../MarketHelper';
 
+enum MarketAppGridState {
+    NOT_LOADED, LOADING, LOADED
+}
+
 export class MarketAppsTreeGrid
     extends ListBox<MarketApplication> {
 
     private installedApplications: Application[];
+
+    private installedAppsWereSet: boolean;
 
     public static debug: boolean = false;
 
@@ -27,15 +33,18 @@ export class MarketAppsTreeGrid
 
     private updateConfirmationDialog?: ConfirmationDialog;
 
-    private loading: boolean;
+    private state: MarketAppGridState;
 
     private searchString: string;
 
-    private allItems: MarketApplication[] = [];
+    private marketApps: MarketApplication[];
 
     constructor() {
         super('market-app-tree-grid');
 
+        this.state = MarketAppGridState.NOT_LOADED;
+        this.installedAppsWereSet = false;
+        this.marketApps = [];
         this.installedApplications = [];
         this.loadingStartedListeners = [];
         this.loadingFinishedListeners = [];
@@ -45,11 +54,6 @@ export class MarketAppsTreeGrid
 
     private initListeners(): void {
         this.subscribeOnApplicationEvents();
-        this.onShown(() => {
-            if (!this.loading) {
-                this.updateAppsStatuses(this.getItems());
-            }
-        });
     }
 
     protected createItemView(item: MarketApplication, readOnly: boolean): MarketListViewer {
@@ -180,35 +184,69 @@ export class MarketAppsTreeGrid
             });
     }
 
-    updateInstallApplications(installApplications: Application[]) {
+    setInstalledApplications(installApplications: Application[]): void {
         this.installedApplications = installApplications;
-        this.updateAndSortApps(this.allItems);
-        this.setSearchString(this.searchString);
+
+        if (!this.installedAppsWereSet && this.state === MarketAppGridState.LOADED) {
+            this.setItemsIfDataReady();
+        }
+
+        this.installedAppsWereSet = true;
+    }
+
+    updateAppInstalled(app: Application): void {
+        this.replaceInstalledApp(app);
+        this.updateApp(app);
+    }
+
+    updateAppUninstalled(app: Application): void {
+        this.installedApplications =
+            this.installedApplications.filter((app: Application) => app.getApplicationKey() !== app.getApplicationKey());
+        this.updateApp(app);
+    }
+
+    private updateApp(app: Application): void {
+        this.updateAndSortApps(this.marketApps);
+        const marketApp = this.marketApps.find((marketApp: MarketApplication) => marketApp.getAppKey().equals(app.getApplicationKey()));
+
+        if (marketApp) {
+            this.replaceItems(marketApp);
+        }
+    }
+
+    private replaceInstalledApp(installedApp: Application): void {
+        const index = this.installedApplications.findIndex(
+            (app: Application) => app.getApplicationKey().equals(installedApp.getApplicationKey()));
+
+        if (index > -1) {
+            this.installedApplications.splice(index, 1, installedApp);
+        } else {
+            this.installedApplications.push(installedApp);
+        }
     }
 
     load(): void {
         this.clearItems();
-        this.loading = true;
+        this.state = MarketAppGridState.LOADING;
         this.notifyLoadingStarted();
 
         MarketApplicationFetcher.fetchApps().then((data: MarketApplicationResponse) => {
-            const apps = this.updateAndSortApps(data.getApplications());
-            this.setAllItems(apps);
+            this.state = MarketAppGridState.LOADED;
+            this.marketApps = data.getApplications();
+
+            if (this.installedAppsWereSet) {
+                this.setItemsIfDataReady();
+            }
         }).catch((reason) => {
+            this.state = MarketAppGridState.NOT_LOADED;
             const status500Message = i18n('market.error.500');
             const defaultErrorMessage = i18n('market.error.default');
             const exception = new Exception(reason.getStatusCode() === 500 ? status500Message : defaultErrorMessage);
             DefaultErrorHandler.handle(exception);
             return [];
         }).finally(() => {
-          this.loading = false;
-          this.notifyLoadingFinished();
+            this.notifyLoadingFinished();
         });
-    }
-
-    private setAllItems(items: MarketApplication[]): void {
-        this.allItems = items;
-        this.setItems(this.allItems);
     }
 
     private updateAndSortApps(apps: MarketApplication[]): MarketApplication[] {
@@ -216,7 +254,7 @@ export class MarketAppsTreeGrid
         return apps.sort(MarketAppsTreeGridHelper.compareAppsByStatusAndDisplayName);
     }
 
-    private updateAppsStatuses(applications: MarketApplication[]) {
+    private updateAppsStatuses(applications: MarketApplication[]): void {
         const marketApps = applications.filter(marketApp => !!marketApp.getLatestVersion());
         const installedApps = this.installedApplications.slice();
         const installedAppsIds = installedApps.map(app => app.getApplicationKey().toString());
@@ -270,6 +308,17 @@ export class MarketAppsTreeGrid
                 }
             }
         });
+    }
+
+    // to be invoked when market apps and installed apps are both set, to create items in list, no need to rerender the list after,
+    // just update, add or delete items from it
+    private setItemsIfDataReady(): void {
+        this.updateAndSortApps(this.marketApps);
+        this.setItems(this.marketApps);
+    }
+
+    protected updateItemView(itemView: MarketListViewer, item: MarketApplication) {
+        itemView.setItem(item);
     }
 
     onLoadingStarted(listener: () => void) {
