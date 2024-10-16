@@ -13,6 +13,7 @@ import {UploadFailedEvent} from '@enonic/lib-admin-ui/ui/uploader/UploadFailedEv
 import {NotifyManager} from '@enonic/lib-admin-ui/notify/NotifyManager';
 import {UploadStartedEvent} from '@enonic/lib-admin-ui/ui/uploader/UploadStartedEvent';
 import {DivEl} from '@enonic/lib-admin-ui/dom/DivEl';
+import {AppHelper} from '@enonic/lib-admin-ui/util/AppHelper';
 
 export class InstallAppDialog
     extends ModalDialog {
@@ -33,41 +34,20 @@ export class InstallAppDialog
             class: 'install-application-dialog'
         });
 
-        this.marketAppsTreeGrid.reload();
+        this.marketAppsTreeGrid.load();
     }
 
     protected initElements() {
         super.initElements();
 
         this.statusMessage = new StatusMessage();
-
         this.applicationInput = new ApplicationInput(this.getCancelAction(), 'large').setPlaceholder(i18n('dialog.install.search'));
-
         this.clearButton = new ButtonEl();
-
         this.dropzoneContainer = new DropzoneContainer(true);
-
-        this.marketAppsTreeGrid = new MarketAppsTreeGrid((item, args) => {
-            if (!item.isVisible()) {
-                return false;
-            }
-
-            const marketApp = item.getData();
-            if (marketApp.isEmpty()) {
-                // true for an empty app because it is the empty node that triggers loading
-                return true;
-            }
-
-            const inputValue = args?.searchString?.toLowerCase() || '';
-
-            const displayName = marketApp.getDisplayName().toLowerCase();
-            const description = marketApp.getDescription().toLowerCase();
-
-            return displayName.indexOf(inputValue) >= 0 || description.indexOf(inputValue) >= 0;
-        });
+        this.marketAppsTreeGrid = new MarketAppsTreeGrid();
     }
 
-    protected postInitElements() {
+    protected postInitElements(): void {
         super.postInitElements();
         this.setElementToFocusOnShow(this.applicationInput);
     }
@@ -75,36 +55,33 @@ export class InstallAppDialog
     protected initListeners() {
         super.initListeners();
 
-        this.applicationInput.onTextValueChanged(() => {
+        const debouncedSearch = AppHelper.debounce(() => {
             const searchString = this.applicationInput.getValue();
             const hasValue = !StringHelper.isEmpty(searchString);
             this.clearButton.setVisible(hasValue);
-            this.marketAppsTreeGrid.setFilterArgs({searchString});
-        });
+            this.marketAppsTreeGrid.setSearchString(searchString);
+            this.toggleNoItems(this.marketAppsTreeGrid.getChildren().length === 0);
+        }, 300);
+
+        this.applicationInput.onTextValueChanged(debouncedSearch);
 
         this.applicationInput.onAppInstallStarted(() => {
-            this.marketAppsTreeGrid.mask();
             this.statusMessage.showInstalling();
         });
 
         this.applicationInput.onAppInstallFinished(() => {
             this.clearButton.setVisible(!StringHelper.isEmpty(this.applicationInput.getValue()));
-            this.marketAppsTreeGrid.unmask();
         });
 
         this.applicationInput.onAppInstallFailed((message: string) => {
             this.clearButton.setVisible(!StringHelper.isEmpty(this.applicationInput.getValue()));
-
-            this.marketAppsTreeGrid.invalidate();
-            this.marketAppsTreeGrid.initData([]);
-            this.marketAppsTreeGrid.unmask();
-
+            this.marketAppsTreeGrid.clearItems();
             this.statusMessage.showFailed(message);
         });
 
-        this.marketAppsTreeGrid.onLoaded(() => {
+        this.marketAppsTreeGrid.onLoadingFinished(() => {
             this.statusMessage.reset();
-            this.toggleStatusMessage(this.marketAppsTreeGrid.isDataViewEmpty());
+            this.toggleNoItems(this.marketAppsTreeGrid.getItemCount() === 0);
             this.removeClass('loading');
             this.notifyResize();
         });
@@ -112,7 +89,6 @@ export class InstallAppDialog
         this.marketAppsTreeGrid.onLoadingStarted(() => {
             this.addClass('loading');
             this.statusMessage.showLoading();
-            this.marketAppsTreeGrid.mask();
         });
 
         this.clearButton.onClicked(() => {
@@ -128,38 +104,32 @@ export class InstallAppDialog
             this.clearButton.hide();
         });
 
-        this.marketAppsTreeGrid.onShown(() => {
-            const isLoading = this.hasClass('loading');
-            if (isLoading) {
-                this.marketAppsTreeGrid.mask();
-            }
-        });
-
-        this.marketAppsTreeGrid.onRowCountChanged((event, data) => {
+        this.marketAppsTreeGrid.onItemsAdded(() => {
             const isLoading = this.hasClass('loading');
             if (!isLoading) {
-                this.toggleStatusMessage(data.current < 1);
+                this.toggleNoItems(this.marketAppsTreeGrid.getItemCount() < 1);
             }
         });
     }
 
-    private toggleStatusMessage(showStatus: boolean) {
-        if (showStatus) {
+    private toggleNoItems(isEmpty: boolean) {
+        if (isEmpty) {
             this.statusMessage.showNoResult();
-            if (this.getBody().isVisible()) {
-                this.getBody().hide();
-            }
         } else {
             this.statusMessage.hide();
-            if (!this.getBody().isVisible()) {
-                this.getBody().show();
-                this.marketAppsTreeGrid.getGrid().resizeCanvas();
-            }
         }
     }
 
-    updateInstallApplications(installApplications: Application[]) {
-        this.marketAppsTreeGrid.updateInstallApplications(installApplications);
+    setInstalledApplications(installedApplications: Application[]) {
+        this.marketAppsTreeGrid.setInstalledApplications(installedApplications);
+    }
+
+    updateAppInstalled(installedApplication: Application) {
+        this.marketAppsTreeGrid.updateAppInstalled(installedApplication);
+    }
+
+    updateAppUninstalled(installedApplication: Application) {
+        this.marketAppsTreeGrid.updateAppUninstalled(installedApplication);
     }
 
     doRender(): Q.Promise<boolean> {
@@ -222,26 +192,19 @@ export class InstallAppDialog
     }
 
     show() {
-        this.resetFileInputWithUploader();
         super.show();
         this.statusMessage.reset();
     }
 
     hide() {
         super.hide();
+        this.applicationInput.reset();
         this.statusMessage.reset();
         this.applicationInput.reset();
     }
 
-    close() {
-        this.applicationInput.reset();
-        super.close();
-    }
-
     private resetFileInputWithUploader() {
-        if (this.applicationInput) {
-            this.applicationInput.reset();
-        }
+        this.applicationInput?.reset();
     }
 }
 

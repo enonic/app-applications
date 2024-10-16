@@ -1,47 +1,38 @@
-.application-grid.tree-grid .grid .slick-row {
-  .version, .state, .modified {
-    text-align: right;
-    font-size: 0.9em;
-  }
-  .modified {
-    padding-right: 25px;
-  }
+.applications-grid-list {
+  .item-view-wrapper {
+    height: 44px;
 
-  .slick-cell {
-    .toggle.icon {
-      display: none;
-    }
+    &.selected {
+      .application-viewer {
+        .xp-admin-common-names-view * {
+          color: @admin-white;
+        }
 
-    &.name.l0 {
-      padding-left: 10px;
-    }
-
-    &.name {
-      flex-grow: 1;
-
-      .viewer {
-        overflow: hidden;
-
-        .@{_COMMON_PREFIX}wrapper {
-          flex-shrink: 0;
+        .archive-status {
+          span {
+            color: @admin-white;
+          }
         }
       }
     }
 
-    &.version {
-      flex-shrink: 0;
-      flex-basis: 90px;
-      justify-content: center;
-    }
+    .applications-list-viewer {
+      display: grid;
+      grid-template-columns: 1fr 120px 60px;
+      padding-left: 0;
 
-    &.state {
-      flex-shrink: 0;
-      flex-basis: 50px;
-      justify-content: center;
-    }
+      .text-block {
+        display: flex;
+        justify-content: center;
+        align-items: center;
 
-    &.r3.slick-cell-checkboxsel {
-      padding-right: 2px;
+        &.state {
+          .progress-bar {
+            width: 48px;
+            height: 8px;
+          }
+        }
+      }
     }
   }
 

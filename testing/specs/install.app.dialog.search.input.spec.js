@@ -49,8 +49,8 @@ describe('Install app dialog, search input spec.', function () {
             await installDialog.waitForSpinnerNotVisible();
             // 4. Verify the expected warning:
             await installDialog.waitForApplicationNotFoundMessage();
-            let message = await installDialog.applicationNotFoundMessage();
-            await studioUtils.saveScreenshot('app_not_found');
+            let message = await installDialog.getApplicationNotFoundMessage();
+            await studioUtils.saveScreenshot('app_not_found_message');
             assert.ok(message.includes('No applications found'), "'No applications found' - message should appear");
         });
 
