@@ -1,13 +1,19 @@
 import {Application} from '@enonic/lib-admin-ui/application/Application';
 import {ClassHelper} from '@enonic/lib-admin-ui/ClassHelper';
 import {Event} from '@enonic/lib-admin-ui/event/Event';
-import {InstalledAppChangedEvent} from './InstalledAppChangedEvent';
 
 export class InstallAppPromptEvent
-    extends InstalledAppChangedEvent {
+    extends Event {
+
+    private readonly installedApplications: Application[];
 
     constructor(installedApplications: Application[]) {
-        super(installedApplications);
+        super();
+        this.installedApplications = installedApplications;
+    }
+
+    getInstalledApplications(): Application[] {
+        return this.installedApplications;
     }
 
     static on(handler: (event: InstallAppPromptEvent) => void) {

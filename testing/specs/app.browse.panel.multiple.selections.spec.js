@@ -89,7 +89,7 @@ describe('Application Browse Panel, multiple selection in grid', function () {
         async () => {
             let appBrowsePanel = new AppBrowsePanel();
             // 1. Select all applications(one app is stopped):
-            await appBrowsePanel.clickOnSelectAll();
+            await appBrowsePanel.clickOnSelectAllCheckbox();
             // 2. Open the context menu:
             await appBrowsePanel.rightClickOnRowByDisplayName(appConst.TEST_APPLICATIONS.FIRST_APP);
             await appBrowsePanel.waitForContextMenuDisplayed();
@@ -122,8 +122,3 @@ function restartApps() {
         });
     });
 }
-
-
-
-
-

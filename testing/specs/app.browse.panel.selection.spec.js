@@ -26,7 +26,7 @@ describe('Applications Browse panel - selection of items spec', function () {
             let appBrowsePanel = new AppBrowsePanel();
             await appBrowsePanel.clickOnSelectionControllerCheckbox();
             await studioUtils.saveScreenshot('selection_controller_checked');
-            let number = await appBrowsePanel.getNumberOfSelectedRows();
+            let number = await appBrowsePanel.getNumberOfCheckedRows();
             assert.ok(number >= EXPECTED_NUMBER_OF_APPLICATIONS, 'all applications should be selected');
         });
 
@@ -38,7 +38,7 @@ describe('Applications Browse panel - selection of items spec', function () {
             // 2. Click on the checkbox and unselect all apps:
             await appBrowsePanel.clickOnSelectionControllerCheckbox();
             await studioUtils.saveScreenshot('selection_controller_unchecked');
-            let number = await appBrowsePanel.getNumberOfSelectedRows();
+            let number = await appBrowsePanel.getNumberOfCheckedRows();
             assert.equal(number, 0, 'all applications should be unselected');
         });
 
@@ -60,7 +60,7 @@ describe('Applications Browse panel - selection of items spec', function () {
             await appBrowsePanel.pressArrowDownKey();
             await studioUtils.saveScreenshot('arrow_down_key');
             let appName = await appStatisticPanel.getApplicationName();
-            assert.ok(appName, appConst.TEST_APPLICATIONS.FOURTH_APP, 'the next application should be selected');
+            assert.equal(appName, appConst.TEST_APPLICATIONS.FOURTH_APP, 'the next application should be selected');
         });
 
     it(`GIVEN existing application is selected WHEN Arrow Up key has been pressed THEN the next application should be selected`,
@@ -76,7 +76,7 @@ describe('Applications Browse panel - selection of items spec', function () {
             assert.equal(result, appConst.TEST_APPLICATIONS.FIRST_APP, 'previous application should be selected');
         });
 
-    it(`GIVEN existing application is selected WHEN selecting one more THEN last selected application should be displayed in the Selection Panel`,
+    it(`GIVEN existing application is selected WHEN selecting one more THEN last selected application should be displayed in the 'Selection Panel'`,
         async () => {
             let appStatisticPanel = new AppStatisticPanel();
             let appBrowsePanel = new AppBrowsePanel();
@@ -89,7 +89,7 @@ describe('Applications Browse panel - selection of items spec', function () {
                 'last selected application should be displayed in the Selection Panel');
         });
 
-    it(`GIVEN three application are selected WHEN deselecting one THEN second application should be displayed in the Statistic Panel`,
+    it(`GIVEN three application are selected WHEN deselecting one THEN second application should be displayed in the 'Statistic Panel'`,
         async () => {
             let appBrowsePanel = new AppBrowsePanel();
             let appStatisticPanel = new AppStatisticPanel();
@@ -99,6 +99,8 @@ describe('Applications Browse panel - selection of items spec', function () {
             await appBrowsePanel.clickOnCheckboxAndSelectRowByDisplayName(appConst.TEST_APPLICATIONS.THIRD_APP);
             // 2. Unselect one application:
             await appBrowsePanel.clickOnCheckboxAndSelectRowByDisplayName(appConst.TEST_APPLICATIONS.THIRD_APP);
+            await appBrowsePanel.pause(1000);
+            await studioUtils.saveScreenshot('last_app_in_stat_panel');
             let appName = await appStatisticPanel.getApplicationName();
             assert.equal(appName, appConst.TEST_APPLICATIONS.SECOND_APP,
                 'Only the last selected application should be displayed in the Selection Panel');

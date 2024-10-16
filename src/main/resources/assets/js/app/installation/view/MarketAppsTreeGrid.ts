@@ -1,109 +1,80 @@
-import * as Q from 'q';
 import {MarketApplicationFetcher} from '../../resource/MarketApplicationFetcher';
 import {i18n} from '@enonic/lib-admin-ui/util/Messages';
 import {Application} from '@enonic/lib-admin-ui/application/Application';
-import {Element} from '@enonic/lib-admin-ui/dom/Element';
-import {TreeGrid} from '@enonic/lib-admin-ui/ui/treegrid/TreeGrid';
-import {MarketApplication, MarketAppStatus, MarketAppStatusFormatter} from '@enonic/lib-admin-ui/application/MarketApplication';
-import {TreeNode} from '@enonic/lib-admin-ui/ui/treegrid/TreeNode';
-import {TreeGridBuilder} from '@enonic/lib-admin-ui/ui/treegrid/TreeGridBuilder';
-import {ResponsiveItem} from '@enonic/lib-admin-ui/ui/responsive/ResponsiveItem';
-import {ResponsiveManager} from '@enonic/lib-admin-ui/ui/responsive/ResponsiveManager';
 import {ApplicationEvent, ApplicationEventType} from '@enonic/lib-admin-ui/application/ApplicationEvent';
 import {DefaultErrorHandler} from '@enonic/lib-admin-ui/DefaultErrorHandler';
 import {Exception} from '@enonic/lib-admin-ui/Exception';
-import {MarketApplicationResponse} from '@enonic/lib-admin-ui/application/MarketApplicationResponse';
-import {MarketHelper} from '@enonic/lib-admin-ui/application/MarketHelper';
 import {MarketAppsTreeGridHelper} from './MarketAppsTreeGridHelper';
 import {InstallUrlApplicationRequest} from '../../resource/InstallUrlApplicationRequest';
 import {ApplicationInstallResult} from '../../resource/ApplicationInstallResult';
-import {KeyHelper} from '@enonic/lib-admin-ui/ui/KeyHelper';
 import {ConfirmationDialog} from '@enonic/lib-admin-ui/ui/dialog/ConfirmationDialog';
+import {ListBox} from '@enonic/lib-admin-ui/ui/selector/list/ListBox';
+import {MarketListViewer} from './MarketListViewer';
+import {MarketApplication, MarketAppStatus} from '../../MarketApplication';
+import {MarketApplicationResponse} from '../../MarketApplicationResponse';
+import {MarketHelper} from '../../MarketHelper';
 
-interface GridEventData {
-    row: number;
-}
-
-interface RowCountChangedEventData
-    extends Slick.EventData {
-    previous: number;
-    current: number;
-}
-
-export type MarketAppsTreeGridFilter = (item: TreeNode<MarketApplication>, args: MarketAppsTreeGridFilterArgs) => boolean;
-
-export interface MarketAppsTreeGridFilterArgs {
-    searchString: string
+enum MarketAppGridState {
+    NOT_LOADED, LOADING, LOADED
 }
 
 export class MarketAppsTreeGrid
-    extends TreeGrid<MarketApplication> {
+    extends ListBox<MarketApplication> {
 
     private installedApplications: Application[];
+
+    private installedAppsWereSet: boolean;
 
     public static debug: boolean = false;
 
     private loadingStartedListeners: (() => void)[];
 
+    private loadingFinishedListeners: (() => void)[];
+
     private updateConfirmationDialog?: ConfirmationDialog;
 
-    constructor(filter: MarketAppsTreeGridFilter) {
+    private state: MarketAppGridState;
 
-        super(new TreeGridBuilder<MarketApplication>()
-            .setColumns(MarketAppsTreeGridHelper.generateColumns())
-            .setPartialLoadEnabled(true)
-            .setLoadBufferSize(2)
-            .setCheckableRows(false)
-            .setShowToolbar(false)
-            .setRowHeight(70)
-            .disableMultipleSelection(true)
-            .prependClasses('market-app-tree-grid')
-            .setSelectedCellCssClass('selected-sort-row')
-            .setQuietErrorHandling(true)
-            .setAutoLoad(false)
-        );
+    private searchString: string;
 
-        this.getGridData().setFilter(filter);
+    private marketApps: MarketApplication[];
 
+    constructor() {
+        super('market-app-tree-grid');
+
+        this.state = MarketAppGridState.NOT_LOADED;
+        this.installedAppsWereSet = false;
+        this.marketApps = [];
         this.installedApplications = [];
         this.loadingStartedListeners = [];
+        this.loadingFinishedListeners = [];
 
         this.initListeners();
     }
 
     private initListeners(): void {
-        this.subscribeAndManageInstallClick();
         this.subscribeOnApplicationEvents();
-        this.onShown(() => {
-            if (!this.loading) {
-                this.getCurrentData();
-                const marketApps = this.getRoot().getAllNodes().map(node => node.getData());
-                this.updateAppsStatuses(marketApps);
+    }
+
+    protected createItemView(item: MarketApplication, readOnly: boolean): MarketListViewer {
+        const viewer = new MarketListViewer();
+        viewer.setItem(item);
+
+        viewer.onActionButtonClicked(() => {
+            if (item.getStatus() === MarketAppStatus.NOT_INSTALLED || item.getStatus() === MarketAppStatus.OLDER_VERSION_INSTALLED) {
+                this.installApp(item);
             }
         });
+
+        return viewer;
     }
 
-    doRender(): Q.Promise<boolean> {
-        return super.doRender().then((rendered) => {
-            this.initAvailableSizeChangeListener();
-            return rendered;
-        });
+    protected getItemId(item: MarketApplication): string {
+        return item.getId();
     }
 
-    private initAvailableSizeChangeListener() {
-        ResponsiveManager.onAvailableSizeChanged(this, (item: ResponsiveItem) => {
-            this.getGrid().resizeCanvas();
-        });
-    }
-
-    private findNodeByAppUrl(url: string): TreeNode<MarketApplication> {
-        const nodes: TreeNode<MarketApplication>[] = this.getGrid().getDataView().getItems();
-        for (const node of nodes) {
-            if (node.getData().getLatestVersionDownloadUrl() === url) {
-                return node;
-            }
-        }
-        return null;
+    private findNodeByAppUrl(url: string): MarketApplication {
+        return this.getItems().find((app: MarketApplication) => app.getLatestVersionDownloadUrl() === url);
     }
 
     private subscribeOnApplicationEvents() { // update status of market app
@@ -128,9 +99,9 @@ export class MarketAppsTreeGrid
     }
 
     private handleApplicationProgress(appUrl: string, progress: number): void {
-        // TODO: send appKey from backend instead of looking for it!
-        const nodeToUpdate = this.findNodeByAppUrl(appUrl);
-        if (!nodeToUpdate) {
+        const app = this.findNodeByAppUrl(appUrl);
+
+        if (!app) {
             return;
         }
 
@@ -138,27 +109,16 @@ export class MarketAppsTreeGrid
             console.debug(`MarketAppsTreeGrid: progress ${progress}`);
         }
 
-        let app = nodeToUpdate.getData();
         app.setProgress(progress);
-
-        let row = this.getGrid().getDataView().getRowById(nodeToUpdate.getId());
-        if (row > -1) {
-            let cell = this.getGrid().getColumnIndex('appStatus');
-            this.getGrid().updateCell(row, cell);
-        }
+        const viewer: MarketListViewer = this.getItemView(app) as MarketListViewer;
+        viewer?.setItem(app);
     }
 
-    private installAppByRow(row: number): void {
-        const marketApplication: MarketApplication = this.getItem(row)?.getData();
-
-        if (!marketApplication) {
-            return;
-        }
-
+    private installApp(marketApplication: MarketApplication): void {
         if (this.isMajorVersionUpdate(marketApplication)) {
-            this.showUpdateConfirmationDialog(marketApplication, row);
+            this.showUpdateConfirmationDialog(marketApplication);
         } else {
-            this.doInstallApp(marketApplication, row);
+            this.doInstallApp(marketApplication);
         }
     }
 
@@ -176,7 +136,7 @@ export class MarketAppsTreeGrid
         return marketAppMajorVersion > installedAppMajorVersion;
     }
 
-    private showUpdateConfirmationDialog(marketApplication: MarketApplication, row: number): void {
+    private showUpdateConfirmationDialog(marketApplication: MarketApplication): void {
         const installedApp: Application =
             this.installedApplications.find((app: Application) => app.getApplicationKey().equals(marketApplication.getAppKey()));
 
@@ -191,7 +151,7 @@ export class MarketAppsTreeGrid
                 marketApplication.getLatestVersion())
         );
         this.updateConfirmationDialog.setQuestion(this.generateConfirmationQuestion(marketApplication), false);
-        this.updateConfirmationDialog.setYesCallback(() => this.doInstallApp(marketApplication, row));
+        this.updateConfirmationDialog.setYesCallback(() => this.doInstallApp(marketApplication));
         this.updateConfirmationDialog.open();
     }
 
@@ -203,10 +163,10 @@ export class MarketAppsTreeGrid
         return `${part1} ${linkHtml} ${part2}`;
     }
 
-    private doInstallApp(marketApplication: MarketApplication, row: number): void {
+    private doInstallApp(marketApplication: MarketApplication): void {
         const oldStatus: MarketAppStatus = marketApplication.getStatus();
         marketApplication.setStatus(MarketAppStatus.INSTALLING);
-        this.getGrid().updateRow(row);
+        this.replaceItems(marketApplication);
 
         void new InstallUrlApplicationRequest(marketApplication.getLatestVersionDownloadUrl())
             .sendAndParse().then((result: ApplicationInstallResult) => {
@@ -221,60 +181,71 @@ export class MarketAppsTreeGrid
             }).catch((reason) => {
                 marketApplication.setStatus(oldStatus);
                 DefaultErrorHandler.handle(reason);
-            }).finally(() => {
-                this.getGrid().updateRow(row);
             });
     }
 
-    private subscribeAndManageInstallClick() {
-        this.getGrid().subscribeOnClick(({target}, data) => {
-            const elem: Element = Element.fromHtmlElement(target.tagName.toLowerCase() === 'a' ? target : target.parentElement);
-            const canInstall = elem.hasClass(MarketAppStatusFormatter.statusInstallCssClass) ||
-                               elem.hasClass(MarketAppStatusFormatter.statusUpdateCssClass);
-            if (!canInstall) {
-                return;
-            }
-
-            const {row} = (data as GridEventData);
-            this.installAppByRow(row);
-        });
-
-        this.getGrid().setOnKeyDown((event) => {
-            if (KeyHelper.isEnterKey(event)) {
-                if (event.target.tagName.toLowerCase() === 'a') {
-                    event.target.click();
-                }
-            }
-        });
-    }
-
-    isEmptyNode(node: TreeNode<MarketApplication>): boolean {
-        const data = node.getData();
-        return !data.getAppKey();
-    }
-
-    updateInstallApplications(installApplications: Application[]) {
+    setInstalledApplications(installApplications: Application[]): void {
         this.installedApplications = installApplications;
 
-        const apps = this.updateAndSortApps(this.getDefaultData());
+        if (!this.installedAppsWereSet && this.state === MarketAppGridState.LOADED) {
+            this.setItemsIfDataReady();
+        }
 
-        super.initData(this.dataToTreeNodes(apps, this.getRoot().getDefaultRoot()));
+        this.installedAppsWereSet = true;
     }
 
-    fetchChildren(): Q.Promise<MarketApplication[]> {
-        this.notifyLoadingStarted();
-        this.hideErrorPanelIfVisible();
+    updateAppInstalled(app: Application): void {
+        this.replaceInstalledApp(app);
+        this.updateApp(app);
+    }
 
-        return MarketApplicationFetcher.fetchApps().then((data: MarketApplicationResponse) => {
-            const totalHits = data.getMetadata().getTotalHits();
-            this.getRoot().getCurrentRoot().setMaxChildren(totalHits);
-            return this.updateAndSortApps(data.getApplications());
+    updateAppUninstalled(app: Application): void {
+        this.installedApplications =
+            this.installedApplications.filter((app: Application) => app.getApplicationKey() !== app.getApplicationKey());
+        this.updateApp(app);
+    }
+
+    private updateApp(app: Application): void {
+        this.updateAndSortApps(this.marketApps);
+        const marketApp = this.marketApps.find((marketApp: MarketApplication) => marketApp.getAppKey().equals(app.getApplicationKey()));
+
+        if (marketApp) {
+            this.replaceItems(marketApp);
+        }
+    }
+
+    private replaceInstalledApp(installedApp: Application): void {
+        const index = this.installedApplications.findIndex(
+            (app: Application) => app.getApplicationKey().equals(installedApp.getApplicationKey()));
+
+        if (index > -1) {
+            this.installedApplications.splice(index, 1, installedApp);
+        } else {
+            this.installedApplications.push(installedApp);
+        }
+    }
+
+    load(): void {
+        this.clearItems();
+        this.state = MarketAppGridState.LOADING;
+        this.notifyLoadingStarted();
+
+        MarketApplicationFetcher.fetchApps().then((data: MarketApplicationResponse) => {
+            this.state = MarketAppGridState.LOADED;
+            this.marketApps = data.getApplications();
+
+            if (this.installedAppsWereSet) {
+                this.setItemsIfDataReady();
+            }
         }).catch((reason) => {
+            this.state = MarketAppGridState.NOT_LOADED;
             const status500Message = i18n('market.error.500');
             const defaultErrorMessage = i18n('market.error.default');
             const exception = new Exception(reason.getStatusCode() === 500 ? status500Message : defaultErrorMessage);
             DefaultErrorHandler.handle(exception);
             return [];
+        }).finally(() => {
+            this.notifyLoadingFinished();
         });
     }
 
@@ -283,14 +254,7 @@ export class MarketAppsTreeGrid
         return apps.sort(MarketAppsTreeGridHelper.compareAppsByStatusAndDisplayName);
     }
 
-    private hideErrorPanelIfVisible() {
-        if (this.getErrorPanel().isVisible()) {
-            this.hideErrorPanel();
-            this.mask();
-        }
-    }
-
-    private updateAppsStatuses(applications: MarketApplication[]) {
+    private updateAppsStatuses(applications: MarketApplication[]): void {
         const marketApps = applications.filter(marketApp => !!marketApp.getLatestVersion());
         const installedApps = this.installedApplications.slice();
         const installedAppsIds = installedApps.map(app => app.getApplicationKey().toString());
@@ -312,23 +276,49 @@ export class MarketAppsTreeGrid
         });
     }
 
-    initData(nodes: TreeNode<MarketApplication>[]) {
-        super.initData(nodes);
-        this.getGrid().getCanvasNode().style.height = (`${70 * nodes.length}px`);
-        this.getGrid().resizeCanvas();
+    private filterItemsFunc(marketApp: MarketApplication): boolean {
+        if (!this.searchString || marketApp.isEmpty()) {
+            // true for an empty app because it is the empty node that triggers loading
+            return true;
+        }
+
+        const inputValue = this.searchString?.toLowerCase() || '';
+        const displayName = marketApp.getDisplayName().toLowerCase();
+        const description = marketApp.getDescription().toLowerCase();
+
+        return displayName.indexOf(inputValue) >= 0 || description.indexOf(inputValue) >= 0;
     }
 
-    getDataId(data: MarketApplication): string {
-        return data.getAppKey() ? data.getAppKey().toString() : '';
+    setSearchString(searchString: string): void {
+        this.searchString = searchString;
+        this.filterItems();
     }
 
-    setFilterArgs(args: MarketAppsTreeGridFilterArgs) {
-        this.getGridData().setFilterArgs(args);
-        this.getGridData().refresh();
+    private filterItems(): void {
+        this.removeChildren();
+
+        this.itemViews.forEach((viewer: MarketListViewer, id: string) => {
+            const item = this.getItem(id);
+
+            if (item) {
+                const isToBeShown = this.filterItemsFunc(item);
+
+                if (isToBeShown) {
+                    this.appendChild(viewer);
+                }
+            }
+        });
     }
 
-    isDataViewEmpty(): boolean {
-        return this.getGrid().getDataView().getLength() === 0;
+    // to be invoked when market apps and installed apps are both set, to create items in list, no need to rerender the list after,
+    // just update, add or delete items from it
+    private setItemsIfDataReady(): void {
+        this.updateAndSortApps(this.marketApps);
+        this.setItems(this.marketApps);
+    }
+
+    protected updateItemView(itemView: MarketListViewer, item: MarketApplication) {
+        itemView.setItem(item);
     }
 
     onLoadingStarted(listener: () => void) {
@@ -347,7 +337,19 @@ export class MarketAppsTreeGrid
         });
     }
 
-    onRowCountChanged(listener: (eventData: Slick.EventData, args: RowCountChangedEventData) => void): void {
-        this.getGridData().onRowCountChanged(listener);
+    onLoadingFinished(listener: () => void) {
+        this.loadingFinishedListeners.push(listener);
+    }
+
+    unLoadingFinished(listener: () => void) {
+        this.loadingFinishedListeners = this.loadingFinishedListeners.filter((curr) => {
+            return listener !== curr;
+        });
+    }
+
+    private notifyLoadingFinished() {
+        this.loadingFinishedListeners.forEach((listener) => {
+            listener();
+        });
     }
 }

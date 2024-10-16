@@ -140,7 +140,7 @@ describe('Tests for Applications Item Statistics Panel', function () {
             // 'Content Types' header should not be displayed:
             await appStatisticPanel.waitForContentTypesHeaderNotDisplayed();
             // 'Part' header should not be displayed:
-           await appStatisticPanel.waitForPartHeaderNotDisplayed();
+            await appStatisticPanel.waitForPartHeaderNotDisplayed();
         });
 
     it(`WHEN two applications have been selected THEN should display info of the last selected application`,
