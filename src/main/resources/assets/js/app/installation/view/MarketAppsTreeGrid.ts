@@ -123,8 +123,7 @@ export class MarketAppsTreeGrid
     }
 
     private isMajorVersionUpdate(marketApplication: MarketApplication): boolean {
-        const installedApp: Application =
-            this.installedApplications.find((app: Application) => app.getApplicationKey().equals(marketApplication.getAppKey()));
+        const installedApp = this.getInstalledAppByMarketApp(marketApplication);
 
         if (!installedApp) {
             return false;
@@ -137,8 +136,7 @@ export class MarketAppsTreeGrid
     }
 
     private showUpdateConfirmationDialog(marketApplication: MarketApplication): void {
-        const installedApp: Application =
-            this.installedApplications.find((app: Application) => app.getApplicationKey().equals(marketApplication.getAppKey()));
+        const installedApp = this.getInstalledAppByMarketApp(marketApplication);
 
         if (!this.updateConfirmationDialog) {
             this.updateConfirmationDialog = new ConfirmationDialog();
@@ -199,19 +197,24 @@ export class MarketAppsTreeGrid
         this.updateApp(app);
     }
 
-    updateAppUninstalled(app: Application): void {
+    updateAppUninstalled(uninstalled: Application): void {
         this.installedApplications =
-            this.installedApplications.filter((app: Application) => app.getApplicationKey() !== app.getApplicationKey());
-        this.updateApp(app);
+            this.installedApplications.filter((app: Application) => app.getApplicationKey() !== uninstalled.getApplicationKey());
+        this.updateApp(uninstalled);
     }
 
     private updateApp(app: Application): void {
         this.updateAndSortApps(this.marketApps);
-        const marketApp = this.marketApps.find((marketApp: MarketApplication) => marketApp.getAppKey().equals(app.getApplicationKey()));
+        const marketApp = this.marketApps.find((marketApp: MarketApplication) => this.appsHaveMatchingKeys(marketApp, app));
 
         if (marketApp) {
             this.replaceItems(marketApp);
         }
+    }
+
+    private appsHaveMatchingKeys(marketApp: MarketApplication, installedApp: Application): boolean {
+        return marketApp.getAppKey().equals(installedApp.getApplicationKey()) ||
+               this.replaceDashesWithDotsInMarketApp(marketApp) === installedApp.getApplicationKey().toString();
     }
 
     private replaceInstalledApp(installedApp: Application): void {
@@ -256,24 +259,41 @@ export class MarketAppsTreeGrid
 
     private updateAppsStatuses(applications: MarketApplication[]): void {
         const marketApps = applications.filter(marketApp => !!marketApp.getLatestVersion());
-        const installedApps = this.installedApplications.slice();
-        const installedAppsIds = installedApps.map(app => app.getApplicationKey().toString());
-        const getInstalledAppIndex = (marketApp: MarketApplication) => installedAppsIds.indexOf(marketApp.getAppKey().toString());
 
         marketApps.forEach(marketApp => {
-            const installedAppIndex = getInstalledAppIndex(marketApp);
-            const isMarketAppInstalled = installedAppIndex >= 0;
-            if (isMarketAppInstalled) {
-                if (MarketAppsTreeGridHelper.installedAppCanBeUpdated(marketApp, installedApps[installedAppIndex])) {
-                    marketApp.setStatus(MarketAppStatus.OLDER_VERSION_INSTALLED);
-                } else {
-                    marketApp.setStatus(MarketAppStatus.INSTALLED);
-                }
-            } else if (marketApp.getStatus() === MarketAppStatus.INSTALLED ||
-                       marketApp.getStatus() === MarketAppStatus.OLDER_VERSION_INSTALLED) {
-                marketApp.setStatus(MarketAppStatus.NOT_INSTALLED);
-            }
+            const installedApp = this.getInstalledAppByMarketApp(marketApp);
+            marketApp.setStatus(this.getAppStatusForInstallDialog(marketApp, installedApp));
         });
+    }
+
+    private getAppStatusForInstallDialog(marketApp: MarketApplication, installedApp?: Application): MarketAppStatus {
+        if (installedApp) {
+            if (MarketAppsTreeGridHelper.installedAppCanBeUpdated(marketApp, installedApp)) {
+               return MarketAppStatus.OLDER_VERSION_INSTALLED;
+            }
+
+            return MarketAppStatus.INSTALLED;
+        }
+
+        if (marketApp.getStatus() === MarketAppStatus.INSTALLED ||
+            marketApp.getStatus() === MarketAppStatus.OLDER_VERSION_INSTALLED) {
+            return MarketAppStatus.NOT_INSTALLED;
+        }
+
+        return marketApp.getStatus();
+    }
+
+    private getInstalledAppByMarketApp(marketApp: MarketApplication): Application | undefined {
+        const marketAppNameNoDashes = this.replaceDashesWithDotsInMarketApp(marketApp);
+        const marketAppKey = marketApp.getAppKey();
+
+        return this.installedApplications.find(
+            (app: Application) => app.getApplicationKey().equals(marketAppKey) || app.getApplicationKey().toString() ===
+                                  marketAppNameNoDashes);
+    }
+
+    private replaceDashesWithDotsInMarketApp(marketApp: MarketApplication): string {
+        return marketApp.getAppKey().toString().replace(/-/g, '.');
     }
 
     private filterItemsFunc(marketApp: MarketApplication): boolean {

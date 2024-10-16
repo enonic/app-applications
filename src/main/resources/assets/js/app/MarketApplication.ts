@@ -116,8 +116,7 @@ export enum MarketAppStatus {
     NOT_INSTALLED,
     INSTALLED,
     INSTALLING,
-    OLDER_VERSION_INSTALLED,
-    UNKNOWN
+    OLDER_VERSION_INSTALLED
 }
 
 export class MarketAppStatusFormatter {
