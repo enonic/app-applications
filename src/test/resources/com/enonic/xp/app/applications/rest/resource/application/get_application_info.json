@@ -56,7 +56,7 @@
           "com.enonic.xp.my-interface-2"
         ],
         "key": "myapp:my-widget",
-        "url": "_/admin:widget/myapp/my-widget"
+        "url": "_/widgets/myapp/my-widget"
       }
     ]
   }

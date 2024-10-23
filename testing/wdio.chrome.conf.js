@@ -14,7 +14,6 @@ exports.config = {
     capabilities: [{
         browserName: 'chrome',
         browserVersion: browser_version,
-        "wdio:enforceWebDriverClassic": true,
         'goog:chromeOptions': {
             "args": [
                 "--headless", "--disable-gpu", "--no-sandbox",
@@ -29,7 +28,7 @@ exports.config = {
     // Enables colors for log output.
     coloredLogs: true,
 
-    baseUrl: 'http://localhost:8080/admin',
+    baseUrl: 'http://localhost:8080/admin/tool',
     //
     // Default timeout for all waitForXXX commands.
     waitforTimeout: 3000,

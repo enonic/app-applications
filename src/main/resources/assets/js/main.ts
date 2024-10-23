@@ -11,9 +11,8 @@ import {ServerEventsListener} from '@enonic/lib-admin-ui/event/ServerEventsListe
 import {i18nInit} from '@enonic/lib-admin-ui/util/MessagesInitializer';
 import {i18n} from '@enonic/lib-admin-ui/util/Messages';
 import {AppInstalledEvent} from './app/installation/AppInstalledEvent';
-import {CONFIG} from '@enonic/lib-admin-ui/util/Config';
-import {JSONObject} from '@enonic/lib-admin-ui/types';
 import {AppUninstalledEvent} from './app/installation/AppUninstalledEvent';
+import {CONFIG} from '@enonic/lib-admin-ui/util/Config';
 
 const body = Body.get();
 
@@ -33,10 +32,10 @@ function getApplication(): Application {
 
 function startLostConnectionDetector() {
     ConnectionDetector.get()
-            .setAuthenticated(true)
-            .setSessionExpireRedirectUrl(CONFIG.getString('toolUri'))
-            .setNotificationMessage(i18n('notify.connection.loss'))
-            .startPolling(true);
+        .setAuthenticated(true)
+        .setSessionExpireRedirectUrl(CONFIG.getString('toolUri'))
+        .setNotificationMessage(i18n('notify.connection.loss'))
+        .startPolling(true);
 }
 
 function startApplication() {
@@ -69,25 +68,19 @@ function startApplication() {
     });
 
     AppUninstalledEvent.on((event) => {
-       installAppDialog.updateAppUninstalled(event.getApplication());
+        installAppDialog.updateAppUninstalled(event.getApplication());
     });
-
 }
 
 (async () => {
     if (!document.currentScript) {
         throw Error('Legacy browsers are not supported');
     }
-
-    const configScriptId = document.currentScript.getAttribute('data-config-script-id');
-    if (!configScriptId) {
-        throw Error('Missing \'data-config-script-id\' attribute');
+    const configServiceUrl = document.currentScript.getAttribute('data-config-service-url');
+    if (!configServiceUrl) {
+        throw Error('Unable to fetch app config');
     }
-
-    const configScriptEl: HTMLElement = document.getElementById(configScriptId);
-    CONFIG.setConfig(JSON.parse(configScriptEl.innerText) as JSONObject);
-
-    await i18nInit(CONFIG.getString('apis.i18nUrl'));
+    await CONFIG.init(configServiceUrl);
+    await i18nInit(CONFIG.getString('services.i18nUrl'));
     startApplication();
 })();
-
