@@ -34,7 +34,7 @@ describe("Tests for Applications Grid context menu", function () {
             await appBrowsePanel.rightClickOnRowByDisplayName(appConst.TEST_APPLICATIONS.THIRD_APP);
             // 'context menu' gets opened:
             await appBrowsePanel.waitForContextMenuDisplayed();
-            await studioUtils.saveScreenshot("app_context_menu1");
+            await studioUtils.saveScreenshot('app_context_menu1');
         });
 
     it(`WHEN right click on a started application THEN 'Start' menu item should be disabled, because the application is started`,

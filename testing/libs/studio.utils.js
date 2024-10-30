@@ -69,17 +69,30 @@ module.exports = {
     async doSwitchToApplicationsBrowsePanel() {
         let browsePanel = new BrowsePanel();
         console.log('testUtils:switching to Applications app...');
-        await this.getBrowser().switchWindow(appConst.APPLICATION_TITLE);
+        await this.getBrowser().switchWindow(appConst.BROWSER_TITLES.APPLICATION_TITLE);
         console.log("switched to Applications app...");
         await browsePanel.waitForSpinnerNotVisible();
         return await browsePanel.waitForGridLoaded(appConst.mediumTimeout);
     },
+    async switchToTab(title) {
+        let handles = await this.getBrowser().getWindowHandles();
+        for (const handle of handles) {
+            await this.getBrowser().switchToWindow(handle);
+            let currentTitle = await this.getBrowser().getTitle();
+            if (currentTitle === title) {
+                return handle;
+            }
+        }
+        throw new Error('Browser tab with title ' + title + ' was not found');
+    },
+
     async doSwitchToHome() {
         console.log('testUtils:switching to Home page...');
-        await this.getBrowser().switchWindow("Enonic XP Home");
-        console.log("switched to Home Page...");
         let homePage = new HomePage();
+        await this.switchToTab(appConst.BROWSER_TITLES.XP_HOME);
+        console.log("switched to Home Page...");
         return await homePage.waitForLoaded(appConst.mediumTimeout);
+
     },
     async doSwitchToLoginPage() {
         console.log('testUtils:switching to Home page...');
