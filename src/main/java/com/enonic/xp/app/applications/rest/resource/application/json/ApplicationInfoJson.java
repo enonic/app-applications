@@ -1,14 +1,19 @@
 package com.enonic.xp.app.applications.rest.resource.application.json;
 
+import java.util.stream.Collectors;
+
 import com.google.common.base.Preconditions;
 
 import com.enonic.xp.admin.widget.WidgetDescriptor;
+import com.enonic.xp.api.ApiDescriptors;
 import com.enonic.xp.app.ApplicationInfo;
 import com.enonic.xp.app.applications.json.content.page.PageDescriptorListJson;
 import com.enonic.xp.app.applications.json.content.page.region.LayoutDescriptorsJson;
 import com.enonic.xp.app.applications.json.content.page.region.PartDescriptorsJson;
 import com.enonic.xp.app.applications.json.schema.content.ContentTypeSummaryListJson;
 import com.enonic.xp.app.applications.json.schema.relationship.RelationshipTypeListJson;
+import com.enonic.xp.app.applications.rest.resource.apis.json.ApiDescriptorJson;
+import com.enonic.xp.app.applications.rest.resource.apis.json.ApiDescriptorsJson;
 import com.enonic.xp.app.applications.rest.resource.macro.json.MacrosJson;
 import com.enonic.xp.app.applications.rest.resource.schema.content.LocaleMessageResolver;
 import com.enonic.xp.app.applications.rest.resource.schema.mixin.InlineMixinResolver;
@@ -41,6 +46,8 @@ public class ApplicationInfoJson
 
     private final AdminToolDescriptorsJson tools;
 
+    private final ApiDescriptorsJson apis;
+
     private final IdProviderApplicationJson idProviderApplication;
 
     private final ApplicationDeploymentJson deployment;
@@ -66,6 +73,7 @@ public class ApplicationInfoJson
         this.tasks = new ApplicationTaskDescriptorsJson( builder.applicationInfo.getTasks() );
         this.widgets = new WidgetDescriptorsJson( builder.widgetDescriptors );
         this.tools = builder.adminToolDescriptors;
+        this.apis = new ApiDescriptorsJson( builder.apis.stream().map( ApiDescriptorJson::new ).collect( Collectors.toList() ) );
         this.idProviderApplication = new IdProviderApplicationJson( builder.applicationInfo.getIdProviderDescriptor(),
                                                                     builder.applicationInfo.getIdProviderReferences() );
         this.deployment = new ApplicationDeploymentJson( builder.deploymentUrl );
@@ -131,6 +139,11 @@ public class ApplicationInfoJson
         return tools;
     }
 
+    public ApiDescriptorsJson getApis()
+    {
+        return apis;
+    }
+
     public static Builder create()
     {
         return new Builder();
@@ -143,6 +156,8 @@ public class ApplicationInfoJson
         private Descriptors<WidgetDescriptor> widgetDescriptors;
 
         private AdminToolDescriptorsJson adminToolDescriptors;
+
+        private ApiDescriptors apis;
 
         private String deploymentUrl;
 
@@ -169,6 +184,12 @@ public class ApplicationInfoJson
         public Builder setAdminToolDescriptors( final AdminToolDescriptorsJson adminToolDescriptors )
         {
             this.adminToolDescriptors = adminToolDescriptors;
+            return this;
+        }
+
+        public Builder setApis( final ApiDescriptors apis )
+        {
+            this.apis = apis;
             return this;
         }
 

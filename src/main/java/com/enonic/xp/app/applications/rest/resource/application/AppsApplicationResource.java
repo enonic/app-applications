@@ -37,6 +37,8 @@ import com.enonic.xp.admin.tool.AdminToolDescriptorService;
 import com.enonic.xp.admin.tool.AdminToolDescriptors;
 import com.enonic.xp.admin.widget.WidgetDescriptor;
 import com.enonic.xp.admin.widget.WidgetDescriptorService;
+import com.enonic.xp.api.ApiDescriptorService;
+import com.enonic.xp.api.ApiDescriptors;
 import com.enonic.xp.app.Application;
 import com.enonic.xp.app.ApplicationDescriptor;
 import com.enonic.xp.app.ApplicationDescriptorService;
@@ -114,6 +116,8 @@ public final class AppsApplicationResource
     private WidgetDescriptorService widgetDescriptorService;
 
     private AdminToolDescriptorService adminToolDescriptorService;
+
+    private ApiDescriptorService apiDescriptorService;
 
     private MixinService mixinService;
 
@@ -201,11 +205,12 @@ public final class AppsApplicationResource
         final ApplicationInfo applicationInfo = this.applicationInfoService.getApplicationInfo( applicationKey );
         final Descriptors<WidgetDescriptor> widgetDescriptors = this.widgetDescriptorService.getByApplication( applicationKey );
         final AdminToolDescriptors adminToolDescriptors = this.adminToolDescriptorService.getByApplication( applicationKey );
+        final ApiDescriptors apiDescriptors = apiDescriptorService.getByApplication( applicationKey );
 
         final ApplicationInfoJson.Builder builder = ApplicationInfoJson.create().
             setApplicationInfo( applicationInfo ).
             setWidgetDescriptors( widgetDescriptors ).
-
+            setApis(apiDescriptors ).
             setAdminToolDescriptors( new AdminToolDescriptorsJson( adminToolDescriptors.stream().map(
                 adminToolDescriptor -> new AdminToolDescriptorJson( adminToolDescriptor, this.adminToolDescriptorService.getIconByKey(
                     adminToolDescriptor.getKey() ), this.adminToolDescriptorService.generateAdminToolUri(
@@ -577,6 +582,12 @@ public final class AppsApplicationResource
     public void setMixinService( final MixinService mixinService )
     {
         this.mixinService = mixinService;
+    }
+
+    @Reference
+    public void setApiDescriptorService( final ApiDescriptorService apiDescriptorService )
+    {
+        this.apiDescriptorService = apiDescriptorService;
     }
 }
 

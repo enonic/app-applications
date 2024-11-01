@@ -9,6 +9,7 @@ import {ContentTypeSummary} from '@enonic/lib-admin-ui/schema/content/ContentTyp
 import {MacroDescriptor} from '@enonic/lib-admin-ui/macro/MacroDescriptor';
 import {Widget} from '@enonic/lib-admin-ui/content/Widget';
 import {BaseDescriptor} from './BaseDescriptor';
+import {ApiDescriptor} from './ApiDescriptor';
 
 export class ApplicationInfo {
 
@@ -35,6 +36,8 @@ export class ApplicationInfo {
     private idProviderApplication: IdProviderApplication;
 
     private deployment: ApplicationDeployment;
+
+    private apiDescriptors: ApiDescriptor[];
 
     static fromJson(json: ApplicationInfoJson): ApplicationInfo {
         let result = new ApplicationInfo();
@@ -73,6 +76,10 @@ export class ApplicationInfo {
 
         result.tools = (json.tools && json.tools.descriptors) ? json.tools.descriptors.map((toolJson) => {
             return AdminToolDescriptor.fromJson(toolJson);
+        }) : [];
+
+        result.apiDescriptors = json.apis && json.apis.descriptors ? json.apis.descriptors.map((apiJson) => {
+            return ApiDescriptor.fromJson(apiJson);
         }) : [];
 
         result.idProviderApplication = json.idProviderApplication ? IdProviderApplication.fromJson(json.idProviderApplication) : null;
@@ -116,6 +123,10 @@ export class ApplicationInfo {
 
     getWidgets(): Widget[] {
         return this.widgets;
+    }
+
+    getApiDescriptors(): ApiDescriptor[] {
+        return this.apiDescriptors;
     }
 
     getTools(): AdminToolDescriptor[] {

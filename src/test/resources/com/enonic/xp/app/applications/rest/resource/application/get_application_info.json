@@ -1,4 +1,23 @@
 {
+  "apis" : {
+      "descriptors" : [ {
+          "allowedPrincipals" : [ "role:system.everyone" ],
+          "description" : "description",
+          "displayName" : "displayName1",
+          "documentationUrl" : "url",
+          "key" : "testapplication:myapi1",
+          "mount" : true,
+          "name" : "myapi1"
+      }, {
+          "allowedPrincipals" : [ "role:system.everyone" ],
+          "description" : "description",
+          "displayName" : "displayName2",
+          "documentationUrl" : "url",
+          "key" : "testapplication:myapi2",
+          "mount" : false,
+          "name" : "myapi2"
+      } ]
+  },
   "contentTypes": {
     "contentTypes": [],
     "total": 0
