@@ -24,6 +24,9 @@ import com.enonic.xp.admin.tool.AdminToolDescriptorService;
 import com.enonic.xp.admin.tool.AdminToolDescriptors;
 import com.enonic.xp.admin.widget.WidgetDescriptor;
 import com.enonic.xp.admin.widget.WidgetDescriptorService;
+import com.enonic.xp.api.ApiDescriptor;
+import com.enonic.xp.api.ApiDescriptorService;
+import com.enonic.xp.api.ApiDescriptors;
 import com.enonic.xp.app.Application;
 import com.enonic.xp.app.ApplicationDescriptor;
 import com.enonic.xp.app.ApplicationDescriptorService;
@@ -50,6 +53,8 @@ import com.enonic.xp.resource.ResourceKey;
 import com.enonic.xp.resource.ResourceService;
 import com.enonic.xp.schema.mixin.MixinService;
 import com.enonic.xp.script.ScriptExports;
+import com.enonic.xp.security.PrincipalKeys;
+import com.enonic.xp.security.RoleKeys;
 import com.enonic.xp.site.SiteDescriptor;
 import com.enonic.xp.site.SiteService;
 import com.enonic.xp.web.multipart.MultipartForm;
@@ -86,6 +91,8 @@ public class AppsApplicationResourceTest
     private LocaleService localeService;
 
     private MixinService mixinService;
+
+    private ApiDescriptorService apiDescriptorService;
 
     @Test
     public void getApplicationByKey()
@@ -170,6 +177,17 @@ public class AppsApplicationResourceTest
 
         final ApplicationInfo applicationInfo = ApplicationInfo.create().build();
 
+        final ApiDescriptor apiDescriptor1 =
+            ApiDescriptor.create().key( DescriptorKey.from( applicationKey, "myapi1" ) ).mount( true ).allowedPrincipals(
+                PrincipalKeys.from( RoleKeys.EVERYONE ) ).documentationUrl( "url" ).description( "description" ).displayName(
+                "displayName1" ).build();
+
+        final ApiDescriptor apiDescriptor2 =
+            ApiDescriptor.create().key( DescriptorKey.from( applicationKey, "myapi2" ) ).mount( false ).allowedPrincipals(
+                PrincipalKeys.from( RoleKeys.EVERYONE ) ).documentationUrl( "url" ).description( "description" ).displayName(
+                "displayName2" ).build();
+
+        when( apiDescriptorService.getByApplication( applicationKey ) ).thenReturn( ApiDescriptors.from( apiDescriptor1, apiDescriptor2 ) );
         when( this.applicationInfoService.getApplicationInfo( applicationKey ) ).thenReturn( applicationInfo );
 
         final Resource resource = mock( Resource.class );
@@ -581,6 +599,7 @@ public class AppsApplicationResourceTest
         this.widgetDescriptorService = mock( WidgetDescriptorService.class );
         this.adminToolDescriptorService = mock( AdminToolDescriptorService.class );
         this.mixinService = mock( MixinService.class );
+        this.apiDescriptorService = mock( ApiDescriptorService.class );
 
         final AppsApplicationResource resource = new AppsApplicationResource();
         resource.setApplicationService( this.applicationService );
@@ -594,6 +613,7 @@ public class AppsApplicationResourceTest
         resource.setWidgetDescriptorService( this.widgetDescriptorService );
         resource.setAdminToolDescriptorService( this.adminToolDescriptorService );
         resource.setMixinService( this.mixinService );
+        resource.setApiDescriptorService( this.apiDescriptorService );
 
         return resource;
     }

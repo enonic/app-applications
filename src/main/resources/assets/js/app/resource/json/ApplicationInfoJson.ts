@@ -8,6 +8,7 @@ import {ContentTypeSummaryListJson} from '@enonic/lib-admin-ui/schema/content/Co
 import {BaseDescriptorsJson} from './BaseDescriptorJson';
 import {MacrosJson} from '@enonic/lib-admin-ui/macro/MacrosJson';
 import {AdminToolDescriptorsJson} from './AdminToolDescriptorsJson';
+import {ApiDescriptorsJson} from './ApiDescriptorsJson';
 
 export interface ApplicationInfoJson {
 
@@ -34,5 +35,7 @@ export interface ApplicationInfoJson {
     widgets: WidgetDescriptorsJson;
 
     tools: AdminToolDescriptorsJson;
+
+    apis: ApiDescriptorsJson;
 
 }

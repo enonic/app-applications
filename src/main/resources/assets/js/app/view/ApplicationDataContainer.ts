@@ -18,6 +18,7 @@ import {AEl} from '@enonic/lib-admin-ui/dom/AEl';
 import {StringHelper} from '@enonic/lib-admin-ui/util/StringHelper';
 import {ContentTypeSummary} from '@enonic/lib-admin-ui/schema/content/ContentTypeSummary';
 import {BaseDescriptor} from '../resource/BaseDescriptor';
+import {ApiDescriptor} from '../resource/ApiDescriptor';
 
 export class ApplicationDataContainer
     extends DivEl {
@@ -170,6 +171,7 @@ export class ApplicationDataContainer
 
         extensionGroup.addDataElements(i18n('field.tools'), this.getExtensionsTools(applicationInfo));
         extensionGroup.addDataElements(i18n('field.widgets'), this.getExtensionsWidgets(applicationInfo));
+        extensionGroup.addDataElements(i18n('field.apis'), this.getExtensionsApis(applicationInfo));
 
         return extensionGroup;
     }
@@ -178,12 +180,24 @@ export class ApplicationDataContainer
         return applicationInfo.getWidgets().map(this.widgetToElement).sort(this.sortElInAlphabeticallyAsc);
     }
 
+    private getExtensionsApis(applicationInfo: ApplicationInfo): Element[] {
+        return applicationInfo.getApiDescriptors().map(this.apiDescriptorToElement).sort(this.sortElInAlphabeticallyAsc);
+    }
+
     private widgetToElement(widget: Widget): Element {
         const interfacesStr = widget.getInterfaces().join(', ');
         const displayString = widget.getDisplayName() + (StringHelper.isBlank(interfacesStr) ? '' : ' (' + interfacesStr + ')');
 
         const spanEl = new SpanEl().setHtml(displayString);
         new Tooltip(spanEl, widget.getWidgetDescriptorKey().toString(), 200).setMode(Tooltip.MODE_GLOBAL_STATIC);
+        return spanEl;
+    }
+
+    private apiDescriptorToElement(apiDescriptor: ApiDescriptor): Element {
+        const displayName = apiDescriptor.getDisplayName() || apiDescriptor.getName();
+
+        const spanEl = new SpanEl().setHtml(displayName);
+        new Tooltip(spanEl, apiDescriptor.getKey(), 200).setMode(Tooltip.MODE_GLOBAL_STATIC);
         return spanEl;
     }
 
