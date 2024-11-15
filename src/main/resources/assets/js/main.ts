@@ -33,10 +33,11 @@ function getApplication(): Application {
 
 function startLostConnectionDetector() {
     ConnectionDetector.get()
-            .setAuthenticated(true)
-            .setSessionExpireRedirectUrl(CONFIG.getString('toolUri'))
-            .setNotificationMessage(i18n('notify.connection.loss'))
-            .startPolling(true);
+        .setAuthenticated(true)
+        .setStatusUrl(CONFIG.getString('statusApiUrl'))
+        .setSessionExpireRedirectUrl(CONFIG.getString('toolUri'))
+        .setNotificationMessage(i18n('notify.connection.loss'))
+        .startPolling(true);
 }
 
 function startApplication() {
@@ -52,7 +53,7 @@ function startApplication() {
 
     application.setLoaded(true);
 
-    const serverEventsListener = new ServerEventsListener([application]);
+    const serverEventsListener = new ServerEventsListener([application], CONFIG.getString('eventApiUrl'));
     serverEventsListener.start();
 
     startLostConnectionDetector();

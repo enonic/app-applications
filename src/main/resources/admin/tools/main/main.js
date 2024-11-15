@@ -21,7 +21,6 @@ function getConfigAsJson() {
         readonlyMode: readonlyMode,
         apis: {
             i18nUrl: portal.apiUrl({
-                application: app.name,
                 api: 'i18n',
             }),
         },
@@ -30,6 +29,14 @@ function getConfigAsJson() {
             'main'
         ),
         xpVersion: app.version,
+        eventApiUrl: portal.apiUrl({
+            application: 'admin',
+            api: 'event',
+        }),
+        statusApiUrl: portal.apiUrl({
+            application: 'admin',
+            api: 'status',
+        }),
     }, null, 4).replace(/<(\/?script|!--)/gi, "\\u003C$1");
 }
 
