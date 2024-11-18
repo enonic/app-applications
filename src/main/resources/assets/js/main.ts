@@ -32,9 +32,8 @@ function getApplication(): Application {
 }
 
 function startLostConnectionDetector() {
-    ConnectionDetector.get()
+    ConnectionDetector.get(CONFIG.getString('statusApiUrl'))
         .setAuthenticated(true)
-        .setStatusUrl(CONFIG.getString('statusApiUrl'))
         .setSessionExpireRedirectUrl(CONFIG.getString('toolUri'))
         .setNotificationMessage(i18n('notify.connection.loss'))
         .startPolling(true);
