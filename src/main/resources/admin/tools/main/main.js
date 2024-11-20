@@ -37,12 +37,19 @@ function getConfigAsJson() {
             application: 'admin',
             api: 'status',
         }),
+        launcherUrl: admin.widgetUrl({
+            application: 'com.enonic.xp.app.main',
+            widget: 'launcher',
+            params: {
+                appName: app.name,
+                theme: 'dark',
+            }
+        }),
     }, null, 4).replace(/<(\/?script|!--)/gi, "\\u003C$1");
 }
 
 function handleGet() {
     const view = resolve('./main.html');
-    const toolBaseUrl = admin.getToolUrl(app.name, 'main');
 
     const params = {
         assetsUri: portal.assetUrl({
@@ -53,9 +60,6 @@ function handleGet() {
             bundles: ['i18n/phrases'],
             locale: admin.getLocales()
         }),
-        launcherPath: admin.getLauncherPath(),
-        toolBaseUrl: toolBaseUrl,
-        toolAppName: app.name,
         configScriptId: 'app-applications-config-as-json',
         configAsJson: getConfigAsJson(),
     };

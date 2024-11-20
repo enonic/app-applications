@@ -14,6 +14,7 @@ import {AppInstalledEvent} from './app/installation/AppInstalledEvent';
 import {CONFIG} from '@enonic/lib-admin-ui/util/Config';
 import {JSONObject} from '@enonic/lib-admin-ui/types';
 import {AppUninstalledEvent} from './app/installation/AppUninstalledEvent';
+import {LauncherHelper} from '@enonic/lib-admin-ui/util/LauncherHelper';
 
 const body = Body.get();
 
@@ -72,6 +73,7 @@ function startApplication() {
        installAppDialog.updateAppUninstalled(event.getApplication());
     });
 
+    LauncherHelper.appendLauncherPanel();
 }
 
 (async () => {
