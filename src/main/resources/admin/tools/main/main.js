@@ -4,6 +4,7 @@ const admin = require('/lib/xp/admin');
 const mustache = require('/lib/mustache');
 const portal = require('/lib/xp/portal');
 const i18n = require('/lib/xp/i18n');
+const assetLib = require('/lib/enonic/asset');
 
 function getMarketUrl() {
     const marketConfigBean = __.newBean('com.enonic.xp.app.main.GetMarketConfigBean');
@@ -16,7 +17,7 @@ function getConfigAsJson() {
     return JSON.stringify({
         adminUrl: admin.getBaseUri(),
         appId: app.name,
-        assetsUri: portal.assetUrl({path: ''}),
+        assetsUri: assetLib.assetUrl({path: ''}),
         marketUrl: getMarketUrl(),
         readonlyMode: readonlyMode,
         apis: {
@@ -52,7 +53,7 @@ function handleGet() {
     const view = resolve('./main.html');
 
     const params = {
-        assetsUri: portal.assetUrl({
+        assetsUri: assetLib.assetUrl({
             path: ''
         }),
         appName: i18n.localize({
