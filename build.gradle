@@ -17,6 +17,9 @@ app {
     devSourcePaths += file( "$rootDir/../lib-admin-ui/src/main/resources" )
 }
 
+sourceCompatibility = JavaVersion.VERSION_11
+targetCompatibility = sourceCompatibility
+
 configurations {
     devResources {
         attributes {
@@ -37,6 +40,8 @@ dependencies {
     include "com.enonic.lib:lib-admin-ui:${libAdminUiVersion}"
     devResources "com.enonic.lib:lib-admin-ui:${libAdminUiVersion}"
     include "com.enonic.lib:lib-mustache:2.1.1"
+    include "com.enonic.lib:lib-asset:1.0.0"
+
     testImplementation "org.junit.jupiter:junit-jupiter-api:5.9.1"
     testImplementation "org.mockito:mockito-core:4.8.0"
     testImplementation( testFixtures( "com.enonic.xp:jaxrs-impl:${xpVersion}" ) )
@@ -73,22 +78,14 @@ tasks.register('webpack', NpmTask ) {
     inputs.dir '.xp/dev'
     inputs.dir 'src/main/resources/assets'
     inputs.file 'webpack.config.js'
-    outputs.dir "$buildDir/build/resources/main/assets"
 }
 
 jar {
-    exclude 'assets/**/*.ts'
-    exclude 'assets/**/*.less'
-    exclude 'assets/styles/*.js'
+    dependsOn += webpack
+}
 
-    if ( isProd() )
-    {
-        exclude 'assets/**/*.map'
-    }
-
-    outputs.dir "$buildDir/resources/main"
-
-    dependsOn ( 'webpack', 'test', 'javadoc' )
+processResources {
+    exclude 'assets/**'  // Excluded because webpack does it
 }
 
 test {

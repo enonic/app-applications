@@ -228,7 +228,7 @@ export class ApplicationBrowsePanel
     private handleAppStoppedEvent(event: ApplicationEvent) {
             const stoppedApp: Application = this.treeListBox.getItem(event.getApplicationKey().getName());
             // seems to be present in the grid and xp is running
-            if (stoppedApp && ServerEventsConnection.get().isConnected()) {
+            if (stoppedApp && ServerEventsConnection.get(CONFIG.getString('eventApiUrl')).isConnected()) {
                 this.updateAppByKey(event.getApplicationKey());
             }
     }
