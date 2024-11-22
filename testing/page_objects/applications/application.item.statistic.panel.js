@@ -35,7 +35,7 @@ class ApplicationItemStatisticsPanel extends Page {
             return await this.getTextInElements(selector);
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('stat_panel');
-            throw new Error('Error while getting application-data-headers, screenshot: ' + screenshot + '  ' + err);
+            throw new Error(`Error while getting application-data-headers, screenshot: ${screenshot} ` + err);
         }
     }
 
@@ -50,7 +50,7 @@ class ApplicationItemStatisticsPanel extends Page {
             return await this.waitForElementDisplayed(xpath.title, appConst.mediumTimeout);
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('stat_panel');
-            throw  new Error("App Statistic Panel - app name is not displayed in the panel, screenshot: " + screenshot + ' ' + err);
+            throw new Error("App Statistic Panel - app name is not displayed in the panel, screenshot: " + screenshot + ' ' + err);
         }
     }
 
@@ -63,7 +63,7 @@ class ApplicationItemStatisticsPanel extends Page {
             return await this.waitForElementNotDisplayed(xpath.title, appConst.mediumTimeout);
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('stat_panel');
-            throw  new Error("App Statistic Panel - app name should not be displayed in the panel, screenshot: " + screenshot + ' ' + err);
+            throw new Error(`App Statistic Panel - app name should not be displayed in the panel, screenshot: ${screenshot} ` + err);
         }
     }
 
@@ -86,7 +86,7 @@ class ApplicationItemStatisticsPanel extends Page {
             await this.waitForElementNotDisplayed(locator, appConst.mediumTimeout);
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('content_types_header');
-            throw new Error('Content Types header should not be displayed in the statistics panel, screenshot:' + screenshot + ' ' + err);
+            throw new Error(`Content Types header should not be displayed in the statistics panel, screenshot: ${screenshot} ` + err);
         }
     }
 
@@ -96,7 +96,7 @@ class ApplicationItemStatisticsPanel extends Page {
             await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('content_types_header');
-            throw new Error('Content Types header should  be displayed in the statistics panel, screenshot:' + screenshot + ' ' + err);
+            throw new Error(`Content Types header should  be displayed in the statistics panel, screenshot: ${screenshot} ` + err);
         }
     }
 
@@ -118,7 +118,7 @@ class ApplicationItemStatisticsPanel extends Page {
             await this.waitForElementNotDisplayed(locator, appConst.mediumTimeout);
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('content_types_header');
-            throw new Error('Parts header should not be displayed in the statistics panel, screenshot:' + screenshot + ' ' + err);
+            throw new Error(`Parts header should not be displayed in the statistics panel, screenshot: ${screenshot} ` + err);
         }
     }
 
@@ -128,7 +128,7 @@ class ApplicationItemStatisticsPanel extends Page {
             await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('content_types_header');
-            throw new Error('Parts header should  be displayed in the statistics panel, screenshot:' + screenshot + ' ' + err);
+            throw new Error(`Parts header should  be displayed in the statistics panel, screenshot: ${screenshot} ` + err);
         }
     }
 
@@ -142,7 +142,7 @@ class ApplicationItemStatisticsPanel extends Page {
             return await this.waitForElementDisplayed(xpath.idProviderApplicationsHeaders, appConst.mediumTimeout);
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_provider_data');
-            throw new Error('Provider data should be displayed in the statistics panel, screenshot: ' + screenshot + ' ' + err);
+            throw new Error(`Provider data should be displayed in the statistics panel, screenshot: ${screenshot}` + err);
         }
     }
 
@@ -152,7 +152,7 @@ class ApplicationItemStatisticsPanel extends Page {
             return this.getTextInDisplayedElements(xpath.siteDataHeaders);
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_site_data_info');
-            throw new Error("Statistics panel - Site data headers, screenshot: " + screenshot + ' ' + err);
+            throw new Error(`Statistics panel - Site data headers, screenshot: ${screenshot} ` + err);
         }
     }
 
@@ -161,7 +161,7 @@ class ApplicationItemStatisticsPanel extends Page {
             return await this.waitForElementDisplayed(xpath.siteDataHeaders, appConst.mediumTimeout);
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_site_data');
-            throw new Error('Site data should be displayed in the statistics panel, screenshot: ' + screenshot + ' ' + err);
+            throw new Error(`Site data should be displayed in the statistics panel, screenshot:${screenshot} ` + err);
         }
     }
 
@@ -188,7 +188,7 @@ class ApplicationItemStatisticsPanel extends Page {
             return await this.getText(locator);
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('stat_panel_dropdown_btn');
-            throw new Error('error while getting text from the button,screenshot: ' + screenshot + ' ' + err);
+            throw new Error(`error while getting text from the button,screenshot: ${screenshot} ` + err);
         }
     }
 
@@ -218,7 +218,7 @@ class ApplicationItemStatisticsPanel extends Page {
             return await this.waitForElementDisplayed(xpath.stopActionMenuItem, appConst.shortTimeout)
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('stop_menu_item_not_visible');
-            throw new Error('Stop menu item should be displayed: screenshot' + screenshot + '  ' + err);
+            throw new Error(`Stop menu item should be displayed: screenshot : ${screenshot} ` + err);
         }
     }
 
@@ -227,7 +227,7 @@ class ApplicationItemStatisticsPanel extends Page {
             return await this.waitForElementNotDisplayed(xpath.stopActionMenuItem, appConst.shortTimeout)
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('stop_menu_item_visible');
-            throw new Error('Stop menu item should not be displayed: screenshot' + screenshot + '  ' + err);
+            throw new Error(`Stop menu item should not be displayed: screenshot: ${screenshot} ` + err);
         }
     }
 
@@ -236,7 +236,7 @@ class ApplicationItemStatisticsPanel extends Page {
             return await this.waitForElementDisplayed(xpath.startActionMenuItem, appConst.shortTimeout)
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('start_menu_item_not_visible');
-            throw new Error('Start menu item should be displayed: screenshot' + screenshot + '  ' + err);
+            throw new Error(`Start menu item should be displayed: screenshot: ${screenshot} ` + err);
         }
     }
 }

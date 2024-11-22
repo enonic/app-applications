@@ -2,6 +2,7 @@
 
 const admin = require('/lib/xp/admin');
 const portal = require('/lib/xp/portal');
+const assetLib = require('/lib/enonic/asset');
 
 function getMarketUrl() {
     const marketConfigBean = __.newBean('com.enonic.xp.app.main.GetMarketConfigBean');
@@ -11,13 +12,15 @@ function getMarketUrl() {
 function handleGet() {
     const readonlyMode = app.config['readonlyMode'] === 'true' || false;
 
+    const baseUri = admin.getBaseUri();
+
     return {
         status: 200,
         contentType: 'application/json',
         body: {
-            adminUrl: admin.getBaseUri(),
+            adminUrl: baseUri,
             appId: app.name,
-            assetsUri: portal.assetUrl({path: ''}),
+            assetsUri: assetLib.assetUrl({path: ''}),
             marketUrl: getMarketUrl(),
             readonlyMode,
             services: {
@@ -27,7 +30,9 @@ function handleGet() {
                 app.name,
                 'main'
             ),
-            xpVersion: app.version
+            xpVersion: app.version,
+            statusApiUrl: `${baseUri}/rest/status`,
+            eventApiUrl: `${baseUri}/event`,
         }
     };
 }

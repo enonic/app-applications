@@ -25,4 +25,8 @@ module.exports = Object.freeze({
     generateRandomName: function (part) {
         return part + Math.round(Math.random() * 1000000);
     },
+    BROWSER_TITLES: {
+        XP_HOME: 'Enonic XP Home',
+        APPLICATION_TITLE: `Applications - Enonic XP Admin`,
+    },
 });
