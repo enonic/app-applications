@@ -63,7 +63,7 @@ jobs:
           name: app-applications
           path: build/libs/app-applications.jar
 
-      - uses: codecov/codecov-action@v4
+      - uses: codecov/codecov-action@v5
         continue-on-error: true
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
