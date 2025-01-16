@@ -6,7 +6,7 @@ import {UninstallApplicationEvent} from './UninstallApplicationEvent';
 import {ApplicationUploadStartedEvent} from './ApplicationUploadStartedEvent';
 import {ApplicationActionRequest} from '../resource/ApplicationActionRequest';
 import {BrowsePanel} from '@enonic/lib-admin-ui/app/browse/BrowsePanel';
-import {Application, ApplicationUploadMock} from '@enonic/lib-admin-ui/application/Application';
+import {Application, ApplicationBuilder, ApplicationUploadMock} from '@enonic/lib-admin-ui/application/Application';
 import {DefaultErrorHandler} from '@enonic/lib-admin-ui/DefaultErrorHandler';
 import {ApplicationKey} from '@enonic/lib-admin-ui/application/ApplicationKey';
 import {TreeGridActions} from '@enonic/lib-admin-ui/ui/treegrid/actions/TreeGridActions';
@@ -151,7 +151,7 @@ export class ApplicationBrowsePanel
         this.getBrowseItemPanel().toggleClass('highlighted', hasHighlighted);
     }
 
-    private registerEvents() {
+    private registerEvents(): void {
         StopApplicationEvent.on((event: StopApplicationEvent) =>
             ApplicationBrowsePanel.sendApplicationActionRequest('stop', event.getApplications()));
         StartApplicationEvent.on((event: StartApplicationEvent) =>
@@ -169,7 +169,7 @@ export class ApplicationBrowsePanel
     }
 
     private handleAppEvent(event: ApplicationEvent) {
-        if (event.isSystemApplication()) {
+        if (event.isSystemApplication() || event.getApplicationKey().toString() === 'com.enonic.xp.app.applications') {
             return;
         }
 
@@ -186,14 +186,15 @@ export class ApplicationBrowsePanel
         }
 
         if (event.isNeedToUpdateApplication() && event.getApplicationKey()) {
-            this.updateAppByKey(event.getApplicationKey());
+            this.updateAppByKey(event.getApplicationKey()).catch(DefaultErrorHandler.handle);
         }
     }
 
-    private updateAppByKey(key: ApplicationKey): void {
-        this.fetchAppByKey(key).then((application: Application) => {
+    private updateAppByKey(key: ApplicationKey): Q.Promise<Application> {
+        return this.fetchAppByKey(key).then((application: Application) => {
             this.treeListBox.replaceItems(application);
-        }).catch(DefaultErrorHandler.handle);
+            return application;
+        });
     }
 
     private fetchAppByKey(applicationKey: ApplicationKey): Q.Promise<Application> {
@@ -201,12 +202,13 @@ export class ApplicationBrowsePanel
     }
 
     private handleAppInstalledEvent(event: ApplicationEvent) {
-        this.fetchAppByKey(event.getApplicationKey()).then((application: Application) => {
-            setTimeout(() => { // timeout lets grid to remove UploadMockNode so that its not counted in the toolbar
-                showFeedback(i18n('notify.installed', application.getDisplayName()));
-                this.treeListBox.addItems(application, false, 0);
-                new AppInstalledEvent(application).fire();
-            }, 200);
+        // if updating local app
+        this.removeItemFromList(event.getApplicationKey().toString());
+        this.treeListBox.addItems(this.createAppFromEvent(event), false, 0);
+
+        this.updateAppByKey(event.getApplicationKey()).then((application) => {
+            showFeedback(i18n('notify.installed', application.getDisplayName()));
+            new AppInstalledEvent(application).fire();
         }).catch(DefaultErrorHandler.handle);
     }
 
@@ -214,23 +216,39 @@ export class ApplicationBrowsePanel
         const uninstalledApp: Application = this.treeListBox.getItem(event.getApplicationKey().getName());
         const uninstalledAppName: string = uninstalledApp ? uninstalledApp.getDisplayName() : event.getApplicationKey().toString();
         showFeedback(i18n('notify.uninstalled', uninstalledAppName));
-        const itemToRemove = this.treeListBox.getItems().find(
-            (item: Application) => item.getApplicationKey().getName() === event.getApplicationKey().getName());
-
-        if (itemToRemove) {
-            this.selectionWrapper.deselect(itemToRemove);
-            this.treeListBox.removeItems(itemToRemove);
-        }
+        this.removeItemFromList(event.getApplicationKey().toString(), true);
 
         new AppUninstalledEvent(uninstalledApp).fire();
     }
 
-    private handleAppStoppedEvent(event: ApplicationEvent) {
-            const stoppedApp: Application = this.treeListBox.getItem(event.getApplicationKey().getName());
-            // seems to be present in the grid and xp is running
-            if (stoppedApp && ServerEventsConnection.get(CONFIG.getString('eventApiUrl')).isConnected()) {
-                this.updateAppByKey(event.getApplicationKey());
+    private createAppFromEvent(event: ApplicationEvent): Application {
+        const builder = new ApplicationBuilder();
+        builder.id = event.getApplicationKey().toString();
+        builder.applicationKey = event.getApplicationKey();
+        builder.displayName = event.getName();
+        builder.url = event.getApplicationUrl();
+        return builder.build();
+    }
+
+    private removeItemFromList(appKeyAsString: string, deselect?: boolean) {
+        const itemToRemove = this.treeListBox.getItems().find(
+            (item: Application) => item.getApplicationKey().getName() === appKeyAsString);
+
+        if (itemToRemove) {
+            if (deselect) {
+                this.selectionWrapper.deselect(itemToRemove);
             }
+
+            this.treeListBox.removeItems(itemToRemove);
+        }
+    }
+
+    private handleAppStoppedEvent(event: ApplicationEvent) {
+        const stoppedApp: Application = this.treeListBox.getItem(event.getApplicationKey().getName());
+        // seems to be present in the grid and xp is running
+        if (stoppedApp && ServerEventsConnection.get(CONFIG.getString('eventApiUrl')).isConnected()) {
+            this.updateAppByKey(event.getApplicationKey()).catch(DefaultErrorHandler.handle);
+        }
     }
 
     private handleNewAppUpload(event: ApplicationUploadStartedEvent) {
