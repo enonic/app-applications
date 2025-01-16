@@ -198,8 +198,9 @@ export class MarketAppsTreeGrid
     }
 
     updateAppUninstalled(uninstalled: Application): void {
+        const uninstalledKey = uninstalled.getApplicationKey().toString();
         this.installedApplications =
-            this.installedApplications.filter((app: Application) => app.getApplicationKey() !== uninstalled.getApplicationKey());
+            this.installedApplications.filter((app: Application) => app.getApplicationKey().toString() !== uninstalledKey);
         this.updateApp(uninstalled);
     }
 
