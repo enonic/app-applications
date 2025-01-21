@@ -16,8 +16,6 @@ public final class WidgetDescriptorJson
 
     public String description;
 
-    public String url;
-
     public Set<String> interfaces;
 
     public Map<String, String> config;
@@ -27,7 +25,6 @@ public final class WidgetDescriptorJson
         this.key = widgetDescriptor.getKeyString();
         this.displayName = widgetDescriptor.getDisplayName();
         this.description = widgetDescriptor.getDescription();
-        this.url = widgetDescriptor.getUrl();
         this.interfaces = ImmutableSet.copyOf( widgetDescriptor.getInterfaces() );
         this.config = widgetDescriptor.getConfig();
     }
