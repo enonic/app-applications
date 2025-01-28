@@ -13,6 +13,7 @@ function handleGet() {
     const readonlyMode = app.config['readonlyMode'] === 'true' || false;
 
     const baseUri = admin.getBaseUri();
+    const baseUriWithoutTailingSlash = baseUri.endsWith('/') ? baseUri.substring(0, baseUri.length - 1) : baseUri;
 
     return {
         status: 200,
@@ -31,8 +32,8 @@ function handleGet() {
                 'main'
             ),
             xpVersion: app.version,
-            statusApiUrl: `${baseUri}/rest/status`,
-            eventApiUrl: `${baseUri}/event`,
+            statusApiUrl: `${baseUriWithoutTailingSlash}/rest/status`,
+            eventApiUrl: `${baseUriWithoutTailingSlash}/event`,
         }
     };
 }
