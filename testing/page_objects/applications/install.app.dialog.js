@@ -157,9 +157,14 @@ class InstallAppDialog extends Page {
         return this.getTextInDisplayedElements(items);
     }
 
-    waitForApplicationDisplayed(appDisplayName) {
-        let selector = XPATH.appByDisplayName(appDisplayName);
-        return this.waitForElementDisplayed(selector, appConst.longTimeout);
+    async waitForApplicationDisplayed(appDisplayName) {
+        try {
+            let selector = XPATH.appByDisplayName(appDisplayName);
+            return await this.waitForElementDisplayed(selector, appConst.longTimeout);
+        } catch (err) {
+            let screenshot = await this.saveScreenshotUniqueName('err_app_displayed');
+            throw new Error(`Application ${appDisplayName} is not displayed, screenshot: ${screenshot} ` + err);
+        }
     }
 
     typeSearchText(text) {

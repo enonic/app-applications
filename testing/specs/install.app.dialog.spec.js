@@ -66,9 +66,12 @@ describe('Install Application Dialog specification', function () {
         await appBrowsePanel.clickOnInstallButton();
         await dialog.waitForOpened();
         await dialog.waitForSpinnerNotVisible();
-        // Type a name in the search input:
+        // 1. Type an app-name in the search input:
         await dialog.typeSearchText(CHUCK_NORRIS_APP_DISPLAY_NAME);
+        // 2. Verify that only one application is displayed now:
         await dialog.waitForApplicationDisplayed('Chuck Norris');
+        await dialog.pause(2000);
+        await studioUtils.saveScreenshot('install_dlg_filtered');
         let names = await dialog.getApplicationNames();
         assert.ok(names.length === 1, 'only one application should be displayed');
         assert.equal(names[0], CHUCK_NORRIS_APP_DISPLAY_NAME, 'Chuck Norris app should be filtered');
