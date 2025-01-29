@@ -49,7 +49,8 @@ export class InstallAppDialog
 
     protected postInitElements(): void {
         super.postInitElements();
-        this.setElementToFocusOnShow(this.applicationInput);
+
+        this.disableInput();
     }
 
     protected initListeners() {
@@ -81,12 +82,13 @@ export class InstallAppDialog
 
         this.marketAppsTreeGrid.onLoadingFinished(() => {
             this.statusMessage.reset();
-            this.toggleNoItems(this.marketAppsTreeGrid.getItemCount() === 0);
+            this.enableAndFocusInput();
             this.removeClass('loading');
             this.notifyResize();
         });
 
         this.marketAppsTreeGrid.onLoadingStarted(() => {
+            this.disableInput();
             this.addClass('loading');
             this.statusMessage.showLoading();
         });
@@ -107,9 +109,19 @@ export class InstallAppDialog
         this.marketAppsTreeGrid.onItemsAdded(() => {
             const isLoading = this.hasClass('loading');
             if (!isLoading) {
-                this.toggleNoItems(this.marketAppsTreeGrid.getItemCount() < 1);
+                this.enableAndFocusInput();
             }
         });
+    }
+
+    private disableInput() {
+        this.applicationInput.getTextInput().setEnabled(false);
+    }
+
+    private enableAndFocusInput() {
+        this.applicationInput.getTextInput().setEnabled(true);
+        this.applicationInput.getTextInput().giveFocus();
+        this.toggleNoItems(this.marketAppsTreeGrid.getItemCount() === 0);
     }
 
     private toggleNoItems(isEmpty: boolean) {
