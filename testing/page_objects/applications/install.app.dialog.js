@@ -45,6 +45,7 @@ class InstallAppDialog extends Page {
     async waitForOpened() {
         try {
             await this.waitForElementDisplayed(this.grid, appConst.mediumTimeout);
+            await this.pause(700);
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_load_install_dialog');
             throw new Error(`Install App dialog was not loaded! screenshot: ${screenshot}  ` + err);
