@@ -169,7 +169,7 @@ export class ApplicationBrowsePanel
     }
 
     private handleAppEvent(event: ApplicationEvent) {
-        if (event.isSystemApplication() || event.getApplicationKey().toString() === 'com.enonic.xp.app.applications') {
+        if (event.isSystemApplication() || event.getApplicationKey()?.toString() === 'com.enonic.xp.app.applications') {
             return;
         }
 
