@@ -60,21 +60,25 @@ describe('Install Application Dialog specification', function () {
         assert.ok(names.includes('ADFS ID Provider'), 'Auth0 ID Provider this application should be second');
     });
 
-    it('GIVEN install dialog is opened WHEN search text has been typed THEN apps should be filtered ', async () => {
+    it('GIVEN install dialog is opened WHEN app-name has been typed in the search input THEN the only one application should be displayed in the dialog',
+        async () => {
         let appBrowsePanel = new AppBrowsePanel();
         let dialog = new InstallDialog();
         await appBrowsePanel.clickOnInstallButton();
         await dialog.waitForOpened();
         await dialog.waitForSpinnerNotVisible();
-        // Type a name in the search input:
+        // 1. Type an app-name in the search input:
         await dialog.typeSearchText(CHUCK_NORRIS_APP_DISPLAY_NAME);
+        // 2. Verify that only one application is displayed now:
         await dialog.waitForApplicationDisplayed('Chuck Norris');
+            await dialog.pause(1000);
+        await studioUtils.saveScreenshot('install_dlg_filtered');
         let names = await dialog.getApplicationNames();
-        assert.ok(names.length === 1, 'only one application should be displayed');
+            assert.ok(names.length === 1, 'the only one application should be displayed');
         assert.equal(names[0], CHUCK_NORRIS_APP_DISPLAY_NAME, 'Chuck Norris app should be filtered');
     });
 
-    it('GIVEN dialog is opened WHEN install link has been clicked THEN the app should be installed', async () => {
+    it('GIVEN dialog is opened WHEN install link for an app has been clicked THEN the app should be installed', async () => {
         let appBrowsePanel = new AppBrowsePanel();
         let dialog = new InstallDialog();
         await appBrowsePanel.clickOnInstallButton();
@@ -95,7 +99,7 @@ describe('Install Application Dialog specification', function () {
     });
 
     // verifies  https://github.com/enonic/app-applications/issues/8
-    it("GIVEN existing installed application WHEN install dialog has been opened THEN 'Installed' status should be displayed near the application",
+    it("GIVEN existing installed application WHEN install dialog has been opened THEN 'Installed' status should be displayed for the application",
         async () => {
             let appBrowsePanel = new AppBrowsePanel();
             let installAppDialog = new InstallDialog();
@@ -103,7 +107,7 @@ describe('Install Application Dialog specification', function () {
             await appBrowsePanel.clickOnInstallButton();
             await installAppDialog.waitForOpened();
             await installAppDialog.waitForSpinnerNotVisible();
-            // Verify that 'Installed' button is displayed in the modal dialog:
+            // 2. Verify that 'Installed' button is displayed for 'Chuck Norris' app in the modal dialog:
             let result = await installAppDialog.waitForApplicationInstalled(CHUCK_NORRIS_APP_DISPLAY_NAME);
             assert.ok(result, `'${CHUCK_NORRIS_APP_DISPLAY_NAME}' should be with Installed status`);
         });

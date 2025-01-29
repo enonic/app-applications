@@ -12,13 +12,16 @@ function getMarketUrl() {
 function handleGet() {
     const readonlyMode = app.config['readonlyMode'] === 'true' || false;
 
-    const baseUri = admin.getBaseUri();
+    let baseUri = admin.getBaseUri();
+    if (baseUri.endsWith('/')) {
+        baseUri = baseUri.substring(0, baseUri.length - 1);
+    }
 
     return {
         status: 200,
         contentType: 'application/json',
         body: {
-            adminUrl: baseUri,
+            adminUrl: admin.getBaseUri(),
             appId: app.name,
             assetsUri: assetLib.assetUrl({path: ''}),
             marketUrl: getMarketUrl(),
