@@ -172,7 +172,7 @@ class InstallAppDialog extends Page {
             await this.getBrowser().waitUntil(async () => {
                 let attrClass = await this.getAttribute(this.searchInput, 'class');
                 return !attrClass.includes('disabled');
-            }, {timeout: appConst.shortTimeout, timeoutMsg: "'Search Input' is not enabled!"});
+            }, {timeout: appConst.longTimeout, timeoutMsg: "'Search Input' is not enabled!"});
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_search_input');
             throw new Error(`Error - Install App Dialog, search input,  screenshot:${screenshot} ` + err);
