@@ -50,7 +50,6 @@
         display: block;
         color: @admin-font-gray2;
         text-align: center;
-        margin: 15px 0;
         font-size: 14px;
 
         &.failed {
@@ -61,10 +60,10 @@
 
     .modal-dialog-body {
       padding-top: 0;
-    }
 
-    .modal-dialog-footer {
-      display: none;
+      &.empty {
+        display: none;
+      }
     }
   }
 

@@ -130,6 +130,7 @@ export class InstallAppDialog
         } else {
             this.statusMessage.hide();
         }
+        this.getBody().toggleClass('empty', isEmpty);
     }
 
     setInstalledApplications(installedApplications: Application[]) {
