@@ -28,6 +28,8 @@ export class InstallAppDialog
 
     private marketAppsTreeGrid: MarketAppsTreeGrid;
 
+    private uploadDialogActive: boolean = false;
+
     constructor() {
         super({
             title: i18n('dialog.install'),
@@ -112,6 +114,18 @@ export class InstallAppDialog
                 this.enableAndFocusInput();
             }
         });
+
+        this.applicationInput.getUploader().getUploadButton().onClicked(() => {
+            this.uploadDialogActive = true;
+
+            setTimeout(() => {
+               this.uploadDialogActive = false;
+            }, 500);
+        });
+    }
+
+    isMasked(): boolean {
+        return this.uploadDialogActive || super.isMasked();
     }
 
     private disableInput() {
