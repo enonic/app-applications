@@ -216,6 +216,11 @@ export class InstallAppDialog
         this.applicationInput.reset();
     }
 
+    protected isFocusOutEventToBeProcessed(lastFocused: HTMLElement): boolean {
+        return lastFocused !== this.applicationInput.getUploader().getUploadButton().getHTMLElement() &&
+               super.isFocusOutEventToBeProcessed(lastFocused);
+    }
+
     private resetFileInputWithUploader() {
         this.applicationInput?.reset();
     }
