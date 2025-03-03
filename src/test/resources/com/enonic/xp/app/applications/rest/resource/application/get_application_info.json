@@ -26,8 +26,6 @@
     "url": "http://localhost:80/webapp/testapplication"
   },
   "idProviderApplication": {
-    "idProviders": null,
-    "mode": null
   },
   "layouts": {
     "descriptors": []
@@ -55,7 +53,6 @@
     "descriptors": [
       {
         "application": "myapp",
-        "description": null,
         "displayName": "My tool",
         "icon": "icon-source",
         "key": "myapp:my-tool",

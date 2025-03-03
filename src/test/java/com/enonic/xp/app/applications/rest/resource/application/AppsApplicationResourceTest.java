@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.jboss.resteasy.core.ResteasyContext;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.AdditionalAnswers;
@@ -209,7 +210,7 @@ public class AppsApplicationResourceTest
         when( mockRequest.getServerName() ).thenReturn( "localhost" );
         when( mockRequest.getScheme() ).thenReturn( "http" );
         when( mockRequest.getServerPort() ).thenReturn( 80 );
-        this.setHttpRequest( mockRequest );
+        ResteasyContext.getContextDataMap().put( HttpServletRequest.class, mockRequest );
 
         final String response = request().
             path( "application/info" ).
@@ -353,7 +354,7 @@ public class AppsApplicationResourceTest
             entity( "{\"URL\":\"" + "http://enonic.net" + "\"}", MediaType.APPLICATION_JSON_TYPE ).
             post().getAsString();
 
-        Assertions.assertEquals( "{\"applicationInstalledJson\":null,\"failure\":\"Failed to process application from http://enonic.net\"}",
+        Assertions.assertEquals( "{\"failure\":\"Failed to process application from http://enonic.net\"}",
                                  response );
     }
 
@@ -366,7 +367,7 @@ public class AppsApplicationResourceTest
             entity( "{\"URL\":\"" + "inv://enonic.net" + "\"}", MediaType.APPLICATION_JSON_TYPE ).
             post().getAsString();
 
-        Assertions.assertEquals( "{\"applicationInstalledJson\":null,\"failure\":\"Failed to upload application from inv://enonic.net\"}",
+        Assertions.assertEquals( "{\"failure\":\"Failed to upload application from inv://enonic.net\"}",
                                  response );
     }
 
@@ -379,7 +380,7 @@ public class AppsApplicationResourceTest
             entity( "{\"URL\":\"" + "ftp://enonic.net" + "\"}", MediaType.APPLICATION_JSON_TYPE ).
             post().getAsString();
 
-        Assertions.assertEquals( "{\"applicationInstalledJson\":null,\"failure\":\"Illegal protocol: ftp\"}", response );
+        Assertions.assertEquals( "{\"failure\":\"Illegal protocol: ftp\"}", response );
     }
 
     @Test
@@ -457,7 +458,7 @@ public class AppsApplicationResourceTest
             path( "application/install" ).multipart( "file", "file.jar", new byte[]{0, 1, 2}, MediaType.MULTIPART_FORM_DATA_TYPE ).
             post().getAsString();
 
-        Assertions.assertEquals( "{\"applicationInstalledJson\":null,\"failure\":\"Failed to process application file.jar\"}", response );
+        Assertions.assertEquals( "{\"failure\":\"Failed to process application file.jar\"}", response );
     }
 
     @Test

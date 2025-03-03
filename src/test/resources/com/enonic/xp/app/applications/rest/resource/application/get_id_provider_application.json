@@ -1,5 +1,4 @@
 {
-  "config": null,
   "deletable": false,
   "description": "Application description",
   "displayName": "application display name",
@@ -10,8 +9,6 @@
       {
         "Input": {
           "config": {},
-          "customText": null,
-          "helpText": null,
           "immutable": false,
           "indexed": false,
           "inputType": "TextLine",
@@ -21,8 +18,7 @@
           "occurrences": {
             "maximum": 1,
             "minimum": 0
-          },
-          "validationRegexp": null
+          }
         }
       }
     ]
