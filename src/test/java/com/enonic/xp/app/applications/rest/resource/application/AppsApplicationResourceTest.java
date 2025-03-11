@@ -5,9 +5,9 @@ import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 
 import org.jboss.resteasy.core.ResteasyContext;
 import org.junit.jupiter.api.Assertions;

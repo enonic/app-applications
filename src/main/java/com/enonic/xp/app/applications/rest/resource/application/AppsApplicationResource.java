@@ -2,8 +2,10 @@ package com.enonic.xp.app.applications.rest.resource.application;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.Callable;
@@ -11,19 +13,19 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.stream.Collectors;
 
-import javax.annotation.security.RolesAllowed;
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.CacheControl;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import jakarta.annotation.security.RolesAllowed;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.CacheControl;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -131,7 +133,7 @@ public final class AppsApplicationResource
     }
 
     @GET
-    public ApplicationJson getByKey( @QueryParam("applicationKey") String applicationKey )
+    public ApplicationJson getByKey( @QueryParam("applicationKey") String applicationKey, final List<Locale> locales )
     {
         final ApplicationKey appKey = ApplicationKey.from( applicationKey );
         final Application application = this.applicationService.getInstalledApplication( appKey );
@@ -153,14 +155,14 @@ public final class AppsApplicationResource
             setSiteDescriptor( siteDescriptor ).
             setIdProviderDescriptor( idProviderDescriptor ).
             setIconUrlResolver( this.iconUrlResolver ).
-            setLocaleMessageResolver( new LocaleMessageResolver( this.localeService, appKey ) ).
+            setLocaleMessageResolver( new LocaleMessageResolver( this.localeService, appKey, locales ) ).
             setInlineMixinResolver( new InlineMixinResolver( this.mixinService ) ).
             build();
     }
 
     @GET
     @Path("list")
-    public ListApplicationJson list( @QueryParam("query") final String query )
+    public ListApplicationJson list( @QueryParam("query") final String query,final List<Locale> locales )
         throws Exception
     {
         Applications applications = this.applicationService.getInstalledApplications();
@@ -186,7 +188,7 @@ public final class AppsApplicationResource
                     setSiteDescriptor( siteDescriptor ).
                     setIdProviderDescriptor( idProviderDescriptor ).
                     setIconUrlResolver( this.iconUrlResolver ).
-                    setLocaleMessageResolver( new LocaleMessageResolver( this.localeService, applicationKey ) ).
+                    setLocaleMessageResolver( new LocaleMessageResolver( this.localeService, applicationKey, locales ) ).
                     setInlineMixinResolver( new InlineMixinResolver( this.mixinService ) ).
                     build() );
             }
@@ -217,7 +219,7 @@ public final class AppsApplicationResource
                     adminToolDescriptor.getApplicationKey().toString(), adminToolDescriptor.getName() ) ) ).collect(
                 Collectors.toList() ) ) ).
 
-            setLocaleMessageResolver( new LocaleMessageResolver( this.localeService, applicationKey ) ).
+            setLocaleMessageResolver( new LocaleMessageResolver( this.localeService, applicationKey, Collections.list(request.getLocales()) ) ).
             setInlineMixinResolver( new InlineMixinResolver( this.mixinService ) );
 
         final Resource resource = resourceService.getResource( ResourceKey.from( applicationKey, "/webapp/webapp.js" ) );
@@ -433,7 +435,7 @@ public final class AppsApplicationResource
 
     @GET
     @Path("getIdProviderApplication")
-    public ApplicationJson getIdProviderApplication( @QueryParam("applicationKey") String key )
+    public ApplicationJson getIdProviderApplication( @QueryParam("applicationKey") String key, final List<Locale> locales )
     {
         final ApplicationKey applicationKey = ApplicationKey.from( key );
 
@@ -454,7 +456,7 @@ public final class AppsApplicationResource
                 setSiteDescriptor( siteDescriptor ).
                 setIdProviderDescriptor( idProviderDescriptor ).
                 setIconUrlResolver( this.iconUrlResolver ).
-                setLocaleMessageResolver( new LocaleMessageResolver( this.localeService, applicationKey ) ).
+                setLocaleMessageResolver( new LocaleMessageResolver( this.localeService, applicationKey, locales ) ).
                 setInlineMixinResolver( new InlineMixinResolver( this.mixinService ) ).
                 build();
         }

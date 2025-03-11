@@ -1,5 +1,6 @@
 package com.enonic.xp.app.applications.rest.resource.schema.content;
 
+import java.util.Collections;
 import java.util.Locale;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -31,7 +32,7 @@ public class LocaleMessageResolverTest
         LocaleService localeService = Mockito.mock( LocaleService.class );
         Mockito.when( localeService.getBundle( Mockito.any(), Mockito.any() ) ).thenReturn( messageBundle );
 
-        this.localeMessageResolver = new LocaleMessageResolver( localeService, ApplicationKey.from( "myApplication" ) );
+        this.localeMessageResolver = new LocaleMessageResolver( localeService, ApplicationKey.from( "myApplication" ), Collections.emptyList() );
     }
 
     @Test

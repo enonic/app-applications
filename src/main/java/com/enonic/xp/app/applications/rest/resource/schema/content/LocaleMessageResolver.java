@@ -1,9 +1,7 @@
 package com.enonic.xp.app.applications.rest.resource.schema.content;
 
-import java.util.Collections;
+import java.util.List;
 import java.util.Locale;
-
-import javax.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,7 +9,6 @@ import org.slf4j.LoggerFactory;
 import com.enonic.xp.app.ApplicationKey;
 import com.enonic.xp.i18n.LocaleService;
 import com.enonic.xp.i18n.MessageBundle;
-import com.enonic.xp.web.servlet.ServletRequestHolder;
 
 public final class LocaleMessageResolver
 {
@@ -19,17 +16,15 @@ public final class LocaleMessageResolver
 
     private final LocaleService localeService;
 
-    private ApplicationKey applicationKey;
+    private final ApplicationKey applicationKey;
 
-    public LocaleMessageResolver( final LocaleService localeService )
+    private final List<Locale> locales;
+
+    public LocaleMessageResolver( final LocaleService localeService, final ApplicationKey applicationKey, final List<Locale> locales )
     {
         this.localeService = localeService;
-    }
-
-    public LocaleMessageResolver( final LocaleService localeService, final ApplicationKey applicationKey )
-    {
-        this( localeService );
         this.applicationKey = applicationKey;
+        this.locales = locales;
     }
 
     public String localizeMessage( final String key, final String defaultValue )
@@ -56,12 +51,6 @@ public final class LocaleMessageResolver
 
     private Locale getLocale()
     {
-        final HttpServletRequest req = ServletRequestHolder.getRequest();
-        if ( req == null )
-        {
-            return null;
-        }
-
-        return localeService.getSupportedLocale( Collections.list( req.getLocales() ), applicationKey );
+        return localeService.getSupportedLocale( locales, applicationKey );
     }
 }
