@@ -2,6 +2,7 @@ package com.enonic.xp.app.applications.rest.resource.application;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -11,19 +12,19 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.stream.Collectors;
 
-import javax.annotation.security.RolesAllowed;
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.CacheControl;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import jakarta.annotation.security.RolesAllowed;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.CacheControl;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -131,7 +132,7 @@ public final class AppsApplicationResource
     }
 
     @GET
-    public ApplicationJson getByKey( @QueryParam("applicationKey") String applicationKey )
+    public ApplicationJson getByKey( @QueryParam("applicationKey") String applicationKey, @Context HttpServletRequest request )
     {
         final ApplicationKey appKey = ApplicationKey.from( applicationKey );
         final Application application = this.applicationService.getInstalledApplication( appKey );
@@ -146,21 +147,21 @@ public final class AppsApplicationResource
         final IdProviderDescriptor idProviderDescriptor = this.idProviderDescriptorService.getDescriptor( appKey );
         final ApplicationDescriptor appDescriptor = applicationDescriptorService.get( appKey );
 
-        return ApplicationJson.create().
-            setApplication( application ).
-            setLocal( local ).
-            setApplicationDescriptor( appDescriptor ).
-            setSiteDescriptor( siteDescriptor ).
-            setIdProviderDescriptor( idProviderDescriptor ).
-            setIconUrlResolver( this.iconUrlResolver ).
-            setLocaleMessageResolver( new LocaleMessageResolver( this.localeService, appKey ) ).
-            setInlineMixinResolver( new InlineMixinResolver( this.mixinService ) ).
-            build();
+        return ApplicationJson.create()
+            .setApplication( application )
+            .setLocal( local )
+            .setApplicationDescriptor( appDescriptor )
+            .setSiteDescriptor( siteDescriptor )
+            .setIdProviderDescriptor( idProviderDescriptor )
+            .setIconUrlResolver( this.iconUrlResolver )
+            .setLocaleMessageResolver( new LocaleMessageResolver( this.localeService, appKey, Collections.list( request.getLocales() ) ) )
+            .setInlineMixinResolver( new InlineMixinResolver( this.mixinService ) )
+            .build();
     }
 
     @GET
     @Path("list")
-    public ListApplicationJson list( @QueryParam("query") final String query )
+    public ListApplicationJson list( @QueryParam("query") final String query, @Context HttpServletRequest request )
         throws Exception
     {
         Applications applications = this.applicationService.getInstalledApplications();
@@ -179,16 +180,17 @@ public final class AppsApplicationResource
                 final boolean localApplication = this.applicationService.isLocalApplication( applicationKey );
                 final ApplicationDescriptor appDescriptor = this.applicationDescriptorService.get( applicationKey );
 
-                json.add( ApplicationJson.create().
-                    setApplication( application ).
-                    setLocal( localApplication ).
-                    setApplicationDescriptor( appDescriptor ).
-                    setSiteDescriptor( siteDescriptor ).
-                    setIdProviderDescriptor( idProviderDescriptor ).
-                    setIconUrlResolver( this.iconUrlResolver ).
-                    setLocaleMessageResolver( new LocaleMessageResolver( this.localeService, applicationKey ) ).
-                    setInlineMixinResolver( new InlineMixinResolver( this.mixinService ) ).
-                    build() );
+                json.add( ApplicationJson.create()
+                              .setApplication( application )
+                              .setLocal( localApplication )
+                              .setApplicationDescriptor( appDescriptor )
+                              .setSiteDescriptor( siteDescriptor )
+                              .setIdProviderDescriptor( idProviderDescriptor )
+                              .setIconUrlResolver( this.iconUrlResolver )
+                              .setLocaleMessageResolver( new LocaleMessageResolver( this.localeService, applicationKey,
+                                                                                    Collections.list( request.getLocales() ) ) )
+                              .setInlineMixinResolver( new InlineMixinResolver( this.mixinService ) )
+                              .build() );
             }
         }
 
@@ -207,18 +209,24 @@ public final class AppsApplicationResource
         final AdminToolDescriptors adminToolDescriptors = this.adminToolDescriptorService.getByApplication( applicationKey );
         final ApiDescriptors apiDescriptors = apiDescriptorService.getByApplication( applicationKey );
 
-        final ApplicationInfoJson.Builder builder = ApplicationInfoJson.create().
-            setApplicationInfo( applicationInfo ).
-            setWidgetDescriptors( widgetDescriptors ).
-            setApis(apiDescriptors ).
-            setAdminToolDescriptors( new AdminToolDescriptorsJson( adminToolDescriptors.stream().map(
-                adminToolDescriptor -> new AdminToolDescriptorJson( adminToolDescriptor, this.adminToolDescriptorService.getIconByKey(
-                    adminToolDescriptor.getKey() ), this.adminToolDescriptorService.generateAdminToolUri(
-                    adminToolDescriptor.getApplicationKey().toString(), adminToolDescriptor.getName() ) ) ).collect(
-                Collectors.toList() ) ) ).
+        final ApplicationInfoJson.Builder builder = ApplicationInfoJson.create()
+            .setApplicationInfo( applicationInfo )
+            .setWidgetDescriptors( widgetDescriptors )
+            .setApis( apiDescriptors )
+            .setAdminToolDescriptors( new AdminToolDescriptorsJson( adminToolDescriptors.stream()
+                                                                        .map( adminToolDescriptor -> new AdminToolDescriptorJson(
+                                                                            adminToolDescriptor,
+                                                                            this.adminToolDescriptorService.getIconByKey(
+                                                                                adminToolDescriptor.getKey() ),
+                                                                            this.adminToolDescriptorService.generateAdminToolUri(
+                                                                                adminToolDescriptor.getApplicationKey().toString(),
+                                                                                adminToolDescriptor.getName() ) ) )
+                                                                        .collect( Collectors.toList() ) ) )
+            .
 
-            setLocaleMessageResolver( new LocaleMessageResolver( this.localeService, applicationKey ) ).
-            setInlineMixinResolver( new InlineMixinResolver( this.mixinService ) );
+                setLocaleMessageResolver(
+                new LocaleMessageResolver( this.localeService, applicationKey, Collections.list( request.getLocales() ) ) )
+            .setInlineMixinResolver( new InlineMixinResolver( this.mixinService ) );
 
         final Resource resource = resourceService.getResource( ResourceKey.from( applicationKey, "/webapp/webapp.js" ) );
         if ( resource != null && resource.exists() )
@@ -251,8 +259,7 @@ public final class AppsApplicationResource
         applications = this.filterApplications( applications, query );
         applications = this.sortApplications( applications );
 
-        return applications.stream().filter( app -> !app.isSystem() ).map( app -> app.getKey().toString() ).
-            collect( Collectors.toList() );
+        return applications.stream().filter( app -> !app.isSystem() ).map( app -> app.getKey().toString() ).collect( Collectors.toList() );
     }
 
     @POST
@@ -433,7 +440,7 @@ public final class AppsApplicationResource
 
     @GET
     @Path("getIdProviderApplication")
-    public ApplicationJson getIdProviderApplication( @QueryParam("applicationKey") String key )
+    public ApplicationJson getIdProviderApplication( @QueryParam("applicationKey") String key, @Context HttpServletRequest request )
     {
         final ApplicationKey applicationKey = ApplicationKey.from( key );
 
@@ -447,25 +454,25 @@ public final class AppsApplicationResource
             final SiteDescriptor siteDescriptor = this.siteService.getDescriptor( applicationKey );
 
             final ApplicationDescriptor appDescriptor = applicationDescriptorService.get( applicationKey );
-            return ApplicationJson.create().
-                setApplication( application ).
-                setLocal( localApplication ).
-                setApplicationDescriptor( appDescriptor ).
-                setSiteDescriptor( siteDescriptor ).
-                setIdProviderDescriptor( idProviderDescriptor ).
-                setIconUrlResolver( this.iconUrlResolver ).
-                setLocaleMessageResolver( new LocaleMessageResolver( this.localeService, applicationKey ) ).
-                setInlineMixinResolver( new InlineMixinResolver( this.mixinService ) ).
-                build();
+            return ApplicationJson.create()
+                .setApplication( application )
+                .setLocal( localApplication )
+                .setApplicationDescriptor( appDescriptor )
+                .setSiteDescriptor( siteDescriptor )
+                .setIdProviderDescriptor( idProviderDescriptor )
+                .setIconUrlResolver( this.iconUrlResolver )
+                .setLocaleMessageResolver(
+                    new LocaleMessageResolver( this.localeService, applicationKey, Collections.list( request.getLocales() ) ) )
+                .setInlineMixinResolver( new InlineMixinResolver( this.mixinService ) )
+                .build();
         }
         return null;
     }
 
     private Applications sortApplications( final Applications applications )
     {
-        return Applications.from( applications.stream().
-            sorted( Comparator.comparing( Application::getDisplayName ) ).
-            collect( Collectors.toList() ) );
+        return Applications.from(
+            applications.stream().sorted( Comparator.comparing( Application::getDisplayName ) ).collect( Collectors.toList() ) );
     }
 
     private Applications filterApplications( final Applications applications, final String query )
@@ -473,15 +480,16 @@ public final class AppsApplicationResource
         if ( !nullToEmpty( query ).isBlank() )
         {
             final String queryLowercase = query.toLowerCase();
-            return Applications.from( applications.stream().
-                filter( application -> nullToEmpty( application.getDisplayName() ).toLowerCase().contains( queryLowercase ) ||
-                    nullToEmpty( application.getMaxSystemVersion() ).toLowerCase().contains( queryLowercase ) ||
-                    nullToEmpty( application.getMinSystemVersion() ).toLowerCase().contains( queryLowercase ) ||
-                    nullToEmpty( application.getSystemVersion() ).toLowerCase().contains( queryLowercase ) ||
-                    nullToEmpty( application.getUrl() ).toLowerCase().contains( queryLowercase ) ||
-                    nullToEmpty( application.getVendorName() ).toLowerCase().contains( queryLowercase ) ||
-                    nullToEmpty( application.getVendorUrl() ).toLowerCase().contains( queryLowercase ) ).
-                collect( Collectors.toList() ) );
+            return Applications.from( applications.stream()
+                                          .filter( application -> nullToEmpty( application.getDisplayName() ).toLowerCase()
+                                              .contains( queryLowercase ) ||
+                                              nullToEmpty( application.getMaxSystemVersion() ).toLowerCase().contains( queryLowercase ) ||
+                                              nullToEmpty( application.getMinSystemVersion() ).toLowerCase().contains( queryLowercase ) ||
+                                              nullToEmpty( application.getSystemVersion() ).toLowerCase().contains( queryLowercase ) ||
+                                              nullToEmpty( application.getUrl() ).toLowerCase().contains( queryLowercase ) ||
+                                              nullToEmpty( application.getVendorName() ).toLowerCase().contains( queryLowercase ) ||
+                                              nullToEmpty( application.getVendorUrl() ).toLowerCase().contains( queryLowercase ) )
+                                          .collect( Collectors.toList() ) );
         }
 
         return applications;

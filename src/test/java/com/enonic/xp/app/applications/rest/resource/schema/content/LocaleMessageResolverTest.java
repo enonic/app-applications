@@ -1,10 +1,10 @@
 package com.enonic.xp.app.applications.rest.resource.schema.content;
 
+import java.util.List;
 import java.util.Locale;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
 import com.enonic.xp.app.ApplicationKey;
 import com.enonic.xp.i18n.LocaleService;
@@ -12,6 +12,9 @@ import com.enonic.xp.i18n.MessageBundle;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class LocaleMessageResolverTest
 {
@@ -22,16 +25,13 @@ public class LocaleMessageResolverTest
     @BeforeEach
     public void init()
     {
-
         Locale.setDefault( new Locale( "es", "ES" ) );
-
-        messageBundle = Mockito.mock( MessageBundle.class );
-        Mockito.when( messageBundle.localize( "key.valid" ) ).thenReturn( "translated" );
-
-        LocaleService localeService = Mockito.mock( LocaleService.class );
-        Mockito.when( localeService.getBundle( Mockito.any(), Mockito.any() ) ).thenReturn( messageBundle );
-
-        this.localeMessageResolver = new LocaleMessageResolver( localeService, ApplicationKey.from( "myApplication" ) );
+        messageBundle = mock( MessageBundle.class );
+        when( messageBundle.localize( "key.valid" ) ).thenReturn( "translated" );
+        LocaleService localeService = mock( LocaleService.class );
+        when( localeService.getBundle( any(), any() ) ).thenReturn( messageBundle );
+        this.localeMessageResolver =
+            new LocaleMessageResolver( localeService, ApplicationKey.from( "myApplication" ), List.of( Locale.US ) );
     }
 
     @Test
@@ -61,8 +61,8 @@ public class LocaleMessageResolverTest
     @Test
     public void testValidKeyWithInvalidValue()
     {
-        Mockito.when( messageBundle.localize( "key.valid" ) ).thenThrow( new IllegalArgumentException() );
-        Mockito.when( messageBundle.getMessage( "key.valid" ) ).thenReturn( "invalid value" );
+        when( messageBundle.localize( "key.valid" ) ).thenThrow( new IllegalArgumentException() );
+        when( messageBundle.getMessage( "key.valid" ) ).thenReturn( "invalid value" );
 
         Locale.setDefault( new Locale( "es", "ES" ) );
         final String result = localeMessageResolver.localizeMessage( "key.valid", "defaultValue" );
