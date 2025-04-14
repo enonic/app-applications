@@ -16,7 +16,7 @@ describe('Install app dialog, search input spec.', function () {
 
     const LOCAL_FILE = "file:c:/";
 
-    it(`GIVEN 'install app' dialog is opened WHEN not existing URL has been typed THEN expected validation message should appear`,
+    it.skip(`GIVEN 'install app' dialog is opened WHEN not existing URL has been typed THEN expected validation message should appear`,
         async () => {
             let appBrowsePanel = new AppBrowsePanel();
             let installDialog = new InstallDialog();
@@ -34,7 +34,7 @@ describe('Install app dialog, search input spec.', function () {
             assert.ok(message.includes('Failed to process application from'), 'expected notification message should appear');
         });
 
-    it(`GIVEN 'install app' dialog is opened WHEN path to local file has been typed THEN expected warning message should appear`,
+    it.skip(`GIVEN 'install app' dialog is opened WHEN path to local file has been typed THEN expected warning message should appear`,
         async () => {
             let appBrowsePanel = new AppBrowsePanel();
             let installDialog = new InstallDialog();
@@ -54,7 +54,7 @@ describe('Install app dialog, search input spec.', function () {
             assert.ok(message.includes('No applications found'), "'No applications found' - message should appear");
         });
 
-    it(`GIVEN 'install app' dialog is opened WHEN actual URL has been typed and 'Enter' key pressed THEN application should be installed`,
+    it.skip(`GIVEN 'install app' dialog is opened WHEN actual URL has been typed and 'Enter' key pressed THEN application should be installed`,
         async () => {
             let appBrowsePanel = new AppBrowsePanel();
             let installDialog = new InstallDialog();

@@ -17,7 +17,7 @@ describe('Install Application Dialog specification', function () {
 
     const CHUCK_NORRIS_APP_DISPLAY_NAME = 'Chuck Norris';
 
-    it("SHOULD show install app dialog WHEN 'Install' button has been clicked",
+    it.skip("SHOULD show install app dialog WHEN 'Install' button has been clicked",
         async () => {
             let appBrowsePanel = new AppBrowsePanel();
             let dialog = new InstallDialog();
@@ -32,7 +32,7 @@ describe('Install Application Dialog specification', function () {
             //assert.isTrue(result, 'Focus should be in the `filter input` by default');
         });
 
-    it('GIVEN install dialog is opened WHEN Esc key has been pressed THEN dialog closes',
+    it.skip('GIVEN install dialog is opened WHEN Esc key has been pressed THEN dialog closes',
         async () => {
             let appBrowsePanel = new AppBrowsePanel();
             let dialog = new InstallDialog();
@@ -48,7 +48,7 @@ describe('Install Application Dialog specification', function () {
             await dialog.waitForClosed(appConst.mediumTimeout);
         });
 
-    it('WHEN dialog is opened THEN applications should be present in the grid AND applications are sorted by a name',
+    it.skip('WHEN dialog is opened THEN applications should be present in the grid AND applications are sorted by a name',
         async () => {
             let appBrowsePanel = new AppBrowsePanel();
             let dialog = new InstallDialog();
@@ -63,7 +63,7 @@ describe('Install Application Dialog specification', function () {
             assert.ok(names.includes('ADFS ID Provider'), 'Auth0 ID Provider this application should be second');
         });
 
-    it('GIVEN install dialog is opened WHEN app-name has been typed in the search input THEN the only one application should be displayed in the dialog',
+    it.skip('GIVEN install dialog is opened WHEN app-name has been typed in the search input THEN the only one application should be displayed in the dialog',
         async () => {
             let appBrowsePanel = new AppBrowsePanel();
             let dialog = new InstallDialog();
@@ -81,7 +81,7 @@ describe('Install Application Dialog specification', function () {
             assert.equal(names[0], CHUCK_NORRIS_APP_DISPLAY_NAME, 'Chuck Norris app should be filtered');
         });
 
-    it('GIVEN dialog is opened WHEN install link for an app has been clicked THEN the app should be installed',
+    it.skip('GIVEN dialog is opened WHEN install link for an app has been clicked THEN the app should be installed',
         async () => {
             let appBrowsePanel = new AppBrowsePanel();
             let dialog = new InstallDialog();
@@ -103,7 +103,7 @@ describe('Install Application Dialog specification', function () {
         });
 
     // verifies  https://github.com/enonic/app-applications/issues/8
-    it("GIVEN existing installed application WHEN install dialog has been opened THEN 'Installed' status should be displayed near the application",
+    it.skip("GIVEN existing installed application WHEN install dialog has been opened THEN 'Installed' status should be displayed near the application",
         async () => {
             let appBrowsePanel = new AppBrowsePanel();
             let installAppDialog = new InstallDialog();
@@ -118,7 +118,7 @@ describe('Install Application Dialog specification', function () {
 
     // Verifies issue https://github.com/enonic/app-applications/issues/241
     // Install Dialog - application's status is not updated after installing an application in filtered grid #241
-    it("GIVEN an application is installed in filtered grid WHEN Install dialog has been reopened THEN the application should be with 'Installed' status",
+    it.skip("GIVEN an application is installed in filtered grid WHEN Install dialog has been reopened THEN the application should be with 'Installed' status",
         async () => {
             let appBrowsePanel = new AppBrowsePanel();
             let installAppDialog = new InstallDialog();

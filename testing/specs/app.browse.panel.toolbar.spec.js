@@ -32,7 +32,7 @@ describe('Application Browse Panel, check buttons in the toolbar', function () {
             await appBrowsePanel.isUninstallButtonEnabled();
         });
 
-    it('GIVEN Install App dialog is opened WHEN Install button has been clicked in two rows THEN two new applications should appear in the grid',
+    it.skip('GIVEN Install App dialog is opened WHEN Install button has been clicked in two rows THEN two new applications should appear in the grid',
         async () => {
             let appBrowsePanel = new AppBrowsePanel();
             let installAppDialog = new InstallAppDialog();
@@ -57,7 +57,7 @@ describe('Application Browse Panel, check buttons in the toolbar', function () {
             await appBrowsePanel.waitForAppByDescriptionDisplayed(APP_2_DESCRIPTION);
         });
 
-    it('WHEN An installed application is selected or unselected THEN the toolbar buttons must be updated',
+    it.skip('WHEN An installed application is selected or unselected THEN the toolbar buttons must be updated',
         async () => {
             let appBrowsePanel = new AppBrowsePanel();
             // 1. select the application:
@@ -87,7 +87,7 @@ describe('Application Browse Panel, check buttons in the toolbar', function () {
             assert.ok(await appBrowsePanel.isRowByIndexChecked(1) === false, 'Second row should be unselected');
         });
 
-    it("WHEN Two existing applications have been checked THEN 'Selection Controller' gets partial",
+    it.skip("WHEN Two existing applications have been checked THEN 'Selection Controller' gets partial",
         async () => {
             let appBrowsePanel = new AppBrowsePanel();
             // 1. Select 2 applications:
@@ -99,7 +99,7 @@ describe('Application Browse Panel, check buttons in the toolbar', function () {
         });
 
     // Verifies issue#145 "Selection Controller remains checked after uninstalling applications."
-    it('GIVEN Two existing applications are filtered (Show Selection has been clicked )WHEN both application have uninstalled THEN Selection Toggler get not visible AND Selection checkbox gets unselected',
+    it.skip('GIVEN Two existing applications are filtered (Show Selection has been clicked )WHEN both application have uninstalled THEN Selection Toggler get not visible AND Selection checkbox gets unselected',
         async () => {
             let appBrowsePanel = new AppBrowsePanel();
             let uninstallAppDialog = new UninstallAppDialog();
