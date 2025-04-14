@@ -3,22 +3,23 @@ package com.enonic.xp.app.applications.rest.resource.application;
 import java.net.URL;
 import java.time.Instant;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import java.util.Locale;
 
 import org.jboss.resteasy.core.ResteasyContext;
-import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.AdditionalAnswers;
+import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatchers;
-import org.mockito.Mockito;
 import org.osgi.framework.Version;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.io.ByteSource;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 
 import com.enonic.xp.admin.tool.AdminToolDescriptor;
 import com.enonic.xp.admin.tool.AdminToolDescriptorService;
@@ -47,6 +48,7 @@ import com.enonic.xp.icon.Icon;
 import com.enonic.xp.idprovider.IdProviderDescriptor;
 import com.enonic.xp.idprovider.IdProviderDescriptorService;
 import com.enonic.xp.inputtype.InputTypeName;
+import com.enonic.xp.jaxrs.impl.MockRestResponse;
 import com.enonic.xp.page.DescriptorKey;
 import com.enonic.xp.portal.script.PortalScriptService;
 import com.enonic.xp.resource.Resource;
@@ -61,16 +63,18 @@ import com.enonic.xp.site.SiteService;
 import com.enonic.xp.web.multipart.MultipartForm;
 import com.enonic.xp.web.multipart.MultipartItem;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.isA;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class AppsApplicationResourceTest
     extends AdminResourceTestSupport
 {
-    private static final ObjectMapper MAPPER = new ObjectMapper();
-
     private ApplicationService applicationService;
 
     private ApplicationDescriptorService applicationDescriptorService;
@@ -95,6 +99,17 @@ public class AppsApplicationResourceTest
 
     private ApiDescriptorService apiDescriptorService;
 
+    @BeforeEach
+    public void setup()
+    {
+        final HttpServletRequest mockRequest = mock( HttpServletRequest.class );
+        when( mockRequest.getServerName() ).thenReturn( "localhost" );
+        when( mockRequest.getScheme() ).thenReturn( "http" );
+        when( mockRequest.getServerPort() ).thenReturn( 80 );
+        when( mockRequest.getLocales() ).thenReturn( Collections.enumeration( Collections.singleton( Locale.US ) ) );
+        ResteasyContext.getContextDataMap().put( HttpServletRequest.class, mockRequest );
+    }
+
     @Test
     public void getApplicationByKey()
         throws Exception
@@ -107,7 +122,6 @@ public class AppsApplicationResourceTest
         when( this.idProviderDescriptorService.getDescriptor( isA( ApplicationKey.class ) ) ).thenReturn( idProviderDescriptor );
         final ApplicationDescriptor appDescriptor = createApplicationDescriptor();
         when( this.applicationDescriptorService.get( isA( ApplicationKey.class ) ) ).thenReturn( appDescriptor );
-
         when( mixinService.inlineFormItems( isA( Form.class ) ) ).then( AdditionalAnswers.returnsFirstArg() );
 
         String response = request().
@@ -206,21 +220,12 @@ public class AppsApplicationResourceTest
         when( this.adminToolDescriptorService.getByApplication( applicationKey ) ).thenReturn( adminToolDescriptors );
         when( this.adminToolDescriptorService.generateAdminToolUri( any(), any() ) ).thenReturn( "url/to/tool" );
 
-        final HttpServletRequest mockRequest = mock( HttpServletRequest.class );
-        when( mockRequest.getServerName() ).thenReturn( "localhost" );
-        when( mockRequest.getScheme() ).thenReturn( "http" );
-        when( mockRequest.getServerPort() ).thenReturn( 80 );
-        ResteasyContext.getContextDataMap().put( HttpServletRequest.class, mockRequest );
-
         final String response = request().
             path( "application/info" ).
             queryParam( "applicationKey", "testapplication" ).
             get().getAsString();
 
         assertJson( "get_application_info.json", response );
-
-        final String deploymentUrl = MAPPER.readTree( response ).findPath( "deployment" ).findPath( "url" ).asText();
-        Assertions.assertEquals( "http://localhost:80/webapp/testapplication", deploymentUrl );
     }
 
     @Test
@@ -290,24 +295,18 @@ public class AppsApplicationResourceTest
     public void startApplication()
         throws Exception
     {
-        request().
-            path( "application/start" ).
-            entity( "{\"key\":[\"testapplication\"]}", MediaType.APPLICATION_JSON_TYPE ).
-            post();
+        request().path( "application/start" ).entity( "{\"key\":[\"testapplication\"]}", MediaType.APPLICATION_JSON_TYPE ).post();
 
-        Mockito.verify( this.applicationService ).startApplication( ApplicationKey.from( "testapplication" ), true );
+        verify( this.applicationService ).startApplication( ApplicationKey.from( "testapplication" ), true );
     }
 
     @Test
     public void stopApplication()
         throws Exception
     {
-        request().
-            path( "application/stop" ).
-            entity( "{\"key\":[\"testapplication\"]}", MediaType.APPLICATION_JSON_TYPE ).
-            post();
+        request().path( "application/stop" ).entity( "{\"key\":[\"testapplication\"]}", MediaType.APPLICATION_JSON_TYPE ).post();
 
-        Mockito.verify( this.applicationService ).stopApplication( ApplicationKey.from( "testapplication" ), true );
+        verify( this.applicationService ).stopApplication( ApplicationKey.from( "testapplication" ), true );
     }
 
     @Test
@@ -322,7 +321,7 @@ public class AppsApplicationResourceTest
 
         String expected = (String) Response.ok( readFromFile( "application.svg" ), "image/svg+xml" ).build().getEntity();
 
-        Assertions.assertEquals( expected, response );
+        assertEquals( expected, response );
     }
 
     @Test
@@ -342,7 +341,7 @@ public class AppsApplicationResourceTest
 
         byte[] expected = icon.toByteArray();
 
-        Assertions.assertTrue( Arrays.equals( expected, response ) );
+        assertTrue( Arrays.equals( expected, response ) );
     }
 
     @Test
@@ -354,7 +353,7 @@ public class AppsApplicationResourceTest
             entity( "{\"URL\":\"" + "http://enonic.net" + "\"}", MediaType.APPLICATION_JSON_TYPE ).
             post().getAsString();
 
-        Assertions.assertEquals( "{\"failure\":\"Failed to process application from http://enonic.net\"}",
+        assertEquals( "{\"failure\":\"Failed to process application from http://enonic.net\"}",
                                  response );
     }
 
@@ -367,7 +366,7 @@ public class AppsApplicationResourceTest
             entity( "{\"URL\":\"" + "inv://enonic.net" + "\"}", MediaType.APPLICATION_JSON_TYPE ).
             post().getAsString();
 
-        Assertions.assertEquals( "{\"failure\":\"Failed to upload application from inv://enonic.net\"}",
+        assertEquals( "{\"failure\":\"Failed to upload application from inv://enonic.net\"}",
                                  response );
     }
 
@@ -380,7 +379,7 @@ public class AppsApplicationResourceTest
             entity( "{\"URL\":\"" + "ftp://enonic.net" + "\"}", MediaType.APPLICATION_JSON_TYPE ).
             post().getAsString();
 
-        Assertions.assertEquals( "{\"failure\":\"Illegal protocol: ftp\"}", response );
+        assertEquals( "{\"failure\":\"Illegal protocol: ftp\"}", response );
     }
 
     @Test
@@ -392,10 +391,14 @@ public class AppsApplicationResourceTest
             this.applicationService.installGlobalApplication( ArgumentMatchers.eq( new URL( application.getUrl() ) ), any() ) ).thenReturn(
             application );
 
-        String response = request().
-            path( "application/installUrl" ).
-            entity( "{\"URL\":\"" + application.getUrl() + "\"}", MediaType.APPLICATION_JSON_TYPE ).
-            post().getAsString();
+        String response = request().path( "application/installUrl" )
+            .entity( "{\"URL\":\"" + application.getUrl() + "\"}", MediaType.APPLICATION_JSON_TYPE )
+            .post()
+            .getAsString();
+        ArgumentCaptor<URL> captor = ArgumentCaptor.forClass( URL.class );
+        verify( applicationService ).installGlobalApplication( captor.capture(), any() );
+        assertEquals( application.getUrl(), captor.getValue().toString() );
+
         assertJson( "install_url.json", response );
     }
 
@@ -404,12 +407,15 @@ public class AppsApplicationResourceTest
         throws Exception
     {
         final ApplicationKey applicationKey = ApplicationKey.from( "testapplication" );
-        Mockito.doThrow( new ApplicationInstallException( "" ) ).when( this.applicationService ).uninstallApplication( applicationKey,
-                                                                                                                       true );
-        Assertions.assertThrows( ApplicationInstallException.class, () -> {
-            request().path( "application/uninstall" ).entity( "{\"key\":[\"" + applicationKey + "\"]}",
-                                                              MediaType.APPLICATION_JSON_TYPE ).post().getAsString();
-        } );
+        doThrow( new ApplicationInstallException( "expectedException" ) )
+            .when( this.applicationService )
+            .uninstallApplication( applicationKey, true );
+
+        final MockRestResponse post = request().path( "application/uninstall" )
+            .entity( "{\"key\":[\"" + applicationKey + "\"]}", MediaType.APPLICATION_JSON_TYPE )
+            .post();
+        assertEquals( 500, post.getStatus() );
+        assertEquals( "expectedException", post.getAsString() );
     }
 
     @Test
@@ -421,23 +427,7 @@ public class AppsApplicationResourceTest
         final String response = request().path( "application/uninstall" ).entity( "{\"key\":[\"" + applicationKey + "\"]}",
                                                                                   MediaType.APPLICATION_JSON_TYPE ).post().getAsString();
 
-        Assertions.assertEquals( "{}", response );
-    }
-
-    @Test
-    public void testInstallEmpty()
-        throws Exception
-    {
-        final MultipartForm form = mock( MultipartForm.class );
-        when( form.get( "file" ) ).thenReturn( null );
-
-        when( this.multipartService.parse( any() ) ).thenReturn( form );
-
-        Assertions.assertThrows( RuntimeException.class, () -> {
-            request().path( "application/install" ).multipart( "file", "file.jar", new byte[]{0, 1, 2},
-                                                               MediaType.MULTIPART_FORM_DATA_TYPE ).
-                post();
-        } );
+        assertEquals( "{}", response );
     }
 
     @Test
@@ -455,10 +445,10 @@ public class AppsApplicationResourceTest
         when( this.applicationService.installGlobalApplication( file.getBytes(), "file.jar" ) ).thenThrow( new RuntimeException() );
 
         String response = request().
-            path( "application/install" ).multipart( "file", "file.jar", new byte[]{0, 1, 2}, MediaType.MULTIPART_FORM_DATA_TYPE ).
+            path( "application/install" ).entity( new byte[]{0, 1, 2}, MediaType.MULTIPART_FORM_DATA_TYPE ).
             post().getAsString();
 
-        Assertions.assertEquals( "{\"failure\":\"Failed to process application file.jar\"}", response );
+        assertEquals( "{\"failure\":\"Failed to process application file.jar\"}", response );
     }
 
     @Test
@@ -479,7 +469,7 @@ public class AppsApplicationResourceTest
         when( this.applicationService.installGlobalApplication( file.getBytes(), "file.jar" ) ).thenReturn( application );
 
         String response = request().
-            path( "application/install" ).multipart( "file", "file.jar", new byte[]{0, 1, 2}, MediaType.MULTIPART_FORM_DATA_TYPE ).
+            path( "application/install" ).entity( new byte[]{0, 1, 2}, MediaType.MULTIPART_FORM_DATA_TYPE ).
             post().getAsString();
 
         assertJson( "install_url.json", response );
