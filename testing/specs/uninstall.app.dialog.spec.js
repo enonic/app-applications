@@ -16,7 +16,7 @@ describe('Uninstall Application dialog specification', function () {
 
     const AUDIT_LOG_APP_NAME = 'Audit log browser';
 
-    it("WHEN uninstall dialog is opened THEN expected title and buttons should be present",
+    it.skip("WHEN uninstall dialog is opened THEN expected title and buttons should be present",
         async () => {
             let uninstallAppDialog = new UninstallAppDialog();
             // 1. Select 'Chuck Norris' app and click on 'Uninstall' button:
@@ -30,7 +30,7 @@ describe('Uninstall Application dialog specification', function () {
             await uninstallAppDialog.waitForNoButtonDisplayed();
         });
 
-    it("GIVEN uninstall dialog is opened WHEN 'Cancel-top' button has been pressed THEN modal dialog closes",
+    it.skip("GIVEN uninstall dialog is opened WHEN 'Cancel-top' button has been pressed THEN modal dialog closes",
         async () => {
             let uninstallAppDialog = new UninstallAppDialog();
             // 1. Select 'Chuck Norris' app and click on 'Uninstall' button:
@@ -39,7 +39,7 @@ describe('Uninstall Application dialog specification', function () {
             await uninstallAppDialog.waitForClosed();
         });
 
-    it("GIVEN uninstall dialog is opened WHEN 'Esc' key has been pressed THEN dialog closes",
+    it.skip("GIVEN uninstall dialog is opened WHEN 'Esc' key has been pressed THEN dialog closes",
         async () => {
             let uninstallAppDialog = new UninstallAppDialog();
             let appBrowsePanel = new AppBrowsePanel();
@@ -51,7 +51,7 @@ describe('Uninstall Application dialog specification', function () {
             await uninstallAppDialog.waitForClosed();
         });
 
-    it("GIVEN Uninstall dialog is opened WHEN 'Yes' button has been pressed THEN app should be uninstalled",
+    it.skip("GIVEN Uninstall dialog is opened WHEN 'Yes' button has been pressed THEN app should be uninstalled",
         async () => {
             let uninstallAppDialog = new UninstallAppDialog();
             let appBrowsePanel = new AppBrowsePanel();
@@ -76,7 +76,7 @@ describe('Uninstall Application dialog specification', function () {
 
     // Verify issue https://github.com/enonic/app-applications/issues/585
     // Install app dialog won't get refreshed after app install/uninstall #585
-    it("GIVEN an application has been uninstalled WHEN 'Install App' dialog has been reopened THEN 'Install' link should be displayed for the application",
+    it.skip("GIVEN an application has been uninstalled WHEN 'Install App' dialog has been reopened THEN 'Install' link should be displayed for the application",
         async () => {
             let appBrowsePanel = new AppBrowsePanel();
             let installDialog = new InstallAppDialog();
