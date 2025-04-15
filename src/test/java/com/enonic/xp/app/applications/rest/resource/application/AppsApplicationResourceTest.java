@@ -218,7 +218,6 @@ public class AppsApplicationResourceTest
 
         final AdminToolDescriptors adminToolDescriptors = createAdminToolDescriptors();
         when( this.adminToolDescriptorService.getByApplication( applicationKey ) ).thenReturn( adminToolDescriptors );
-        when( this.adminToolDescriptorService.generateAdminToolUri( any(), any() ) ).thenReturn( "url/to/tool" );
 
         final String response = request().
             path( "application/info" ).

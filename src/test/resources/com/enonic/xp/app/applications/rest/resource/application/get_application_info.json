@@ -57,7 +57,7 @@
         "icon": "icon-source",
         "key": "myapp:my-tool",
         "name": "my-tool",
-        "toolUrl": "url/to/tool"
+        "toolUrl": "/admin/myapp/myapp:my-tool"
       }
     ]
   },

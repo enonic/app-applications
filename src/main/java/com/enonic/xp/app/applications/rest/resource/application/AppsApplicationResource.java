@@ -12,6 +12,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.stream.Collectors;
 
+import com.enonic.xp.web.servlet.ServletRequestUrlHelper;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.Consumes;
@@ -122,13 +123,10 @@ public final class AppsApplicationResource
 
     private MixinService mixinService;
 
-    private final ApplicationIconUrlResolver iconUrlResolver;
-
     private static final ApplicationImageHelper HELPER = new ApplicationImageHelper();
 
     public AppsApplicationResource()
     {
-        iconUrlResolver = new ApplicationIconUrlResolver();
     }
 
     @GET
@@ -153,7 +151,7 @@ public final class AppsApplicationResource
             .setApplicationDescriptor( appDescriptor )
             .setSiteDescriptor( siteDescriptor )
             .setIdProviderDescriptor( idProviderDescriptor )
-            .setIconUrlResolver( this.iconUrlResolver )
+            .setIconUrlResolver( new ApplicationIconUrlResolver( request ) )
             .setLocaleMessageResolver( new LocaleMessageResolver( this.localeService, appKey, Collections.list( request.getLocales() ) ) )
             .setInlineMixinResolver( new InlineMixinResolver( this.mixinService ) )
             .build();
@@ -186,7 +184,7 @@ public final class AppsApplicationResource
                               .setApplicationDescriptor( appDescriptor )
                               .setSiteDescriptor( siteDescriptor )
                               .setIdProviderDescriptor( idProviderDescriptor )
-                              .setIconUrlResolver( this.iconUrlResolver )
+                              .setIconUrlResolver( new ApplicationIconUrlResolver( request ) )
                               .setLocaleMessageResolver( new LocaleMessageResolver( this.localeService, applicationKey,
                                                                                     Collections.list( request.getLocales() ) ) )
                               .setInlineMixinResolver( new InlineMixinResolver( this.mixinService ) )
@@ -209,20 +207,19 @@ public final class AppsApplicationResource
         final AdminToolDescriptors adminToolDescriptors = this.adminToolDescriptorService.getByApplication( applicationKey );
         final ApiDescriptors apiDescriptors = apiDescriptorService.getByApplication( applicationKey );
 
+        final AdminToolDescriptorsJson adminToolDescriptorsJson = new AdminToolDescriptorsJson(adminToolDescriptors.stream()
+                .map(adminToolDescriptor -> new AdminToolDescriptorJson(
+                        adminToolDescriptor,
+                        this.adminToolDescriptorService.getIconByKey(adminToolDescriptor.getKey()),
+                        ServletRequestUrlHelper.createUri(request, "/admin/" + adminToolDescriptor.getApplicationKey() + "/" + adminToolDescriptor.getKey())
+                ))
+                .collect(Collectors.toList()));
+
         final ApplicationInfoJson.Builder builder = ApplicationInfoJson.create()
             .setApplicationInfo( applicationInfo )
             .setWidgetDescriptors( widgetDescriptors )
             .setApis( apiDescriptors )
-            .setAdminToolDescriptors( new AdminToolDescriptorsJson( adminToolDescriptors.stream()
-                                                                        .map( adminToolDescriptor -> new AdminToolDescriptorJson(
-                                                                            adminToolDescriptor,
-                                                                            this.adminToolDescriptorService.getIconByKey(
-                                                                                adminToolDescriptor.getKey() ),
-                                                                            this.adminToolDescriptorService.generateAdminToolUri(
-                                                                                adminToolDescriptor.getApplicationKey().toString(),
-                                                                                adminToolDescriptor.getName() ) ) )
-                                                                        .collect( Collectors.toList() ) ) )
-            .
+            .setAdminToolDescriptors(adminToolDescriptorsJson).
 
                 setLocaleMessageResolver(
                 new LocaleMessageResolver( this.localeService, applicationKey, Collections.list( request.getLocales() ) ) )
@@ -294,7 +291,7 @@ public final class AppsApplicationResource
     @Path("install")
     @RolesAllowed(RoleKeys.ADMIN_ID)
     @Consumes(MediaType.MULTIPART_FORM_DATA)
-    public ApplicationInstallResultJson install( final MultipartForm form )
+    public ApplicationInstallResultJson install( final MultipartForm form, @Context HttpServletRequest request )
         throws Exception
     {
         final MultipartItem appFile = form.get( "file" );
@@ -309,7 +306,7 @@ public final class AppsApplicationResource
         }
         final ByteSource byteSource = appFile.getBytes();
 
-        return lock( appFile.getFileName(), () -> installApplication( byteSource, appFile.getFileName() ) );
+        return lock( appFile.getFileName(), () -> installApplication( byteSource, appFile.getFileName(), request ) );
     }
 
     @POST
@@ -330,7 +327,7 @@ public final class AppsApplicationResource
     @Path("installUrl")
     @RolesAllowed(RoleKeys.ADMIN_ID)
     @Consumes(MediaType.APPLICATION_JSON)
-    public ApplicationInstallResultJson installUrl( final ApplicationInstallParams params )
+    public ApplicationInstallResultJson installUrl( final ApplicationInstallParams params, @Context HttpServletRequest request )
         throws Exception
     {
         final String urlString = params.getUrl();
@@ -343,7 +340,7 @@ public final class AppsApplicationResource
 
             if ( ALLOWED_PROTOCOLS.contains( url.getProtocol() ) )
             {
-                return lock( url, () -> installApplication( url, sha512 ) );
+                return lock( url, () -> installApplication( url, sha512, request ) );
             }
             else
             {
@@ -398,7 +395,7 @@ public final class AppsApplicationResource
         responseBuilder.cacheControl( cacheControl );
     }
 
-    private ApplicationInstallResultJson installApplication( final URL url, final byte[] sha512 )
+    private ApplicationInstallResultJson installApplication( final URL url, final byte[] sha512, HttpServletRequest request )
     {
         final ApplicationInstallResultJson result = new ApplicationInstallResultJson();
 
@@ -406,7 +403,7 @@ public final class AppsApplicationResource
         {
             final Application application = this.applicationService.installGlobalApplication( url, sha512 );
 
-            result.setApplicationInstalledJson( new ApplicationInstalledJson( application, false, iconUrlResolver ) );
+            result.setApplicationInstalledJson( new ApplicationInstalledJson( application, false, new ApplicationIconUrlResolver( request ) ) );
         }
         catch ( Exception e )
         {
@@ -418,7 +415,7 @@ public final class AppsApplicationResource
         return result;
     }
 
-    private ApplicationInstallResultJson installApplication( final ByteSource byteSource, final String applicationName )
+    private ApplicationInstallResultJson installApplication( final ByteSource byteSource, final String applicationName, HttpServletRequest request )
     {
         final ApplicationInstallResultJson result = new ApplicationInstallResultJson();
 
@@ -426,7 +423,7 @@ public final class AppsApplicationResource
         {
             final Application application = this.applicationService.installGlobalApplication( byteSource, applicationName );
 
-            result.setApplicationInstalledJson( new ApplicationInstalledJson( application, false, iconUrlResolver ) );
+            result.setApplicationInstalledJson( new ApplicationInstalledJson( application, false, new ApplicationIconUrlResolver( request ) ) );
         }
         catch ( Exception e )
         {
@@ -460,7 +457,7 @@ public final class AppsApplicationResource
                 .setApplicationDescriptor( appDescriptor )
                 .setSiteDescriptor( siteDescriptor )
                 .setIdProviderDescriptor( idProviderDescriptor )
-                .setIconUrlResolver( this.iconUrlResolver )
+                .setIconUrlResolver( new ApplicationIconUrlResolver( request ) )
                 .setLocaleMessageResolver(
                     new LocaleMessageResolver( this.localeService, applicationKey, Collections.list( request.getLocales() ) ) )
                 .setInlineMixinResolver( new InlineMixinResolver( this.mixinService ) )
