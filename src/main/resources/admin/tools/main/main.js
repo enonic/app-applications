@@ -15,7 +15,6 @@ function getConfigAsJson() {
     const readonlyMode = app.config['readonlyMode'] === 'true' || false;
 
     return JSON.stringify({
-        adminUrl: admin.getBaseUri(),
         appId: app.name,
         assetsUri: assetLib.assetUrl({path: ''}),
         marketUrl: getMarketUrl(),
@@ -49,7 +48,7 @@ function getConfigAsJson() {
     }, null, 4).replace(/<(\/?script|!--)/gi, "\\u003C$1");
 }
 
-function handleGet() {
+function handleGet(req) {
     const view = resolve('./main.html');
 
     const params = {
@@ -59,7 +58,7 @@ function handleGet() {
         appName: i18n.localize({
             key: 'admin.tool.displayName',
             bundles: ['i18n/phrases'],
-            locale: admin.getLocales()
+            locale: req.locales
         }),
         configScriptId: 'app-applications-config-as-json',
         configAsJson: getConfigAsJson(),
