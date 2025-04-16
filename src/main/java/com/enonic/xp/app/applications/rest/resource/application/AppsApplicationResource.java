@@ -211,7 +211,7 @@ public final class AppsApplicationResource
                 .map(adminToolDescriptor -> new AdminToolDescriptorJson(
                         adminToolDescriptor,
                         this.adminToolDescriptorService.getIconByKey(adminToolDescriptor.getKey()),
-                        ServletRequestUrlHelper.createUri(request, "/admin/" + adminToolDescriptor.getApplicationKey() + "/" + adminToolDescriptor.getKey())
+                        ServletRequestUrlHelper.createUri(request, "/admin/" + adminToolDescriptor.getApplicationKey() + "/" + adminToolDescriptor.getName())
                 ))
                 .collect(Collectors.toList()));
 
