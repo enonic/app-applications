@@ -49,6 +49,7 @@ dependencies {
     implementation "com.enonic.xp:jaxrs-api:${xpVersion}"
     implementation "com.enonic.xp:admin-api:${xpVersion}"
     implementation "com.enonic.xp:portal-api:${xpVersion}"
+    include "com.enonic.xp:lib-i18n:${xpVersion}"
     include "com.enonic.xp:lib-admin:${xpVersion}"
     include "com.enonic.lib:lib-admin-ui:${libAdminUiVersion}"
     devResources "com.enonic.lib:lib-admin-ui:${libAdminUiVersion}"
