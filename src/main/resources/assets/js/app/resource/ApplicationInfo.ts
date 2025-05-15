@@ -1,5 +1,4 @@
 import {ApplicationInfoJson} from './json/ApplicationInfoJson';
-import {ContentReference} from './ContentReference';
 import {ApplicationDeployment} from './json/ApplicationDeployment';
 import {ApplicationTask} from './ApplicationTask';
 import {IdProviderApplication} from './IdProviderApplication';
@@ -22,8 +21,6 @@ export class ApplicationInfo {
     private layouts: BaseDescriptor[];
 
     private relations: RelationshipType[];
-
-    private references: ContentReference[];
 
     private macros: MacroDescriptor[];
 
@@ -60,10 +57,6 @@ export class ApplicationInfo {
 
         result.macros = (json.macros && json.macros.macros) ? json.macros.macros.map((macroJson) => {
             return MacroDescriptor.fromJson(macroJson);
-        }) : [];
-
-        result.references = (json.references && json.references.references) ? json.references.references.map((referenceJson) => {
-            return ContentReference.fromJson(referenceJson);
         }) : [];
 
         result.tasks = (json.tasks && json.tasks.tasks) ? json.tasks.tasks.map((taskJson) => {
@@ -107,10 +100,6 @@ export class ApplicationInfo {
 
     getRelations(): RelationshipType[] {
         return this.relations;
-    }
-
-    getReferences(): ContentReference[] {
-        return this.references;
     }
 
     getMacros(): MacroDescriptor[] {

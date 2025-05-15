@@ -1,7 +1,6 @@
 import {Application} from '@enonic/lib-admin-ui/application/Application';
 import {Element} from '@enonic/lib-admin-ui/dom/Element';
 import {ApplicationInfo} from '../resource/ApplicationInfo';
-import {ContentReference} from '../resource/ContentReference';
 import {AdminToolDescriptor} from '../resource/AdminToolDescriptor';
 import {RelationshipType} from '../relationshiptype/RelationshipType';
 import {DivEl} from '@enonic/lib-admin-ui/dom/DivEl';
@@ -86,10 +85,6 @@ export class ApplicationDataContainer
             (relationshipType: RelationshipType) => relationshipType.getRelationshiptypeName().getLocalName()).sort(
             this.sortAlphabeticallyAsc);
         siteGroup.addDataArray(i18n('field.relationshipTypes'), relationshipTypeNames);
-
-        const referencesPaths: string[] = applicationInfo.getReferences().map(
-            (reference: ContentReference) => reference.getContentPath()).sort(this.sortAlphabeticallyAsc);
-        siteGroup.addDataArray(i18n('field.usedBy'), referencesPaths);
 
         return siteGroup;
     }

@@ -36,8 +36,6 @@ public class ApplicationInfoJson
 
     private final RelationshipTypeListJson relations;
 
-    private final ContentReferencesJson references;
-
     private final MacrosJson macros;
 
     private final ApplicationTaskDescriptorsJson tasks;
@@ -63,7 +61,6 @@ public class ApplicationInfoJson
             new LayoutDescriptorsJson( LayoutDescriptors.from( builder.applicationInfo.getLayouts() ), builder.localeMessageResolver,
                                        builder.inlineMixinResolver );
         this.relations = new RelationshipTypeListJson( builder.applicationInfo.getRelations() );
-        this.references = new ContentReferencesJson( builder.applicationInfo.getContentReferences() );
         this.macros = MacrosJson.
             create().
             setMacroDescriptors( builder.applicationInfo.getMacros() ).
@@ -107,11 +104,6 @@ public class ApplicationInfoJson
     public MacrosJson getMacros()
     {
         return macros;
-    }
-
-    public ContentReferencesJson getReferences()
-    {
-        return references;
     }
 
     public ApplicationTaskDescriptorsJson getTasks()
