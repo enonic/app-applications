@@ -49,7 +49,7 @@ import com.enonic.xp.idprovider.IdProviderDescriptor;
 import com.enonic.xp.idprovider.IdProviderDescriptorService;
 import com.enonic.xp.inputtype.InputTypeName;
 import com.enonic.xp.jaxrs.impl.MockRestResponse;
-import com.enonic.xp.page.DescriptorKey;
+import com.enonic.xp.descriptor.DescriptorKey;
 import com.enonic.xp.portal.script.PortalScriptService;
 import com.enonic.xp.resource.Resource;
 import com.enonic.xp.resource.ResourceKey;

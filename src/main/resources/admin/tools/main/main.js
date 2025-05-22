@@ -30,12 +30,10 @@ function getConfigAsJson() {
         ),
         xpVersion: app.version,
         eventApiUrl: portal.apiUrl({
-            application: 'admin',
-            api: 'event',
+            api: 'admin:event',
         }),
         statusApiUrl: portal.apiUrl({
-            application: 'admin',
-            api: 'status',
+            api: 'admin:status',
         }),
         launcherUrl: admin.widgetUrl({
             application: 'com.enonic.xp.app.main',
