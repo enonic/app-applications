@@ -104,9 +104,9 @@ describe(`Item Statistics Panel 'Action Menu' spec`, function () {
 
 async function restartTestApp() {
     let appBrowsePanel = new AppBrowsePanel();
-    let state = await appBrowsePanel.getApplicationState(appConst.TEST_APPS_NAME.MY_FIRST_APP);
+    let state = await appBrowsePanel.getApplicationState(appConst.TEST_APPS_NAME.SIMPLE_SITE_APP);
     if (state === 'stopped') {
-        await appBrowsePanel.clickOnRowByDisplayName(appConst.TEST_APPS_NAME.MY_FIRST_APP);
+        await appBrowsePanel.clickOnRowByDisplayName(appConst.TEST_APPS_NAME.SIMPLE_SITE_APP);
         await appBrowsePanel.clickOnStartButton();
     }
 }
