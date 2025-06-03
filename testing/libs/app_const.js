@@ -9,12 +9,15 @@ module.exports = Object.freeze({
     installAppTimeout: 60000,
     APPLICATION_TITLE: `Applications - Enonic XP Admin`,
     DELETE_INBOUND_MESSAGE: 'The content you are about to delete has inbound references. Please verify them before deletion.',
-    TEST_APPLICATIONS: {
-        FIRST_APP: 'First Selenium App',
-        SECOND_APP: 'Second Selenium App',
-        THIRD_APP: 'Third Selenium App',
-        FOURTH_APP: 'Fourth Selenium App',
+
+    TEST_APPS_NAME: {
+        TEST_AUTH0_PROVIDER_APP: 'Test Auth0 ID Provider',
+        SIMPLE_SITE_APP: 'Simple Site App',
+        TEST_APP_WITH_METADATA_MIXIN: 'Test Selenium App',
+        MY_FIRST_APP: 'My First App',
+        TEST_ADFS_PROVIDER_APP: 'Test ADFS ID Provider',
     },
+
     TEST_IMAGES: {
         HAND: 'hand',
         WHALE: 'whale'
@@ -22,7 +25,7 @@ module.exports = Object.freeze({
     contentTypes: {
         SHORTCUT: 'base:shortcut',
     },
-    generateRandomName: function (part) {
+    generateRandomName (part) {
         return part + Math.round(Math.random() * 1000000);
     },
     BROWSER_TITLES: {

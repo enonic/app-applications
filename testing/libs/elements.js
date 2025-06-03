@@ -45,4 +45,8 @@ module.exports = Object.freeze({
         DROPDOWN_DIV: "//div[contains(@id,'Dropdown')]",
         NOTIFICATION_ACTIONS_DIV: "//div[@class='notification-actions']",
     },
+    INPUTS: {
+        TEXT_INPUT: "//input[@type='text']",
+        CHECKBOX_INPUT: "//input[@type='checkbox']",
+    },
 });
