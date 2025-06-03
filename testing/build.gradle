@@ -15,6 +15,7 @@ repositories {
 
 configurations {
     distro
+    apps
 }
 
 def unpackDir = layout.buildDirectory.dir("install").get()
@@ -29,6 +30,11 @@ def appUrl = project.hasProperty( 'appUrl' ) ? appUrl : "file:///$projectDir/../
 
 dependencies {
     distro "com.enonic.xp:enonic-xp-generic:$version@zip"
+    apps "com.enonic.uitest:auth0-idprovider:1.0.0-SNAPSHOT"
+    apps "com.enonic.uitest:adfs-idprovider:1.0.0-SNAPSHOT"
+    apps "com.enonic.uitest:simple-page:1.0.0-SNAPSHOT"
+    apps "com.enonic.uitest:test-application:1.0.0-SNAPSHOT"
+    apps "com.enonic.uitest:myfirstapp:1.0.0-SNAPSHOT"
 }
 
 tasks.register( 'unpackDistro', Copy ) {
@@ -47,11 +53,11 @@ tasks.register( 'copyConfig', Copy ) {
     mustRunAfter unpackDistro
 }
 
-tasks.register( 'copyApps', Copy ) {
-    println appDir
-    from file( appDir )
-    include '*.jar'
-    into file( deployDir )
+tasks.register( 'downloadApps', Copy ) {
+    from {
+        configurations.apps
+    }
+    into deployDir
     mustRunAfter unpackDistro
 }
 
@@ -114,13 +120,13 @@ tasks.register( 'generateReportAndStopServer', NpmTask ) {
 }
 
 tasks.register( 'testAppFirefox', NpmTask ) {
-    dependsOn ( npmInstall, unpackDistro, copyConfig, copyApps, deployApp, startServer )
+    dependsOn ( npmInstall, unpackDistro, copyConfig, downloadApps, deployApp, startServer )
     args = ['run-script', 'test:firefox']
     finalizedBy generateReportAndStopServer
 }
 
 tasks.register( 'w_testAppChrome', NpmTask) {
-    dependsOn ( npmInstall, unpackDistro, copyConfig, copyApps, deployApp, startServer )
+    dependsOn ( npmInstall, unpackDistro, copyConfig, downloadApps, deployApp, startServer )
     args = ['run-script', 'test_apps:wdio_chrome']
     finalizedBy generateReportAndStopServer
 }

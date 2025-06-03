@@ -11,36 +11,36 @@ describe(`Applications Grid context menu, application is stopped`, function () {
         webDriverHelper.setupBrowser();
     }
 
-    it(`GIVEN existing an application is selected WHEN 'Stop' button has been clicked THEN the application gets stopped`,
+    it(`GIVEN existing an app is highlighted WHEN 'Stop' button has been clicked THEN the application gets stopped`,
         async () => {
             let appBrowsePanel = new AppBrowsePanel();
-            await appBrowsePanel.clickOnRowByDisplayName(appConst.TEST_APPLICATIONS.SECOND_APP);
-            let state = await appBrowsePanel.getApplicationState(appConst.TEST_APPLICATIONS.SECOND_APP);
+            await appBrowsePanel.clickOnRowByDisplayName(appConst.TEST_APPS_NAME.MY_FIRST_APP);
+            let state = await appBrowsePanel.getApplicationState(appConst.TEST_APPS_NAME.MY_FIRST_APP);
             if (state === 'started') {
                 await appBrowsePanel.clickOnStopButton();
             }
-            state = await appBrowsePanel.getApplicationState(appConst.TEST_APPLICATIONS.SECOND_APP);
-            assert.equal(state, 'stopped', "Application state should be 'stopped'");
+            state = await appBrowsePanel.getApplicationState(appConst.TEST_APPS_NAME.MY_FIRST_APP);
+            assert.equal(state, 'stopped', "The app state should be 'stopped'");
         });
 
-    it(`WHEN right click on the stopped application THEN 'Start' menu item should be enabled`,
+    it(`WHEN do right click on the stopped app THEN 'Start' menu item should be enabled`,
         async () => {
             let appBrowsePanel = new AppBrowsePanel();
-            await appBrowsePanel.rightClickOnRowByDisplayName(appConst.TEST_APPLICATIONS.SECOND_APP);
+            await appBrowsePanel.rightClickOnRowByDisplayName(appConst.TEST_APPS_NAME.MY_FIRST_APP);
             await appBrowsePanel.waitForContextMenuDisplayed();
             await studioUtils.saveScreenshot('start_menu_item2');
             // 'Start menu item should be enabled'
             await appBrowsePanel.waitForContextMenuItemEnabled('Start');
         });
 
-    it(`WHEN right click an the stopped application THEN 'Stop' menu item should be disabled`,
+    it(`WHEN do right click an the stopped app THEN 'Stop' menu item should be disabled`,
         async () => {
             let appBrowsePanel = new AppBrowsePanel();
-            await appBrowsePanel.rightClickOnRowByDisplayName(appConst.TEST_APPLICATIONS.SECOND_APP);
+            await appBrowsePanel.rightClickOnRowByDisplayName(appConst.TEST_APPS_NAME.MY_FIRST_APP);
             await appBrowsePanel.waitForContextMenuDisplayed();
             // 'Stop menu item should be disabled', otherwise exception will be thrown
             await appBrowsePanel.waitForContextMenuItemDisabled('Stop');
-            // this application is local - Uninstall button should be disabled:
+            // this application is local so 'Uninstall' button should be disabled:
             await appBrowsePanel.waitForContextMenuItemDisabled('Uninstall');
         });
 

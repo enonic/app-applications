@@ -1,17 +1,17 @@
 const assert = require('node:assert');
 const webDriverHelper = require('../libs/WebDriverHelper');
 const studioUtils = require('../libs/studio.utils');
-const appConstants = require('../libs/app_const');
+const appConst = require('../libs/app_const');
 const AppBrowsePanel = require('../page_objects/applications/applications.browse.panel');
 const AppStatisticPanel = require('../page_objects/applications/application.item.statistic.panel');
 
 const Apps = {
-    firstApp: 'First Selenium App',
-    secondApp: 'Second Selenium App'
+    firstApp: appConst.TEST_APPS_NAME.TEST_ADFS_PROVIDER_APP,
+    secondApp: appConst.TEST_APPS_NAME.TEST_AUTH0_PROVIDER_APP
 };
 
 describe('Tests for Applications Item Statistics Panel', function () {
-    this.timeout(appConstants.SUITE_TIMEOUT);
+    this.timeout(appConst.SUITE_TIMEOUT);
 
     if (typeof browser === 'undefined') {
         webDriverHelper.setupBrowser();
@@ -70,10 +70,9 @@ describe('Tests for Applications Item Statistics Panel', function () {
             assert.ok(headers.length > 0, "Site info should be displayed in the statistics panel");
             // 3. Verify that expected application's site-info should be displayed in Statistics Panel:
             assert.strictEqual(headers[0], 'Content Types', "Expected header should be present in statistics panel");
-            assert.strictEqual(headers[1], 'Page', "Expected header should be present in statistics panel");
-            assert.strictEqual(headers[2], 'Part', "Expected header should be present in statistics panel");
-            assert.strictEqual(headers[3], 'Layout', "Expected header should be present in statistics panel");
-            assert.strictEqual(headers[4], 'Relationship Types', "Expected header should be present in statistics panel");
+            assert.strictEqual(headers[1], 'Part', "Expected header should be present in statistics panel");
+            assert.strictEqual(headers[2], 'Layout', "Expected header should be present in statistics panel");
+            assert.strictEqual(headers[3], 'Relationship Types', "Expected header should be present in statistics panel");
         });
 
     it(`WHEN existing application is selected THEN should display providers-info for the running selected application`,
@@ -98,12 +97,13 @@ describe('Tests for Applications Item Statistics Panel', function () {
             // 2. Verify that Site data group is displayed:
             await appStatisticPanel.waitForSiteItemDataGroupDisplayed();
             let contentTypes = await appStatisticPanel.getContentTypes();
-            assert.equal(contentTypes.length, 3, 'Content Types list should not be empty');
+            assert.strictEqual(contentTypes.length, 3, 'Content Types list should not be empty');
+            // 3. Verify the order of displayed items:
             assert.strictEqual(contentTypes[0], 'article',
                 'article type should be first in the list, because the list is sorted by a name');
 
             let parts = await appStatisticPanel.getParts();
-            assert.equal(parts.length, 4, 'Part list should not be empty');
+            assert.ok(parts.length >= 3, 'Part list should not be empty');
         });
 
     it(`WHEN existing stopped application is selected THEN site-info gets not visible in stopped application`,

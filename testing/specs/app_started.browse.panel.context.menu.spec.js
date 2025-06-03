@@ -20,18 +20,20 @@ describe("Tests for Applications Grid context menu", function () {
     it(`GIVEN one row is selected WHEN right click on the row THEN context menu should appear`,
         async () => {
             let appBrowsePanel = new AppBrowsePanel();
-            await appBrowsePanel.clickOnRowByDisplayName(appConst.TEST_APPLICATIONS.THIRD_APP);
-            await appBrowsePanel.rightClickOnRowByDisplayName(appConst.TEST_APPLICATIONS.THIRD_APP);
-            // 'context menu' gets opened:
+            // 1. Do highlight the row
+            await appBrowsePanel.clickOnRowByDisplayName(appConst.TEST_APPS_NAME.SIMPLE_SITE_APP);
+            // 2. Do right-click:
+            await appBrowsePanel.rightClickOnRowByDisplayName(appConst.TEST_APPS_NAME.TEST_ADFS_PROVIDER_APP);
+            // 3. Verify - 'context menu' gets opened:
             await appBrowsePanel.waitForContextMenuDisplayed();
             await studioUtils.saveScreenshot('app_context_menu_blue');
         });
 
-    it(`WHEN right click on an application THEN context menu should appear`,
+    it(`WHEN do right click on an application(not higlighted) THEN context menu should appear`,
         async () => {
             let appBrowsePanel = new AppBrowsePanel();
             // 1. do right-click:
-            await appBrowsePanel.rightClickOnRowByDisplayName(appConst.TEST_APPLICATIONS.THIRD_APP);
+            await appBrowsePanel.rightClickOnRowByDisplayName(appConst.TEST_APPS_NAME.SIMPLE_SITE_APP);
             // 'context menu' gets opened:
             await appBrowsePanel.waitForContextMenuDisplayed();
             await studioUtils.saveScreenshot('app_context_menu1');
@@ -40,14 +42,14 @@ describe("Tests for Applications Grid context menu", function () {
     it(`WHEN right click on a started application THEN 'Start' menu item should be disabled, because the application is started`,
         async () => {
             let appBrowsePanel = new AppBrowsePanel();
-            let state = await appBrowsePanel.getApplicationState(appConst.TEST_APPLICATIONS.THIRD_APP);
+            let state = await appBrowsePanel.getApplicationState(appConst.TEST_APPS_NAME.SIMPLE_SITE_APP);
             if (state == 'stopped') {
-                await appBrowsePanel.clickOnRowByDisplayName(appConst.TEST_APPLICATIONS.THIRD_APP);
+                await appBrowsePanel.clickOnRowByDisplayName(appConst.TEST_APPS_NAME.SIMPLE_SITE_APP);
                 await appBrowsePanel.clickOnStartButton();
                 await appBrowsePanel.pause(2000);
             }
             // 1. Open application's Context Menu:
-            await appBrowsePanel.rightClickOnRowByDisplayName(appConst.TEST_APPLICATIONS.THIRD_APP);
+            await appBrowsePanel.rightClickOnRowByDisplayName(appConst.TEST_APPS_NAME.SIMPLE_SITE_APP);
             await appBrowsePanel.waitForContextMenuDisplayed();
             await studioUtils.saveScreenshot('app_context_menu2');
             // 2. Verify state of all menu items:
@@ -62,10 +64,10 @@ describe("Tests for Applications Grid context menu", function () {
         async () => {
             let appBrowsePanel = new AppBrowsePanel();
             // 1. Open the context menu:
-            await appBrowsePanel.rightClickOnRowByDisplayName(appConst.TEST_APPLICATIONS.THIRD_APP);
+            await appBrowsePanel.rightClickOnRowByDisplayName(appConst.TEST_APPS_NAME.SIMPLE_SITE_APP);
             await appBrowsePanel.waitForContextMenuDisplayed();
             // 2. Click outside the menu:
-            await appBrowsePanel.clickOnRowByDisplayName(appConst.TEST_APPLICATIONS.FIRST_APP);
+            await appBrowsePanel.clickOnRowByDisplayName(appConst.TEST_APPS_NAME.SIMPLE_SITE_APP);
             await appBrowsePanel.waitForContextMenuNotDisplayed();
         });
 
