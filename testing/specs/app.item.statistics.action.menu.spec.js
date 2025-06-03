@@ -18,6 +18,7 @@ describe(`Item Statistics Panel 'Action Menu' spec`, function () {
         async () => {
             let appBrowsePanel = new AppBrowsePanel();
             let appStatisticPanel = new AppStatisticPanel();
+            await restartTestApp();
             // 1. Select the application:
             await appBrowsePanel.clickOnRowByDisplayName(FIRST_APP);
             // 2. Verify the status in Statistics Panel:
