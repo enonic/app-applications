@@ -50,11 +50,17 @@ import com.enonic.xp.idprovider.IdProviderDescriptorService;
 import com.enonic.xp.inputtype.InputTypeName;
 import com.enonic.xp.jaxrs.impl.MockRestResponse;
 import com.enonic.xp.descriptor.DescriptorKey;
+import com.enonic.xp.macro.MacroDescriptors;
+import com.enonic.xp.page.PageDescriptors;
 import com.enonic.xp.portal.script.PortalScriptService;
+import com.enonic.xp.region.LayoutDescriptors;
+import com.enonic.xp.region.PartDescriptors;
 import com.enonic.xp.resource.Resource;
 import com.enonic.xp.resource.ResourceKey;
 import com.enonic.xp.resource.ResourceService;
+import com.enonic.xp.schema.content.ContentTypes;
 import com.enonic.xp.schema.mixin.MixinService;
+import com.enonic.xp.schema.relationship.RelationshipTypes;
 import com.enonic.xp.script.ScriptExports;
 import com.enonic.xp.security.PrincipalKeys;
 import com.enonic.xp.security.RoleKeys;
@@ -190,7 +196,14 @@ public class AppsApplicationResourceTest
         final ApplicationKey applicationKey = createApplication().getKey();
         final ResourceKey resourceKey = ResourceKey.from( applicationKey, "/webapp/webapp.js" );
 
-        final ApplicationInfo applicationInfo = ApplicationInfo.create().build();
+        final ApplicationInfo applicationInfo = ApplicationInfo.create()
+            .setPages( PageDescriptors.empty() )
+            .setParts( PartDescriptors.empty() )
+            .setLayouts( LayoutDescriptors.empty() )
+            .setContentTypes( ContentTypes.empty() )
+            .setMacros( MacroDescriptors.empty() )
+            .setRelations( RelationshipTypes.empty() )
+            .build();
 
         final ApiDescriptor apiDescriptor1 =
             ApiDescriptor.create().key( DescriptorKey.from( applicationKey, "myapi1" ) ).mount( true ).allowedPrincipals(
