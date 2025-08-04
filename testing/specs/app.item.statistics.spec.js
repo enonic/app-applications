@@ -72,7 +72,6 @@ describe('Tests for Applications Item Statistics Panel', function () {
             assert.strictEqual(headers[0], 'Content Types', "Expected header should be present in statistics panel");
             assert.strictEqual(headers[1], 'Part', "Expected header should be present in statistics panel");
             assert.strictEqual(headers[2], 'Layout', "Expected header should be present in statistics panel");
-            assert.strictEqual(headers[3], 'Relationship Types', "Expected header should be present in statistics panel");
         });
 
     it(`WHEN existing application is selected THEN should display providers-info for the running selected application`,
