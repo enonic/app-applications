@@ -3,7 +3,6 @@ import {ApplicationDeployment} from './ApplicationDeployment';
 import {ApplicationTasksJson} from './ApplicationTasksJson';
 import {IdProviderApplicationJson} from './IdProviderApplicationJson';
 import {WidgetDescriptorsJson} from './WidgetDescriptorsJson';
-import {RelationshipTypeListJson} from '../../relationshiptype/RelationshipTypeListJson';
 import {ContentTypeSummaryListJson} from '@enonic/lib-admin-ui/schema/content/ContentTypeSummaryListJson';
 import {BaseDescriptorsJson} from './BaseDescriptorJson';
 import {MacrosJson} from '@enonic/lib-admin-ui/macro/MacrosJson';
@@ -19,8 +18,6 @@ export interface ApplicationInfoJson {
     parts: BaseDescriptorsJson;
 
     layouts: BaseDescriptorsJson;
-
-    relations: RelationshipTypeListJson;
 
     macros: MacrosJson;
 

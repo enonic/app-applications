@@ -3,7 +3,6 @@ import {ApplicationDeployment} from './json/ApplicationDeployment';
 import {ApplicationTask} from './ApplicationTask';
 import {IdProviderApplication} from './IdProviderApplication';
 import {AdminToolDescriptor} from './AdminToolDescriptor';
-import {RelationshipType} from '../relationshiptype/RelationshipType';
 import {ContentTypeSummary} from '@enonic/lib-admin-ui/schema/content/ContentTypeSummary';
 import {MacroDescriptor} from '@enonic/lib-admin-ui/macro/MacroDescriptor';
 import {Widget} from '@enonic/lib-admin-ui/content/Widget';
@@ -19,8 +18,6 @@ export class ApplicationInfo {
     private parts: BaseDescriptor[];
 
     private layouts: BaseDescriptor[];
-
-    private relations: RelationshipType[];
 
     private macros: MacroDescriptor[];
 
@@ -49,11 +46,6 @@ export class ApplicationInfo {
 
         result.layouts = (json.layouts && json.layouts.descriptors) ?
             json.layouts.descriptors.map((descriptorJson => BaseDescriptor.fromJson(descriptorJson))) : [];
-
-        result.relations = (json.relations && json.relations.relationshipTypes) ? json.relations.relationshipTypes.map(
-            (relationshipJson) => {
-                return RelationshipType.fromJson(relationshipJson);
-            }) : [];
 
         result.macros = (json.macros && json.macros.macros) ? json.macros.macros.map((macroJson) => {
             return MacroDescriptor.fromJson(macroJson);
@@ -96,10 +88,6 @@ export class ApplicationInfo {
 
     getLayouts(): BaseDescriptor[] {
         return this.layouts;
-    }
-
-    getRelations(): RelationshipType[] {
-        return this.relations;
     }
 
     getMacros(): MacroDescriptor[] {

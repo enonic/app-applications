@@ -21,22 +21,12 @@ public class ContentTypeSummaryJson
 
     private final LocaleMessageResolver localeMessageResolver;
 
-    private final ImmutableList<String> metadataMixinNames;
-
     public ContentTypeSummaryJson( final ContentType contentType, final LocaleMessageResolver localeMessageResolver )
     {
         this.contentType = contentType;
         this.localeMessageResolver = localeMessageResolver;
 
         ImmutableList.Builder<String> xDataNamesBuilder = new ImmutableList.Builder<>();
-        if ( this.contentType.getXData() != null )
-        {
-            for ( XDataName xDataName : this.contentType.getXData() )
-            {
-                xDataNamesBuilder.add( xDataName.toString() );
-            }
-        }
-        this.metadataMixinNames = xDataNamesBuilder.build();
     }
 
     public String getName()
@@ -100,11 +90,6 @@ public class ContentTypeSummaryJson
     public String getSuperType()
     {
         return contentType.getSuperType() != null ? contentType.getSuperType().toString() : null;
-    }
-
-    public List<String> getMetadata()
-    {
-        return metadataMixinNames;
     }
 
     public boolean isAbstract()

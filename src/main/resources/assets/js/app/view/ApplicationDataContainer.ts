@@ -2,7 +2,6 @@ import {Application} from '@enonic/lib-admin-ui/application/Application';
 import {Element} from '@enonic/lib-admin-ui/dom/Element';
 import {ApplicationInfo} from '../resource/ApplicationInfo';
 import {AdminToolDescriptor} from '../resource/AdminToolDescriptor';
-import {RelationshipType} from '../relationshiptype/RelationshipType';
 import {DivEl} from '@enonic/lib-admin-ui/dom/DivEl';
 import {ItemDataGroup} from '@enonic/lib-admin-ui/app/view/ItemDataGroup';
 import {i18n} from '@enonic/lib-admin-ui/util/Messages';
@@ -80,11 +79,6 @@ export class ApplicationDataContainer
         const layoutNames: string[] = applicationInfo.getLayouts().map(this.getDescriptorName).sort(
             this.sortAlphabeticallyAsc);
         siteGroup.addDataArray(i18n('field.layout'), layoutNames);
-
-        const relationshipTypeNames: string[] = applicationInfo.getRelations().map(
-            (relationshipType: RelationshipType) => relationshipType.getRelationshiptypeName().getLocalName()).sort(
-            this.sortAlphabeticallyAsc);
-        siteGroup.addDataArray(i18n('field.relationshipTypes'), relationshipTypeNames);
 
         return siteGroup;
     }

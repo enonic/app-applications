@@ -60,7 +60,6 @@ import com.enonic.xp.resource.ResourceKey;
 import com.enonic.xp.resource.ResourceService;
 import com.enonic.xp.schema.content.ContentTypes;
 import com.enonic.xp.schema.mixin.MixinService;
-import com.enonic.xp.schema.relationship.RelationshipTypes;
 import com.enonic.xp.script.ScriptExports;
 import com.enonic.xp.security.PrincipalKeys;
 import com.enonic.xp.security.RoleKeys;
@@ -202,7 +201,6 @@ public class AppsApplicationResourceTest
             .setLayouts( LayoutDescriptors.empty() )
             .setContentTypes( ContentTypes.empty() )
             .setMacros( MacroDescriptors.empty() )
-            .setRelations( RelationshipTypes.empty() )
             .build();
 
         final ApiDescriptor apiDescriptor1 =

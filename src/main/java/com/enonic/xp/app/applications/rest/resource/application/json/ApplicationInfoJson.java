@@ -1,9 +1,5 @@
 package com.enonic.xp.app.applications.rest.resource.application.json;
 
-import java.util.stream.Collectors;
-
-import com.google.common.base.Preconditions;
-
 import com.enonic.xp.admin.widget.WidgetDescriptor;
 import com.enonic.xp.api.ApiDescriptors;
 import com.enonic.xp.app.ApplicationInfo;
@@ -11,7 +7,6 @@ import com.enonic.xp.app.applications.json.content.page.PageDescriptorListJson;
 import com.enonic.xp.app.applications.json.content.page.region.LayoutDescriptorsJson;
 import com.enonic.xp.app.applications.json.content.page.region.PartDescriptorsJson;
 import com.enonic.xp.app.applications.json.schema.content.ContentTypeSummaryListJson;
-import com.enonic.xp.app.applications.json.schema.relationship.RelationshipTypeListJson;
 import com.enonic.xp.app.applications.rest.resource.apis.json.ApiDescriptorJson;
 import com.enonic.xp.app.applications.rest.resource.apis.json.ApiDescriptorsJson;
 import com.enonic.xp.app.applications.rest.resource.macro.json.MacrosJson;
@@ -23,6 +18,9 @@ import com.enonic.xp.descriptor.Descriptors;
 import com.enonic.xp.page.PageDescriptors;
 import com.enonic.xp.region.LayoutDescriptors;
 import com.enonic.xp.region.PartDescriptors;
+import com.google.common.base.Preconditions;
+
+import java.util.stream.Collectors;
 
 public class ApplicationInfoJson
 {
@@ -33,8 +31,6 @@ public class ApplicationInfoJson
     private final PartDescriptorsJson parts;
 
     private final LayoutDescriptorsJson layouts;
-
-    private final RelationshipTypeListJson relations;
 
     private final MacrosJson macros;
 
@@ -60,7 +56,6 @@ public class ApplicationInfoJson
         this.layouts =
             new LayoutDescriptorsJson( LayoutDescriptors.from( builder.applicationInfo.getLayouts() ), builder.localeMessageResolver,
                                        builder.inlineMixinResolver );
-        this.relations = new RelationshipTypeListJson( builder.applicationInfo.getRelations() );
         this.macros = MacrosJson.
             create().
             setMacroDescriptors( builder.applicationInfo.getMacros() ).
@@ -94,11 +89,6 @@ public class ApplicationInfoJson
     public LayoutDescriptorsJson getLayouts()
     {
         return layouts;
-    }
-
-    public RelationshipTypeListJson getRelations()
-    {
-        return relations;
     }
 
     public MacrosJson getMacros()
