@@ -6,7 +6,7 @@ import com.enonic.xp.form.FormItemSet;
 import com.enonic.xp.form.FormOptionSet;
 import com.enonic.xp.form.InlineMixin;
 import com.enonic.xp.form.Input;
-import com.enonic.xp.form.Layout;
+import com.enonic.xp.form.FieldSet;
 
 public class FormItemJsonFactory
 {
@@ -16,9 +16,9 @@ public class FormItemJsonFactory
         {
             return new FormItemSetJson( (FormItemSet) formItem, localeMessageResolver );
         }
-        else if ( formItem instanceof Layout )
+        else if ( formItem instanceof FieldSet)
         {
-            return LayoutJsonFactory.create( (Layout) formItem, localeMessageResolver );
+            return LayoutJsonFactory.create( (FieldSet) formItem, localeMessageResolver );
         }
         else if ( formItem instanceof Input )
         {
