@@ -16,7 +16,7 @@
     "@wdio/mocha-framework": "^9.18.0",
     "allure-commandline": "^2.34.1",
     "@wdio/allure-reporter": "^9.18.0",
-    "@wdio/concise-reporter": "^9.18.0"
+    "@wdio/concise-reporter": "^9.19.0"
   },
   "engines": {
     "node": ">= 22.16.0",
