@@ -65,26 +65,6 @@ public class InputJson
         }
     }
 
-    public boolean isImmutable()
-    {
-        return input.isImmutable();
-    }
-
-    public boolean isIndexed()
-    {
-        return input.isIndexed();
-    }
-
-    public boolean isMaximizeUIInputWidth()
-    {
-        return input.isMaximizeUIInputWidth();
-    }
-
-    public String getCustomText()
-    {
-        return input.getCustomText();
-    }
-
     public String getHelpText()
     {
         if ( localeMessageResolver != null && !nullToEmpty( input.getHelpTextI18nKey() ).isBlank() )
@@ -95,11 +75,6 @@ public class InputJson
         {
             return input.getHelpText();
         }
-    }
-
-    public String getValidationRegexp()
-    {
-        return input.getValidationRegexp();
     }
 
     public OccurrencesJson getOccurrences()
@@ -139,7 +114,7 @@ public class InputJson
 
     private List<Map<String, String>> toJson( final Collection<InputTypeProperty> properties )
     {
-        final List<Map<String, String>> json = new ArrayList<>( );
+        final List<Map<String, String>> json = new ArrayList<>();
         for ( final InputTypeProperty property : properties )
         {
             json.add( toJson( property ) );
