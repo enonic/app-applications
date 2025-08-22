@@ -1,0 +1,32 @@
+[versions]
+
+junit = "5.12.2"
+junit-launcher = "1.12.2"
+mockito = "5.17.0"
+enonicDefaults = "2.1.5"
+xpApp = "3.6.1"
+xpBase = "3.6.1"
+nodeGradle = "7.0.2"
+
+# App
+libMustache = "2.1.1"
+libAsset = "1.0.3"
+
+[libraries]
+
+junit-bom = { module = "org.junit:junit-bom", version.ref = "junit" }
+junit-jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit" }
+junit-launcher = { module = "org.junit.platform:junit-platform-launcher", version.ref = "junit-launcher" }
+
+mockito-bom = { module = "org.mockito:mockito-bom", version.ref = "mockito" }
+mockito-jupiter = { module = "org.mockito:mockito-junit-jupiter", version.ref = "mockito" }
+
+# App
+lib-mustache = { module = "com.enonic.lib:lib-mustache", version.ref = "libMustache" }
+lib-asset = { module = "com.enonic.lib:lib-asset", version.ref = "libAsset" }
+
+[plugins]
+enonic-defaults = { id = "com.enonic.defaults", version.ref = "enonicDefaults" }
+enonic-xp-app = { id = "com.enonic.xp.app", version.ref = "xpApp" }
+enonic-xp-base = { id = "com.enonic.xp.base" }                                   # No version. Transitive via xp.app
+node-gradle = { id = "com.github.node-gradle.node", version.ref = "nodeGradle" }

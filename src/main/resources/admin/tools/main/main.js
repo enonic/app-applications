@@ -43,7 +43,7 @@ function getConfigAsJson() {
                 theme: 'dark',
             }
         }),
-    }, null, 4).replace(/<(\/?script|!--)/gi, "\\u003C$1");
+    }, null, 4).replace(/<(\/?script|!--)/gi, '\\u003C$1');
 }
 
 function handleGet(req) {
@@ -51,12 +51,12 @@ function handleGet(req) {
 
     const params = {
         assetsUri: assetLib.assetUrl({
-            path: ''
+            path: '',
         }),
         appName: i18n.localize({
             key: 'admin.tool.displayName',
             bundles: ['i18n/phrases'],
-            locale: req.locales
+            locale: req.locales,
         }),
         configScriptId: 'app-applications-config-as-json',
         configAsJson: getConfigAsJson(),
@@ -64,14 +64,14 @@ function handleGet(req) {
 
     const marketUrl = getMarketUrl();
     const baseMarketUrl = marketUrl.substring(0, marketUrl.indexOf('/', 9));
-    const marketSrc = ' \'self\' ' + baseMarketUrl + ';';
+    const contentSecurityPolicy = `default-src 'self'; script-src 'self' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; object-src 'none'; connect-src 'self' ${baseMarketUrl}; img-src data: 'self' ${baseMarketUrl}; font-src data: 'self'`;
 
     return {
         contentType: 'text/html',
         body: mustache.render(view, params),
         headers: {
-            'Content-Security-Policy': 'default-src \'self\'; script-src \'self\' \'unsafe-eval\'; style-src \'self\' \'unsafe-inline\'; object-src \'none\'; connect-src ' + marketSrc + ' img-src ' + marketSrc
-        }
+            'Content-Security-Policy': contentSecurityPolicy,
+        },
     };
 }
 

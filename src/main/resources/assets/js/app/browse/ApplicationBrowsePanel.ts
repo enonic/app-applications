@@ -35,17 +35,17 @@ import {AppUninstalledEvent} from '../installation/AppUninstalledEvent';
 export class ApplicationBrowsePanel
     extends BrowsePanel {
 
-    protected treeListBox: ApplicationsGridList;
+    declare protected treeListBox: ApplicationsGridList;
 
-    protected treeActions: ApplicationBrowseActions;
+    declare protected treeActions: ApplicationBrowseActions;
 
-    protected toolbar: ListBoxToolbar<Application>;
+    declare protected toolbar: ListBoxToolbar<Application>;
 
-    protected contextMenu: TreeGridContextMenu;
+    declare protected contextMenu: TreeGridContextMenu;
 
-    protected selectionWrapper: SelectionWrapperExt;
+    declare protected selectionWrapper: SelectionWrapperExt;
 
-    protected keyNavigator: SelectableListBoxKeyNavigator<Application>;
+    declare protected keyNavigator: SelectableListBoxKeyNavigator<Application>;
 
     constructor() {
         super();

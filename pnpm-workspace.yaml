@@ -1,0 +1,10 @@
+packages:
+  - .
+  - testing
+  - .xp/dev/*
+
+onlyBuiltDependencies:
+  - '@swc/core'
+  - esbuild
+  - edgedriver
+  - geckodriver
