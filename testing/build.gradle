@@ -2,10 +2,13 @@ import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
 
 plugins {
     id 'java'
-    id 'com.enonic.defaults'
-    id 'com.enonic.xp.base'
-    id 'com.github.node-gradle.node'
+    alias(libs.plugins.enonic.defaults)
+    alias(libs.plugins.enonic.xp.base)
+    alias(libs.plugins.node.gradle)
 }
+
+apply from: "$rootDir/gradle/node.gradle"
+
 group = 'com.enonic.xp.js_testing'
 
 repositories {
@@ -21,7 +24,7 @@ configurations {
 }
 
 def unpackDir = layout.buildDirectory.dir("install").get()
-def distroDir = unpackDir.dir("enonic-xp-generic-$version")
+def distroDir = unpackDir.dir("enonic-xp-generic-$xpVersion")
 def deployDir = distroDir.dir("home/deploy")
 def appDir = "$projectDir/test-applications"
 def xpHome = "$distroDir/home"
@@ -31,7 +34,7 @@ def appFile = "$distroDir/system/40/${appName}-${version}.jar"
 def appUrl = project.hasProperty( 'appUrl' ) ? appUrl : "file:///$projectDir/../build/libs/${appName}.jar"
 
 dependencies {
-    distro "com.enonic.xp:enonic-xp-generic:$version@tgz"
+    distro "com.enonic.xp:enonic-xp-generic:$xpVersion@tgz"
     apps "com.enonic.uitest:auth0-idprovider:1.0.0-SNAPSHOT"
     apps "com.enonic.uitest:adfs-idprovider:1.0.0-SNAPSHOT"
     apps "com.enonic.uitest:simple-page:1.0.0-SNAPSHOT"
@@ -40,30 +43,41 @@ dependencies {
 }
 
 tasks.register( 'unpackDistro', Copy ) {
+    description = 'Unpacks the XP distribution for testing'
+    group = 'Test Setup'
+
     from {
         configurations.distro.collect { tarTree( it ) }
     }
     into unpackDir
 }
 
-tasks.register( 'copyConfig', Copy ) {
-    println "$appDir/common-config"
+tasks.register('copyConfig', Copy) {
+    description = 'Copy common configuration files'
+    group = 'setup'
+
     from "$appDir/common-config"
     include '**.*.cfg'
     include '*.properties'
-    into file( configDir )
-    mustRunAfter unpackDistro
+    into file(configDir)
+    mustRunAfter tasks.named( 'unpackDistro' )
 }
 
-tasks.register( 'downloadApps', Copy ) {
+tasks.register('downloadApps', Copy) {
+    description = 'Download test applications'
+    group = 'setup'
+
     from {
         configurations.apps
     }
     into deployDir
-    mustRunAfter unpackDistro
+    mustRunAfter tasks.named( 'unpackDistro' )
 }
 
-tasks.register( 'deployApp', DefaultTask ) {
+tasks.register('deployApp', DefaultTask) {
+    description = 'Deploy the main application'
+    group = 'setup'
+
     outputs.files( appFile )
     outputs.upToDateWhen { false }
     doLast {
@@ -75,12 +89,15 @@ tasks.register( 'deployApp', DefaultTask ) {
         println "Copying from ${appUrl} to ${appFile}"
         new URL(appUrl as String).withInputStream { i -> f.withOutputStream { it << i } }
     }
-    mustRunAfter unpackDistro
+    mustRunAfter tasks.named( 'unpackDistro' )
 }
 
 def process
-tasks.register( 'startServer' ) {
-    dependsOn unpackDistro
+tasks.register('startServer' ) {
+    description = 'Start XP server'
+    group = 'server'
+
+    dependsOn tasks.named( 'unpackDistro' )
     doLast {
         def pb
         if (DefaultNativePlatform.getCurrentOperatingSystem().windows) {
@@ -101,7 +118,9 @@ tasks.register( 'startServer' ) {
     }
 }
 
-tasks.register( 'stopServer' ) {
+tasks.register('stopServer' ) {
+    description = 'Stop XP server'
+    group = 'server'
     doLast {
         if (DefaultNativePlatform.getCurrentOperatingSystem().windows) {
             Runtime.getRuntime().exec("taskkill /F /T /PID " + process.pid());
@@ -111,29 +130,54 @@ tasks.register( 'stopServer' ) {
     }
 }
 
-tasks.register( 'cleanup', Delete ) {
+tasks.register('cleanup', Delete) {
+    description = 'Clean up test reports'
+    group = 'verification'
+
     delete './build/reports/allure'
 }
 
-tasks.register( 'generateReportAndStopServer', NpmTask ) {
+tasks.register('generateReportAndStopServer', PnpmTask) {
+    description = 'Generate test report and stop server'
+    group = 'verification'
+
     args = ['run-script', 'allure-report']
-    finalizedBy cleanup
-    finalizedBy stopServer
+    finalizedBy tasks.named( 'cleanup' )
+    finalizedBy tasks.named( 'stopServer' )
 }
 
-tasks.register( 'testAppFirefox', NpmTask ) {
-    dependsOn ( npmInstall, unpackDistro, copyConfig, downloadApps, deployApp, startServer )
+tasks.register('testAppFirefox', PnpmTask) {
+    description = 'Run application tests in Firefox'
+    group = 'verification'
+
+    dependsOn tasks.named( 'pnpmInstall' )
+    dependsOn tasks.named( 'unpackDistro' )
+    dependsOn tasks.named( 'copyConfig' )
+    dependsOn tasks.named( 'downloadApps' )
+    dependsOn tasks.named( 'deployApp' )
+    dependsOn tasks.named( 'startServer' )
     args = ['run-script', 'test:firefox']
-    finalizedBy generateReportAndStopServer
+    finalizedBy tasks.named( 'generateReportAndStopServer' )
 }
 
-tasks.register( 'w_testAppChrome', NpmTask) {
-    dependsOn ( npmInstall, unpackDistro, copyConfig, downloadApps, deployApp, startServer )
+tasks.register('w_testAppChrome', PnpmTask) {
+    description = 'Run application tests in Chrome'
+    group = 'verification'
+
+    dependsOn tasks.named( 'pnpmInstall' )
+    dependsOn tasks.named( 'unpackDistro' )
+    dependsOn tasks.named( 'copyConfig' )
+    dependsOn tasks.named( 'downloadApps' )
+    dependsOn tasks.named( 'deployApp' )
+    dependsOn tasks.named( 'startServer' )
     args = ['run-script', 'test_apps:wdio_chrome']
-    finalizedBy generateReportAndStopServer
+    finalizedBy tasks.named( 'generateReportAndStopServer' )
 }
 
-tasks.register( 'w_testAppChromeLocal', NpmTask ) {
-    dependsOn ( npmInstall )
+tasks.register('w_testAppChromeLocal', PnpmTask) {
+    description = 'Run application tests in Chrome locally'
+    group = 'verification'
+
+    dependsOn tasks.named( 'pnpmInstall' )
     args = ['run-script', 'test_apps:wdio_chrome']
 }

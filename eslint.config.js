@@ -13,8 +13,8 @@ module.exports = [
             },
             globals: {
                 ...globals.browser,
-                ...globals.es6,
-            },
+                ...globals.ES2023
+            }
         },
         plugins: {
             '@typescript-eslint': tsPlugin,

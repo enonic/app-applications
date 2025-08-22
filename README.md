@@ -1,9 +1,8 @@
-Enonic XP - Applications App
-===
+# Enonic XP - Applications App
 
 [![Actions Status](https://github.com/enonic/app-applications/workflows/Gradle%20Build/badge.svg)](https://github.com/enonic/app-applications/actions)
 [![License][license-image]][license-url]
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/85183c43117642708e7f3af2db5fcdb2)](https://www.codacy.com/app/enonic/app-applications?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=enonic/app-applications&amp;utm_campaign=Badge_Grade)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/85183c43117642708e7f3af2db5fcdb2)](https://www.codacy.com/app/enonic/app-applications?utm_source=github.com&utm_medium=referral&utm_content=enonic/app-applications&utm_campaign=Badge_Grade)
 
 Install and manage applications built on [Enonic XP](https://github.com/enonic/xp) platform.
 
@@ -39,38 +38,9 @@ If the environment is set, the Gradle will look for the local `lib-admin-ui` and
 The environment parameter will also be passed to `lib-admin-ui`.
 
 Both environments are almost identical, except that building in the development environment will result in creating the DTS files, sourcemaps and other things, critical for the debugging.
-The build itself may also be a bit slower sometimes. 
-
-#### Quick
-
-Sometimes, you may want to build your project faster. To do so, just skip the linting (`lint` task) and testing (`test` task):
-
-```
-./gradlew build -x lint -x test
-```
-
-In cases, when you set the environment type explicitly, skipping the `lint` or `test` will also result in skipping those two tasks in local `lib-admin-ui` build.
-
-#### Clean
-
-To rebuild the project from scratch, you may want to remove all compiles sources and dependencies. In that case, using `clean` command may not be enough. To remove the build and dependencies, use:
-
-```
-./gradlew flush
-```
-
-#### NPM upgrade
-
-In case you want forcefully update all your node dependencies, use:
-
-```
-./gradlew npmInstallForce
-```
-
-Take a note, that you can also use aliases in Gradle, and `nIF` would be just enough to run `npmInstallForce`.
+The build itself may also be a bit slower sometimes.
 
 <!-- Links -->
-[travis-url]:    https://travis-ci.org/enonic/app-applications
-[travis-image]:  https://travis-ci.org/enonic/app-applications.svg?branch=master "Build status"
-[license-url]:   LICENSE.txt
+
+[license-url]: LICENSE.txt
 [license-image]: https://img.shields.io/github/license/enonic/app-applications.svg "GPL 3.0"

@@ -2,19 +2,16 @@ plugins {
     id 'java'
     id 'jacoco'
     id 'maven-publish'
-    id 'com.enonic.defaults' version '2.1.5'
-    id 'com.enonic.xp.app' version '3.6.1'
-    id "com.github.node-gradle.node" version '7.0.2'
+    alias(libs.plugins.enonic.defaults)
+    alias(libs.plugins.enonic.xp.app)
+    alias(libs.plugins.node.gradle)
 }
 
-def xpVersion = version
-
 app {
-    name = 'com.enonic.xp.app.applications'
-    group = 'com.enonic.xp'
+    name = "${group}.${projectName}"
     displayName = 'Applications'
     systemApp = true
-    systemVersion = "${version}"
+    systemVersion = "${xpVersion}"
     devSourcePaths += file( "$rootDir/../lib-admin-ui/src/main/resources" )
 }
 
@@ -24,15 +21,15 @@ configurations {
             attribute( LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE, objects.named( LibraryElements, 'dev-resources' ) )
         }
     }
-    all {
-        resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
-    }
 }
 
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(21)
     }
+
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = sourceCompatibility
 }
 
 repositories {
@@ -46,29 +43,30 @@ apply from: "$projectDir/gradle/node.gradle"
 apply from: "$projectDir/gradle/lib-admin.gradle"
 
 dependencies {
-    implementation "com.enonic.xp:jaxrs-api:${xpVersion}"
     implementation "com.enonic.xp:admin-api:${xpVersion}"
+    implementation "com.enonic.xp:jaxrs-api:${xpVersion}"
     implementation "com.enonic.xp:portal-api:${xpVersion}"
-    include "com.enonic.xp:lib-i18n:${xpVersion}"
     include "com.enonic.xp:lib-admin:${xpVersion}"
+    include "com.enonic.xp:lib-i18n:${xpVersion}"
     include "com.enonic.xp:lib-portal:${xpVersion}"
+    include libs.lib.asset
+    include libs.lib.mustache
+
     include "com.enonic.lib:lib-admin-ui:${libAdminUiVersion}"
     devResources "com.enonic.lib:lib-admin-ui:${libAdminUiVersion}"
-    include "com.enonic.lib:lib-mustache:2.1.1"
-    include "com.enonic.lib:lib-asset:1.0.3"
 
-    testImplementation(platform("org.junit:junit-bom:5.12.2"))
-    testImplementation(platform("org.mockito:mockito-bom:5.17.0"))
-    testImplementation 'org.junit.jupiter:junit-jupiter'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-    testImplementation 'org.mockito:mockito-junit-jupiter'
-    testImplementation( testFixtures( "com.enonic.xp:jaxrs-impl:${xpVersion}" ) )
-    testImplementation( testFixtures( "com.enonic.xp:core-app:${xpVersion}" ) )
+    testImplementation platform(libs.junit.bom)
+    testImplementation platform(libs.mockito.bom)
+    testImplementation libs.junit.jupiter
+    testImplementation libs.mockito.jupiter
+    testImplementation testFixtures( "com.enonic.xp:jaxrs-impl:${xpVersion}" )
+    testImplementation testFixtures( "com.enonic.xp:core-app:${xpVersion}" )
+    testRuntimeOnly libs.junit.launcher
 }
 
-tasks.register('lint', NpmTask ) {
+tasks.register('lint', PnpmTask ) {
     group "verification"
-    dependsOn( 'npmInstall' )
+    dependsOn( 'pnpmInstall' )
     args = ['run', 'lint']
     outputs.upToDateWhen { false }
 }
@@ -77,8 +75,8 @@ check.configure {
     dependsOn( 'lint' )
 }
 
-tasks.register('webpack', NpmTask ) {
-    dependsOn( 'npmInstall' )
+tasks.register('webpack', PnpmTask ) {
+    dependsOn( 'pnpmInstall' )
     environment = ['NODE_ENV': nodeEnvironment()]
     description = 'Build UI resources (ts, css, etc).'
     args = ['run', 'build']
@@ -92,7 +90,7 @@ jar {
 }
 
 processResources {
-    exclude 'assets/**'  // Excluded because webpack does it
+    exclude 'assets/**'
 }
 
 test {
