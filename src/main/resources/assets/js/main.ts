@@ -11,8 +11,7 @@ import {ServerEventsListener} from '@enonic/lib-admin-ui/event/ServerEventsListe
 import {i18nInit} from '@enonic/lib-admin-ui/util/MessagesInitializer';
 import {i18n} from '@enonic/lib-admin-ui/util/Messages';
 import {AppInstalledEvent} from './app/installation/AppInstalledEvent';
-import {CONFIG} from '@enonic/lib-admin-ui/util/Config';
-import {JSONObject} from '@enonic/lib-admin-ui/types';
+import {CONFIG, ConfigObject} from '@enonic/lib-admin-ui/util/Config';
 import {AppUninstalledEvent} from './app/installation/AppUninstalledEvent';
 import {LauncherHelper} from '@enonic/lib-admin-ui/util/LauncherHelper';
 
@@ -87,7 +86,7 @@ function startApplication() {
     }
 
     const configScriptEl: HTMLElement = document.getElementById(configScriptId);
-    CONFIG.setConfig(JSON.parse(configScriptEl.innerText) as JSONObject);
+    CONFIG.setConfig(JSON.parse(configScriptEl.innerText) as ConfigObject);
 
     await i18nInit(CONFIG.getString('apis.i18nUrl'));
     startApplication();
