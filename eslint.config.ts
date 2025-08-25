@@ -1,11 +1,12 @@
-const baseConfig = require('@enonic/eslint-config');
-const { plugin: tsPlugin } = require('typescript-eslint');
-const globals = require('globals');
+import baseConfig from '@enonic/eslint-config';
+import {plugin as tsPlugin} from 'typescript-eslint';
+import globals from 'globals';
 
-module.exports = [
-    ...baseConfig, // This includes the extended configuration from @enonic/eslint-config
+export default [
+    // This includes the extended configuration from @enonic/eslint-config
+    ...baseConfig,
     {
-        files: ["**/*.ts", "**/*.tsx"], // Apply rules to TypeScript files
+        files: ["**/*.ts", "**/*.tsx"],
         languageOptions: {
             parserOptions: {
                 project: './tsconfig.json',
@@ -13,8 +14,8 @@ module.exports = [
             },
             globals: {
                 ...globals.browser,
-                ...globals.ES2023
-            }
+                ...globals.es2023,
+            },
         },
         plugins: {
             '@typescript-eslint': tsPlugin,
@@ -66,6 +67,8 @@ module.exports = [
     },
     {
         ignores: [
+            "vite.config.ts",
+            "eslint.config.ts",
             "**/node_modules/",
             "**/build/",
             "**/dist/",
@@ -77,4 +80,3 @@ module.exports = [
         ]
     }
 ];
-

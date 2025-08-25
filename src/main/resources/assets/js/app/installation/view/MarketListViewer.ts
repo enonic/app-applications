@@ -1,7 +1,7 @@
 import {DivEl} from '@enonic/lib-admin-ui/dom/DivEl';
 import {MarketAppViewer} from './MarketAppViewer';
 import {SpanEl} from '@enonic/lib-admin-ui/dom/SpanEl';
-import * as Q from 'q';
+import Q from 'q';
 import {Button} from '@enonic/lib-admin-ui/ui/button/Button';
 import {MarketApplication, MarketAppStatus, MarketAppStatusFormatter} from '../../MarketApplication';
 import {LiEl} from '@enonic/lib-admin-ui/dom/LiEl';

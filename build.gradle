@@ -2,17 +2,35 @@ plugins {
     id 'java'
     id 'jacoco'
     id 'maven-publish'
-    alias(libs.plugins.enonic.defaults)
-    alias(libs.plugins.enonic.xp.app)
-    alias(libs.plugins.node.gradle)
+    alias( libs.plugins.enonic.defaults )
+    alias( libs.plugins.enonic.xp.app )
+    alias( libs.plugins.node.gradle )
 }
 
-app {
-    name = "${group}.${projectName}"
-    displayName = 'Applications'
-    systemApp = true
-    systemVersion = "${xpVersion}"
-    devSourcePaths += file( "$rootDir/../lib-admin-ui/src/main/resources" )
+allprojects {
+    pluginManager.withPlugin( 'java' ) {
+        java {
+            toolchain {
+                languageVersion = JavaLanguageVersion.of( 21 )
+            }
+
+            sourceCompatibility = JavaVersion.VERSION_21
+            targetCompatibility = sourceCompatibility
+        }
+    }
+
+    apply from: "$rootDir/gradle/env.gradle"
+    apply from: "$rootDir/gradle/node.gradle"
+
+    if ( project.name != 'testing' ) {
+        apply from: "$rootDir/gradle/lib-admin.gradle"
+    }
+}
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+    xp.enonicRepo( 'dev' )
 }
 
 configurations {
@@ -22,25 +40,6 @@ configurations {
         }
     }
 }
-
-java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
-    }
-
-    sourceCompatibility = JavaVersion.VERSION_21
-    targetCompatibility = sourceCompatibility
-}
-
-repositories {
-    mavenLocal()
-    xp.enonicRepo('dev')
-    mavenCentral()
-}
-
-apply from: "$projectDir/gradle/env.gradle"
-apply from: "$projectDir/gradle/node.gradle"
-apply from: "$projectDir/gradle/lib-admin.gradle"
 
 dependencies {
     implementation "com.enonic.xp:admin-api:${xpVersion}"
@@ -55,8 +54,8 @@ dependencies {
     include "com.enonic.lib:lib-admin-ui:${libAdminUiVersion}"
     devResources "com.enonic.lib:lib-admin-ui:${libAdminUiVersion}"
 
-    testImplementation platform(libs.junit.bom)
-    testImplementation platform(libs.mockito.bom)
+    testImplementation platform( libs.junit.bom )
+    testImplementation platform( libs.mockito.bom )
     testImplementation libs.junit.jupiter
     testImplementation libs.mockito.jupiter
     testImplementation testFixtures( "com.enonic.xp:jaxrs-impl:${xpVersion}" )
@@ -64,42 +63,101 @@ dependencies {
     testRuntimeOnly libs.junit.launcher
 }
 
-tasks.register('lint', PnpmTask ) {
-    group "verification"
-    dependsOn( 'pnpmInstall' )
-    args = ['run', 'lint']
-    outputs.upToDateWhen { false }
+app {
+    name = "${group}.${projectName}"
+    displayName = 'Applications'
+    systemApp = true
+    systemVersion = "${xpVersion}"
+    devSourcePaths += file( "$rootDir/../lib-admin-ui/src/main/resources" )
 }
 
-check.configure {
-    dependsOn( 'lint' )
+// Verification tasks
+tasks.register( 'checkTypes', PnpmTask ) {
+    dependsOn tasks.named( 'pnpmInstall' )
+    group = 'verification'
+    args = ['run', 'check:types']
+    outputs.cacheIf { false }
 }
 
-tasks.register('webpack', PnpmTask ) {
-    dependsOn( 'pnpmInstall' )
+tasks.register( 'checkLint', PnpmTask ) {
+    dependsOn tasks.named( 'pnpmInstall' )
+    group = 'verification'
+    args = ['run', 'check:lint']
+    outputs.cacheIf { false }
+}
+
+tasks.register( 'pnpmCheck', PnpmTask ) {
+    dependsOn tasks.named( 'pnpmInstall' )
+    group = 'verification'
+    args = ['run', 'check']
+    outputs.cacheIf { false }
+}
+
+// Build tasks
+tasks.register( 'pnpmBuild', PnpmTask ) {
+    dependsOn tasks.named( 'pnpmInstall' )
+    description = 'Build UI resources (ts, css, etc) with Vite.'
+    args = ['run', "build:${environmentShort()}"]
     environment = ['NODE_ENV': nodeEnvironment()]
-    description = 'Build UI resources (ts, css, etc).'
-    args = ['run', 'build']
     inputs.dir '.xp/dev'
-    inputs.dir 'src/main/resources/assets'
-    inputs.file 'webpack.config.js'
+    inputs.dir 'src/main'
+    inputs.file 'vite.config.ts'
+    inputs.file 'tsconfig.json'
+    outputs.dir "${buildDir}/resources/main"
 }
 
-jar {
-    dependsOn += webpack
+tasks.register( 'yolo' ) {
+    description = 'Build without running install, check, or test tasks'
+
+    dependsOn tasks.named( 'deploy' )
+    dependsOn tasks.named( 'checkTypes' )
+
+    nodeSetup.enabled = false
+    npmSetup.enabled = false
+    pnpmSetup.enabled = false
+    pnpmCheck.enabled = false
+    checkLint.enabled = false
+    check.enabled = false
+    test.enabled = false
+    javadoc.enabled = false
 }
 
-processResources {
-    exclude 'assets/**'
+// Task configurations
+tasks.named( 'jar' ).configure {
+    exclude 'assets/**/tsconfig.tsbuildinfo'
+
+    if ( isProd() ) {
+        exclude 'assets/**/*.map'
+    }
+
+    includeEmptyDirs = false
+
+    dependsOn tasks.named( 'pnpmBuild' )
 }
 
-test {
+tasks.named( 'processResources' ).configure {
+    // Don't need source files
+    exclude 'assets/js/**'
+    exclude 'assets/styles/**'
+
+    // Inlined by the Vite into CSS
+    exclude 'assets/fonts/**'
+    exclude 'assets/img/**'
+
+    includeEmptyDirs = false
+}
+
+tasks.named( 'compileTestJava' ).configure {
+    dependsOn tasks.named( 'pnpmBuild' )
+}
+
+tasks.named( 'test' ).configure {
     useJUnitPlatform()
     systemProperty 'java.awt.headless', 'true'
     jvmArgs '-XX:TieredStopAtLevel=1'
 }
 
-jacocoTestReport {
+tasks.named( 'jacocoTestReport' ).configure {
     reports {
         xml.required = true
         html.required = true
@@ -107,4 +165,8 @@ jacocoTestReport {
     mustRunAfter jar
 }
 
-check.dependsOn jacocoTestReport
+// Lifecycle wiring
+tasks.named( 'check' ).configure {
+    dependsOn tasks.named( 'pnpmCheck' )
+    dependsOn jacocoTestReport
+}
