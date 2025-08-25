@@ -1,24 +1,28 @@
 {
-    "compilerOptions": {
-        "module": "ES2022",
-        "moduleResolution": "bundler",
-        "target": "ES2023",
-        "lib": ["ES2023", "DOM"],
-        "baseUrl": ".",
-        "outDir": "build/resources/main/assets/js/",
-        "allowSyntheticDefaultImports": true,
-        "forceConsistentCasingInFileNames": true,
-        "useDefineForClassFields": false,
-        "allowJs": false,
-        "noImplicitReturns": false,
-        "noImplicitThis": true,
-        "strictNullChecks": false,
-        "skipLibCheck": true,
-        "incremental": true,
-        "isolatedModules": true,
-        "types": ["q"]
-    },
-    "include": ["src/**/*"],
-    "compileOnSave": false,
-    "buildOnSave": false
+  "compilerOptions": {
+    "module": "ES2022",
+    "moduleResolution": "bundler",
+    "target": "ES2023",
+    "lib": ["ES2023", "DOM"],
+    "baseUrl": ".",
+    "outDir": "build/resources/main/assets/js/",
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true,
+    "useDefineForClassFields": false,
+    "allowJs": false,
+    "noImplicitReturns": false,
+    "noImplicitThis": true,
+    "strictNullChecks": false,
+    "skipLibCheck": true,
+    "incremental": true,
+    "isolatedModules": true,
+    "types": ["q"]
+  },
+  "files": ["./src/main/resources/assets/js/main.ts"],
+  "include": [
+    "src/**/*",
+    ".xp/dev/lib-admin-ui/**/*.ts"
+  ],
+  "compileOnSave": false,
+  "buildOnSave": false
 }

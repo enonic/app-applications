@@ -1,4 +1,4 @@
-import * as Q from 'q';
+import Q from 'q';
 import {StartApplicationAction} from './StartApplicationAction';
 import {StopApplicationAction} from './StopApplicationAction';
 import {InstallApplicationAction} from './InstallApplicationAction';

@@ -1,7 +1,7 @@
 import {MarketApplicationResponse} from './MarketApplicationResponse';
 import {MarketApplication} from './MarketApplication';
 import {MarketApplicationMetadata} from './MarketApplicationMetadata';
-import * as Q from 'q';
+import Q from 'q';
 import {PostRequest} from '@enonic/lib-admin-ui/rest/PostRequest';
 import {UriHelper} from '@enonic/lib-admin-ui/util/UriHelper';
 import {JsonResponse} from '@enonic/lib-admin-ui/rest/JsonResponse';

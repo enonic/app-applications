@@ -1,7 +1,7 @@
 import {DivEl} from '@enonic/lib-admin-ui/dom/DivEl';
 import {Application, ApplicationUploadMock} from '@enonic/lib-admin-ui/application/Application';
 import {ApplicationViewer} from '@enonic/lib-admin-ui/application/ApplicationViewer';
-import * as Q from 'q';
+import Q from 'q';
 import {SpanEl} from '@enonic/lib-admin-ui/dom/SpanEl';
 import {ProgressBar} from '@enonic/lib-admin-ui/ui/ProgressBar';
 

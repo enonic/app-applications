@@ -27,7 +27,7 @@ import {ListBoxToolbar} from '@enonic/lib-admin-ui/ui/selector/list/ListBoxToolb
 import {ApplicationsGridList} from './ApplicationsGridList';
 import {SelectableListBoxKeyNavigator} from '@enonic/lib-admin-ui/ui/selector/list/SelectableListBoxKeyNavigator';
 import {GetApplicationRequest} from '../resource/GetApplicationRequest';
-import * as Q from 'q';
+import Q from 'q';
 import {Element} from '@enonic/lib-admin-ui/dom/Element';
 import {ApplicationsListViewer} from './ApplicationsListViewer';
 import {AppUninstalledEvent} from '../installation/AppUninstalledEvent';
