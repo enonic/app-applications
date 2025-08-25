@@ -23,17 +23,17 @@ configurations {
 }
 
 def unpackDir = layout.buildDirectory.dir( 'install' ).get()
-def distroDir = unpackDir.dir( "enonic-xp-generic-$xpVersion" )
+def distroDir = unpackDir.dir( "enonic-xp-generic-$version" )
 def deployDir = distroDir.dir( 'home/deploy' )
 def appDir = "$projectDir/test-applications"
 def xpHome = "$distroDir/home"
 def configDir = "$xpHome/config"
 def appName = 'app-applications'
-def appFile = "$distroDir/system/40/${appName}-${xpVersion}.jar"
+def appFile = "$distroDir/system/40/${appName}-${version}.jar"
 def appUrl = project.hasProperty( 'appUrl' ) ? appUrl : "file:///$projectDir/../build/libs/${appName}.jar"
 
 dependencies {
-    distro "com.enonic.xp:enonic-xp-generic:$xpVersion@tgz"
+    distro "com.enonic.xp:enonic-xp-generic:${version}@tgz"
     apps 'com.enonic.uitest:auth0-idprovider:1.0.0-SNAPSHOT'
     apps 'com.enonic.uitest:adfs-idprovider:1.0.0-SNAPSHOT'
     apps 'com.enonic.uitest:simple-page:1.0.0-SNAPSHOT'
