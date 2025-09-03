@@ -1,10 +1,8 @@
 import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
 
 plugins {
-    id 'java'
-    alias( libs.plugins.enonic.defaults )
+    id 'base'
     alias( libs.plugins.enonic.xp.base )
-    alias( libs.plugins.node.gradle )
 }
 
 group = 'com.enonic.xp.js_testing'
@@ -18,7 +16,7 @@ repositories {
 configurations {
     distro
     apps {
-        transitive false
+        transitive = false
     }
 }
 
@@ -100,7 +98,6 @@ tasks.register( 'startServer' ) {
     group = 'Test Execution'
     dependsOn tasks.named( 'unpackDistro' )
     doLast {
-        sleep( 5000 )
         logger.lifecycle( 'Starting XP Server at: {}', xpHome )
         logger.lifecycle( 'Server logs will be written to: build/reports/logs/xp.log' )
         def pb
@@ -118,7 +115,41 @@ tasks.register( 'startServer' ) {
         pb.redirectOutput( logsPath.file( 'xp.log' ).asFile )
         pb.redirectErrorStream( true )
         process = pb.start()
-        sleep( 60000 )
+    }
+}
+
+tasks.register( 'waitForServer') {
+    doLast {
+        long maxWaitMs = 60000
+        long deadline = System.nanoTime() + maxWaitMs * 1_000_000L
+
+        boolean ready = false
+        while (!ready && System.nanoTime() < deadline) {
+            logger.lifecycle("Waiting for server server...")
+
+            try {
+                HttpURLConnection conn = (HttpURLConnection) new URL("http://localhost:2609/ready").openConnection()
+                conn.setConnectTimeout(1000)
+                conn.setReadTimeout(1000)
+                conn.connect()
+                int code = conn.getResponseCode()
+                if (code == 200) {
+                    ready = true
+                    break
+                }
+            } catch (IOException ignored) {
+                // Not up yet; retry
+            }
+            sleep(1000)
+
+        }
+        if (ready) {
+            logger.lifecycle('Server is ready.')
+        } else {
+            throw new GradleException("Server not ready after ${maxWaitMs} ms.")
+        }
+
+        sleep(1000)
     }
 }
 
@@ -179,6 +210,7 @@ tasks.register( 'testAppFirefox', PnpmTask ) {
     dependsOn tasks.named( 'downloadApps' )
     dependsOn tasks.named( 'deployApp' )
     dependsOn tasks.named( 'startServer' )
+    dependsOn tasks.named( 'waitForServer' )
     args = ['--color', 'run', 'test:firefox']
     finalizedBy tasks.named( 'generateReportAndStopServer' )
 }
@@ -193,6 +225,7 @@ tasks.register( 'w_testAppChrome', PnpmTask ) {
     dependsOn tasks.named( 'downloadApps' )
     dependsOn tasks.named( 'deployApp' )
     dependsOn tasks.named( 'startServer' )
+    dependsOn tasks.named( 'waitForServer' )
     args = ['--color', 'run', 'test_apps:wdio_chrome']
     finalizedBy tasks.named( 'generateReportAndStopServer' )
 }
