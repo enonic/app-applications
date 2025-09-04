@@ -23,7 +23,7 @@ configurations {
 def unpackDir = layout.buildDirectory.dir( 'install' ).get()
 def distroDir = unpackDir.dir( "enonic-xp-generic-$version" )
 def deployDir = distroDir.dir( 'home/deploy' )
-def appDir = "$projectDir/test-applications"
+def testConfDir = "$projectDir/test-config"
 def xpHome = "$distroDir/home"
 def configDir = "$xpHome/config"
 def appName = 'app-applications'
@@ -56,7 +56,7 @@ tasks.register( 'copyConfig', Copy ) {
     description = 'Copy common configuration files'
     group = 'setup'
 
-    from "$appDir/common-config"
+    from "$testConfDir/common-config"
     include '**.*.cfg'
     include '*.properties'
     into file( configDir )

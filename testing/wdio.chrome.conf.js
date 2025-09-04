@@ -3,6 +3,9 @@ const PropertiesReader = require('properties-reader');
 const file = path.join(__dirname, '/browser.properties');
 const properties = PropertiesReader(file);
 const browser_version = properties.get('browser.version');
+const width = properties.get('browser.width');
+const height = properties.get('browser.height');
+
 exports.config = {
 
     specs: [
@@ -20,9 +23,18 @@ exports.config = {
                 "--headless", "--disable-gpu", "--no-sandbox",
                 "--lang=en",
                 '--disable-extensions',
-                'window-size=1970,1000'
-            ]
-        }
+                `window-size=${width},${height}`,
+                '--disable-save-password-bubble',
+                '--disable-infobars',
+                '--disable-notifications',
+                '--disable-popup-blocking'
+            ],
+            "prefs": {
+                'credentials_enable_service': false,
+                'profile.password_manager_enabled': false,
+                'autofill.profile_enabled': false
+            }
+        },
     }],
     logLevel: 'info',
     //
