@@ -55,15 +55,8 @@ class AppBrowsePanel extends Page {
             await this.waitForSpinnerNotVisible(appConst.mediumTimeout);
             console.log('applications browse panel is loaded')
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_grid');
-            throw new Error(`Applications browse panel was not loaded, screenshot: ${screenshot} ` + err);
+            await this.handleError('Applications browse panel was not loaded', 'err_browse_panel', err);
         }
-    }
-
-    waitForToolbarDisplayed(ms) {
-        return this.waitForElementDisplayed(XPATH.toolbar, ms).catch(() => {
-            throw new Error(`Content browse panel was not loaded in  ${ms}`);
-        });
     }
 
     async clickOnRowByDescription(description) {
@@ -73,8 +66,7 @@ class AppBrowsePanel extends Page {
             await this.clickOnElement(nameXpath);
             return await this.pause(500);
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_grid_item');
-            throw new Error(`Row with the app was not found, screenshot: ${screenshot} ` + err);
+            await this.handleError(`Row with the app ${description} was not found`, 'err_row_by_description', err);
         }
     }
 
@@ -85,8 +77,7 @@ class AppBrowsePanel extends Page {
             await this.clickOnElement(nameXpath);
             return await this.pause(500);
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_click_on_app');
-            throw new Error(`Error when clicking on the row, screenshot: ${screenshot} ` + err);
+            await this.handleError(`Row with the app ${displayName} was not found`, 'err_row_by_display_name', err);
         }
     }
 
@@ -95,24 +86,25 @@ class AppBrowsePanel extends Page {
             await this.waitForElementDisplayed(this.numberInToggler, appConst.shortTimeout);
             return await this.getText(this.numberInToggler);
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_number_selection_toggle');
-            throw new Error(`The number in 'Selection toggle' , screenshot:${screenshot} ` + err)
+            await this.handleError('Number in Selection toggle', 'err_number_selection_toggle', err);
         }
     }
 
     // Click on Show Selection/Hide Selection
-    clickOnSelectionToggler() {
-        return this.clickOnElement(this.selectionPanelToggler).catch(err => {
-            throw new Error(`Error when clicking 'Selection toggle' ` + err);
-        });
+    async clickOnSelectionToggler() {
+        try {
+            await this.clickOnElement(this.selectionPanelToggler);
+        } catch (err) {
+            await this.handleError("Click on Selection toggle", 'err_click_selection_toggle', err);
+        }
     }
 
     async isAppByDescriptionDisplayed(description) {
         try {
             return await this.isElementDisplayed(XPATH.rowByDescription(description));
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_app_in_grid');
-            throw new Error(`Error occurred in isAppByDescriptionDisplayed, screenshot: ${screenshot} ` + err);
+            await this.handleError(`Application with the description ${description} should be is displayed in the app-grid`,
+                `err_app_in_grid`, err);
         }
     }
 
@@ -120,8 +112,7 @@ class AppBrowsePanel extends Page {
         try {
             return await this.waitForElementDisplayed(XPATH.rowByDescription(description), appConst.shortTimeout)
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_app_in_grid');
-            throw new Error(`Application should be displayed in the app-grid, screenshot: ${screenshot} ` + err);
+            await this.handleError(`Application with the description ${description} should be displayed in the app-grid`, `err_app`, err);
         }
     }
 
@@ -138,8 +129,7 @@ class AppBrowsePanel extends Page {
         try {
             await this.waitForElementDisplayed(XPATH.rowByDisplayName(appName), 1000)
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName(`err_find_app`);
-            throw new Error(`Item was not found! Screenshot: ${screenshot} ` + err);
+            await this.handleError(`Application with the name ${appName} should be displayed in the app-grid`, `err_app`, err);
         }
     }
 
@@ -156,8 +146,7 @@ class AppBrowsePanel extends Page {
             await this.clickOnElement(this.selectionControllerCheckBox);
             return await this.pause(700);
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_selection_controller');
-            throw new Error(`App Browse Panel click on Selection controller, screenshot: ${screenshot} ` + err);
+            await this.handleError('Clicked on Selection controller checkbox', 'err_click_selection_controller', err);
         }
     }
 
@@ -182,17 +171,17 @@ class AppBrowsePanel extends Page {
             await this.waitForElementEnabled(XPATH.installButton, appConst.mediumTimeout);
             return await this.clickOnElement(XPATH.installButton);
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_browsepanel_install');
-            throw new Error(`Install button is not enabled! screenshot:${screenshot} ` + err);
+            await this.handleError('Clicked on Install button', 'err_click_install_button', err);
         }
     }
 
-    clickOnUninstallButton() {
-        return this.waitForElementEnabled(XPATH.unInstallButton, appConst.mediumTimeout).then(() => {
-            return this.clickOnElement(XPATH.unInstallButton);
-        }).catch(err => {
-            throw new Error(`Uninstall button is not enabled  ! ${err}`);
-        })
+    async clickOnUninstallButton() {
+        try {
+            await this.waitForElementEnabled(XPATH.unInstallButton, appConst.mediumTimeout);
+            await this.clickOnElement(XPATH.unInstallButton);
+        } catch (err) {
+            await this.handleError('Clicked on Uninstall button', 'err_click_uninstall_button', err);
+        }
     }
 
     async clickOnStartButton() {
@@ -201,8 +190,7 @@ class AppBrowsePanel extends Page {
             await this.clickOnElement(XPATH.startButton);
             return await this.pause(1500);
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_browsepanel_start');
-            throw new Error(`Start button is disabled!screenshot: ${screenshot} ` + err);
+            await this.handleError('Clicked on Start button', 'err_click_start_button', err);
         }
     }
 
@@ -212,8 +200,7 @@ class AppBrowsePanel extends Page {
             await this.clickOnElement(XPATH.stopButton);
             return await this.pause(1500);
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_browsepanel_stop');
-            throw new Error(`Stop button is disabled! screenshot:${screenshot} ` + err);
+            await this.handleError('Clicked on Stop button', 'err_click_stop_button', err);
         }
     }
 
@@ -223,10 +210,12 @@ class AppBrowsePanel extends Page {
         });
     }
 
-    waitForStartButtonEnabled() {
-        return this.waitForElementEnabled(XPATH.startButton, appConst.mediumTimeout).catch(err => {
-            throw new Error(`Button Start-app is not enabled ` + err);
-        });
+    async waitForStartButtonEnabled() {
+        try {
+            await this.waitForElementEnabled(XPATH.startButton, appConst.mediumTimeout)
+        } catch (err) {
+            await this.handleError('Button Start-app is not enabled', 'err_start_button_enabled', err);
+        }
     }
 
     waitForStartButtonDisabled() {
@@ -239,8 +228,7 @@ class AppBrowsePanel extends Page {
         try {
             return await this.waitForElementEnabled(XPATH.stopButton, appConst.mediumTimeout)
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_stop_button_should_be_enabled');
-            throw new Error(`Button Stop-app is not enabled! screenshot: ${screenshot} ` + err);
+            await this.handleError('Button Stop-app is not enabled', 'err_stop_button_enabled', err);
         }
     }
 
@@ -248,8 +236,7 @@ class AppBrowsePanel extends Page {
         try {
             return await this.waitForElementDisabled(XPATH.stopButton, appConst.mediumTimeout)
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_stop_button_should_be_enabled');
-            throw new Error(`Button Stop-app is not disabled! ${screenshot} ` + err);
+            await this.handleError('Button Stop-app is not disabled', 'err_stop_button_disabled', err);
         }
     }
 
@@ -260,21 +247,24 @@ class AppBrowsePanel extends Page {
             await this.doRightClick(nameXpath);
             return await this.pause(500);
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_open_context_menu');
-            throw new Error(`Do right click on the row, screenshot: ${screenshot} ` + err);
+            await this.handleError(`Right click on the row ${name}`, 'err_right_click_row', err);
         }
     }
 
-    waitForUninstallButtonEnabled() {
-        return this.waitForElementEnabled(XPATH.unInstallButton, appConst.mediumTimeout).catch(err => {
-            throw new Error('Uninstall button ' + err);
-        });
+    async waitForUninstallButtonEnabled() {
+        try {
+            await this.waitForElementEnabled(XPATH.unInstallButton, appConst.mediumTimeout)
+        } catch (err) {
+            await this.handleError('Button Uninstall-app is not enabled', 'err_uninstall_button_enabled', err);
+        }
     }
 
-    waitForUninstallButtonDisabled() {
-        return this.waitForElementDisabled(XPATH.unInstallButton, appConst.mediumTimeout).catch(err => {
-            throw new Error('Uninstall button is not disabled ' + err);
-        });
+    async waitForUninstallButtonDisabled() {
+        try {
+            await this.waitForElementDisabled(XPATH.unInstallButton, appConst.mediumTimeout)
+        } catch (err) {
+            await this.handleError('Button Uninstall-app is not disabled', 'err_uninstall_button_disabled', err);
+        }
     }
 
     isInstallButtonEnabled() {
@@ -305,8 +295,7 @@ class AppBrowsePanel extends Page {
             await this.clickOnElement(checkboxXpath);
             return await this.pause(500);
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_select_all_checkbox');
-            throw new Error(`Select all checkbox was not found, screenshot: ${screenshot}  ` + err);
+            await this.handleError('Clicked on Select All checkbox', 'err_click_select_all_checkbox', err);
         }
     }
 
@@ -317,7 +306,7 @@ class AppBrowsePanel extends Page {
             await this.clickOnElement(displayNameXpath);
             return await this.pause(500);
         } catch (err) {
-            throw new Error(`Row with the displayName ${displayName} was not found.` + err)
+            await this.handleError(`Clicked on checkbox for the row ${displayName}`, 'err_click_checkbox_row', err);
         }
     }
 
@@ -330,28 +319,21 @@ class AppBrowsePanel extends Page {
         }
     }
 
-    pressArrowUpKey() {
-        return this.keys('Arrow_Up').then(() => {
-            return this.pause(500);
-        }).catch(err => {
-            throw new Error('Error when clicking on Arrow Up key ' + err);
-        });
+    async pressArrowUpKey() {
+        await this.keys('Arrow_Up');
+        return await this.pause(400);
     }
 
-    pressEscKey() {
-        return this.keys('Escape').then(() => {
-            return this.pause(500);
-        }).catch(err => {
-            throw new Error('Error when clicking on Esc key ' + err);
-        });
+    async pressEscKey() {
+        await this.keys('Escape');
+        return await this.pause(500);
     }
 
     async waitForContextMenuNotDisplayed() {
         try {
             return await this.waitForElementNotDisplayed(XPATH.contextMenu, appConst.shortTimeout)
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_close_context_menu');
-            throw new Error(`Browse context menu was not closed! screenshot:${screenshot}` + err)
+            await this.handleError('Browse context menu was not closed', 'err_close_context_menu', err);
         }
     }
 
@@ -359,8 +341,7 @@ class AppBrowsePanel extends Page {
         try {
             await this.waitForElementDisplayed(XPATH.contextMenu, appConst.shortTimeout)
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_open_context_menu');
-            throw new Error('Context menu is not visible' + err);
+            await this.handleError('Browse context menu was not opened', 'err_open_context_menu', err);
         }
     }
 
@@ -372,18 +353,17 @@ class AppBrowsePanel extends Page {
         return attr.includes('checked');
     }
 
-    //throw exception after the timeout
-    waitForContextMenuItemDisabled(name) {
-        let menuItemXpath = XPATH.contextMenuItemByName(name);
-        return this.waitForElementDisplayed(menuItemXpath, 3000).catch(err => {
-            throw Error('Failed to find context menu item ' + name);
-        }).then(() => {
-            return this.browser.waitUntil(() => {
-                return this.getAttribute(menuItemXpath, 'class').then(result => {
-                    return result.includes('disabled');
-                })
-            }, {timeout: appConst.mediumTimeout, timeoutMsg: 'context menu item is not disabled in 3000 ms'});
-        })
+    // throw exception after the timeout
+    async waitForContextMenuItemDisabled(name) {
+        try {
+            let menuItemLocator = XPATH.contextMenuItemByName(name);
+            await this.getBrowser().waitUntil(async () => {
+                let atr = await this.getAttribute(menuItemLocator, 'class');
+                return atr.includes('disabled');
+            }, {timeout: appConst.mediumTimeout, timeoutMsg: 'The context menu item is not disabled!'});
+        } catch (err) {
+            await this.handleError(`Context menu item ${name} should be disabled`, 'err_context_menu_item_disabled', err);
+        }
     }
 
 
@@ -392,7 +372,7 @@ class AppBrowsePanel extends Page {
             let nameXpath = XPATH.enabledContextMenuButton(menuItem);
             await this.waitForElementDisplayed(nameXpath, appConst.shortTimeout)
         } catch (err) {
-            throw new Error(`Menu item is not enabled! ` + menuItem)
+            await this.handleError(`Context menu item ${menuItem} should be enabled`, 'err_context_menu_item_enabled', err);
         }
     }
 
@@ -402,8 +382,7 @@ class AppBrowsePanel extends Page {
             await this.waitForElementDisplayed(stateXpath, appConst.mediumTimeout);
             return await this.getText(stateXpath);
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_app_state');
-            throw new Error(`App Browse panel, App-state screenshot: ${screenshot} ` + err);
+            await this.handleError(`Getting application state for ${appName}`, 'err_get_app_state', err);
         }
     }
 
@@ -412,8 +391,7 @@ class AppBrowsePanel extends Page {
             let displayNameXpath = XPATH.applicationsGridListUL + XPATH.GRID_LIST_ITEM + lib.H6_DISPLAY_NAME;
             return await this.getTextInDisplayedElements(displayNameXpath);
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_app_display_names');
-            throw new Error(`Error occurred in getApplicationDisplayNames, screenshot:${screenshot} ` + err);
+            await this.handleError('Getting application display names', 'err_get_app_display_names', err);
         }
     }
 
@@ -442,8 +420,7 @@ class AppBrowsePanel extends Page {
         try {
             await this.waitForElementNotDisplayed(this.selectionPanelToggler, appConst.mediumTimeout);
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_selection_toggler_should_not_visible');
-            throw new Error(`Selection toggle should not be visible, screenshot:${screenshot} ` + err);
+            await this.handleError('Selection toggle should not be visible', 'err_selection_toggler_should_not_visible', err);
         }
     }
 
@@ -482,7 +459,6 @@ class AppBrowsePanel extends Page {
         let attribute = await this.getAttribute(locator, 'class');
         return attribute.includes('selected') && !attribute.includes('checked');
     }
-
 }
 
 module.exports = AppBrowsePanel;

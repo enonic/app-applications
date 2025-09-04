@@ -162,13 +162,15 @@ class Page {
         return await element.waitForDisplayed({timeout: ms});
     }
 
-    async waitForSpinnerNotVisible(ms) {
-        let timeout;
-        timeout = ms === undefined ? appConst.longTimeout : ms;
-        let message = "Spinner still displayed! timeout is " + timeout;
-        await this.browser.waitUntil(async () => {
-            return await this.isElementNotDisplayed("//div[@class='spinner']");
-        }, {timeout: timeout, timeoutMsg: message});
+    async waitForSpinnerNotVisible(ms = appConst.longTimeout) {
+        const message = `Spinner still displayed! Timeout: ${ms}`;
+        try {
+            await this.browser.waitUntil(async () => {
+                return await this.isElementNotDisplayed("//div[@class='spinner']");
+            }, {timeout: ms, timeoutMsg: message});
+        } catch (err) {
+            await this.handleError("Failed to wait for spinner to disappear", 'err_spinner_not_visible', err);
+        }
     }
 
     waitUntilElementNotVisible(selector, timeout) {
@@ -250,6 +252,11 @@ class Page {
     async isSelected(selector) {
         let elems = await this.findElements(selector);
         return await elems[0].isSelected();
+    }
+
+    async handleError(errorMessage, screenshotName, error) {
+        let screenshot = await this.saveScreenshotUniqueName(screenshotName);
+        throw new Error(`${errorMessage}, screenshot: ${screenshot} ` + error);
     }
 }
 

@@ -16,7 +16,11 @@ const makeChromeOptions = (headless, width, height) => ({
         ...(headless ? ["--headless", "--disable-gpu", "--no-sandbox"] : []),
         "--lang=en",
         '--disable-extensions',
-        `--window-size=${width},${height}`
+        `--window-size=${width},${height}`,
+        '--disable-save-password-bubble',
+        '--disable-infobars',
+        '--disable-notifications',
+        '--disable-popup-blocking'
     ]
 });
 
@@ -51,6 +55,11 @@ WebDriverHelper.prototype.setupBrowser = function setupBrowser(w, h) {
                 "wdio:enforceWebDriverClassic": true,
                 browserVersion: browser_version,
                 'goog:chromeOptions': makeChromeOptions(isHeadless, width, height)
+            },
+            prefs: {
+                'credentials_enable_service': false,
+                'profile.password_manager_enabled': false,
+                'autofill.profile_enabled': false
             }
         };
         _this.browser = await webdriverio.remote(options);

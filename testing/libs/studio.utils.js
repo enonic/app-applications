@@ -10,7 +10,7 @@ const webDriverHelper = require('./WebDriverHelper');
 module.exports = {
 
     getBrowser() {
-        if (typeof browser !== "undefined") {
+        if (typeof browser !== 'undefined') {
             return browser;
         } else {
             return webDriverHelper.browser;
@@ -100,13 +100,6 @@ module.exports = {
         console.log("switched to Login Page...");
         let loginPage = new LoginPage();
         return await loginPage.waitForPageLoaded(appConst.mediumTimeout);
-    },
-    switchAndCheckTitle: function (handle, reqTitle) {
-        return this.getBrowser().switchWindow(handle).then(() => {
-            return this.getBrowser().getTitle().then(title => {
-                return title == reqTitle;
-            })
-        });
     },
 
     async doLoginAndClickOnApplicationsLink(userName, password) {
