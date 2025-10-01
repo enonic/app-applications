@@ -2,9 +2,9 @@
 
 junit = "5.12.2"
 mockito = "5.17.0"
-enonicDefaults = "2.1.5"
-enonicXpGradle = "3.6.1"
-nodeGradle = "7.0.2"
+enonicDefaults = "2.1.6"
+enonicXpGradle = "3.6.2"
+nodeGradle = "7.1.0"
 
 # App
 libMustache = "2.1.1"
