@@ -34,8 +34,6 @@ dependencies {
     apps 'com.enonic.uitest:myfirstapp:1.0.0-SNAPSHOT'
 }
 
-def process
-
 // Setup tasks
 tasks.register( 'unpackDistro', Copy ) {
     description = 'Unpacks the XP distribution for testing'
@@ -49,7 +47,7 @@ tasks.register( 'unpackDistro', Copy ) {
 
 tasks.register( 'copyConfig', Copy ) {
     description = 'Copy common configuration files'
-    group = 'setup'
+    group = 'Test Setup'
 
     from layout.projectDirectory.dir('test-config/common-config')
     include '**.*.cfg'
@@ -60,7 +58,7 @@ tasks.register( 'copyConfig', Copy ) {
 
 tasks.register( 'downloadApps', Copy ) {
     description = 'Download test applications'
-    group = 'setup'
+    group = 'Test Setup'
 
     from {
         configurations.apps
@@ -71,7 +69,8 @@ tasks.register( 'downloadApps', Copy ) {
 
 tasks.register( 'deployApp', DefaultTask ) {
     description = 'Deploy the main application'
-    group = 'setup'
+    group = 'Test Setup'
+
     def appName = rootProject.tasks.named("jar", Jar).get().archiveBaseName.get()
     def appFile = distroDir.file("system/40/${appName}-${version}.jar").asFile
 
@@ -90,9 +89,11 @@ tasks.register( 'deployApp', DefaultTask ) {
 }
 
 // Server management tasks
+def process
 tasks.register( 'startServer' ) {
     description = 'Starts the XP server for testing'
-    group = 'Test Execution'
+    group = 'Test Setup'
+
     dependsOn tasks.named( 'unpackDistro' )
     doLast {
         logger.lifecycle( 'Starting XP Server at: {}', xpHome )
@@ -116,6 +117,9 @@ tasks.register( 'startServer' ) {
 }
 
 tasks.register( 'waitForServer') {
+    description = 'Waits for the XP server'
+    group = 'Test Setup'
+
     doLast {
         long maxWaitMs = 60000
         long deadline = System.nanoTime() + maxWaitMs * 1_000_000L
@@ -152,7 +156,8 @@ tasks.register( 'waitForServer') {
 
 tasks.register( 'stopServer' ) {
     description = 'Stops the XP server'
-    group = 'Test Execution'
+    group = 'Test Setup'
+
     doLast {
         if ( !project.hasProperty( 'process' ) ) {
             logger.warn( 'Server process not found - it might already be stopped' )
@@ -183,17 +188,17 @@ tasks.register( 'stopServer' ) {
 
 tasks.register( 'cleanup', Delete ) {
     description = 'Clean up test reports'
-    group = 'verification'
+    group = 'Test Reporting'
 
     delete layout.buildDirectory.dir('reports/allure')
 }
 
-tasks.register( 'generateReportAndStopServer', PnpmTask ) {
+tasks.register( 'generateReport', PnpmTask ) {
     description = 'Generates test report and stops server'
     group = 'Test Reporting'
+
     args = ['--color', 'run', 'allure-report']
     finalizedBy tasks.named( 'cleanup' )
-    finalizedBy tasks.named( 'stopServer' )
 }
 
 // Test execution tasks
@@ -209,7 +214,8 @@ tasks.register( 'testAppFirefox', PnpmTask ) {
     dependsOn tasks.named( 'startServer' )
     dependsOn tasks.named( 'waitForServer' )
     args = ['--color', 'run', 'test:firefox']
-    finalizedBy tasks.named( 'generateReportAndStopServer' )
+    finalizedBy tasks.named( 'generateReport' )
+    finalizedBy tasks.named( 'stopServer' )
 }
 
 tasks.register( 'w_testAppChrome', PnpmTask ) {
@@ -224,7 +230,8 @@ tasks.register( 'w_testAppChrome', PnpmTask ) {
     dependsOn tasks.named( 'startServer' )
     dependsOn tasks.named( 'waitForServer' )
     args = ['--color', 'run', 'test_apps:wdio_chrome']
-    finalizedBy tasks.named( 'generateReportAndStopServer' )
+    finalizedBy tasks.named( 'generateReport' )
+    finalizedBy tasks.named( 'stopServer' )
 }
 
 tasks.register( 'w_testAppChromeLocal', PnpmTask ) {
