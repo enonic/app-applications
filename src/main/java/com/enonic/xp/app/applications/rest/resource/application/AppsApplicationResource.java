@@ -12,6 +12,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.stream.Collectors;
 
+import com.enonic.xp.app.applications.ApplicationInfo;
+import com.enonic.xp.app.applications.ApplicationInfoService;
 import com.enonic.xp.web.servlet.ServletRequestUrlHelper;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.servlet.http.HttpServletRequest;
@@ -44,8 +46,6 @@ import com.enonic.xp.api.ApiDescriptors;
 import com.enonic.xp.app.Application;
 import com.enonic.xp.app.ApplicationDescriptor;
 import com.enonic.xp.app.ApplicationDescriptorService;
-import com.enonic.xp.app.ApplicationInfo;
-import com.enonic.xp.app.ApplicationInfoService;
 import com.enonic.xp.app.ApplicationKey;
 import com.enonic.xp.app.ApplicationNotFoundException;
 import com.enonic.xp.app.ApplicationService;

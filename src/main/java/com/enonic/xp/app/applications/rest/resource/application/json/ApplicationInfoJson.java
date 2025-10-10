@@ -2,7 +2,7 @@ package com.enonic.xp.app.applications.rest.resource.application.json;
 
 import com.enonic.xp.admin.widget.WidgetDescriptor;
 import com.enonic.xp.api.ApiDescriptors;
-import com.enonic.xp.app.ApplicationInfo;
+import com.enonic.xp.app.applications.ApplicationInfo;
 import com.enonic.xp.app.applications.json.content.page.PageDescriptorListJson;
 import com.enonic.xp.app.applications.json.content.page.region.LayoutDescriptorsJson;
 import com.enonic.xp.app.applications.json.content.page.region.PartDescriptorsJson;
