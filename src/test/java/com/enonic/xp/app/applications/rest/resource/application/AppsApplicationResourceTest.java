@@ -20,24 +20,25 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
+import com.enonic.xp.admin.extension.AdminExtensionDescriptor;
+import com.enonic.xp.admin.extension.AdminExtensionDescriptorService;
 import com.enonic.xp.admin.tool.AdminToolDescriptor;
 import com.enonic.xp.admin.tool.AdminToolDescriptorService;
 import com.enonic.xp.admin.tool.AdminToolDescriptors;
-import com.enonic.xp.admin.widget.WidgetDescriptor;
-import com.enonic.xp.admin.widget.WidgetDescriptorService;
 import com.enonic.xp.api.ApiDescriptor;
 import com.enonic.xp.api.ApiDescriptorService;
 import com.enonic.xp.api.ApiDescriptors;
 import com.enonic.xp.app.Application;
 import com.enonic.xp.app.ApplicationDescriptor;
 import com.enonic.xp.app.ApplicationDescriptorService;
-import com.enonic.xp.app.applications.ApplicationInfo;
-import com.enonic.xp.app.applications.ApplicationInfoService;
 import com.enonic.xp.app.ApplicationKey;
 import com.enonic.xp.app.ApplicationService;
 import com.enonic.xp.app.Applications;
+import com.enonic.xp.app.applications.ApplicationInfo;
+import com.enonic.xp.app.applications.ApplicationInfoService;
 import com.enonic.xp.app.applications.rest.resource.AdminResourceTestSupport;
 import com.enonic.xp.core.impl.app.ApplicationInstallException;
+import com.enonic.xp.descriptor.DescriptorKey;
 import com.enonic.xp.descriptor.Descriptors;
 import com.enonic.xp.form.Form;
 import com.enonic.xp.form.Input;
@@ -48,7 +49,6 @@ import com.enonic.xp.idprovider.IdProviderDescriptor;
 import com.enonic.xp.idprovider.IdProviderDescriptorService;
 import com.enonic.xp.inputtype.InputTypeName;
 import com.enonic.xp.jaxrs.impl.MockRestResponse;
-import com.enonic.xp.descriptor.DescriptorKey;
 import com.enonic.xp.macro.MacroDescriptors;
 import com.enonic.xp.page.PageDescriptors;
 import com.enonic.xp.portal.script.PortalScriptService;
@@ -57,13 +57,13 @@ import com.enonic.xp.region.PartDescriptors;
 import com.enonic.xp.resource.Resource;
 import com.enonic.xp.resource.ResourceKey;
 import com.enonic.xp.resource.ResourceService;
+import com.enonic.xp.schema.content.CmsFormFragmentService;
 import com.enonic.xp.schema.content.ContentTypes;
-import com.enonic.xp.schema.mixin.MixinService;
 import com.enonic.xp.script.ScriptExports;
 import com.enonic.xp.security.PrincipalKeys;
 import com.enonic.xp.security.RoleKeys;
-import com.enonic.xp.site.SiteDescriptor;
-import com.enonic.xp.site.SiteService;
+import com.enonic.xp.site.CmsDescriptor;
+import com.enonic.xp.site.CmsService;
 import com.enonic.xp.util.Version;
 import com.enonic.xp.web.multipart.MultipartForm;
 import com.enonic.xp.web.multipart.MultipartItem;
@@ -86,11 +86,11 @@ public class AppsApplicationResourceTest
 
     private ApplicationInfoService applicationInfoService;
 
-    private SiteService siteService;
+    private CmsService cmsService;
 
     private IdProviderDescriptorService idProviderDescriptorService;
 
-    private WidgetDescriptorService widgetDescriptorService;
+    private AdminExtensionDescriptorService adminExtensionDescriptorService;
 
     private AdminToolDescriptorService adminToolDescriptorService;
 
@@ -100,7 +100,7 @@ public class AppsApplicationResourceTest
 
     private LocaleService localeService;
 
-    private MixinService mixinService;
+    private CmsFormFragmentService cmsFormFragmentService;
 
     private ApiDescriptorService apiDescriptorService;
 
@@ -121,13 +121,13 @@ public class AppsApplicationResourceTest
     {
         final Application application = createApplication();
         when( this.applicationService.getInstalledApplication( isA( ApplicationKey.class ) ) ).thenReturn( application );
-        final SiteDescriptor siteDescriptor = createSiteDescriptor();
-        when( this.siteService.getDescriptor( isA( ApplicationKey.class ) ) ).thenReturn( siteDescriptor );
+        final CmsDescriptor siteDescriptor = createCmsDescriptor( application.getKey() );
+        when( this.cmsService.getDescriptor( isA( ApplicationKey.class ) ) ).thenReturn( siteDescriptor );
         final IdProviderDescriptor idProviderDescriptor = createIdProviderDescriptor();
         when( this.idProviderDescriptorService.getDescriptor( isA( ApplicationKey.class ) ) ).thenReturn( idProviderDescriptor );
         final ApplicationDescriptor appDescriptor = createApplicationDescriptor();
         when( this.applicationDescriptorService.get( isA( ApplicationKey.class ) ) ).thenReturn( appDescriptor );
-        when( mixinService.inlineFormItems( isA( Form.class ) ) ).then( AdditionalAnswers.returnsFirstArg() );
+        when( cmsFormFragmentService.inlineFormItems( isA( Form.class ) ) ).then( AdditionalAnswers.returnsFirstArg() );
 
         String response = request().
             path( "application" ).
@@ -142,8 +142,8 @@ public class AppsApplicationResourceTest
     {
         final Application application = createApplication();
         when( this.applicationService.getInstalledApplication( isA( ApplicationKey.class ) ) ).thenReturn( application );
-        final SiteDescriptor siteDescriptor = createSiteDescriptor();
-        when( this.siteService.getDescriptor( isA( ApplicationKey.class ) ) ).thenReturn( siteDescriptor );
+        final CmsDescriptor siteDescriptor = createCmsDescriptor( application.getKey() );
+        when( this.cmsService.getDescriptor( isA( ApplicationKey.class ) ) ).thenReturn( siteDescriptor );
         final IdProviderDescriptor idProviderDescriptor = createIdProviderDescriptor();
         when( this.idProviderDescriptorService.getDescriptor( isA( ApplicationKey.class ) ) ).thenReturn( idProviderDescriptor );
         final ApplicationDescriptor appDescriptor = createApplicationDescriptor();
@@ -158,7 +158,7 @@ public class AppsApplicationResourceTest
 
         when( this.localeService.getBundle( any(), any() ) ).thenReturn( messageBundle );
 
-        when( mixinService.inlineFormItems( isA( Form.class ) ) ).then( AdditionalAnswers.returnsFirstArg() );
+        when( cmsFormFragmentService.inlineFormItems( isA( Form.class ) ) ).then( AdditionalAnswers.returnsFirstArg() );
 
         String response = request().
             path( "application" ).
@@ -174,13 +174,13 @@ public class AppsApplicationResourceTest
         final Application application = createApplication();
         final Applications applications = Applications.from( application );
         when( this.applicationService.getInstalledApplications() ).thenReturn( applications );
-        final SiteDescriptor siteDescriptor = createSiteDescriptor();
-        when( this.siteService.getDescriptor( isA( ApplicationKey.class ) ) ).thenReturn( siteDescriptor );
+        final CmsDescriptor siteDescriptor = createCmsDescriptor( application.getKey() );
+        when( this.cmsService.getDescriptor( isA( ApplicationKey.class ) ) ).thenReturn( siteDescriptor );
         final IdProviderDescriptor idProviderDescriptor = createIdProviderDescriptor();
         when( this.idProviderDescriptorService.getDescriptor( isA( ApplicationKey.class ) ) ).thenReturn( idProviderDescriptor );
         final ApplicationDescriptor appDescriptor = createApplicationDescriptor();
         when( this.applicationDescriptorService.get( isA( ApplicationKey.class ) ) ).thenReturn( appDescriptor );
-        when( mixinService.inlineFormItems( isA( Form.class ) ) ).then( AdditionalAnswers.returnsFirstArg() );
+        when( cmsFormFragmentService.inlineFormItems( isA( Form.class ) ) ).then( AdditionalAnswers.returnsFirstArg() );
 
         String response = request().
             path( "application/list" ).
@@ -225,7 +225,7 @@ public class AppsApplicationResourceTest
         when( scriptExports.hasMethod( "get" ) ).thenReturn( true );
         when( this.portalScriptService.execute( resourceKey ) ).thenReturn( scriptExports );
 
-        when( this.widgetDescriptorService.getByApplication( applicationKey ) ).thenReturn( createWidgetDescriptors() );
+        when( this.adminExtensionDescriptorService.getByApplication( applicationKey ) ).thenReturn( createAdminExtensionDescriptors() );
 
         final AdminToolDescriptors adminToolDescriptors = createAdminToolDescriptors();
         when( this.adminToolDescriptorService.getByApplication( applicationKey ) ).thenReturn( adminToolDescriptors );
@@ -245,13 +245,13 @@ public class AppsApplicationResourceTest
         final Application application = createApplication();
         final Applications applications = Applications.from( application, createEmptyApplication() );
         when( this.applicationService.getInstalledApplications() ).thenReturn( applications );
-        final SiteDescriptor siteDescriptor = createSiteDescriptor();
-        when( this.siteService.getDescriptor( isA( ApplicationKey.class ) ) ).thenReturn( siteDescriptor );
+        final CmsDescriptor siteDescriptor = createCmsDescriptor( application.getKey() );
+        when( this.cmsService.getDescriptor( isA( ApplicationKey.class ) ) ).thenReturn( siteDescriptor );
         final IdProviderDescriptor idProviderDescriptor = createIdProviderDescriptor();
         when( this.idProviderDescriptorService.getDescriptor( isA( ApplicationKey.class ) ) ).thenReturn( idProviderDescriptor );
         final ApplicationDescriptor appDescriptor = createApplicationDescriptor();
         when( this.applicationDescriptorService.get( isA( ApplicationKey.class ) ) ).thenReturn( appDescriptor );
-        when( mixinService.inlineFormItems( isA( Form.class ) ) ).then( AdditionalAnswers.returnsFirstArg() );
+        when( cmsFormFragmentService.inlineFormItems( isA( Form.class ) ) ).then( AdditionalAnswers.returnsFirstArg() );
 
         String response = request().
             path( "application/list" ).
@@ -267,8 +267,8 @@ public class AppsApplicationResourceTest
         final Application application = createApplication();
         final Applications applications = Applications.from( application, createEmptyApplication() );
         when( this.applicationService.getInstalledApplications() ).thenReturn( applications );
-        final SiteDescriptor siteDescriptor = createSiteDescriptor();
-        when( this.siteService.getDescriptor( isA( ApplicationKey.class ) ) ).thenReturn( siteDescriptor );
+        final CmsDescriptor siteDescriptor = createCmsDescriptor( application.getKey() );
+        when( this.cmsService.getDescriptor( isA( ApplicationKey.class ) ) ).thenReturn( siteDescriptor );
         final IdProviderDescriptor idProviderDescriptor = createIdProviderDescriptor();
         when( this.idProviderDescriptorService.getDescriptor( isA( ApplicationKey.class ) ) ).thenReturn( idProviderDescriptor );
         final ApplicationDescriptor appDescriptor = createApplicationDescriptor();
@@ -288,8 +288,8 @@ public class AppsApplicationResourceTest
         final Application application = createApplication();
         final Applications applications = Applications.from( application );
         when( this.applicationService.getInstalledApplications() ).thenReturn( applications );
-        final SiteDescriptor siteDescriptor = createSiteDescriptor();
-        when( this.siteService.getDescriptor( isA( ApplicationKey.class ) ) ).thenReturn( siteDescriptor );
+        final CmsDescriptor siteDescriptor = createCmsDescriptor( application.getKey() );
+        when( this.cmsService.getDescriptor( isA( ApplicationKey.class ) ) ).thenReturn( siteDescriptor );
         final IdProviderDescriptor idProviderDescriptor = createIdProviderDescriptor();
         when( this.idProviderDescriptorService.getDescriptor( isA( ApplicationKey.class ) ) ).thenReturn( idProviderDescriptor );
         final ApplicationDescriptor appDescriptor = createApplicationDescriptor();
@@ -524,14 +524,14 @@ public class AppsApplicationResourceTest
         return application;
     }
 
-    private SiteDescriptor createSiteDescriptor()
+    private CmsDescriptor createCmsDescriptor(final ApplicationKey applicationKey)
     {
         final Form config = Form.create().
             addFormItem( Input.create().name( "some-name" ).label( "some-label" ).helpTextI18nKey( "site.config.helpText" ).labelI18nKey(
                 "site.config.label" ).inputType( InputTypeName.TEXT_LINE ).build() ).
             build();
 
-        return SiteDescriptor.create().form( config ).build();
+        return CmsDescriptor.create().applicationKey( applicationKey ).form( config ).build();
     }
 
     private IdProviderDescriptor createIdProviderDescriptor()
@@ -545,9 +545,9 @@ public class AppsApplicationResourceTest
             build();
     }
 
-    private Descriptors<WidgetDescriptor> createWidgetDescriptors()
+    private Descriptors<AdminExtensionDescriptor> createAdminExtensionDescriptors()
     {
-        final WidgetDescriptor widgetDescriptor1 = WidgetDescriptor.create().
+        final AdminExtensionDescriptor widgetDescriptor1 = AdminExtensionDescriptor.create().
             displayName( "My widget" ).
             description( "My widget description" ).
             addInterface( "com.enonic.xp.my-interface" ).
@@ -592,28 +592,28 @@ public class AppsApplicationResourceTest
         this.applicationService = mock( ApplicationService.class );
         this.applicationDescriptorService = mock( ApplicationDescriptorService.class );
         this.applicationInfoService = mock( ApplicationInfoService.class );
-        this.siteService = mock( SiteService.class );
+        this.cmsService = mock( CmsService.class );
         this.idProviderDescriptorService = mock( IdProviderDescriptorService.class );
         this.resourceService = mock( ResourceService.class );
         this.portalScriptService = mock( PortalScriptService.class );
         this.localeService = mock( LocaleService.class );
-        this.widgetDescriptorService = mock( WidgetDescriptorService.class );
+        this.adminExtensionDescriptorService = mock( AdminExtensionDescriptorService.class );
         this.adminToolDescriptorService = mock( AdminToolDescriptorService.class );
-        this.mixinService = mock( MixinService.class );
+        this.cmsFormFragmentService = mock( CmsFormFragmentService.class );
         this.apiDescriptorService = mock( ApiDescriptorService.class );
 
         final AppsApplicationResource resource = new AppsApplicationResource();
         resource.setApplicationService( this.applicationService );
-        resource.setSiteService( this.siteService );
+        resource.setCmsService( this.cmsService );
         resource.setIdProviderDescriptorService( this.idProviderDescriptorService );
         resource.setApplicationDescriptorService( this.applicationDescriptorService );
         resource.setApplicationInfoService( this.applicationInfoService );
         resource.setResourceService( this.resourceService );
         resource.setPortalScriptService( this.portalScriptService );
         resource.setLocaleService( this.localeService );
-        resource.setWidgetDescriptorService( this.widgetDescriptorService );
+        resource.setAdminExtensionDescriptorService( this.adminExtensionDescriptorService );
         resource.setAdminToolDescriptorService( this.adminToolDescriptorService );
-        resource.setMixinService( this.mixinService );
+        resource.setCmsFormFragmentService( this.cmsFormFragmentService );
         resource.setApiDescriptorService( this.apiDescriptorService );
 
         return resource;

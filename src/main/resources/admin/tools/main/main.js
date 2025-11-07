@@ -35,9 +35,9 @@ function getConfigAsJson() {
         statusApiUrl: portal.apiUrl({
             api: 'admin:status',
         }),
-        launcherUrl: admin.widgetUrl({
+        launcherUrl: admin.extensionUrl({
             application: 'com.enonic.xp.app.main',
-            widget: 'launcher',
+            extension: 'launcher',
             params: {
                 appName: app.name,
                 theme: 'dark',

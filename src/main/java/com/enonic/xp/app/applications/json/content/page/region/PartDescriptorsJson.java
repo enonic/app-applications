@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.enonic.xp.app.applications.rest.resource.schema.content.LocaleMessageResolver;
-import com.enonic.xp.app.applications.rest.resource.schema.mixin.InlineMixinResolver;
+import com.enonic.xp.app.applications.rest.resource.schema.mixin.CmsFormFragmentServiceResolver;
 import com.enonic.xp.region.PartDescriptors;
 
 
@@ -19,7 +19,7 @@ public class PartDescriptorsJson
     }
 
     public PartDescriptorsJson( final PartDescriptors descriptors, final LocaleMessageResolver localeMessageResolver,
-                                final InlineMixinResolver inlineMixinResolver )
+                                final CmsFormFragmentServiceResolver inlineMixinResolver )
     {
         this.descriptorJsonList = descriptors.stream().map(
             descriptor -> new PartDescriptorJson( descriptor, localeMessageResolver, inlineMixinResolver ) ).collect(
