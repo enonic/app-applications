@@ -1,0 +1,13 @@
+displayName:
+  text: "Applications"
+  i18n: "admin.tool.displayName"
+description:
+  text: "Install and manage your Apps"
+  i18n: "admin.tool.description"
+allow:
+- "role:system.admin"
+apis:
+- "i18n"
+- "admin:extension"
+- "admin:status"
+- "admin:event"
