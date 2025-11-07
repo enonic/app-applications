@@ -1,10 +1,10 @@
 package com.enonic.xp.app.applications.json.form;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -12,9 +12,8 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.enonic.xp.app.applications.rest.resource.schema.content.LocaleMessageResolver;
 import com.enonic.xp.data.Value;
 import com.enonic.xp.form.Input;
-import com.enonic.xp.inputtype.InputTypeConfig;
 import com.enonic.xp.inputtype.InputTypeName;
-import com.enonic.xp.inputtype.InputTypeProperty;
+import com.enonic.xp.util.GenericValue;
 
 import static com.google.common.base.Strings.nullToEmpty;
 
@@ -87,18 +86,65 @@ public class InputJson
         return this.inputType;
     }
 
-    public Map<String, List<Map<String, String>>> getConfig()
+    public Map<String, List<Map<String, Object>>> getConfig()
     {
-        final InputTypeConfig config = this.input.getInputTypeConfig();
+        final GenericValue config = this.input.getInputTypeConfig();
 
-        final Map<String, List<Map<String, String>>> json = new LinkedHashMap<>();
-        for ( final String name : config.getNames() )
-        {
+        final Map<String, List<Map<String, Object>>> json = new LinkedHashMap<>();
 
-            json.put( name, toJson( config.getProperties( name ) ) );
-        }
+        config.properties().forEach( entry -> {
+            final String name = entry.getKey();
+            final GenericValue value = entry.getValue();
+
+            if ( "options".equals( entry.getKey() ) && ( InputTypeName.RADIO_BUTTON.equals( this.input.getInputType() ) ||
+                InputTypeName.COMBO_BOX.equals( this.input.getInputType() ) ) )
+            {
+                json.put( name, doHandleRadioButtonOrComboBox( value ) );
+            }
+            else
+            {
+                json.put( name, toJsonAsList( value ) );
+            }
+        } );
 
         return json;
+    }
+
+    private List<Map<String, Object>> doHandleRadioButtonOrComboBox( final GenericValue value )
+    {
+        final List<Map<String, Object>> result = new ArrayList<>();
+
+        value.values().forEach( item -> {
+            final Map<String, Object> json = new LinkedHashMap<>();
+
+            final String optionValue = item.optional( "value" ).map( GenericValue::asString ).orElse( null );
+
+            json.put( "@value", optionValue );
+
+            final Optional<GenericValue> label = item.optional( "label" );
+            if ( label.isPresent() )
+            {
+                final GenericValue labelValue = label.get();
+
+                String labelText = labelValue.optional( "text" ).map( GenericValue::asString ).orElse( null );
+                if ( labelValue.optional( "i18n" ).isPresent() )
+                {
+                    final String i18nKey = labelValue.property( "i18n" ).asString();
+                    json.put( "@i18n", i18nKey );
+
+                    if ( InputTypeName.RADIO_BUTTON.equals( this.input.getInputType() ) )
+                    {
+                        labelText = this.localeMessageResolver.localizeMessage( i18nKey, labelText );
+                    }
+                }
+
+                json.put( "value", labelText );
+            }
+
+            result.add( json );
+        } );
+
+        return result;
     }
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -112,10 +158,10 @@ public class InputJson
         this.defaultValue = defaultValue;
     }
 
-    private List<Map<String, String>> toJson( final Collection<InputTypeProperty> properties )
+    private List<Map<String, Object>> toJsonAsList( final GenericValue value )
     {
-        final List<Map<String, String>> json = new ArrayList<>();
-        for ( final InputTypeProperty property : properties )
+        final List<Map<String, Object>> json = new ArrayList<>();
+        for ( final GenericValue property : value.values() )
         {
             json.add( toJson( property ) );
         }
@@ -123,23 +169,10 @@ public class InputJson
         return json;
     }
 
-    private Map<String, String> toJson( final InputTypeProperty property )
+    private Map<String, Object> toJson( final GenericValue property )
     {
-        final Map<String, String> json = new LinkedHashMap<>();
-
-        String propertyValue = property.getValue();
-
-        for ( final Map.Entry<String, String> attribute : property.getAttributes().entrySet() )
-        {
-            if ( InputTypeName.RADIO_BUTTON.equals( this.input.getInputType() ) && "i18n".equals( attribute.getKey() ) )
-            {
-                propertyValue = this.localeMessageResolver.localizeMessage( attribute.getValue(), propertyValue );
-            }
-            json.put( "@" + attribute.getKey(), attribute.getValue() );
-        }
-
-        json.put( "value", propertyValue );
-
+        final Map<String, Object> json = new LinkedHashMap<>();
+        json.put( "value", property.toRawJs() );
         return json;
     }
 }
