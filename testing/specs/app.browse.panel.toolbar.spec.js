@@ -120,7 +120,7 @@ describe('Application Browse Panel, check buttons in the toolbar', function () {
             await appBrowsePanel.waitForAppByDisplayNameNotDisplayed(CONTENT_VIEWER_APP);
             await appBrowsePanel.waitForAppByDisplayNameNotDisplayed(APP_2_PROVIDER);
             // 6. Verify that initial applications are visible:
-            await appBrowsePanel.waitForAppByDisplayNameDisplayed(appConst.TEST_APPLICATIONS.FIRST_APP);
+            await appBrowsePanel.waitForAppByDisplayNameDisplayed(appConst.TEST_APPS_NAME.MY_FIRST_APP);
             // 7. Selection Controller checkbox gets not selected:
             await appBrowsePanel.isSelectionControllerSelected();
         });
