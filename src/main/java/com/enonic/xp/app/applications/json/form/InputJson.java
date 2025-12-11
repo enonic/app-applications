@@ -8,7 +8,6 @@ import java.util.Optional;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.google.common.collect.ImmutableList;
 
 import com.enonic.xp.app.applications.rest.resource.schema.content.LocaleMessageResolver;
 import com.enonic.xp.data.Value;
@@ -93,11 +92,11 @@ public class InputJson
 
         final Map<String, List<Map<String, Object>>> json = new LinkedHashMap<>();
 
-        config.getProperties().forEach( entry -> {
+        config.properties().forEach( entry -> {
             final String name = entry.getKey();
             final GenericValue value = entry.getValue();
 
-            if ( "option".equals( entry.getKey() ) && ( InputTypeName.RADIO_BUTTON.equals( this.input.getInputType() ) ||
+            if ( "options".equals( entry.getKey() ) && ( InputTypeName.RADIO_BUTTON.equals( this.input.getInputType() ) ||
                 InputTypeName.COMBO_BOX.equals( this.input.getInputType() ) ) )
             {
                 json.put( name, doHandleRadioButtonOrComboBox( value ) );
@@ -115,7 +114,7 @@ public class InputJson
     {
         final List<Map<String, Object>> result = new ArrayList<>();
 
-        value.asList().forEach( item -> {
+        value.values().forEach( item -> {
             final Map<String, Object> json = new LinkedHashMap<>();
 
             final String optionValue = item.optional( "value" ).map( GenericValue::asString ).orElse( null );
@@ -161,8 +160,8 @@ public class InputJson
 
     private List<Map<String, Object>> toJsonAsList( final GenericValue value )
     {
-        final List<Map<String, Object>> json = new ArrayList<>( );
-        for ( final GenericValue property : value.asList() )
+        final List<Map<String, Object>> json = new ArrayList<>();
+        for ( final GenericValue property : value.values() )
         {
             json.add( toJson( property ) );
         }
@@ -173,27 +172,7 @@ public class InputJson
     private Map<String, Object> toJson( final GenericValue property )
     {
         final Map<String, Object> json = new LinkedHashMap<>();
-
-        switch ( property.getType() ) {
-            case STRING:
-                json.put( "value", property.asString() );
-                break;
-            case NUMBER:
-                json.put( "value", property.asDouble() );
-                break;
-            case BOOLEAN:
-                json.put( "value", property.asBoolean() );
-                break;
-            case LIST:
-                json.put( "value", property.asList().stream().map( this::toJson ).collect( ImmutableList.toImmutableList() ) );
-                break;
-            case OBJECT:
-                property.getProperties().forEach( entry -> json.put( entry.getKey(), toJson( entry.getValue() ) ) );
-                break;
-            default:
-                throw new AssertionError( property.getType() );
-        }
-
+        json.put( "value", property.toRawJs() );
         return json;
     }
 }

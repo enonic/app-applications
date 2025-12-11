@@ -193,7 +193,7 @@ public class ApplicationInfoServiceImplTest
                 setFinal().
                 allowChildContent( true ).
                 setBuiltIn().
-                schemaConfig( GenericValue.object().put( "displayNameExpression", "displayNameExpression" ).build() ).
+                schemaConfig( GenericValue.newObject().put( "displayNameExpression", "displayNameExpression" ).build() ).
                 displayName( "displayName" ).
                 description( "description" ).
                 modifiedTime( Instant.ofEpochSecond( 1000 ) ).
