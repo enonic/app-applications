@@ -5,9 +5,9 @@ import java.util.Set;
 
 import com.google.common.collect.ImmutableSet;
 
-import com.enonic.xp.admin.widget.WidgetDescriptor;
+import com.enonic.xp.admin.extension.AdminExtensionDescriptor;
 
-public final class WidgetDescriptorJson
+public final class AdminExtensionDescriptorJson
 {
 
     public String key;
@@ -20,9 +20,9 @@ public final class WidgetDescriptorJson
 
     public Map<String, String> config;
 
-    public WidgetDescriptorJson( final WidgetDescriptor widgetDescriptor )
+    public AdminExtensionDescriptorJson( final AdminExtensionDescriptor widgetDescriptor )
     {
-        this.key = widgetDescriptor.getKeyString();
+        this.key = widgetDescriptor.getKey().toString();
         this.displayName = widgetDescriptor.getDisplayName();
         this.description = widgetDescriptor.getDescription();
         this.interfaces = ImmutableSet.copyOf( widgetDescriptor.getInterfaces() );
