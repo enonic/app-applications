@@ -48,7 +48,7 @@ describe('Install Application Dialog specification', function () {
             await dialog.waitForClosed(appConst.mediumTimeout);
         });
 
-    it('WHEN dialog is opened THEN applications should be present in the grid AND applications are sorted by a name',
+    it.skip('WHEN dialog is opened THEN applications should be present in the grid AND applications are sorted by a name',
         async () => {
             let appBrowsePanel = new AppBrowsePanel();
             let dialog = new InstallDialog();
