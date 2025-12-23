@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.AdditionalAnswers;
 import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatchers;
-import org.osgi.framework.Version;
 
 import com.google.common.io.ByteSource;
 
@@ -65,6 +64,7 @@ import com.enonic.xp.security.PrincipalKeys;
 import com.enonic.xp.security.RoleKeys;
 import com.enonic.xp.site.SiteDescriptor;
 import com.enonic.xp.site.SiteService;
+import com.enonic.xp.util.Version;
 import com.enonic.xp.web.multipart.MultipartForm;
 import com.enonic.xp.web.multipart.MultipartItem;
 
@@ -489,7 +489,7 @@ public class AppsApplicationResourceTest
     {
         final Application application = mock( Application.class );
         when( application.getKey() ).thenReturn( ApplicationKey.from( "testapplication" ) );
-        when( application.getVersion() ).thenReturn( new Version( 1, 0, 0 ) );
+        when( application.getVersion() ).thenReturn( Version.parseVersion( "1.0.0" ) );
         when( application.getDisplayName() ).thenReturn( "application display name" );
         when( application.getUrl() ).thenReturn( "http://enonic.net" );
         when( application.getVendorName() ).thenReturn( "Enonic" );
