@@ -6,18 +6,16 @@ import org.osgi.service.component.annotations.Component;
 @Component(immediate = true, service = MarketConfigService.class, configurationPid = "com.enonic.xp.market")
 public class MarketConfigService
 {
-
-    private final String marketUrl;
+    private final String marketApiUrl;
 
     @Activate
     public MarketConfigService( final MarketConfig marketConfig )
     {
-        this.marketUrl = marketConfig.marketUrl();
+        this.marketApiUrl = marketConfig.marketApiUrl();
     }
 
-    public String getMarketUrl()
+    public String getMarketApiUrl()
     {
-        return marketUrl;
+        return marketApiUrl;
     }
-
 }
