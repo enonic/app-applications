@@ -16,13 +16,13 @@ public final class GetMarketConfigBean
         this.marketConfigSupplier = context.getService( MarketConfigService.class );
     }
 
-    public String getMarketUrl()
+    public String getMarketApiUrl()
     {
         if ( marketConfigSupplier.get() != null )
         {
-            return marketConfigSupplier.get().getMarketUrl();
+            return marketConfigSupplier.get().getMarketApiUrl();
         }
 
-        return MarketConfig.DEFAULT_MARKET_URL;
+        return MarketConfig.DEFAULT_MARKET_API_URL;
     }
 }
