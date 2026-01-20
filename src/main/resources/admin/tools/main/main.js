@@ -6,9 +6,9 @@ const portal = require('/lib/xp/portal');
 const i18n = require('/lib/xp/i18n');
 const assetLib = require('/lib/enonic/asset');
 
-function getMarketUrl() {
+function getMarketApiUrl() {
     const marketConfigBean = __.newBean('com.enonic.xp.app.main.GetMarketConfigBean');
-    return __.toNativeObject(marketConfigBean.getMarketUrl());
+    return __.toNativeObject(marketConfigBean.getMarketApiUrl());
 }
 
 function getConfigAsJson() {
@@ -17,7 +17,7 @@ function getConfigAsJson() {
     return JSON.stringify({
         appId: app.name,
         assetsUri: assetLib.assetUrl({path: ''}),
-        marketUrl: getMarketUrl(),
+        marketApi: getMarketApiUrl(),
         readonlyMode: readonlyMode,
         apis: {
             i18nUrl: portal.apiUrl({
@@ -62,8 +62,8 @@ function handleGet(req) {
         configAsJson: getConfigAsJson(),
     };
 
-    const marketUrl = getMarketUrl();
-    const baseMarketUrl = marketUrl.substring(0, marketUrl.indexOf('/', 9));
+    const marketApiUrl = getMarketApiUrl();
+    const baseMarketUrl = marketApiUrl.substring(0, marketApiUrl.indexOf('/', 9));
     const contentSecurityPolicy = `default-src 'self'; script-src 'self' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; object-src 'none'; connect-src 'self' ${baseMarketUrl}; img-src data: 'self' ${baseMarketUrl}; font-src data: 'self'`;
 
     return {

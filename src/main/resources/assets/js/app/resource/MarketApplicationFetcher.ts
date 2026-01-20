@@ -5,12 +5,9 @@ import {ListMarketApplicationsRequest} from '../ListMarketApplicationsRequest';
 
 export class MarketApplicationFetcher {
 
-    static fetchApps(from: number = 0, size: number = -1): Q.Promise<MarketApplicationResponse> {
+    static fetchApps(): Q.Promise<MarketApplicationResponse> {
         return new ListMarketApplicationsRequest()
-            .setUrl(CONFIG.getString('marketUrl'))
-            .setStart(from)
-            .setCount(size)
-            .setVersion(CONFIG.getString('xpVersion'))
+            .setUrl(CONFIG.getString('marketApi'))
             .sendAndParse();
     }
 }
