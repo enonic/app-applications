@@ -67,6 +67,7 @@ jobs:
         continue-on-error: true
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: false
 
   dispatch:
     needs: [ publish_vars, build ]
