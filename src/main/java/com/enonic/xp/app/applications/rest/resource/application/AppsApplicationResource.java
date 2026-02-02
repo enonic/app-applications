@@ -12,8 +12,13 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.stream.Collectors;
 
+import com.enonic.xp.admin.extension.AdminExtensionDescriptor;
+import com.enonic.xp.admin.extension.AdminExtensionDescriptorService;
 import com.enonic.xp.app.applications.ApplicationInfo;
 import com.enonic.xp.app.applications.ApplicationInfoService;
+import com.enonic.xp.schema.content.CmsFormFragmentService;
+import com.enonic.xp.site.CmsDescriptor;
+import com.enonic.xp.site.CmsService;
 import com.enonic.xp.web.servlet.ServletRequestUrlHelper;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.servlet.http.HttpServletRequest;
@@ -39,8 +44,6 @@ import com.google.common.util.concurrent.Striped;
 
 import com.enonic.xp.admin.tool.AdminToolDescriptorService;
 import com.enonic.xp.admin.tool.AdminToolDescriptors;
-import com.enonic.xp.admin.widget.WidgetDescriptor;
-import com.enonic.xp.admin.widget.WidgetDescriptorService;
 import com.enonic.xp.api.ApiDescriptorService;
 import com.enonic.xp.api.ApiDescriptors;
 import com.enonic.xp.app.Application;
@@ -60,7 +63,7 @@ import com.enonic.xp.app.applications.rest.resource.application.json.Application
 import com.enonic.xp.app.applications.rest.resource.application.json.ApplicationSuccessJson;
 import com.enonic.xp.app.applications.rest.resource.application.json.ListApplicationJson;
 import com.enonic.xp.app.applications.rest.resource.schema.content.LocaleMessageResolver;
-import com.enonic.xp.app.applications.rest.resource.schema.mixin.InlineMixinResolver;
+import com.enonic.xp.app.applications.rest.resource.schema.mixin.CmsFormFragmentServiceResolver;
 import com.enonic.xp.app.applications.rest.resource.tool.json.AdminToolDescriptorJson;
 import com.enonic.xp.app.applications.rest.resource.tool.json.AdminToolDescriptorsJson;
 import com.enonic.xp.descriptor.Descriptors;
@@ -73,11 +76,8 @@ import com.enonic.xp.portal.script.PortalScriptService;
 import com.enonic.xp.resource.Resource;
 import com.enonic.xp.resource.ResourceKey;
 import com.enonic.xp.resource.ResourceService;
-import com.enonic.xp.schema.mixin.MixinService;
 import com.enonic.xp.script.ScriptExports;
 import com.enonic.xp.security.RoleKeys;
-import com.enonic.xp.site.SiteDescriptor;
-import com.enonic.xp.site.SiteService;
 import com.enonic.xp.util.Exceptions;
 import com.enonic.xp.util.HexEncoder;
 import com.enonic.xp.web.multipart.MultipartForm;
@@ -103,7 +103,7 @@ public final class AppsApplicationResource
 
     private ApplicationDescriptorService applicationDescriptorService;
 
-    private SiteService siteService;
+    private CmsService cmsService;
 
     private IdProviderDescriptorService idProviderDescriptorService;
 
@@ -115,13 +115,13 @@ public final class AppsApplicationResource
 
     private LocaleService localeService;
 
-    private WidgetDescriptorService widgetDescriptorService;
+    private AdminExtensionDescriptorService adminExtensionDescriptorService;
 
     private AdminToolDescriptorService adminToolDescriptorService;
 
     private ApiDescriptorService apiDescriptorService;
 
-    private MixinService mixinService;
+    private CmsFormFragmentService cmsFormFragmentService;
 
     private static final ApplicationImageHelper HELPER = new ApplicationImageHelper();
 
@@ -141,7 +141,7 @@ public final class AppsApplicationResource
         }
 
         final boolean local = this.applicationService.isLocalApplication( appKey );
-        final SiteDescriptor siteDescriptor = this.siteService.getDescriptor( appKey );
+        final CmsDescriptor cmsDescriptor = this.cmsService.getDescriptor( appKey );
         final IdProviderDescriptor idProviderDescriptor = this.idProviderDescriptorService.getDescriptor( appKey );
         final ApplicationDescriptor appDescriptor = applicationDescriptorService.get( appKey );
 
@@ -149,11 +149,11 @@ public final class AppsApplicationResource
             .setApplication( application )
             .setLocal( local )
             .setApplicationDescriptor( appDescriptor )
-            .setSiteDescriptor( siteDescriptor )
+            .setCmsDescriptor( cmsDescriptor )
             .setIdProviderDescriptor( idProviderDescriptor )
             .setIconUrlResolver( new ApplicationIconUrlResolver( request ) )
             .setLocaleMessageResolver( new LocaleMessageResolver( this.localeService, appKey, Collections.list( request.getLocales() ) ) )
-            .setInlineMixinResolver( new InlineMixinResolver( this.mixinService ) )
+            .setInlineMixinResolver( new CmsFormFragmentServiceResolver( this.cmsFormFragmentService ) )
             .build();
     }
 
@@ -173,7 +173,7 @@ public final class AppsApplicationResource
             final ApplicationKey applicationKey = application.getKey();
             if ( !application.isSystem() )
             {
-                final SiteDescriptor siteDescriptor = this.siteService.getDescriptor( applicationKey );
+                final CmsDescriptor cmsDescriptor = this.cmsService.getDescriptor( applicationKey );
                 final IdProviderDescriptor idProviderDescriptor = this.idProviderDescriptorService.getDescriptor( applicationKey );
                 final boolean localApplication = this.applicationService.isLocalApplication( applicationKey );
                 final ApplicationDescriptor appDescriptor = this.applicationDescriptorService.get( applicationKey );
@@ -182,12 +182,12 @@ public final class AppsApplicationResource
                               .setApplication( application )
                               .setLocal( localApplication )
                               .setApplicationDescriptor( appDescriptor )
-                              .setSiteDescriptor( siteDescriptor )
+                              .setCmsDescriptor( cmsDescriptor )
                               .setIdProviderDescriptor( idProviderDescriptor )
                               .setIconUrlResolver( new ApplicationIconUrlResolver( request ) )
                               .setLocaleMessageResolver( new LocaleMessageResolver( this.localeService, applicationKey,
                                                                                     Collections.list( request.getLocales() ) ) )
-                              .setInlineMixinResolver( new InlineMixinResolver( this.mixinService ) )
+                              .setInlineMixinResolver( new CmsFormFragmentServiceResolver( this.cmsFormFragmentService ) )
                               .build() );
             }
         }
@@ -203,7 +203,7 @@ public final class AppsApplicationResource
         final ApplicationKey applicationKey = ApplicationKey.from( key );
 
         final ApplicationInfo applicationInfo = this.applicationInfoService.getApplicationInfo( applicationKey );
-        final Descriptors<WidgetDescriptor> widgetDescriptors = this.widgetDescriptorService.getByApplication( applicationKey );
+        final Descriptors<AdminExtensionDescriptor> extensionDescriptors = this.adminExtensionDescriptorService.getByApplication( applicationKey );
         final AdminToolDescriptors adminToolDescriptors = this.adminToolDescriptorService.getByApplication( applicationKey );
         final ApiDescriptors apiDescriptors = apiDescriptorService.getByApplication( applicationKey );
 
@@ -217,13 +217,13 @@ public final class AppsApplicationResource
 
         final ApplicationInfoJson.Builder builder = ApplicationInfoJson.create()
             .setApplicationInfo( applicationInfo )
-            .setWidgetDescriptors( widgetDescriptors )
+            .setAdminExtensionDescriptors( extensionDescriptors )
             .setApis( apiDescriptors )
             .setAdminToolDescriptors(adminToolDescriptorsJson).
 
                 setLocaleMessageResolver(
                 new LocaleMessageResolver( this.localeService, applicationKey, Collections.list( request.getLocales() ) ) )
-            .setInlineMixinResolver( new InlineMixinResolver( this.mixinService ) );
+            .setInlineMixinResolver( new CmsFormFragmentServiceResolver( this.cmsFormFragmentService ) );
 
         final Resource resource = resourceService.getResource( ResourceKey.from( applicationKey, "/webapp/webapp.js" ) );
         if ( resource != null && resource.exists() )
@@ -448,19 +448,19 @@ public final class AppsApplicationResource
             final Application application = this.applicationService.getInstalledApplication( applicationKey );
             final boolean localApplication = this.applicationService.isLocalApplication( applicationKey );
 
-            final SiteDescriptor siteDescriptor = this.siteService.getDescriptor( applicationKey );
+            final CmsDescriptor cmsDescriptor = this.cmsService.getDescriptor( applicationKey );
 
             final ApplicationDescriptor appDescriptor = applicationDescriptorService.get( applicationKey );
             return ApplicationJson.create()
                 .setApplication( application )
                 .setLocal( localApplication )
                 .setApplicationDescriptor( appDescriptor )
-                .setSiteDescriptor( siteDescriptor )
+                .setCmsDescriptor( cmsDescriptor )
                 .setIdProviderDescriptor( idProviderDescriptor )
                 .setIconUrlResolver( new ApplicationIconUrlResolver( request ) )
                 .setLocaleMessageResolver(
                     new LocaleMessageResolver( this.localeService, applicationKey, Collections.list( request.getLocales() ) ) )
-                .setInlineMixinResolver( new InlineMixinResolver( this.mixinService ) )
+                .setInlineMixinResolver( new CmsFormFragmentServiceResolver( this.cmsFormFragmentService ) )
                 .build();
         }
         return null;
@@ -536,9 +536,9 @@ public final class AppsApplicationResource
     }
 
     @Reference
-    public void setSiteService( final SiteService siteService )
+    public void setCmsService( final CmsService cmsService )
     {
-        this.siteService = siteService;
+        this.cmsService = cmsService;
     }
 
     @Reference
@@ -566,9 +566,9 @@ public final class AppsApplicationResource
     }
 
     @Reference
-    public void setWidgetDescriptorService( WidgetDescriptorService widgetDescriptorService )
+    public void setAdminExtensionDescriptorService( AdminExtensionDescriptorService adminExtensionDescriptorService )
     {
-        this.widgetDescriptorService = widgetDescriptorService;
+        this.adminExtensionDescriptorService = adminExtensionDescriptorService;
     }
 
     @Reference
@@ -584,9 +584,9 @@ public final class AppsApplicationResource
     }
 
     @Reference
-    public void setMixinService( final MixinService mixinService )
+    public void setCmsFormFragmentService( final CmsFormFragmentService cmsFormFragmentService )
     {
-        this.mixinService = mixinService;
+        this.cmsFormFragmentService = cmsFormFragmentService;
     }
 
     @Reference
