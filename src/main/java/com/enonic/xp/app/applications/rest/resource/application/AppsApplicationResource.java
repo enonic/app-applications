@@ -267,7 +267,7 @@ public final class AppsApplicationResource
         throws Exception
     {
         params.getKeys().forEach( ( key ) -> lock( key, () -> {
-            this.applicationService.startApplication( key, true );
+            this.applicationService.startApplication( key );
             return null;
         } ) );
         return new ApplicationSuccessJson();
@@ -281,7 +281,7 @@ public final class AppsApplicationResource
         throws Exception
     {
         params.getKeys().forEach( ( key ) -> lock( key, () -> {
-            this.applicationService.stopApplication( key, true );
+            this.applicationService.stopApplication( key );
             return null;
         } ) );
         return new ApplicationSuccessJson();
@@ -317,46 +317,10 @@ public final class AppsApplicationResource
         throws Exception
     {
         params.getKeys().forEach( ( key ) -> lock( key, () -> {
-            this.applicationService.uninstallApplication( key, true );
+            this.applicationService.uninstallApplication( key );
             return null;
         } ) );
         return new ApplicationSuccessJson();
-    }
-
-    @POST
-    @Path("installUrl")
-    @RolesAllowed(RoleKeys.ADMIN_ID)
-    @Consumes(MediaType.APPLICATION_JSON)
-    public ApplicationInstallResultJson installUrl( final ApplicationInstallParams params, @Context HttpServletRequest request )
-        throws Exception
-    {
-        final String urlString = params.getUrl();
-        final byte[] sha512 = Optional.ofNullable( params.getSha512() ).map( HexEncoder::fromHex ).orElse( null );
-        final ApplicationInstallResultJson result = new ApplicationInstallResultJson();
-        String failure;
-        try
-        {
-            final URL url = new URL( urlString );
-
-            if ( ALLOWED_PROTOCOLS.contains( url.getProtocol() ) )
-            {
-                return lock( url, () -> installApplication( url, sha512, request ) );
-            }
-            else
-            {
-                failure = "Illegal protocol: " + url.getProtocol();
-                result.setFailure( failure );
-
-                return result;
-            }
-
-        }
-        catch ( IOException e )
-        {
-            LOG.error( failure = "Failed to upload application from " + urlString, e );
-            result.setFailure( failure );
-            return result;
-        }
     }
 
     @GET
@@ -395,33 +359,13 @@ public final class AppsApplicationResource
         responseBuilder.cacheControl( cacheControl );
     }
 
-    private ApplicationInstallResultJson installApplication( final URL url, final byte[] sha512, HttpServletRequest request )
-    {
-        final ApplicationInstallResultJson result = new ApplicationInstallResultJson();
-
-        try
-        {
-            final Application application = this.applicationService.installGlobalApplication( url, sha512 );
-
-            result.setApplicationInstalledJson( new ApplicationInstalledJson( application, false, new ApplicationIconUrlResolver( request ) ) );
-        }
-        catch ( Exception e )
-        {
-            final String failure = "Failed to process application from " + url;
-            LOG.error( failure, e );
-
-            result.setFailure( failure );
-        }
-        return result;
-    }
-
     private ApplicationInstallResultJson installApplication( final ByteSource byteSource, final String applicationName, HttpServletRequest request )
     {
         final ApplicationInstallResultJson result = new ApplicationInstallResultJson();
 
         try
         {
-            final Application application = this.applicationService.installGlobalApplication( byteSource, applicationName );
+            final Application application = this.applicationService.installGlobalApplication( byteSource );
 
             result.setApplicationInstalledJson( new ApplicationInstalledJson( application, false, new ApplicationIconUrlResolver( request ) ) );
         }
