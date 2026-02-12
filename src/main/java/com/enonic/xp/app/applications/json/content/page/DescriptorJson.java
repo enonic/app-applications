@@ -5,7 +5,7 @@ import com.google.common.base.Preconditions;
 import com.enonic.xp.app.applications.json.ItemJson;
 import com.enonic.xp.app.applications.json.form.FormJson;
 import com.enonic.xp.app.applications.rest.resource.schema.content.LocaleMessageResolver;
-import com.enonic.xp.app.applications.rest.resource.schema.mixin.InlineMixinResolver;
+import com.enonic.xp.app.applications.rest.resource.schema.mixin.CmsFormFragmentServiceResolver;
 import com.enonic.xp.region.ComponentDescriptor;
 
 import static com.google.common.base.Strings.nullToEmpty;
@@ -25,7 +25,7 @@ public abstract class DescriptorJson
     private final boolean deletable;
 
     public DescriptorJson( final ComponentDescriptor descriptor, final LocaleMessageResolver localeMessageResolver,
-                           final InlineMixinResolver inlineMixinResolver )
+                           final CmsFormFragmentServiceResolver inlineMixinResolver )
     {
         Preconditions.checkNotNull( descriptor );
         Preconditions.checkNotNull( localeMessageResolver );

@@ -42,6 +42,7 @@ import com.enonic.xp.security.PrincipalKey;
 import com.enonic.xp.security.SecurityService;
 import com.enonic.xp.task.TaskDescriptor;
 import com.enonic.xp.task.TaskDescriptorService;
+import com.enonic.xp.util.GenericValue;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -192,7 +193,7 @@ public class ApplicationInfoServiceImplTest
                 setFinal().
                 allowChildContent( true ).
                 setBuiltIn().
-                displayNameExpression( "displayNameExpression" ).
+                schemaConfig( GenericValue.newObject().put( "displayNameExpression", "displayNameExpression" ).build() ).
                 displayName( "displayName" ).
                 description( "description" ).
                 modifiedTime( Instant.ofEpochSecond( 1000 ) ).

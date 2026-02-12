@@ -1,6 +1,10 @@
 package com.enonic.xp.app.applications.rest.resource.application.json;
 
-import com.enonic.xp.admin.widget.WidgetDescriptor;
+import java.util.stream.Collectors;
+
+import com.google.common.base.Preconditions;
+
+import com.enonic.xp.admin.extension.AdminExtensionDescriptor;
 import com.enonic.xp.api.ApiDescriptors;
 import com.enonic.xp.app.applications.ApplicationInfo;
 import com.enonic.xp.app.applications.json.content.page.PageDescriptorListJson;
@@ -11,16 +15,13 @@ import com.enonic.xp.app.applications.rest.resource.apis.json.ApiDescriptorJson;
 import com.enonic.xp.app.applications.rest.resource.apis.json.ApiDescriptorsJson;
 import com.enonic.xp.app.applications.rest.resource.macro.json.MacrosJson;
 import com.enonic.xp.app.applications.rest.resource.schema.content.LocaleMessageResolver;
-import com.enonic.xp.app.applications.rest.resource.schema.mixin.InlineMixinResolver;
+import com.enonic.xp.app.applications.rest.resource.schema.mixin.CmsFormFragmentServiceResolver;
 import com.enonic.xp.app.applications.rest.resource.tool.json.AdminToolDescriptorsJson;
-import com.enonic.xp.app.applications.rest.resource.widget.json.WidgetDescriptorsJson;
+import com.enonic.xp.app.applications.rest.resource.widget.json.AdminExtensionDescriptorsJson;
 import com.enonic.xp.descriptor.Descriptors;
 import com.enonic.xp.page.PageDescriptors;
 import com.enonic.xp.region.LayoutDescriptors;
 import com.enonic.xp.region.PartDescriptors;
-import com.google.common.base.Preconditions;
-
-import java.util.stream.Collectors;
 
 public class ApplicationInfoJson
 {
@@ -36,7 +37,7 @@ public class ApplicationInfoJson
 
     private final ApplicationTaskDescriptorsJson tasks;
 
-    private final WidgetDescriptorsJson widgets;
+    private final AdminExtensionDescriptorsJson widgets;
 
     private final AdminToolDescriptorsJson tools;
 
@@ -63,7 +64,7 @@ public class ApplicationInfoJson
             setInlineMixinResolver( builder.inlineMixinResolver ).
             build();
         this.tasks = new ApplicationTaskDescriptorsJson( builder.applicationInfo.getTasks() );
-        this.widgets = new WidgetDescriptorsJson( builder.widgetDescriptors );
+        this.widgets = new AdminExtensionDescriptorsJson( builder.adminExtensionDescriptors );
         this.tools = builder.adminToolDescriptors;
         this.apis = new ApiDescriptorsJson( builder.apis.stream().map( ApiDescriptorJson::new ).collect( Collectors.toList() ) );
         this.idProviderApplication = new IdProviderApplicationJson( builder.applicationInfo.getIdProviderDescriptor(),
@@ -111,7 +112,7 @@ public class ApplicationInfoJson
         return deployment;
     }
 
-    public WidgetDescriptorsJson getWidgets()
+    public AdminExtensionDescriptorsJson getWidgets()
     {
         return widgets;
     }
@@ -135,7 +136,7 @@ public class ApplicationInfoJson
     {
         private ApplicationInfo applicationInfo;
 
-        private Descriptors<WidgetDescriptor> widgetDescriptors;
+        private Descriptors<AdminExtensionDescriptor> adminExtensionDescriptors;
 
         private AdminToolDescriptorsJson adminToolDescriptors;
 
@@ -145,7 +146,7 @@ public class ApplicationInfoJson
 
         private LocaleMessageResolver localeMessageResolver;
 
-        private InlineMixinResolver inlineMixinResolver;
+        private CmsFormFragmentServiceResolver inlineMixinResolver;
 
         private Builder()
         {
@@ -157,9 +158,9 @@ public class ApplicationInfoJson
             return this;
         }
 
-        public Builder setWidgetDescriptors( final Descriptors<WidgetDescriptor> widgetDescriptors )
+        public Builder setAdminExtensionDescriptors( final Descriptors<AdminExtensionDescriptor> adminExtensionDescriptors )
         {
-            this.widgetDescriptors = widgetDescriptors;
+            this.adminExtensionDescriptors = adminExtensionDescriptors;
             return this;
         }
 
@@ -187,7 +188,7 @@ public class ApplicationInfoJson
             return this;
         }
 
-        public Builder setInlineMixinResolver( final InlineMixinResolver inlineMixinResolver )
+        public Builder setInlineMixinResolver( final CmsFormFragmentServiceResolver inlineMixinResolver )
         {
             this.inlineMixinResolver = inlineMixinResolver;
             return this;
