@@ -307,7 +307,7 @@ public class AppsApplicationResourceTest
     {
         request().path( "application/start" ).entity( "{\"key\":[\"testapplication\"]}", MediaType.APPLICATION_JSON_TYPE ).post();
 
-        verify( this.applicationService ).startApplication( ApplicationKey.from( "testapplication" ), true );
+        verify( this.applicationService ).startApplication( ApplicationKey.from( "testapplication" ) );
     }
 
     @Test
@@ -316,7 +316,7 @@ public class AppsApplicationResourceTest
     {
         request().path( "application/stop" ).entity( "{\"key\":[\"testapplication\"]}", MediaType.APPLICATION_JSON_TYPE ).post();
 
-        verify( this.applicationService ).stopApplication( ApplicationKey.from( "testapplication" ), true );
+        verify( this.applicationService ).stopApplication( ApplicationKey.from( "testapplication" ) );
     }
 
     @Test
@@ -355,71 +355,13 @@ public class AppsApplicationResourceTest
     }
 
     @Test
-    public void installUrlInvalidUrl()
-        throws Exception
-    {
-        String response = request().
-            path( "application/installUrl" ).
-            entity( "{\"URL\":\"" + "http://enonic.net" + "\"}", MediaType.APPLICATION_JSON_TYPE ).
-            post().getAsString();
-
-        assertEquals( "{\"failure\":\"Failed to process application from http://enonic.net\"}",
-                                 response );
-    }
-
-    @Test
-    public void installUrlInvalidProtocol()
-        throws Exception
-    {
-        String response = request().
-            path( "application/installUrl" ).
-            entity( "{\"URL\":\"" + "inv://enonic.net" + "\"}", MediaType.APPLICATION_JSON_TYPE ).
-            post().getAsString();
-
-        assertEquals( "{\"failure\":\"Failed to upload application from inv://enonic.net\"}",
-                                 response );
-    }
-
-    @Test
-    public void installUrlNotAllowedProtocol()
-        throws Exception
-    {
-        String response = request().
-            path( "application/installUrl" ).
-            entity( "{\"URL\":\"" + "ftp://enonic.net" + "\"}", MediaType.APPLICATION_JSON_TYPE ).
-            post().getAsString();
-
-        assertEquals( "{\"failure\":\"Illegal protocol: ftp\"}", response );
-    }
-
-    @Test
-    public void installUrl()
-        throws Exception
-    {
-        final Application application = createApplication();
-        when(
-            this.applicationService.installGlobalApplication( ArgumentMatchers.eq( new URL( application.getUrl() ) ), any() ) ).thenReturn(
-            application );
-
-        String response = request().path( "application/installUrl" )
-            .entity( "{\"URL\":\"" + application.getUrl() + "\"}", MediaType.APPLICATION_JSON_TYPE )
-            .post()
-            .getAsString();
-        ArgumentCaptor<URL> captor = ArgumentCaptor.forClass( URL.class );
-        verify( applicationService ).installGlobalApplication( captor.capture(), any() );
-        assertEquals( application.getUrl(), captor.getValue().toString() );
-
-        assertJson( "install_url.json", response );
-    }
-
-    @Test
     public void testUninstallFailed()
         throws Exception
     {
         final ApplicationKey applicationKey = ApplicationKey.from( "testapplication" );
         doThrow( new ApplicationInstallException( "expectedException" ) )
             .when( this.applicationService )
-            .uninstallApplication( applicationKey, true );
+            .uninstallApplication( applicationKey );
 
         final MockRestResponse post = request().path( "application/uninstall" )
             .entity( "{\"key\":[\"" + applicationKey + "\"]}", MediaType.APPLICATION_JSON_TYPE )
@@ -452,7 +394,7 @@ public class AppsApplicationResourceTest
         when( form.get( "file" ) ).thenReturn( file );
         when( this.multipartService.parse( any() ) ).thenReturn( form );
 
-        when( this.applicationService.installGlobalApplication( file.getBytes(), "file.jar" ) ).thenThrow( new RuntimeException() );
+        when( this.applicationService.installGlobalApplication( file.getBytes() ) ).thenThrow( new RuntimeException() );
 
         String response = request().
             path( "application/install" ).entity( new byte[]{0, 1, 2}, MediaType.MULTIPART_FORM_DATA_TYPE ).
@@ -476,7 +418,7 @@ public class AppsApplicationResourceTest
 
         final Application application = createApplication();
 
-        when( this.applicationService.installGlobalApplication( file.getBytes(), "file.jar" ) ).thenReturn( application );
+        when( this.applicationService.installGlobalApplication( file.getBytes() ) ).thenReturn( application );
 
         String response = request().
             path( "application/install" ).entity( new byte[]{0, 1, 2}, MediaType.MULTIPART_FORM_DATA_TYPE ).

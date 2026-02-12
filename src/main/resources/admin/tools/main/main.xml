@@ -10,5 +10,6 @@
     <api>admin:widget</api>
     <api>admin:status</api>
     <api>admin:event</api>
+    <api>server:app</api>
   </apis>
 </tool>
