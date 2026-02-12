@@ -43,6 +43,10 @@ function getConfigAsJson() {
                 theme: 'dark',
             }
         }),
+        applicationInstallApiUrl: portal.apiUrl({
+            api: 'server:app',
+            path: 'installUrl',
+        }),
     }, null, 4).replace(/<(\/?script|!--)/gi, '\\u003C$1');
 }
 
