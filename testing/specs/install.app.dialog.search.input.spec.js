@@ -15,8 +15,9 @@ describe('Install app dialog, search input spec.', function () {
     const LOG_BROWSER_APP_URL = 'https://repo.enonic.com/public/com/enonic/app/logbrowser/2.0.0/logbrowser-2.0.0.jar';
 
     const LOCAL_FILE = "file:c:/";
+    const VALIDATION_MESSAGE = 'Failed to upload application from';
 
-    it(`GIVEN 'install app' dialog is opened WHEN not existing URL has been typed THEN expected validation message should appear`,
+    it(`GIVEN 'install app' dialog is opened WHEN Enter a non-existing URL into the search field THEN expected validation message should appear`,
         async () => {
             let appBrowsePanel = new AppBrowsePanel();
             let installDialog = new InstallDialog();
@@ -31,7 +32,7 @@ describe('Install app dialog, search input spec.', function () {
             // 4. Verify that validation message appears:
             let message = await installDialog.getErrorValidationMessage();
             await studioUtils.saveScreenshot('url_not_exist');
-            assert.ok(message.includes('Failed to process application from'), 'expected notification message should appear');
+            assert.ok(message.includes(VALIDATION_MESSAGE), 'expected validation message should appear');
         });
 
     it(`GIVEN 'install app' dialog is opened WHEN path to local file has been typed THEN expected warning message should appear`,
