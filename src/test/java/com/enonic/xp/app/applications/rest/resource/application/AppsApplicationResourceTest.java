@@ -492,8 +492,7 @@ public class AppsApplicationResourceTest
         final AdminExtensionDescriptor widgetDescriptor1 = AdminExtensionDescriptor.create().
             displayName( "My widget" ).
             description( "My widget description" ).
-            addInterface( "com.enonic.xp.my-interface" ).
-            addInterface( "com.enonic.xp.my-interface-2" ).
+            interfaces( "com.enonic.xp.my-interface", "com.enonic.xp.my-interface-2" ).
             key( DescriptorKey.from( "myapp:my-widget" ) ).
             build();
 
