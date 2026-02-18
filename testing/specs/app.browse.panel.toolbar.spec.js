@@ -16,6 +16,7 @@ describe('Application Browse Panel, check buttons in the toolbar', function () {
     const CONTENT_VIEWER_APP = 'Content Viewer App'; // This displayName should be in grid
     const APP_1_CONTENT_VIEWER = 'Content viewer'; // This displayName should be in Uninstall modal dialog
     const APP_CHUCK = 'Chuck Norris';
+    const APP_CHUCK_DESCRIPTION = 'chucknorris';
     const APP_1_DESCRIPTION = 'Inspect your content object JSON';
     const APP_2_DESCRIPTION = 'Add Auth0 authentication to your Enonic XP installation';
 
@@ -53,7 +54,8 @@ describe('Application Browse Panel, check buttons in the toolbar', function () {
             await installAppDialog.waitForClosed(2000);
             await studioUtils.saveScreenshot('provider_installed');
             // 5. Verify the apps by their description
-            await appBrowsePanel.waitForAppByDescriptionDisplayed(APP_CHUCK);
+            //await appBrowsePanel.waitForAppByDescriptionDisplayed(APP_CHUCK);
+            await appBrowsePanel.waitForAppByDisplayNameDisplayed(APP_CHUCK)
             //await appBrowsePanel.waitForAppByDescriptionDisplayed(APP2);
         });
 
@@ -61,14 +63,15 @@ describe('Application Browse Panel, check buttons in the toolbar', function () {
         async () => {
             let appBrowsePanel = new AppBrowsePanel();
             // 1. select the application:
-            await appBrowsePanel.clickOnRowByDescription(APP_CHUCK);
+            //await appBrowsePanel.clickOnRowByDescription(APP_CHUCK);
+            await appBrowsePanel.clickOnRowByDisplayName(APP_CHUCK);
             await studioUtils.saveScreenshot('chuck_norris_selected');
             // "Uninstall" button gets enabled:
             await appBrowsePanel.waitForUninstallButtonEnabled();
             await appBrowsePanel.waitForStopButtonEnabled();
             await appBrowsePanel.waitForStartButtonDisabled();
             // 2. click on the row again and unselect it:
-            await appBrowsePanel.clickOnRowByDescription(APP_CHUCK);
+            await appBrowsePanel.clickOnRowByDisplayName(APP_CHUCK);
             await appBrowsePanel.waitForUninstallButtonDisabled();
             await appBrowsePanel.waitForStopButtonDisabled();
             await appBrowsePanel.waitForStartButtonDisabled()

@@ -96,7 +96,7 @@ describe('Install Application Dialog specification', function () {
             await dialog.clickOnCancelButtonTop();
             await dialog.waitForClosed();
             // 4. Verify the app in grid:
-            await appBrowsePanel.waitForAppByDescriptionDisplayed(CHUCK_NORRIS_APP_DISPLAY_NAME);
+            await appBrowsePanel.waitForAppByDisplayNameDisplayed(CHUCK_NORRIS_APP_DISPLAY_NAME);
             // 5. Verify the notification message:
             let message = await appBrowsePanel.waitForNotificationMessage();
             assert.equal(message, 'Application \'Chuck Norris\' installed successfully', `Incorrect notification message [${message}]`)
