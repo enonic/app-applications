@@ -6,7 +6,9 @@
           "displayName" : "displayName1",
           "documentationUrl" : "url",
           "key" : "testapplication:myapi1",
-          "mount" : true,
+          "mount": [
+              "xp"
+          ],
           "name" : "myapi1"
       }, {
           "allowedPrincipals" : [ "role:system.everyone" ],
@@ -14,7 +16,7 @@
           "displayName" : "displayName2",
           "documentationUrl" : "url",
           "key" : "testapplication:myapi2",
-          "mount" : false,
+          "mount" : [],
           "name" : "myapi2"
       } ]
   },

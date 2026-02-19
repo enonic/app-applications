@@ -1,6 +1,7 @@
 package com.enonic.xp.app.applications.rest.resource.apis.json;
 
 import java.util.List;
+import java.util.Set;
 
 import com.enonic.xp.api.ApiDescriptor;
 import com.enonic.xp.security.PrincipalKey;
@@ -17,7 +18,7 @@ public final class ApiDescriptorJson
 
     public String documentationUrl;
 
-    public boolean mount;
+    public Set<String> mount;
 
     public List<String> allowedPrincipals;
 
@@ -28,7 +29,7 @@ public final class ApiDescriptorJson
         this.displayName = apiDescriptor.getDisplayName();
         this.description = apiDescriptor.getDescription();
         this.documentationUrl = apiDescriptor.getDocumentationUrl();
-        this.mount = apiDescriptor.isMount();
+        this.mount = apiDescriptor.getMount();
         this.allowedPrincipals = apiDescriptor.getAllowedPrincipals().getSet().stream().map( PrincipalKey::toString ).toList();
     }
 }

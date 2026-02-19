@@ -1,6 +1,5 @@
 package com.enonic.xp.app.applications.rest.resource.application;
 
-import java.net.URL;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.Collections;
@@ -11,8 +10,6 @@ import org.jboss.resteasy.core.ResteasyContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.AdditionalAnswers;
-import org.mockito.ArgumentCaptor;
-import org.mockito.ArgumentMatchers;
 
 import com.google.common.io.ByteSource;
 
@@ -129,10 +126,7 @@ public class AppsApplicationResourceTest
         when( this.applicationDescriptorService.get( isA( ApplicationKey.class ) ) ).thenReturn( appDescriptor );
         when( cmsFormFragmentService.inlineFormItems( isA( Form.class ) ) ).then( AdditionalAnswers.returnsFirstArg() );
 
-        String response = request().
-            path( "application" ).
-            queryParam( "applicationKey", "testapplication" ).
-            get().getAsString();
+        String response = request().path( "application" ).queryParam( "applicationKey", "testapplication" ).get().getAsString();
         assertJson( "get_application_by_key_success.json", response );
     }
 
@@ -160,10 +154,7 @@ public class AppsApplicationResourceTest
 
         when( cmsFormFragmentService.inlineFormItems( isA( Form.class ) ) ).then( AdditionalAnswers.returnsFirstArg() );
 
-        String response = request().
-            path( "application" ).
-            queryParam( "applicationKey", "testapplication" ).
-            get().getAsString();
+        String response = request().path( "application" ).queryParam( "applicationKey", "testapplication" ).get().getAsString();
         assertJson( "get_application_i18n.json", response );
     }
 
@@ -182,9 +173,7 @@ public class AppsApplicationResourceTest
         when( this.applicationDescriptorService.get( isA( ApplicationKey.class ) ) ).thenReturn( appDescriptor );
         when( cmsFormFragmentService.inlineFormItems( isA( Form.class ) ) ).then( AdditionalAnswers.returnsFirstArg() );
 
-        String response = request().
-            path( "application/list" ).
-            get().getAsString();
+        String response = request().path( "application/list" ).get().getAsString();
         assertJson( "get_application_list_success.json", response );
     }
 
@@ -203,15 +192,22 @@ public class AppsApplicationResourceTest
             .setMacros( MacroDescriptors.empty() )
             .build();
 
-        final ApiDescriptor apiDescriptor1 =
-            ApiDescriptor.create().key( DescriptorKey.from( applicationKey, "myapi1" ) ).mount( true ).allowedPrincipals(
-                PrincipalKeys.from( RoleKeys.EVERYONE ) ).documentationUrl( "url" ).description( "description" ).displayName(
-                "displayName1" ).build();
+        final ApiDescriptor apiDescriptor1 = ApiDescriptor.create()
+            .key( DescriptorKey.from( applicationKey, "myapi1" ) )
+            .mount( "xp" )
+            .allowedPrincipals( PrincipalKeys.from( RoleKeys.EVERYONE ) )
+            .documentationUrl( "url" )
+            .description( "description" )
+            .displayName( "displayName1" )
+            .build();
 
-        final ApiDescriptor apiDescriptor2 =
-            ApiDescriptor.create().key( DescriptorKey.from( applicationKey, "myapi2" ) ).mount( false ).allowedPrincipals(
-                PrincipalKeys.from( RoleKeys.EVERYONE ) ).documentationUrl( "url" ).description( "description" ).displayName(
-                "displayName2" ).build();
+        final ApiDescriptor apiDescriptor2 = ApiDescriptor.create()
+            .key( DescriptorKey.from( applicationKey, "myapi2" ) )
+            .allowedPrincipals( PrincipalKeys.from( RoleKeys.EVERYONE ) )
+            .documentationUrl( "url" )
+            .description( "description" )
+            .displayName( "displayName2" )
+            .build();
 
         when( apiDescriptorService.getByApplication( applicationKey ) ).thenReturn( ApiDescriptors.from( apiDescriptor1, apiDescriptor2 ) );
         when( this.applicationInfoService.getApplicationInfo( applicationKey ) ).thenReturn( applicationInfo );
@@ -230,10 +226,7 @@ public class AppsApplicationResourceTest
         final AdminToolDescriptors adminToolDescriptors = createAdminToolDescriptors();
         when( this.adminToolDescriptorService.getByApplication( applicationKey ) ).thenReturn( adminToolDescriptors );
 
-        final String response = request().
-            path( "application/info" ).
-            queryParam( "applicationKey", "testapplication" ).
-            get().getAsString();
+        final String response = request().path( "application/info" ).queryParam( "applicationKey", "testapplication" ).get().getAsString();
 
         assertJson( "get_application_info.json", response );
     }
@@ -253,10 +246,7 @@ public class AppsApplicationResourceTest
         when( this.applicationDescriptorService.get( isA( ApplicationKey.class ) ) ).thenReturn( appDescriptor );
         when( cmsFormFragmentService.inlineFormItems( isA( Form.class ) ) ).then( AdditionalAnswers.returnsFirstArg() );
 
-        String response = request().
-            path( "application/list" ).
-            queryParam( "query", "Enonic" ).
-            get().getAsString();
+        String response = request().path( "application/list" ).queryParam( "query", "Enonic" ).get().getAsString();
         assertJson( "get_application_list_success.json", response );
     }
 
@@ -274,10 +264,7 @@ public class AppsApplicationResourceTest
         final ApplicationDescriptor appDescriptor = createApplicationDescriptor();
         when( this.applicationDescriptorService.get( isA( ApplicationKey.class ) ) ).thenReturn( appDescriptor );
 
-        String response = request().
-            path( "application/list" ).
-            queryParam( "query", "invalid query" ).
-            get().getAsString();
+        String response = request().path( "application/list" ).queryParam( "query", "invalid query" ).get().getAsString();
         assertJson( "get_application_list_with_invalid_query.json", response );
     }
 
@@ -295,9 +282,7 @@ public class AppsApplicationResourceTest
         final ApplicationDescriptor appDescriptor = createApplicationDescriptor();
         when( this.applicationDescriptorService.get( isA( ApplicationKey.class ) ) ).thenReturn( appDescriptor );
 
-        String response = request().
-            path( "application/listKeys" ).
-            get().getAsString();
+        String response = request().path( "application/listKeys" ).get().getAsString();
         assertJson( "get_application_keys_success.json", response );
     }
 
@@ -323,11 +308,11 @@ public class AppsApplicationResourceTest
     public void getIconDefault()
         throws Exception
     {
-        String response = request().
-            path( "application/icon/applicationKey" ).
-            queryParam( "appKey", "applicationKey" ).
-            queryParam( "hash", "123" ).
-            get().getDataAsString();
+        String response = request().path( "application/icon/applicationKey" )
+            .queryParam( "appKey", "applicationKey" )
+            .queryParam( "hash", "123" )
+            .get()
+            .getDataAsString();
 
         String expected = (String) Response.ok( readFromFile( "application.svg" ), "image/svg+xml" ).build().getEntity();
 
@@ -343,11 +328,11 @@ public class AppsApplicationResourceTest
         final ApplicationDescriptor appDescriptor = createApplicationDescriptor( icon );
         when( this.applicationDescriptorService.get( isA( ApplicationKey.class ) ) ).thenReturn( appDescriptor );
 
-        byte[] response = request().
-            path( "application/icon/applicationKey" ).
-            queryParam( "appKey", "applicationKey" ).
-            queryParam( "hash", "123" ).
-            get().getData();
+        byte[] response = request().path( "application/icon/applicationKey" )
+            .queryParam( "appKey", "applicationKey" )
+            .queryParam( "hash", "123" )
+            .get()
+            .getData();
 
         byte[] expected = icon.toByteArray();
 
@@ -359,8 +344,7 @@ public class AppsApplicationResourceTest
         throws Exception
     {
         final ApplicationKey applicationKey = ApplicationKey.from( "testapplication" );
-        doThrow( new ApplicationInstallException( "expectedException" ) )
-            .when( this.applicationService )
+        doThrow( new ApplicationInstallException( "expectedException" ) ).when( this.applicationService )
             .uninstallApplication( applicationKey );
 
         final MockRestResponse post = request().path( "application/uninstall" )
@@ -376,8 +360,10 @@ public class AppsApplicationResourceTest
     {
         final ApplicationKey applicationKey = ApplicationKey.from( "testapplication" );
 
-        final String response = request().path( "application/uninstall" ).entity( "{\"key\":[\"" + applicationKey + "\"]}",
-                                                                                  MediaType.APPLICATION_JSON_TYPE ).post().getAsString();
+        final String response = request().path( "application/uninstall" )
+            .entity( "{\"key\":[\"" + applicationKey + "\"]}", MediaType.APPLICATION_JSON_TYPE )
+            .post()
+            .getAsString();
 
         assertEquals( "{}", response );
     }
@@ -396,9 +382,8 @@ public class AppsApplicationResourceTest
 
         when( this.applicationService.installGlobalApplication( file.getBytes() ) ).thenThrow( new RuntimeException() );
 
-        String response = request().
-            path( "application/install" ).entity( new byte[]{0, 1, 2}, MediaType.MULTIPART_FORM_DATA_TYPE ).
-            post().getAsString();
+        String response =
+            request().path( "application/install" ).entity( new byte[]{0, 1, 2}, MediaType.MULTIPART_FORM_DATA_TYPE ).post().getAsString();
 
         assertEquals( "{\"failure\":\"Failed to process application file.jar\"}", response );
     }
@@ -420,9 +405,8 @@ public class AppsApplicationResourceTest
 
         when( this.applicationService.installGlobalApplication( file.getBytes() ) ).thenReturn( application );
 
-        String response = request().
-            path( "application/install" ).entity( new byte[]{0, 1, 2}, MediaType.MULTIPART_FORM_DATA_TYPE ).
-            post().getAsString();
+        String response =
+            request().path( "application/install" ).entity( new byte[]{0, 1, 2}, MediaType.MULTIPART_FORM_DATA_TYPE ).post().getAsString();
 
         assertJson( "install_url.json", response );
     }
@@ -451,11 +435,11 @@ public class AppsApplicationResourceTest
 
     private ApplicationDescriptor createApplicationDescriptor( final Icon icon )
     {
-        return ApplicationDescriptor.create().
-            key( ApplicationKey.from( "testapplication" ) ).
-            description( "Application description" ).
-            icon( icon ).
-            build();
+        return ApplicationDescriptor.create()
+            .key( ApplicationKey.from( "testapplication" ) )
+            .description( "Application description" )
+            .icon( icon )
+            .build();
     }
 
     private Application createEmptyApplication()
@@ -466,45 +450,51 @@ public class AppsApplicationResourceTest
         return application;
     }
 
-    private CmsDescriptor createCmsDescriptor(final ApplicationKey applicationKey)
+    private CmsDescriptor createCmsDescriptor( final ApplicationKey applicationKey )
     {
-        final Form config = Form.create().
-            addFormItem( Input.create().name( "some-name" ).label( "some-label" ).helpTextI18nKey( "site.config.helpText" ).labelI18nKey(
-                "site.config.label" ).inputType( InputTypeName.TEXT_LINE ).build() ).
-            build();
+        final Form config = Form.create()
+            .addFormItem( Input.create()
+                              .name( "some-name" )
+                              .label( "some-label" )
+                              .helpTextI18nKey( "site.config.helpText" )
+                              .labelI18nKey( "site.config.label" )
+                              .inputType( InputTypeName.TEXT_LINE )
+                              .build() )
+            .build();
 
         return CmsDescriptor.create().applicationKey( applicationKey ).form( config ).build();
     }
 
     private IdProviderDescriptor createIdProviderDescriptor()
     {
-        final Form config = Form.create().
-            addFormItem( Input.create().name( "some-name" ).label( "some-label" ).labelI18nKey( "key.label" ).helpTextI18nKey(
-                "key.help-text" ).inputType( InputTypeName.TEXT_LINE ).build() ).
-            build();
-        return IdProviderDescriptor.create().
-            config( config ).
-            build();
+        final Form config = Form.create()
+            .addFormItem( Input.create()
+                              .name( "some-name" )
+                              .label( "some-label" )
+                              .labelI18nKey( "key.label" )
+                              .helpTextI18nKey( "key.help-text" )
+                              .inputType( InputTypeName.TEXT_LINE )
+                              .build() )
+            .build();
+        return IdProviderDescriptor.create().config( config ).build();
     }
 
     private Descriptors<AdminExtensionDescriptor> createAdminExtensionDescriptors()
     {
-        final AdminExtensionDescriptor widgetDescriptor1 = AdminExtensionDescriptor.create().
-            displayName( "My widget" ).
-            description( "My widget description" ).
-            interfaces( "com.enonic.xp.my-interface", "com.enonic.xp.my-interface-2" ).
-            key( DescriptorKey.from( "myapp:my-widget" ) ).
-            build();
+        final AdminExtensionDescriptor widgetDescriptor1 = AdminExtensionDescriptor.create()
+            .displayName( "My widget" )
+            .description( "My widget description" )
+            .interfaces( "com.enonic.xp.my-interface", "com.enonic.xp.my-interface-2" )
+            .key( DescriptorKey.from( "myapp:my-widget" ) )
+            .build();
 
         return Descriptors.from( widgetDescriptor1 );
     }
 
     private AdminToolDescriptors createAdminToolDescriptors()
     {
-        final AdminToolDescriptor adminToolDescriptor = AdminToolDescriptor.create().
-            key( DescriptorKey.from( "myapp:my-tool" ) ).
-            displayName( "My tool" ).
-            build();
+        final AdminToolDescriptor adminToolDescriptor =
+            AdminToolDescriptor.create().key( DescriptorKey.from( "myapp:my-tool" ) ).displayName( "My tool" ).build();
 
         when( this.adminToolDescriptorService.getIconByKey( adminToolDescriptor.getKey() ) ).thenReturn( "icon-source" );
 

@@ -12,7 +12,7 @@ export class ApiDescriptor {
 
     private readonly documentationUrl: string;
 
-    private readonly mount: boolean;
+    private readonly mount: string[];
 
     private readonly allowedPrincipals: string[];
 
@@ -62,7 +62,7 @@ export class ApiDescriptor {
         return this.documentationUrl;
     }
 
-    isMount(): boolean {
+    getMount(): string[] {
         return this.mount;
     }
 
@@ -83,7 +83,7 @@ class ApiDescriptorBuilder {
 
     documentationUrl: string;
 
-    mount: boolean;
+    mount: string[];
 
     allowedPrincipals: string[];
 
@@ -113,7 +113,7 @@ class ApiDescriptorBuilder {
         return this;
     }
 
-    public setMount(value: boolean) {
+    public setMount(value: string[]) {
         this.mount = value;
         return this;
     }

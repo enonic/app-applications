@@ -5,7 +5,7 @@ export interface ApiDescriptorsJson {
 export interface ApiDescriptorJson {
     key: string;
     name: string;
-    mount: boolean;
+    mount: string[];
     allowedPrincipals: string[];
     displayName?: string;
     description?: string;
