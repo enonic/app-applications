@@ -21,7 +21,7 @@ function getConfigAsJson() {
         readonlyMode: readonlyMode,
         apis: {
             i18nUrl: portal.apiUrl({
-                api: 'i18n',
+                api: `${app.name}:i18n`,
             }),
         },
         toolUri: admin.getToolUrl(
