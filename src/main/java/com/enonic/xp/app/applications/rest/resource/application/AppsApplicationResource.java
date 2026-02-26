@@ -1,25 +1,23 @@
 package com.enonic.xp.app.applications.rest.resource.application;
 
-import java.io.IOException;
-import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.stream.Collectors;
 
-import com.enonic.xp.admin.extension.AdminExtensionDescriptor;
-import com.enonic.xp.admin.extension.AdminExtensionDescriptorService;
-import com.enonic.xp.app.applications.ApplicationInfo;
-import com.enonic.xp.app.applications.ApplicationInfoService;
-import com.enonic.xp.schema.content.CmsFormFragmentService;
-import com.enonic.xp.site.CmsDescriptor;
-import com.enonic.xp.site.CmsService;
-import com.enonic.xp.web.servlet.ServletRequestUrlHelper;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.io.ByteSource;
+import com.google.common.util.concurrent.Striped;
+
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.Consumes;
@@ -34,14 +32,8 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.google.common.io.ByteSource;
-import com.google.common.util.concurrent.Striped;
-
+import com.enonic.xp.admin.extension.AdminExtensionDescriptor;
+import com.enonic.xp.admin.extension.AdminExtensionDescriptorService;
 import com.enonic.xp.admin.tool.AdminToolDescriptorService;
 import com.enonic.xp.admin.tool.AdminToolDescriptors;
 import com.enonic.xp.api.ApiDescriptorService;
@@ -53,9 +45,10 @@ import com.enonic.xp.app.ApplicationKey;
 import com.enonic.xp.app.ApplicationNotFoundException;
 import com.enonic.xp.app.ApplicationService;
 import com.enonic.xp.app.Applications;
+import com.enonic.xp.app.applications.ApplicationInfo;
+import com.enonic.xp.app.applications.ApplicationInfoService;
 import com.enonic.xp.app.applications.rest.resource.ResourceConstants;
 import com.enonic.xp.app.applications.rest.resource.application.json.ApplicationInfoJson;
-import com.enonic.xp.app.applications.rest.resource.application.json.ApplicationInstallParams;
 import com.enonic.xp.app.applications.rest.resource.application.json.ApplicationInstallResultJson;
 import com.enonic.xp.app.applications.rest.resource.application.json.ApplicationInstalledJson;
 import com.enonic.xp.app.applications.rest.resource.application.json.ApplicationJson;
@@ -76,12 +69,15 @@ import com.enonic.xp.portal.script.PortalScriptService;
 import com.enonic.xp.resource.Resource;
 import com.enonic.xp.resource.ResourceKey;
 import com.enonic.xp.resource.ResourceService;
+import com.enonic.xp.schema.content.CmsFormFragmentService;
 import com.enonic.xp.script.ScriptExports;
 import com.enonic.xp.security.RoleKeys;
+import com.enonic.xp.site.CmsDescriptor;
+import com.enonic.xp.site.CmsService;
 import com.enonic.xp.util.Exceptions;
-import com.enonic.xp.util.HexEncoder;
 import com.enonic.xp.web.multipart.MultipartForm;
 import com.enonic.xp.web.multipart.MultipartItem;
+import com.enonic.xp.web.servlet.ServletRequestUrlHelper;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static com.google.common.base.Strings.nullToEmpty;
@@ -203,25 +199,27 @@ public final class AppsApplicationResource
         final ApplicationKey applicationKey = ApplicationKey.from( key );
 
         final ApplicationInfo applicationInfo = this.applicationInfoService.getApplicationInfo( applicationKey );
-        final Descriptors<AdminExtensionDescriptor> extensionDescriptors = this.adminExtensionDescriptorService.getByApplication( applicationKey );
+        final Descriptors<AdminExtensionDescriptor> extensionDescriptors =
+            this.adminExtensionDescriptorService.getByApplication( applicationKey );
         final AdminToolDescriptors adminToolDescriptors = this.adminToolDescriptorService.getByApplication( applicationKey );
         final ApiDescriptors apiDescriptors = apiDescriptorService.getByApplication( applicationKey );
 
-        final AdminToolDescriptorsJson adminToolDescriptorsJson = new AdminToolDescriptorsJson(adminToolDescriptors.stream()
-                .map(adminToolDescriptor -> new AdminToolDescriptorJson(
-                        adminToolDescriptor,
-                        this.adminToolDescriptorService.getIconByKey(adminToolDescriptor.getKey()),
-                        ServletRequestUrlHelper.createUri(request, "/admin/" + adminToolDescriptor.getApplicationKey() + "/" + adminToolDescriptor.getName())
-                ))
-                .collect(Collectors.toList()));
+        final List<AdminToolDescriptorJson> adminTools = adminToolDescriptors.stream()
+            .map( adminToolDescriptor -> new AdminToolDescriptorJson( adminToolDescriptor,
+                                                                      adminToolDescriptor.getIcon() != null ? new String(
+                                                                          adminToolDescriptor.getIcon().toByteArray(),
+                                                                          StandardCharsets.UTF_8 ) : null,
+                                                                      ServletRequestUrlHelper.createUri( request, "/admin/" +
+                                                                          adminToolDescriptor.getApplicationKey() + "/" +
+                                                                          adminToolDescriptor.getName() ) ) )
+            .toList();
 
         final ApplicationInfoJson.Builder builder = ApplicationInfoJson.create()
             .setApplicationInfo( applicationInfo )
             .setAdminExtensionDescriptors( extensionDescriptors )
             .setApis( apiDescriptors )
-            .setAdminToolDescriptors(adminToolDescriptorsJson).
-
-                setLocaleMessageResolver(
+            .setAdminToolDescriptors( new AdminToolDescriptorsJson( adminTools ) )
+            .setLocaleMessageResolver(
                 new LocaleMessageResolver( this.localeService, applicationKey, Collections.list( request.getLocales() ) ) )
             .setInlineMixinResolver( new CmsFormFragmentServiceResolver( this.cmsFormFragmentService ) );
 
@@ -359,7 +357,8 @@ public final class AppsApplicationResource
         responseBuilder.cacheControl( cacheControl );
     }
 
-    private ApplicationInstallResultJson installApplication( final ByteSource byteSource, final String applicationName, HttpServletRequest request )
+    private ApplicationInstallResultJson installApplication( final ByteSource byteSource, final String applicationName,
+                                                             HttpServletRequest request )
     {
         final ApplicationInstallResultJson result = new ApplicationInstallResultJson();
 
@@ -367,7 +366,8 @@ public final class AppsApplicationResource
         {
             final Application application = this.applicationService.installGlobalApplication( byteSource );
 
-            result.setApplicationInstalledJson( new ApplicationInstalledJson( application, false, new ApplicationIconUrlResolver( request ) ) );
+            result.setApplicationInstalledJson(
+                new ApplicationInstalledJson( application, false, new ApplicationIconUrlResolver( request ) ) );
         }
         catch ( Exception e )
         {

@@ -1,5 +1,6 @@
 package com.enonic.xp.app.applications.rest.resource.application;
 
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.Collections;
@@ -494,9 +495,9 @@ public class AppsApplicationResourceTest
     private AdminToolDescriptors createAdminToolDescriptors()
     {
         final AdminToolDescriptor adminToolDescriptor =
-            AdminToolDescriptor.create().key( DescriptorKey.from( "myapp:my-tool" ) ).displayName( "My tool" ).build();
-
-        when( this.adminToolDescriptorService.getIconByKey( adminToolDescriptor.getKey() ) ).thenReturn( "icon-source" );
+            AdminToolDescriptor.create().key( DescriptorKey.from( "myapp:my-tool" ) ).displayName( "My tool" ).setIcon(
+                Icon.from( "icon-source".getBytes( StandardCharsets.UTF_8), "image/svg", Instant.now() )
+            ).build();
 
         return AdminToolDescriptors.from( adminToolDescriptor );
     }
