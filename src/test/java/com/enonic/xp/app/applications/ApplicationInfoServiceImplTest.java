@@ -274,14 +274,14 @@ public class ApplicationInfoServiceImplTest
     private void mockMacros( final ApplicationKey applicationKey )
     {
         final MacroDescriptor macroDescriptor1 = MacroDescriptor.create().
-            key( MacroKey.from( "my-app1:macro1" ) ).
+            key( MacroKey.from( "my.app1:macro1" ) ).
             description( "my description" ).
             displayName( "A macro" ).
             form( Form.empty() ).
             build();
 
         final MacroDescriptor macroDescriptor2 = MacroDescriptor.create().
-            key( MacroKey.from( "my-app2:macro2" ) ).
+            key( MacroKey.from( "my.app2:macro2" ) ).
             description( "my description" ).
             displayName( "B macro" ).
             form( Form.empty() ).
