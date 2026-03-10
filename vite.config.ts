@@ -87,7 +87,11 @@ export default defineConfig(({mode}) => {
       },
       resolve: {
         alias: {
-          '@enonic/lib-admin-ui': path.join(__dirname, '.xp/dev/lib-admin-ui')
+          '@enonic/lib-admin-ui': path.join(__dirname, '.xp/dev/lib-admin-ui'),
+          'react': 'preact/compat',
+          'react-dom': 'preact/compat',
+          'react/jsx-runtime': 'preact/jsx-runtime',
+          'react/jsx-dev-runtime': 'preact/jsx-dev-runtime'
         },
         extensions: ['.ts', '.js']
       },
