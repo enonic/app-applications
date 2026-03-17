@@ -1,7 +1,9 @@
 package com.enonic.xp.app.applications.rest.resource.widget.json;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import com.google.common.collect.ImmutableSet;
 
@@ -26,6 +28,7 @@ public final class AdminExtensionDescriptorJson
         this.displayName = widgetDescriptor.getDisplayName();
         this.description = widgetDescriptor.getDescription();
         this.interfaces = ImmutableSet.copyOf( widgetDescriptor.getInterfaces() );
-        this.config = widgetDescriptor.getConfig();
+        this.config = widgetDescriptor.getConfig().properties().stream().collect(
+            Collectors.toMap( Map.Entry::getKey, entry -> Objects.toString( entry.getValue(), "" ) ) );
     }
 }
