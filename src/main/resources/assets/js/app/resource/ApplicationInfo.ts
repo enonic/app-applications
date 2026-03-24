@@ -5,7 +5,7 @@ import {IdProviderApplication} from './IdProviderApplication';
 import {AdminToolDescriptor} from './AdminToolDescriptor';
 import {ContentTypeSummary} from '@enonic/lib-admin-ui/schema/content/ContentTypeSummary';
 import {MacroDescriptor} from '@enonic/lib-admin-ui/macro/MacroDescriptor';
-import {Widget} from '@enonic/lib-admin-ui/content/Widget';
+import {Extension} from '@enonic/lib-admin-ui/extension/Extension';
 import {BaseDescriptor} from './BaseDescriptor';
 import {ApiDescriptor} from './ApiDescriptor';
 
@@ -23,7 +23,7 @@ export class ApplicationInfo {
 
     private tasks: ApplicationTask[];
 
-    private widgets: Widget[];
+    private extensions: Extension[];
 
     private tools: AdminToolDescriptor[];
 
@@ -55,8 +55,8 @@ export class ApplicationInfo {
             return ApplicationTask.fromJson(taskJson);
         }) : [];
 
-        result.widgets = (json.widgets && json.widgets.descriptors) ? json.widgets.descriptors.map((widgetJson) => {
-            return Widget.fromJson(widgetJson);
+        result.extensions = (json.widgets && json.widgets.descriptors) ? json.widgets.descriptors.map((widgetJson) => {
+            return Extension.fromJson(widgetJson);
         }) : [];
 
         result.tools = (json.tools && json.tools.descriptors) ? json.tools.descriptors.map((toolJson) => {
@@ -98,8 +98,8 @@ export class ApplicationInfo {
         return this.tasks;
     }
 
-    getWidgets(): Widget[] {
-        return this.widgets;
+    getExtensions(): Extension[] {
+        return this.extensions;
     }
 
     getApiDescriptors(): ApiDescriptor[] {
