@@ -9,7 +9,7 @@ import {DateTimeFormatter} from '@enonic/lib-admin-ui/ui/treegrid/DateTimeFormat
 import {ApplicationKey} from '@enonic/lib-admin-ui/application/ApplicationKey';
 import {MacroDescriptor} from '@enonic/lib-admin-ui/macro/MacroDescriptor';
 import {IdProviderMode} from '@enonic/lib-admin-ui/security/IdProviderMode';
-import {Widget} from '@enonic/lib-admin-ui/content/Widget';
+import {Extension} from '@enonic/lib-admin-ui/extension/Extension';
 import {SpanEl} from '@enonic/lib-admin-ui/dom/SpanEl';
 import {Tooltip} from '@enonic/lib-admin-ui/ui/Tooltip';
 import {AEl} from '@enonic/lib-admin-ui/dom/AEl';
@@ -158,27 +158,27 @@ export class ApplicationDataContainer
     private initExtensions(applicationInfo: ApplicationInfo): ItemDataGroup {
         const extensionGroup: ItemDataGroup = new ItemDataGroup(i18n('field.extensions'), 'extensions');
 
-        extensionGroup.addDataElements(i18n('field.tools'), this.getExtensionsTools(applicationInfo));
-        extensionGroup.addDataElements(i18n('field.widgets'), this.getExtensionsWidgets(applicationInfo));
-        extensionGroup.addDataElements(i18n('field.apis'), this.getExtensionsApis(applicationInfo));
+        extensionGroup.addDataElements(i18n('field.tools'), this.getAdminTools(applicationInfo));
+        extensionGroup.addDataElements(i18n('field.widgets'), this.getExtensions(applicationInfo));
+        extensionGroup.addDataElements(i18n('field.apis'), this.getApis(applicationInfo));
 
         return extensionGroup;
     }
 
-    private getExtensionsWidgets(applicationInfo: ApplicationInfo): Element[] {
-        return applicationInfo.getWidgets().map(this.widgetToElement).sort(this.sortElInAlphabeticallyAsc);
+    private getExtensions(applicationInfo: ApplicationInfo): Element[] {
+        return applicationInfo.getExtensions().map(this.extensionToElement).sort(this.sortElInAlphabeticallyAsc);
     }
 
-    private getExtensionsApis(applicationInfo: ApplicationInfo): Element[] {
+    private getApis(applicationInfo: ApplicationInfo): Element[] {
         return applicationInfo.getApiDescriptors().map(this.apiDescriptorToElement).sort(this.sortElInAlphabeticallyAsc);
     }
 
-    private widgetToElement(widget: Widget): Element {
-        const interfacesStr = widget.getInterfaces().join(', ');
-        const displayString = widget.getDisplayName() + (StringHelper.isBlank(interfacesStr) ? '' : ' (' + interfacesStr + ')');
+    private extensionToElement(extension: Extension): Element {
+        const interfacesStr = extension.getInterfaces().join(', ');
+        const displayString = extension.getDisplayName() + (StringHelper.isBlank(interfacesStr) ? '' : ' (' + interfacesStr + ')');
 
         const spanEl = new SpanEl().setHtml(displayString);
-        new Tooltip(spanEl, widget.getWidgetDescriptorKey().toString(), 200).setMode(Tooltip.MODE_GLOBAL_STATIC);
+        new Tooltip(spanEl, extension.getDescriptorKey().toString(), 200).setMode(Tooltip.MODE_GLOBAL_STATIC);
         return spanEl;
     }
 
@@ -190,7 +190,7 @@ export class ApplicationDataContainer
         return spanEl;
     }
 
-    private getExtensionsTools(applicationInfo: ApplicationInfo): Element[] {
+    private getAdminTools(applicationInfo: ApplicationInfo): Element[] {
         return applicationInfo.getTools().map(this.adminToolDescriptorToElement).sort(this.sortElInAlphabeticallyAsc);
     }
 

@@ -2,7 +2,7 @@ import {ContentReferencesJson} from './ContentReferencesJson';
 import {ApplicationDeployment} from './ApplicationDeployment';
 import {ApplicationTasksJson} from './ApplicationTasksJson';
 import {IdProviderApplicationJson} from './IdProviderApplicationJson';
-import {WidgetDescriptorsJson} from './WidgetDescriptorsJson';
+import {ExtensionDescriptorsJson} from './ExtensionDescriptorsJson';
 import {ContentTypeSummaryListJson} from '@enonic/lib-admin-ui/schema/content/ContentTypeSummaryListJson';
 import {BaseDescriptorsJson} from './BaseDescriptorJson';
 import {MacrosJson} from '@enonic/lib-admin-ui/macro/MacrosJson';
@@ -29,7 +29,7 @@ export interface ApplicationInfoJson {
 
     deployment: ApplicationDeployment;
 
-    widgets: WidgetDescriptorsJson;
+    widgets: ExtensionDescriptorsJson;
 
     tools: AdminToolDescriptorsJson;
 
