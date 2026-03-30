@@ -194,7 +194,7 @@ public class ApplicationInfoServiceImplTest
                 allowChildContent( true ).
                 setBuiltIn().
                 schemaConfig( GenericValue.newObject().put( "displayNameExpression", "displayNameExpression" ).build() ).
-                displayName( "displayName" ).
+                title( "displayName" ).
                 description( "description" ).
                 modifiedTime( Instant.ofEpochSecond( 1000 ) ).
                 createdTime( Instant.ofEpochSecond( 1000 ) ).
@@ -209,14 +209,14 @@ public class ApplicationInfoServiceImplTest
     private void mockPageDescriptors( final ApplicationKey applicationKey )
     {
         final PageDescriptor pageDescriptor1 = PageDescriptor.create().
-            displayName( "Landing page" ).
+            title( "Landing page" ).
             config( Form.empty() ).
             regions( RegionDescriptors.create().build() ).
             key( DescriptorKey.from( "module:landing-page" ) ).
             build();
 
         final PageDescriptor pageDescriptor2 = PageDescriptor.create().
-            displayName( "Log out" ).
+            title( "Log out" ).
             config( Form.empty() ).
             regions( RegionDescriptors.create().build() ).
             key( DescriptorKey.from( "module:logout-page" ) ).
@@ -229,13 +229,13 @@ public class ApplicationInfoServiceImplTest
     private void mockPartDescriptors( final ApplicationKey applicationKey )
     {
         final PartDescriptor partDescriptor1 = PartDescriptor.create().
-            displayName( "News part" ).
+            title( "News part" ).
             config( Form.empty() ).
             key( DescriptorKey.from( "module:new-part" ) ).
             build();
 
         final PartDescriptor partDescriptor2 = PartDescriptor.create().
-            displayName( "News part2" ).
+            title( "News part2" ).
             config( Form.empty() ).
             key( DescriptorKey.from( "module:new-part2" ) ).
             build();
@@ -247,7 +247,7 @@ public class ApplicationInfoServiceImplTest
     private void mockLayoutDescriptors( final ApplicationKey applicationKey )
     {
         final LayoutDescriptor layoutDescriptor1 = LayoutDescriptor.create().
-            displayName( "Fancy layout" ).
+            title( "Fancy layout" ).
             config( Form.empty() ).
             regions( RegionDescriptors.create().
                 add( RegionDescriptor.create().name( "left" ).build() ).
@@ -257,7 +257,7 @@ public class ApplicationInfoServiceImplTest
             build();
 
         final LayoutDescriptor layoutDescriptor2 = LayoutDescriptor.create().
-            displayName( "Putty layout" ).
+            title( "Putty layout" ).
             config( Form.empty() ).
             regions( RegionDescriptors.create().
                 add( RegionDescriptor.create().name( "top" ).build() ).
@@ -276,14 +276,14 @@ public class ApplicationInfoServiceImplTest
         final MacroDescriptor macroDescriptor1 = MacroDescriptor.create().
             key( MacroKey.from( "my.app1:macro1" ) ).
             description( "my description" ).
-            displayName( "A macro" ).
+            title( "A macro" ).
             form( Form.empty() ).
             build();
 
         final MacroDescriptor macroDescriptor2 = MacroDescriptor.create().
             key( MacroKey.from( "my.app2:macro2" ) ).
             description( "my description" ).
-            displayName( "B macro" ).
+            title( "B macro" ).
             form( Form.empty() ).
             build();
 

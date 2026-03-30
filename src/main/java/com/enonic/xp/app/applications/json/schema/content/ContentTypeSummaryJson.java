@@ -35,13 +35,13 @@ public class ContentTypeSummaryJson
 
     public String getDisplayName()
     {
-        if ( !nullToEmpty( contentType.getDisplayNameI18nKey() ).isBlank() )
+        if ( !nullToEmpty( contentType.getTitleI18nKey() ).isBlank() )
         {
-            return localeMessageResolver.localizeMessage( contentType.getDisplayNameI18nKey(), contentType.getDisplayName() );
+            return localeMessageResolver.localizeMessage( contentType.getTitleI18nKey(), contentType.getTitle() );
         }
         else
         {
-            return contentType.getDisplayName();
+            return contentType.getTitle();
         }
     }
 
@@ -59,16 +59,17 @@ public class ContentTypeSummaryJson
 
     public String getDisplayNameLabel()
     {
-        final GenericValue displayNamePlaceholder = contentType.getSchemaConfig().optional( "displayNamePlaceholder" ).orElse( null );
+        final String displayNamePlaceholder = contentType.getDisplayNamePlaceholder();
 
         if ( displayNamePlaceholder == null )
         {
             return null;
         }
 
-        final String i18n = displayNamePlaceholder.optional( "i18n" ).map( GenericValue::asString ).orElse( null );
-        final String text = displayNamePlaceholder.optional( "text" ).map( GenericValue::asString ).orElse( null );
-        return !nullToEmpty( i18n ).isBlank() ? localeMessageResolver.localizeMessage( i18n, text ) : text;
+        final String i18n = contentType.getDisplayNamePlaceholderI18nKey() != null ? contentType.getDisplayNamePlaceholderI18nKey() : null;
+        return !nullToEmpty( i18n ).isBlank()
+            ? localeMessageResolver.localizeMessage( i18n, displayNamePlaceholder )
+            : displayNamePlaceholder;
     }
 
     @Override

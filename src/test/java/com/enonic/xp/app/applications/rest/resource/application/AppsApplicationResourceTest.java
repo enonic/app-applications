@@ -199,7 +199,7 @@ public class AppsApplicationResourceTest
             .allowedPrincipals( PrincipalKeys.from( RoleKeys.EVERYONE ) )
             .documentationUrl( "url" )
             .description( "description" )
-            .displayName( "displayName1" )
+            .title( "displayName1" )
             .build();
 
         final ApiDescriptor apiDescriptor2 = ApiDescriptor.create()
@@ -207,7 +207,7 @@ public class AppsApplicationResourceTest
             .allowedPrincipals( PrincipalKeys.from( RoleKeys.EVERYONE ) )
             .documentationUrl( "url" )
             .description( "description" )
-            .displayName( "displayName2" )
+            .title( "displayName2" )
             .build();
 
         when( apiDescriptorService.getByApplication( applicationKey ) ).thenReturn( ApiDescriptors.from( apiDescriptor1, apiDescriptor2 ) );
@@ -483,7 +483,7 @@ public class AppsApplicationResourceTest
     private Descriptors<AdminExtensionDescriptor> createAdminExtensionDescriptors()
     {
         final AdminExtensionDescriptor widgetDescriptor1 = AdminExtensionDescriptor.create()
-            .displayName( "My widget" )
+            .title( "My widget" )
             .description( "My widget description" )
             .interfaces( "com.enonic.xp.my-interface", "com.enonic.xp.my-interface-2" )
             .key( DescriptorKey.from( "myapp:my-widget" ) )
@@ -495,7 +495,7 @@ public class AppsApplicationResourceTest
     private AdminToolDescriptors createAdminToolDescriptors()
     {
         final AdminToolDescriptor adminToolDescriptor =
-            AdminToolDescriptor.create().key( DescriptorKey.from( "myapp:my-tool" ) ).displayName( "My tool" ).setIcon(
+            AdminToolDescriptor.create().key( DescriptorKey.from( "myapp:my-tool" ) ).title( "My tool" ).setIcon(
                 Icon.from( "icon-source".getBytes( StandardCharsets.UTF_8), "image/svg", Instant.now() )
             ).build();
 
