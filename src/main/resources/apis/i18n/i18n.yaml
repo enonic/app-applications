@@ -1,3 +1,4 @@
+kind: "API"
+title: "i18n"
 allow:
   - "role:system.authenticated"
-
