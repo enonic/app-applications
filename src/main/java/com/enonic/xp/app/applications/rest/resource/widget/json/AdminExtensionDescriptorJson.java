@@ -25,10 +25,10 @@ public final class AdminExtensionDescriptorJson
     public AdminExtensionDescriptorJson( final AdminExtensionDescriptor widgetDescriptor )
     {
         this.key = widgetDescriptor.getKey().toString();
-        this.displayName = widgetDescriptor.getDisplayName();
+        this.displayName = widgetDescriptor.getTitle();
         this.description = widgetDescriptor.getDescription();
         this.interfaces = ImmutableSet.copyOf( widgetDescriptor.getInterfaces() );
-        this.config = widgetDescriptor.getConfig().properties().stream().collect(
+        this.config = widgetDescriptor.getSchemaConfig().properties().stream().collect(
             Collectors.toMap( Map.Entry::getKey, entry -> Objects.toString( entry.getValue(), "" ) ) );
     }
 }

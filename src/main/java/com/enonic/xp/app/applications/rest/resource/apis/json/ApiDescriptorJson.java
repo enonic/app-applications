@@ -26,7 +26,7 @@ public final class ApiDescriptorJson
     {
         this.key = apiDescriptor.getKey().toString();
         this.name = apiDescriptor.getKey().getName();
-        this.displayName = apiDescriptor.getDisplayName();
+        this.displayName = apiDescriptor.getTitle();
         this.description = apiDescriptor.getDescription();
         this.documentationUrl = apiDescriptor.getDocumentationUrl();
         this.mount = apiDescriptor.getMount();
