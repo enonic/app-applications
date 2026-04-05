@@ -26,7 +26,7 @@ export class InstallUrlApplicationRequest
     }
 
     getRequestPath(): Path {
-        return Path.fromString(CONFIG.getString('applicationInstallApiUrl'));
+        return Path.fromString(CONFIG.getString('serverAppApi.installUrl'));
     }
 
     protected parseResponse(response: JsonResponse<ApplicationInstallResultJson>): ApplicationInstallResult {

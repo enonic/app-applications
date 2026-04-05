@@ -18,7 +18,6 @@
   },
   "deletable": false,
   "description": "Application description",
-  "displayName": "application display name",
   "editable": false,
   "iconUrl": "/admin/rest-v2/apps/application/icon/testapplication",
   "idProviderConfig": {
@@ -45,6 +44,7 @@
   "minSystemVersion": "5.0",
   "modifiedTime": "2012-01-01T00:00:00Z",
   "state": "started",
+  "title": "application display name",
   "url": "http://enonic.net",
   "vendorName": "Enonic",
   "vendorUrl": "https://www.enonic.com",

@@ -1,7 +1,12 @@
 import {Application} from '@enonic/lib-admin-ui/application/Application';
+import {ApplicationJson} from '@enonic/lib-admin-ui/application/json/ApplicationJson';
 import {Equitable} from '@enonic/lib-admin-ui/Equitable';
 import {ObjectHelper} from '@enonic/lib-admin-ui/ObjectHelper';
 import {ApplicationInstallResultJson} from './json/ApplicationInstallResultJson';
+
+interface ApplicationJsonWithTitle extends ApplicationJson {
+    title?: string;
+}
 
 export class ApplicationInstallResult
     implements Equitable {
@@ -12,7 +17,10 @@ export class ApplicationInstallResult
 
     static fromJson(json: ApplicationInstallResultJson): ApplicationInstallResult {
         let result = new ApplicationInstallResult();
-        const applicationJson = json.applicationInstalledJson?.application;
+        const applicationJson = json.applicationInstalledJson?.application as ApplicationJsonWithTitle;
+        if (applicationJson) {
+            applicationJson.displayName = applicationJson.title || applicationJson.key;
+        }
         result.application = applicationJson ? Application.fromJson(applicationJson) : null;
         result.failure = json.failure;
         return result;

@@ -1,28 +1,19 @@
 package com.enonic.xp.app.applications.rest.resource.application;
 
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Set;
-import java.util.concurrent.Callable;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.Lock;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.google.common.io.ByteSource;
-import com.google.common.util.concurrent.Striped;
 
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
-import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
@@ -49,11 +40,7 @@ import com.enonic.xp.app.applications.ApplicationInfo;
 import com.enonic.xp.app.applications.ApplicationInfoService;
 import com.enonic.xp.app.applications.rest.resource.ResourceConstants;
 import com.enonic.xp.app.applications.rest.resource.application.json.ApplicationInfoJson;
-import com.enonic.xp.app.applications.rest.resource.application.json.ApplicationInstallResultJson;
-import com.enonic.xp.app.applications.rest.resource.application.json.ApplicationInstalledJson;
 import com.enonic.xp.app.applications.rest.resource.application.json.ApplicationJson;
-import com.enonic.xp.app.applications.rest.resource.application.json.ApplicationListParams;
-import com.enonic.xp.app.applications.rest.resource.application.json.ApplicationSuccessJson;
 import com.enonic.xp.app.applications.rest.resource.application.json.ListApplicationJson;
 import com.enonic.xp.app.applications.rest.resource.schema.content.LocaleMessageResolver;
 import com.enonic.xp.app.applications.rest.resource.schema.mixin.CmsFormFragmentServiceResolver;
@@ -74,13 +61,11 @@ import com.enonic.xp.script.ScriptExports;
 import com.enonic.xp.security.RoleKeys;
 import com.enonic.xp.site.CmsDescriptor;
 import com.enonic.xp.site.CmsService;
-import com.enonic.xp.util.Exceptions;
-import com.enonic.xp.web.multipart.MultipartForm;
-import com.enonic.xp.web.multipart.MultipartItem;
 import com.enonic.xp.web.servlet.ServletRequestUrlHelper;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static com.google.common.base.Strings.nullToEmpty;
+import static java.util.Objects.requireNonNullElseGet;
 
 @Path(ResourceConstants.REST_ROOT + "application")
 @Produces(MediaType.APPLICATION_JSON)
@@ -89,12 +74,6 @@ import static com.google.common.base.Strings.nullToEmpty;
 public final class AppsApplicationResource
     implements JaxRsComponent
 {
-    private static final Set<String> ALLOWED_PROTOCOLS = Set.of( "http", "https" );
-
-    private static final Logger LOG = LoggerFactory.getLogger( AppsApplicationResource.class );
-
-    private static final Striped<Lock> LOCK_STRIPED = Striped.lazyWeakLock( 100 );
-
     private ApplicationService applicationService;
 
     private ApplicationDescriptorService applicationDescriptorService;
@@ -161,9 +140,8 @@ public final class AppsApplicationResource
         Applications applications = this.applicationService.getInstalledApplications();
 
         applications = this.filterApplications( applications, query );
-        applications = this.sortApplications( applications );
 
-        final ListApplicationJson json = new ListApplicationJson();
+        final List<ApplicationJson> appJsonList = new ArrayList<>();
         for ( final Application application : applications )
         {
             final ApplicationKey applicationKey = application.getKey();
@@ -174,20 +152,25 @@ public final class AppsApplicationResource
                 final boolean localApplication = this.applicationService.isLocalApplication( applicationKey );
                 final ApplicationDescriptor appDescriptor = this.applicationDescriptorService.get( applicationKey );
 
-                json.add( ApplicationJson.create()
-                              .setApplication( application )
-                              .setLocal( localApplication )
-                              .setApplicationDescriptor( appDescriptor )
-                              .setCmsDescriptor( cmsDescriptor )
-                              .setIdProviderDescriptor( idProviderDescriptor )
-                              .setIconUrlResolver( new ApplicationIconUrlResolver( request ) )
-                              .setLocaleMessageResolver( new LocaleMessageResolver( this.localeService, applicationKey,
-                                                                                    Collections.list( request.getLocales() ) ) )
-                              .setInlineMixinResolver( new CmsFormFragmentServiceResolver( this.cmsFormFragmentService ) )
-                              .build() );
+                appJsonList.add( ApplicationJson.create()
+                                     .setApplication( application )
+                                     .setLocal( localApplication )
+                                     .setApplicationDescriptor( appDescriptor )
+                                     .setCmsDescriptor( cmsDescriptor )
+                                     .setIdProviderDescriptor( idProviderDescriptor )
+                                     .setIconUrlResolver( new ApplicationIconUrlResolver( request ) )
+                                     .setLocaleMessageResolver( new LocaleMessageResolver( this.localeService, applicationKey,
+                                                                                           Collections.list( request.getLocales() ) ) )
+                                     .setInlineMixinResolver( new CmsFormFragmentServiceResolver( this.cmsFormFragmentService ) )
+                                     .build() );
             }
         }
 
+        appJsonList.sort( Comparator.comparing(
+            app -> requireNonNullElseGet( app.getTitle(), app::getKey ), String.CASE_INSENSITIVE_ORDER ) );
+
+        final ListApplicationJson json = new ListApplicationJson();
+        appJsonList.forEach( json::add );
         return json;
     }
 
@@ -246,82 +229,6 @@ public final class AppsApplicationResource
     }
 
     @GET
-    @Path("listKeys")
-    public List<String> listKeys( @QueryParam("query") final String query )
-    {
-        Applications applications = this.applicationService.getInstalledApplications();
-
-        applications = this.filterApplications( applications, query );
-        applications = this.sortApplications( applications );
-
-        return applications.stream().filter( app -> !app.isSystem() ).map( app -> app.getKey().toString() ).collect( Collectors.toList() );
-    }
-
-    @POST
-    @Path("start")
-    @RolesAllowed(RoleKeys.ADMIN_ID)
-    @Consumes(MediaType.APPLICATION_JSON)
-    public ApplicationSuccessJson start( final ApplicationListParams params )
-        throws Exception
-    {
-        params.getKeys().forEach( ( key ) -> lock( key, () -> {
-            this.applicationService.startApplication( key );
-            return null;
-        } ) );
-        return new ApplicationSuccessJson();
-    }
-
-    @POST
-    @Path("stop")
-    @RolesAllowed(RoleKeys.ADMIN_ID)
-    @Consumes(MediaType.APPLICATION_JSON)
-    public ApplicationSuccessJson stop( final ApplicationListParams params )
-        throws Exception
-    {
-        params.getKeys().forEach( ( key ) -> lock( key, () -> {
-            this.applicationService.stopApplication( key );
-            return null;
-        } ) );
-        return new ApplicationSuccessJson();
-    }
-
-    @POST
-    @Path("install")
-    @RolesAllowed(RoleKeys.ADMIN_ID)
-    @Consumes(MediaType.MULTIPART_FORM_DATA)
-    public ApplicationInstallResultJson install( final MultipartForm form, @Context HttpServletRequest request )
-        throws Exception
-    {
-        final MultipartItem appFile = form.get( "file" );
-
-        if ( appFile == null )
-        {
-            throw new IllegalArgumentException( "Missing file item" );
-        }
-        if ( appFile.getFileName() == null )
-        {
-            throw new IllegalArgumentException( "Missing file name" );
-        }
-        final ByteSource byteSource = appFile.getBytes();
-
-        return lock( appFile.getFileName(), () -> installApplication( byteSource, appFile.getFileName(), request ) );
-    }
-
-    @POST
-    @Path("uninstall")
-    @RolesAllowed(RoleKeys.ADMIN_ID)
-    @Consumes(MediaType.APPLICATION_JSON)
-    public ApplicationSuccessJson uninstall( final ApplicationListParams params )
-        throws Exception
-    {
-        params.getKeys().forEach( ( key ) -> lock( key, () -> {
-            this.applicationService.uninstallApplication( key );
-            return null;
-        } ) );
-        return new ApplicationSuccessJson();
-    }
-
-    @GET
     @Path("icon/{appKey}")
     @Produces("image/*")
     public Response getIcon( @PathParam("appKey") final String appKeyStr, @QueryParam("hash") final String hash )
@@ -357,114 +264,31 @@ public final class AppsApplicationResource
         responseBuilder.cacheControl( cacheControl );
     }
 
-    private ApplicationInstallResultJson installApplication( final ByteSource byteSource, final String applicationName,
-                                                             HttpServletRequest request )
-    {
-        final ApplicationInstallResultJson result = new ApplicationInstallResultJson();
-
-        try
-        {
-            final Application application = this.applicationService.installGlobalApplication( byteSource );
-
-            result.setApplicationInstalledJson(
-                new ApplicationInstalledJson( application, false, new ApplicationIconUrlResolver( request ) ) );
-        }
-        catch ( Exception e )
-        {
-            final String failure = "Failed to process application " + applicationName;
-            LOG.error( failure, e );
-
-            result.setFailure( failure );
-        }
-        return result;
-    }
-
-    @GET
-    @Path("getIdProviderApplication")
-    public ApplicationJson getIdProviderApplication( @QueryParam("applicationKey") String key, @Context HttpServletRequest request )
-    {
-        final ApplicationKey applicationKey = ApplicationKey.from( key );
-
-        final IdProviderDescriptor idProviderDescriptor = this.idProviderDescriptorService.getDescriptor( applicationKey );
-
-        if ( idProviderDescriptor != null )
-        {
-            final Application application = this.applicationService.getInstalledApplication( applicationKey );
-            final boolean localApplication = this.applicationService.isLocalApplication( applicationKey );
-
-            final CmsDescriptor cmsDescriptor = this.cmsService.getDescriptor( applicationKey );
-
-            final ApplicationDescriptor appDescriptor = applicationDescriptorService.get( applicationKey );
-            return ApplicationJson.create()
-                .setApplication( application )
-                .setLocal( localApplication )
-                .setApplicationDescriptor( appDescriptor )
-                .setCmsDescriptor( cmsDescriptor )
-                .setIdProviderDescriptor( idProviderDescriptor )
-                .setIconUrlResolver( new ApplicationIconUrlResolver( request ) )
-                .setLocaleMessageResolver(
-                    new LocaleMessageResolver( this.localeService, applicationKey, Collections.list( request.getLocales() ) ) )
-                .setInlineMixinResolver( new CmsFormFragmentServiceResolver( this.cmsFormFragmentService ) )
-                .build();
-        }
-        return null;
-    }
-
-    private Applications sortApplications( final Applications applications )
-    {
-        return Applications.from(
-            applications.stream().sorted( Comparator.comparing( Application::getDisplayName ) ).collect( Collectors.toList() ) );
-    }
-
     private Applications filterApplications( final Applications applications, final String query )
     {
         if ( !nullToEmpty( query ).isBlank() )
         {
             final String queryLowercase = query.toLowerCase();
             return Applications.from( applications.stream()
-                                          .filter( application -> nullToEmpty( application.getDisplayName() ).toLowerCase()
-                                              .contains( queryLowercase ) ||
-                                              nullToEmpty( application.getMaxSystemVersion() ).toLowerCase().contains( queryLowercase ) ||
-                                              nullToEmpty( application.getMinSystemVersion() ).toLowerCase().contains( queryLowercase ) ||
-                                              nullToEmpty( application.getSystemVersion() ).toLowerCase().contains( queryLowercase ) ||
-                                              nullToEmpty( application.getUrl() ).toLowerCase().contains( queryLowercase ) ||
-                                              nullToEmpty( application.getVendorName() ).toLowerCase().contains( queryLowercase ) ||
-                                              nullToEmpty( application.getVendorUrl() ).toLowerCase().contains( queryLowercase ) )
+                                          .filter( application -> {
+                                              final ApplicationDescriptor appDescriptor =
+                                                  applicationDescriptorService.get( application.getKey() );
+                                              if ( appDescriptor != null &&
+                                                  ( nullToEmpty( appDescriptor.getTitle() ).toLowerCase().contains( queryLowercase ) ||
+                                                      nullToEmpty( appDescriptor.getUrl() ).toLowerCase().contains( queryLowercase ) ||
+                                                      nullToEmpty( appDescriptor.getVendorName() ).toLowerCase().contains( queryLowercase ) ||
+                                                      nullToEmpty( appDescriptor.getVendorUrl() ).toLowerCase().contains( queryLowercase ) ) )
+                                              {
+                                                  return true;
+                                              }
+                                              return nullToEmpty( application.getMaxSystemVersion() ).toLowerCase().contains( queryLowercase ) ||
+                                                  nullToEmpty( application.getMinSystemVersion() ).toLowerCase().contains( queryLowercase ) ||
+                                                  nullToEmpty( application.getSystemVersion() ).toLowerCase().contains( queryLowercase );
+                                          } )
                                           .collect( Collectors.toList() ) );
         }
 
         return applications;
-    }
-
-    private <V> V lock( Object key, Callable<V> callable )
-    {
-        final Lock lock = LOCK_STRIPED.get( key );
-        try
-        {
-            if ( lock.tryLock( 30, TimeUnit.MINUTES ) )
-            {
-                try
-                {
-                    return callable.call();
-                }
-                catch ( Exception e )
-                {
-                    throw Exceptions.unchecked( e );
-                }
-                finally
-                {
-                    lock.unlock();
-                }
-            }
-            else
-            {
-                throw new RuntimeException( "Failed to acquire application service lock for application [" + key + "]" );
-            }
-        }
-        catch ( InterruptedException e )
-        {
-            throw new RuntimeException( "Failed to acquire application service lock for application [" + key + "]", e );
-        }
     }
 
     @Reference
