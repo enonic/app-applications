@@ -43,10 +43,28 @@ function getConfigAsJson() {
                 theme: 'dark',
             }
         }),
-        applicationInstallApiUrl: portal.apiUrl({
-            api: 'server:app',
-            path: 'installUrl',
-        }),
+        serverAppApi: {
+            installUrl: portal.apiUrl({
+                api: 'server:app',
+                path: 'installUrl',
+            }),
+            install: portal.apiUrl({
+                api: 'server:app',
+                path: 'install',
+            }),
+            uninstall: portal.apiUrl({
+                api: 'server:app',
+                path: 'uninstall',
+            }),
+            start: portal.apiUrl({
+                api: 'server:app',
+                path: 'start',
+            }),
+            stop: portal.apiUrl({
+                api: 'server:app',
+                path: 'stop',
+            }),
+        },
     }, null, 4).replace(/<(\/?script|!--)/gi, '\\u003C$1');
 }
 

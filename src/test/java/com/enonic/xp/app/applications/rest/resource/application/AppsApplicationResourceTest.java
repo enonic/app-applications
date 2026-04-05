@@ -4,7 +4,6 @@ import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
 import java.util.Locale;
 
 import org.jboss.resteasy.core.ResteasyContext;
@@ -12,10 +11,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.AdditionalAnswers;
 
-import com.google.common.io.ByteSource;
-
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
 import com.enonic.xp.admin.extension.AdminExtensionDescriptor;
@@ -35,7 +31,6 @@ import com.enonic.xp.app.Applications;
 import com.enonic.xp.app.applications.ApplicationInfo;
 import com.enonic.xp.app.applications.ApplicationInfoService;
 import com.enonic.xp.app.applications.rest.resource.AdminResourceTestSupport;
-import com.enonic.xp.core.impl.app.ApplicationInstallException;
 import com.enonic.xp.descriptor.DescriptorKey;
 import com.enonic.xp.descriptor.Descriptors;
 import com.enonic.xp.form.Form;
@@ -46,7 +41,6 @@ import com.enonic.xp.icon.Icon;
 import com.enonic.xp.idprovider.IdProviderDescriptor;
 import com.enonic.xp.idprovider.IdProviderDescriptorService;
 import com.enonic.xp.inputtype.InputTypeName;
-import com.enonic.xp.jaxrs.impl.MockRestResponse;
 import com.enonic.xp.macro.MacroDescriptors;
 import com.enonic.xp.page.PageDescriptors;
 import com.enonic.xp.portal.script.PortalScriptService;
@@ -63,16 +57,11 @@ import com.enonic.xp.security.RoleKeys;
 import com.enonic.xp.site.CmsDescriptor;
 import com.enonic.xp.site.CmsService;
 import com.enonic.xp.util.Version;
-import com.enonic.xp.web.multipart.MultipartForm;
-import com.enonic.xp.web.multipart.MultipartItem;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.isA;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class AppsApplicationResourceTest
@@ -244,7 +233,7 @@ public class AppsApplicationResourceTest
         final IdProviderDescriptor idProviderDescriptor = createIdProviderDescriptor();
         when( this.idProviderDescriptorService.getDescriptor( isA( ApplicationKey.class ) ) ).thenReturn( idProviderDescriptor );
         final ApplicationDescriptor appDescriptor = createApplicationDescriptor();
-        when( this.applicationDescriptorService.get( isA( ApplicationKey.class ) ) ).thenReturn( appDescriptor );
+        when( this.applicationDescriptorService.get( ApplicationKey.from( "testapplication" ) ) ).thenReturn( appDescriptor );
         when( cmsFormFragmentService.inlineFormItems( isA( Form.class ) ) ).then( AdditionalAnswers.returnsFirstArg() );
 
         String response = request().path( "application/list" ).queryParam( "query", "Enonic" ).get().getAsString();
@@ -267,42 +256,6 @@ public class AppsApplicationResourceTest
 
         String response = request().path( "application/list" ).queryParam( "query", "invalid query" ).get().getAsString();
         assertJson( "get_application_list_with_invalid_query.json", response );
-    }
-
-    @Test
-    public void getApplicationKeys()
-        throws Exception
-    {
-        final Application application = createApplication();
-        final Applications applications = Applications.from( application );
-        when( this.applicationService.getInstalledApplications() ).thenReturn( applications );
-        final CmsDescriptor siteDescriptor = createCmsDescriptor( application.getKey() );
-        when( this.cmsService.getDescriptor( isA( ApplicationKey.class ) ) ).thenReturn( siteDescriptor );
-        final IdProviderDescriptor idProviderDescriptor = createIdProviderDescriptor();
-        when( this.idProviderDescriptorService.getDescriptor( isA( ApplicationKey.class ) ) ).thenReturn( idProviderDescriptor );
-        final ApplicationDescriptor appDescriptor = createApplicationDescriptor();
-        when( this.applicationDescriptorService.get( isA( ApplicationKey.class ) ) ).thenReturn( appDescriptor );
-
-        String response = request().path( "application/listKeys" ).get().getAsString();
-        assertJson( "get_application_keys_success.json", response );
-    }
-
-    @Test
-    public void startApplication()
-        throws Exception
-    {
-        request().path( "application/start" ).entity( "{\"key\":[\"testapplication\"]}", MediaType.APPLICATION_JSON_TYPE ).post();
-
-        verify( this.applicationService ).startApplication( ApplicationKey.from( "testapplication" ) );
-    }
-
-    @Test
-    public void stopApplication()
-        throws Exception
-    {
-        request().path( "application/stop" ).entity( "{\"key\":[\"testapplication\"]}", MediaType.APPLICATION_JSON_TYPE ).post();
-
-        verify( this.applicationService ).stopApplication( ApplicationKey.from( "testapplication" ) );
     }
 
     @Test
@@ -340,87 +293,11 @@ public class AppsApplicationResourceTest
         assertTrue( Arrays.equals( expected, response ) );
     }
 
-    @Test
-    public void testUninstallFailed()
-        throws Exception
-    {
-        final ApplicationKey applicationKey = ApplicationKey.from( "testapplication" );
-        doThrow( new ApplicationInstallException( "expectedException" ) ).when( this.applicationService )
-            .uninstallApplication( applicationKey );
-
-        final MockRestResponse post = request().path( "application/uninstall" )
-            .entity( "{\"key\":[\"" + applicationKey + "\"]}", MediaType.APPLICATION_JSON_TYPE )
-            .post();
-        assertEquals( 500, post.getStatus() );
-        assertEquals( "expectedException", post.getAsString() );
-    }
-
-    @Test
-    public void testUninstall()
-        throws Exception
-    {
-        final ApplicationKey applicationKey = ApplicationKey.from( "testapplication" );
-
-        final String response = request().path( "application/uninstall" )
-            .entity( "{\"key\":[\"" + applicationKey + "\"]}", MediaType.APPLICATION_JSON_TYPE )
-            .post()
-            .getAsString();
-
-        assertEquals( "{}", response );
-    }
-
-    @Test
-    public void testInstallInvalid()
-        throws Exception
-    {
-        final MultipartForm form = mock( MultipartForm.class );
-
-        final MultipartItem file = createItem( "file", 10, "jar", "image/png" );
-
-        when( form.iterator() ).thenReturn( List.of( file ).iterator() );
-        when( form.get( "file" ) ).thenReturn( file );
-        when( this.multipartService.parse( any() ) ).thenReturn( form );
-
-        when( this.applicationService.installGlobalApplication( file.getBytes() ) ).thenThrow( new RuntimeException() );
-
-        String response =
-            request().path( "application/install" ).entity( new byte[]{0, 1, 2}, MediaType.MULTIPART_FORM_DATA_TYPE ).post().getAsString();
-
-        assertEquals( "{\"failure\":\"Failed to process application file.jar\"}", response );
-    }
-
-    @Test
-    public void testInstall()
-        throws Exception
-    {
-
-        final MultipartForm form = mock( MultipartForm.class );
-
-        final MultipartItem file = createItem( "file", 10, "jar", "image/png" );
-
-        when( form.iterator() ).thenReturn( List.of( file ).iterator() );
-        when( form.get( "file" ) ).thenReturn( file );
-        when( this.multipartService.parse( any() ) ).thenReturn( form );
-
-        final Application application = createApplication();
-
-        when( this.applicationService.installGlobalApplication( file.getBytes() ) ).thenReturn( application );
-
-        String response =
-            request().path( "application/install" ).entity( new byte[]{0, 1, 2}, MediaType.MULTIPART_FORM_DATA_TYPE ).post().getAsString();
-
-        assertJson( "install_url.json", response );
-    }
-
     private Application createApplication()
     {
         final Application application = mock( Application.class );
         when( application.getKey() ).thenReturn( ApplicationKey.from( "testapplication" ) );
         when( application.getVersion() ).thenReturn( Version.parseVersion( "1.0.0" ) );
-        when( application.getDisplayName() ).thenReturn( "application display name" );
-        when( application.getUrl() ).thenReturn( "http://enonic.net" );
-        when( application.getVendorName() ).thenReturn( "Enonic" );
-        when( application.getVendorUrl() ).thenReturn( "https://www.enonic.com" );
         when( application.getMinSystemVersion() ).thenReturn( "5.0" );
         when( application.getMaxSystemVersion() ).thenReturn( "5.1" );
         when( application.isStarted() ).thenReturn( true );
@@ -439,6 +316,10 @@ public class AppsApplicationResourceTest
         return ApplicationDescriptor.create()
             .key( ApplicationKey.from( "testapplication" ) )
             .description( "Application description" )
+            .title( "application display name" )
+            .url( "http://enonic.net" )
+            .vendorName( "Enonic" )
+            .vendorUrl( "https://www.enonic.com" )
             .icon( icon )
             .build();
     }
@@ -446,7 +327,6 @@ public class AppsApplicationResourceTest
     private Application createEmptyApplication()
     {
         final Application application = mock( Application.class );
-        when( application.getDisplayName() ).thenReturn( "empty name" );
         when( application.getKey() ).thenReturn( ApplicationKey.from( "empty_testapplication" ) );
         return application;
     }
@@ -500,22 +380,6 @@ public class AppsApplicationResourceTest
             ).build();
 
         return AdminToolDescriptors.from( adminToolDescriptor );
-    }
-
-    private MultipartItem createItem( final String name, final long size, final String ext, final String type )
-    {
-        return createItem( name, name, size, ext, type );
-    }
-
-    private MultipartItem createItem( final String name, final String fileName, final long size, final String ext, final String type )
-    {
-        final MultipartItem item = mock( MultipartItem.class );
-        when( item.getName() ).thenReturn( name );
-        when( item.getFileName() ).thenReturn( fileName + "." + ext );
-        when( item.getContentType() ).thenReturn( com.google.common.net.MediaType.parse( type ) );
-        when( item.getSize() ).thenReturn( size );
-        when( item.getBytes() ).thenReturn( ByteSource.wrap( name.getBytes() ) );
-        return item;
     }
 
     @Override

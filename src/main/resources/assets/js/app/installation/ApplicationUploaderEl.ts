@@ -6,6 +6,7 @@ import {ApplicationInstallResultJson} from '../resource/json/ApplicationInstallR
 import {ApplicationInstallResult} from '../resource/ApplicationInstallResult';
 import {UrlHelper} from '../util/UrlHelper';
 import {UploadItem} from '@enonic/lib-admin-ui/ui/uploader/UploadItem';
+import {CONFIG} from '@enonic/lib-admin-ui/util/Config';
 
 export class ApplicationUploaderEl
     extends UploaderEl<Application> {
@@ -15,7 +16,7 @@ export class ApplicationUploaderEl
     constructor(config: UploaderElConfig) {
 
         if (config.url == null) {
-            config.url = UrlHelper.getRestUri('application/install');
+            config.url = CONFIG.getString('serverAppApi.install');
         }
 
         if (config.allowExtensions == null) {
