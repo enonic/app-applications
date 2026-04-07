@@ -190,7 +190,7 @@ export class ApplicationInput
             this.enable();
         }).catch((reason) => {
             DefaultErrorHandler.handle(reason);
-            this.notifyAppInstallFailed(reason);
+            this.notifyAppInstallFailed(reason?.message ?? String(reason));
             this.enable();
         });
     }
