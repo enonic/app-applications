@@ -11,7 +11,6 @@ import {StringHelper} from '@enonic/lib-admin-ui/util/StringHelper';
 import {UploadFailedEvent} from '@enonic/lib-admin-ui/ui/uploader/UploadFailedEvent';
 import {DefaultErrorHandler} from '@enonic/lib-admin-ui/DefaultErrorHandler';
 import {InstallUrlApplicationRequest} from '../../resource/InstallUrlApplicationRequest';
-import {ApplicationInstallResult} from '../../resource/ApplicationInstallResult';
 
 export class ApplicationInput
     extends CompositeFormInputEl {
@@ -185,20 +184,13 @@ export class ApplicationInput
         this.notifyAppInstallStarted();
         this.disable();
 
-        new InstallUrlApplicationRequest(url).sendAndParse().then((result: ApplicationInstallResult) => {
-            const failure: string = result.getFailure();
-
-            if (!failure) {
-                this.notifyAppInstallFinished();
-                this.cancelAction.execute();
-            } else {
-                this.notifyAppInstallFailed(failure);
-            }
-
+        new InstallUrlApplicationRequest(url).sendAndParse().then(() => {
+            this.notifyAppInstallFinished();
+            this.cancelAction.execute();
             this.enable();
         }).catch((reason) => {
             DefaultErrorHandler.handle(reason);
-            this.notifyAppInstallFailed(reason);
+            this.notifyAppInstallFailed(reason?.message ?? String(reason));
             this.enable();
         });
     }
