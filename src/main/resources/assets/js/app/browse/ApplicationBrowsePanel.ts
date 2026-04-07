@@ -232,7 +232,7 @@ export class ApplicationBrowsePanel
 
     private removeItemFromList(appKeyAsString: string, deselect?: boolean) {
         const itemToRemove = this.treeListBox.getItems().find(
-            (item: Application) => item.getApplicationKey().getName() === appKeyAsString);
+            (item: Application) => item.getName() === appKeyAsString);
 
         if (itemToRemove) {
             if (deselect) {
