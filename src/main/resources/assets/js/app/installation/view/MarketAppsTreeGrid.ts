@@ -1,3 +1,4 @@
+import {ApplicationJson} from '@enonic/lib-admin-ui/application/json/ApplicationJson';
 import {MarketApplicationFetcher} from '../../resource/MarketApplicationFetcher';
 import {i18n} from '@enonic/lib-admin-ui/util/Messages';
 import {Application} from '@enonic/lib-admin-ui/application/Application';
@@ -167,12 +168,8 @@ export class MarketAppsTreeGrid
         this.replaceItems(marketApplication);
 
         void new InstallUrlApplicationRequest(marketApplication.getLatestVersionDownloadUrl())
-            .sendAndParse().then((result: ApplicationInstallResult) => {
-                if (result.getFailure()) {
-                    throw Error(result.getFailure());
-                }
-
-                const status: MarketAppStatus = MarketHelper.installedAppCanBeUpdated(marketApplication, result.getApplication())
+            .sendAndParse().then((application) => {
+                const status: MarketAppStatus = MarketHelper.installedAppCanBeUpdated(marketApplication, application)
                                                 ? MarketAppStatus.OLDER_VERSION_INSTALLED
                                                 : MarketAppStatus.INSTALLED;
                 marketApplication.setStatus(status);

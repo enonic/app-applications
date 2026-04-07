@@ -15,14 +15,9 @@ export class ApplicationInstallResult
 
     private failure: string;
 
-    static fromJson(json: ApplicationInstallResultJson): ApplicationInstallResult {
+    static fromJson(json: ApplicationJson): ApplicationInstallResult {
         let result = new ApplicationInstallResult();
-        const applicationJson = json.applicationInstalledJson?.application as ApplicationJsonWithTitle;
-        if (applicationJson) {
-            applicationJson.displayName = applicationJson.title || applicationJson.key;
-        }
-        result.application = applicationJson ? Application.fromJson(applicationJson) : null;
-        result.failure = json.failure;
+        result.application = Application.fromJson(json);
         return result;
     }
 
