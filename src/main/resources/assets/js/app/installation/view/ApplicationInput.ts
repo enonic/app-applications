@@ -1,3 +1,4 @@
+import {i18n} from '@enonic/lib-admin-ui/util/Messages';
 import {ApplicationUploaderEl} from '../ApplicationUploaderEl';
 import {Application} from '@enonic/lib-admin-ui/application/Application';
 import {Action} from '@enonic/lib-admin-ui/ui/Action';
@@ -190,7 +191,7 @@ export class ApplicationInput
             this.enable();
         }).catch((reason) => {
             DefaultErrorHandler.handle(reason);
-            this.notifyAppInstallFailed(reason?.message ?? String(reason));
+            this.notifyAppInstallFailed(i18n('dialog.install.url.failed'));
             this.enable();
         });
     }
