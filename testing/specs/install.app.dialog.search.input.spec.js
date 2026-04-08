@@ -15,7 +15,7 @@ describe('Install app dialog, search input spec.', function () {
     const LOG_BROWSER_APP_URL = 'https://repo.enonic.com/public/com/enonic/app/logbrowser/2.0.0/logbrowser-2.0.0.jar';
 
     const LOCAL_FILE = "file:c:/";
-    const VALIDATION_MESSAGE = 'Failed to upload application from';
+    const VALIDATION_MESSAGE = 'Failed to load application from';
 
     it(`GIVEN 'install app' dialog is opened WHEN Enter a non-existing URL into the search field THEN expected validation message should appear`,
         async () => {
