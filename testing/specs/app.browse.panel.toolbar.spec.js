@@ -15,7 +15,7 @@ describe('Application Browse Panel, check buttons in the toolbar', function () {
 
     const CONTENT_VIEWER_APP = 'Content Viewer App'; // This displayName should be in grid
     const APP_1_CONTENT_VIEWER = 'Content viewer'; // This displayName should be in Uninstall modal dialog
-    const APP_CHUCK = 'Chuck Norris';
+    const APP_CHUCK = 'com.enonic.app.chucknorris';//'Chuck Norris';
     const APP_CHUCK_DESCRIPTION = 'chucknorris';
     const APP_1_DESCRIPTION = 'Inspect your content object JSON';
     const APP_2_DESCRIPTION = 'Add Auth0 authentication to your Enonic XP installation';
@@ -40,12 +40,12 @@ describe('Application Browse Panel, check buttons in the toolbar', function () {
             // 1. Open Install modal dialog
             await appBrowsePanel.clickOnInstallButton();
             await installAppDialog.waitForGridLoaded();
-            await installAppDialog.waitForInstallLink(APP_CHUCK);
+            await installAppDialog.waitForInstallLink('Chuck Norris');
             // 2. Install two applications and close the modal dialog:
             await installAppDialog.pause(500);
-            await installAppDialog.clickOnInstallAppLink(APP_CHUCK);
+            await installAppDialog.clickOnInstallAppLink('Chuck Norris');
             // 3. Wait for installed
-            await installAppDialog.waitForAppInstalled(APP_CHUCK);
+            await installAppDialog.waitForAppInstalled('Chuck Norris');
             //await installAppDialog.waitForInstallLink(APP2);
             //await installAppDialog.clickOnInstallAppLink(APP2);
             //await installAppDialog.waitForAppInstalled(APP2);
@@ -54,11 +54,13 @@ describe('Application Browse Panel, check buttons in the toolbar', function () {
             await installAppDialog.waitForClosed(2000);
             await studioUtils.saveScreenshot('provider_installed');
             // 5. Verify the apps by their description
+            // TODO
             //await appBrowsePanel.waitForAppByDescriptionDisplayed(APP_CHUCK);
             await appBrowsePanel.waitForAppByDisplayNameDisplayed(APP_CHUCK)
             //await appBrowsePanel.waitForAppByDescriptionDisplayed(APP2);
         });
 
+    // TODO
     it('WHEN An installed application is selected or unselected THEN the toolbar buttons must be updated',
         async () => {
             let appBrowsePanel = new AppBrowsePanel();
