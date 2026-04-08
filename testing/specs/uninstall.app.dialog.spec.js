@@ -16,7 +16,7 @@ describe('Uninstall Application dialog specification', function () {
 
     const AUDIT_LOG_APP_NAME = 'Audit log browser';
 
-    it.skip("WHEN uninstall dialog is opened THEN expected title and buttons should be present",
+    it("WHEN uninstall dialog is opened THEN expected title and buttons should be present",
         async () => {
             let uninstallAppDialog = new UninstallAppDialog();
             // 1. Select 'Chuck Norris' app and click on 'Uninstall' button:

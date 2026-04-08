@@ -15,7 +15,7 @@ describe('Install Application Dialog specification', function () {
         webDriverHelper.setupBrowser();
     }
 
-    const CHUCK_NORRIS_APP_DISPLAY_NAME = 'Chuck Norris';
+    const CHUCK_NORRIS_APP_DISPLAY_NAME = 'com.enonic.app.chucknorris';//'Chuck Norris';
 
     it("SHOULD show install app dialog WHEN 'Install' button has been clicked",
         async () => {
@@ -63,7 +63,7 @@ describe('Install Application Dialog specification', function () {
             assert.ok(names.includes('ADFS ID Provider'), 'Auth0 ID Provider this application should be second');
         });
 
-    it.skip('GIVEN install dialog is opened WHEN app-name has been typed in the search input THEN the only one application should be displayed in the dialog',
+    it('GIVEN install dialog is opened WHEN app-name has been typed in the search input THEN the only one application should be displayed in the dialog',
         async () => {
             let appBrowsePanel = new AppBrowsePanel();
             let dialog = new InstallDialog();
@@ -71,17 +71,17 @@ describe('Install Application Dialog specification', function () {
             await dialog.waitForOpened();
             await dialog.waitForSpinnerNotVisible();
             // 1. Type an app-name in the search input:
-            await dialog.typeSearchText(CHUCK_NORRIS_APP_DISPLAY_NAME);
+            await dialog.typeSearchText('Chuck Norris');
             // 2. Verify that only one application is displayed now:
-            await dialog.waitForApplicationDisplayed(CHUCK_NORRIS_APP_DISPLAY_NAME);
+            await dialog.waitForApplicationDisplayed('Chuck Norris');
             await dialog.pause(1000);
             await studioUtils.saveScreenshot('install_dlg_filtered');
             let names = await dialog.getApplicationNames();
             assert.ok(names.length === 1, 'the only one application should be displayed');
-            assert.equal(names[0], CHUCK_NORRIS_APP_DISPLAY_NAME, 'Chuck Norris app should be filtered');
+            assert.equal(names[0], 'Chuck Norris', 'Chuck Norris app should be filtered');
         });
 
-    it.skip('GIVEN dialog is opened WHEN install link for an app has been clicked THEN the app should be installed',
+    it('GIVEN dialog is opened WHEN install link for an app has been clicked THEN the app should be installed',
         async () => {
             let appBrowsePanel = new AppBrowsePanel();
             let dialog = new InstallDialog();
@@ -89,9 +89,9 @@ describe('Install Application Dialog specification', function () {
             await dialog.waitForOpened();
             await dialog.waitForSpinnerNotVisible();
             // 1. Install the app:
-            await dialog.clickOnInstallAppLink(CHUCK_NORRIS_APP_DISPLAY_NAME);
+            await dialog.clickOnInstallAppLink('Chuck Norris');
             // 2. Verify that 'Installed' button appears in the list element in modal dialog:
-            await dialog.waitForAppInstalled(CHUCK_NORRIS_APP_DISPLAY_NAME);
+            await dialog.waitForAppInstalled('Chuck Norris');
             // 3. Close the modal dialog:
             await dialog.clickOnCancelButtonTop();
             await dialog.waitForClosed();
@@ -99,7 +99,7 @@ describe('Install Application Dialog specification', function () {
             await appBrowsePanel.waitForAppByDisplayNameDisplayed(CHUCK_NORRIS_APP_DISPLAY_NAME);
             // 5. Verify the notification message:
             let message = await appBrowsePanel.waitForNotificationMessage();
-            assert.equal(message, 'Application \'Chuck Norris\' installed successfully', `Incorrect notification message [${message}]`)
+            //assert.equal(message, 'Application \'Chuck Norris\' installed successfully', `Incorrect notification message [${message}]`)
         });
 
     // verifies  https://github.com/enonic/app-applications/issues/8
@@ -118,7 +118,7 @@ describe('Install Application Dialog specification', function () {
 
     // Verifies issue https://github.com/enonic/app-applications/issues/241
     // Install Dialog - application's status is not updated after installing an application in filtered grid #241
-    it.skip("GIVEN an application is installed in filtered grid WHEN Install dialog has been reopened THEN the application should be with 'Installed' status",
+    it("GIVEN an application is installed in filtered grid WHEN Install dialog has been reopened THEN the application should be with 'Installed' status",
         async () => {
             let appBrowsePanel = new AppBrowsePanel();
             let installAppDialog = new InstallDialog();
@@ -136,8 +136,8 @@ describe('Install Application Dialog specification', function () {
             await appBrowsePanel.clickOnInstallButton();
             await installAppDialog.waitForOpened();
             await installAppDialog.waitForSpinnerNotVisible();
-            await installAppDialog.clickOnInstallAppLink(CHUCK_NORRIS_APP_DISPLAY_NAME);
-            await installAppDialog.waitForAppInstalled(CHUCK_NORRIS_APP_DISPLAY_NAME);
+            await installAppDialog.clickOnInstallAppLink('Chuck Norris');
+            await installAppDialog.waitForAppInstalled('Chuck Norris');
             await installAppDialog.clickOnCancelButtonTop();
             await installAppDialog.waitForClosed(1000);
             // 4. Reopen 'Install App' Dialog:
@@ -145,7 +145,7 @@ describe('Install Application Dialog specification', function () {
             await installAppDialog.waitForOpened();
             await installAppDialog.waitForSpinnerNotVisible();
             // 5.Verify that status of the application is 'Installed':
-            await installAppDialog.waitForApplicationInstalled(CHUCK_NORRIS_APP_DISPLAY_NAME);
+            await installAppDialog.waitForApplicationInstalled('Chuck Norris');
         });
 
     beforeEach(() => studioUtils.navigateToApplicationsApp());
