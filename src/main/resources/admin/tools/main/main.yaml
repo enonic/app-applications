@@ -9,6 +9,7 @@ allow:
   - "role:system.admin"
 apis:
   - "i18n"
+  - "asset"
   - "admin:extension"
   - "admin:status"
   - "admin:event"
