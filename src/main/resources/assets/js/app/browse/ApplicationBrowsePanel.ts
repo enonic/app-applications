@@ -25,7 +25,6 @@ import {SelectableListBoxWrapper, SelectionMode} from '@enonic/lib-admin-ui/ui/s
 import {TreeGridContextMenu} from '@enonic/lib-admin-ui/ui/treegrid/TreeGridContextMenu';
 import {ListBoxToolbar} from '@enonic/lib-admin-ui/ui/selector/list/ListBoxToolbar';
 import {ApplicationsGridList} from './ApplicationsGridList';
-import {SelectableListBoxKeyNavigator} from '@enonic/lib-admin-ui/ui/selector/list/SelectableListBoxKeyNavigator';
 import {GetApplicationRequest} from '../resource/GetApplicationRequest';
 import Q from 'q';
 import {Element} from '@enonic/lib-admin-ui/dom/Element';
@@ -45,7 +44,6 @@ export class ApplicationBrowsePanel
 
     declare protected selectionWrapper: SelectionWrapperExt;
 
-    declare protected keyNavigator: SelectableListBoxKeyNavigator<Application>;
 
     constructor() {
         super();
@@ -134,8 +132,6 @@ export class ApplicationBrowsePanel
         } else {
             this.toolbar.hideAndDisableSelectionToggler();
         }
-
-        this.keyNavigator = new SelectableListBoxKeyNavigator(this.selectionWrapper);
 
         const panel = new SelectableListBoxPanel(this.selectionWrapper, this.toolbar);
         panel.addClass('applications-selectable-list-box-panel');
