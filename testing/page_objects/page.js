@@ -142,22 +142,22 @@ class Page {
         return await element.isEnabled();
     }
 
-    async waitForElementEnabled(selector, ms) {
+    async waitForElementEnabled(selector, ms = appConst.mediumTimeout) {
         let element = await this.findElement(selector);
         return await element.waitForEnabled({timeout: ms});
     }
 
-    async waitForElementDisabled(selector, ms) {
+    async waitForElementDisabled(selector, ms = appConst.mediumTimeout) {
         let element = await this.findElement(selector);
         return await element.waitForEnabled({timeout: ms, reverse: true});
     }
 
-    async waitForElementNotDisplayed(selector, ms) {
+    async waitForElementNotDisplayed(selector, ms = appConst.mediumTimeout) {
         let element = await this.findElement(selector);
         return await element.waitForDisplayed({timeout: ms, reverse: true});
     }
 
-    async waitForElementDisplayed(selector, ms) {
+    async waitForElementDisplayed(selector, ms = appConst.mediumTimeout) {
         let element = await this.findElement(selector);
         return await element.waitForDisplayed({timeout: ms});
     }
