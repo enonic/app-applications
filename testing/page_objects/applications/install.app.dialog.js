@@ -5,11 +5,12 @@ const Page = require('../page');
 const lib = require('../../libs/elements');
 const appConst = require('../../libs/app_const');
 const XPATH = {
-    container: `//div[contains(@id,'InstallAppDialog')]`,
-    gridUL: `//ul[contains(@id,'MarketAppsTreeGrid')]`,
-    filterInput: `//div[contains(@id,'ApplicationInput')]/input`,
+    container: `//div[contains(@class,'install-application-dialog')]`,
+    gridUL: `//ul[contains(@class,'market-app-tree-grid')]`,
+    filterInput: `//input[contains(@placeholder,'Search Enonic Market')]`,
     appByDisplayName(displayName) {
-        return `//div[contains(@id,'InstallAppDialog')]//div[contains(@id,'NamesView') and child::h6[contains(@class,'main-name')]]//a[contains(.,'${displayName}')]`
+        return XPATH.container +
+               `//div[contains(@id,'NamesView') and child::h6[contains(@class,'main-name')]]//a[contains(.,'${displayName}')]`
     },
     installButtonByName(displayName) {
         return `${lib.MARKET_MODAL_DIALOG.rowByDisplayName(displayName)}//button/span[text()='Install']`
@@ -43,7 +44,7 @@ class InstallAppDialog extends Page {
 
     async waitForOpened() {
         try {
-            await this.waitForElementDisplayed(this.grid, appConst.mediumTimeout);
+            await this.waitForElementDisplayed(this.grid);
         } catch (err) {
             await this.handleError('Install App dialog was not opened!', 'err_open_install_dialog', err);
         }
@@ -76,7 +77,7 @@ class InstallAppDialog extends Page {
     async waitForInstallLink(appName) {
         try {
             const selector = XPATH.installButtonByName(appName);
-            return await this.waitForElementDisplayed(selector, appConst.mediumTimeout);
+            return await this.waitForElementDisplayed(selector);
         } catch (err) {
             await this.handleError(`Install link is not displayed for the application: ${appName}`, 'err_install_link', err);
         }
@@ -85,7 +86,7 @@ class InstallAppDialog extends Page {
     async clickOnInstallAppLink(appName) {
         try {
             let locator = XPATH.installButtonByName(appName);
-            await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
+            await this.waitForElementDisplayed(locator);
             await this.pause(400);
             return await this.clickOnElement(locator);
         } catch (err) {
@@ -101,12 +102,6 @@ class InstallAppDialog extends Page {
         } catch (err) {
             await this.handleError(`App status for : ${appName} should be 'Installed'`, 'err_app_installed_status', err);
         }
-    }
-
-    isCancelButtonTopDisplayed() {
-        return this.isElementDisplayed(this.cancelButton).catch(err => {
-            throw new Error('Error - Cancel button top is not displayed ' + err);
-        })
     }
 
     async getErrorValidationMessage() {
@@ -132,7 +127,7 @@ class InstallAppDialog extends Page {
     async waitForApplicationNotFoundMessage() {
         try {
             let selector = XPATH.container + `//div[contains(@class,'status-message') and contains(.,'No applications found')]`;
-            await this.waitForElementDisplayed(selector, appConst.mediumTimeout)
+            await this.waitForElementDisplayed(selector);
         } catch (err) {
             await this.handleError(`'Application not found' message should be displayed!`, 'err_app_not_found_mess', err);
         }

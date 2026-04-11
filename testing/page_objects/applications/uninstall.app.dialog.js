@@ -24,13 +24,13 @@ class UninstallAppDialog extends Page {
 
     async getQuestion() {
         let result = await this.findElements(XPATH.dialogQuestion);
-        await this.waitForElementDisplayed(XPATH.dialogQuestion, appConst.mediumTimeout);
+        await this.waitForElementDisplayed(XPATH.dialogQuestion);
         return await this.getText(XPATH.dialogQuestion);
     }
 
     async waitForOpened() {
         try {
-            await this.waitForElementDisplayed(XPATH.container, appConst.mediumTimeout);
+            await this.waitForElementDisplayed(XPATH.container);
             return await this.pause(500);
         } catch (err) {
             await this.handleError('Uninstall dialog was not loaded!', 'err_open_uninstall_dialog', err);
@@ -38,7 +38,7 @@ class UninstallAppDialog extends Page {
     }
 
     async clickOnYesButton() {
-        await this.waitForElementDisplayed(this.yesButton, appConst.mediumTimeout);
+        await this.waitForElementDisplayed(this.yesButton);
         await this.clickOnElement(this.yesButton);
         return await this.pause(300);
     }
@@ -59,7 +59,7 @@ class UninstallAppDialog extends Page {
 
     async waitForClosed() {
         try {
-            await this.waitForElementNotDisplayed(XPATH.container, appConst.mediumTimeout);
+            await this.waitForElementNotDisplayed(XPATH.container);
         } catch (err) {
             await this.clickOnCancelButtonTop();
             await this.handleError('Uninstall Dialog was not closed', 'err_close_uninstall_dialog', err);
@@ -68,7 +68,7 @@ class UninstallAppDialog extends Page {
 
     async waitForYesButtonDisplayed() {
         try {
-            return await this.waitForElementDisplayed(this.yesButton, appConst.mediumTimeout)
+            return await this.waitForElementDisplayed(this.yesButton);
         } catch (err) {
             await this.handleError('Uninstall Dialog - Yes button is not visible', 'err_uninstall_dialog_yes_button', err);
         }
@@ -76,7 +76,7 @@ class UninstallAppDialog extends Page {
 
     async waitForNoButtonDisplayed() {
         try {
-            return await this.waitForElementDisplayed(this.noButton, appConst.mediumTimeout)
+            return await this.waitForElementDisplayed(this.noButton);
         } catch (err) {
             await this.handleError('Uninstall Dialog -  No button is not visible', 'err_uninstall_dialog_no_button', err);
         }

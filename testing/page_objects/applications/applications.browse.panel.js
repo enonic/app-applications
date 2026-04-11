@@ -9,17 +9,17 @@ const XPATH = {
     applicationsGridListUL: "//ul[contains(@id,'ApplicationsGridList')]",
     GRID_LIST_ITEM: "//li[contains(@class,'item-view-wrapper')]",
     toolbar: "//div[contains(@id,'Toolbar')]",
-    contextMenu: "//ul[contains(@id,'TreeGridContextMenu')]",
+    contextMenu: "//ul[contains(@class,'context-menu')]",
     treeGridToolbarDiv: `//div[contains(@id,'ListBoxToolbar')]`,
     installButton: `//div[contains(@id,'Toolbar')]/button[contains(@id, 'ActionButton') and child::span[contains(.,'Install')]]`,
     unInstallButton: `//div[contains(@id,'Toolbar')]/button[contains(@id, 'ActionButton') and child::span[contains(.,'Uninstall')]]`,
     stopButton: "//div[contains(@id,'Toolbar')]/button[contains(@id, 'ActionButton') and child::span[contains(.,'Stop')]]",
     startButton: `//div[contains(@id,'Toolbar')]/button[contains(@id, 'ActionButton') and child::span[contains(.,'Start')]]`,
-    selectAllCheckbox: "//div[contains(@id,'ListSelectionController')]",
+    selectAllCheckbox: "//div[contains(@class,'selection-controller')]",
     appState: "//div[contains(@id,'StatusBlock')]/span",
     checkedRowLi: `//li[contains(@class,'checkbox-left selected checked')]`,
     highlightedRow: `//li[contains(@class,'checkbox-left selected') and not(contains(@class,'checked')) ]`,
-    selectionControllerCheckBox: `//div[contains(@id,'SelectionController')]`,
+    selectionControllerCheckBox: `//div[contains(@class,'selection-controller')]`,
     selectionPanelToggler: "//button[contains(@id,'SelectionPanelToggler')]",
     numberInToggler: "//button[contains(@id,'SelectionPanelToggler')]/span",
     appStateByName: displayName => `${lib.TREE_GRID.rowByDisplayName(displayName)}${XPATH.appState}`,
@@ -62,7 +62,7 @@ class AppBrowsePanel extends Page {
     async clickOnRowByDescription(description) {
         try {
             const nameXpath = XPATH.rowByDescription(description);
-            await this.waitForElementDisplayed(nameXpath, appConst.shortTimeout);
+            await this.waitForElementDisplayed(nameXpath);
             await this.clickOnElement(nameXpath);
             return await this.pause(500);
         } catch (err) {
@@ -83,7 +83,7 @@ class AppBrowsePanel extends Page {
 
     async getNumberInSelectionToggler() {
         try {
-            await this.waitForElementDisplayed(this.numberInToggler, appConst.shortTimeout);
+            await this.waitForElementDisplayed(this.numberInToggler);
             return await this.getText(this.numberInToggler);
         } catch (err) {
             await this.handleError('Number in Selection toggle', 'err_number_selection_toggle', err);
@@ -110,7 +110,7 @@ class AppBrowsePanel extends Page {
 
     async waitForAppByDescriptionDisplayed(description) {
         try {
-            return await this.waitForElementDisplayed(XPATH.rowByDescription(description), appConst.shortTimeout)
+            return await this.waitForElementDisplayed(XPATH.rowByDescription(description));
         } catch (err) {
             await this.handleError(`Application with the description ${description} should be displayed in the app-grid`, `err_app`, err);
         }
@@ -127,7 +127,7 @@ class AppBrowsePanel extends Page {
 
     async waitForAppByDisplayNameDisplayed(appName) {
         try {
-            await this.waitForElementDisplayed(XPATH.rowByDisplayName(appName), 1000)
+            await this.waitForElementDisplayed(XPATH.rowByDisplayName(appName));
         } catch (err) {
             await this.handleError(`Application with the name ${appName} should be displayed in the app-grid`, `err_app`, err);
         }
@@ -135,14 +135,14 @@ class AppBrowsePanel extends Page {
 
     waitForRowByDescriptionVisible(description) {
         const nameXpath = XPATH.rowByDescription(description);
-        return this.waitForElementDisplayed(nameXpath, appConst.mediumTimeout).catch(() => {
+        return this.waitForElementDisplayed(nameXpath).catch(() => {
             throw Error(`Row with the name ${description} is not visible in 3000ms.`)
         })
     }
 
     async clickOnSelectionControllerCheckbox() {
         try {
-            await this.waitForElementDisplayed(this.selectionControllerCheckBox, appConst.mediumTimeout);
+            await this.waitForElementDisplayed(this.selectionControllerCheckBox);
             await this.clickOnElement(this.selectionControllerCheckBox);
             return await this.pause(700);
         } catch (err) {
@@ -152,7 +152,7 @@ class AppBrowsePanel extends Page {
 
     //Wait for application with the description is not displayed in app-grid:
     waitForAppNotDisplayed(description) {
-        return this.waitForElementNotDisplayed(XPATH.rowByDescription(description), appConst.shortTimeout).catch(err => {
+        return this.waitForElementNotDisplayed(XPATH.rowByDescription(description)).catch(err => {
             console.log(`item is still displayed:${description} ` + err);
             return false;
         });
@@ -160,7 +160,7 @@ class AppBrowsePanel extends Page {
 
     //Wait for application with the displayName is not displayed in app-grid:
     waitForAppByDisplayNameNotDisplayed(displayName) {
-        return this.waitForElementNotDisplayed(XPATH.rowByDisplayName(displayName), appConst.shortTimeout).catch(err => {
+        return this.waitForElementNotDisplayed(XPATH.rowByDisplayName(displayName)).catch(err => {
             console.log('Application is still displayed:' + displayName + ' ' + err);
             return false;
         });
@@ -168,7 +168,7 @@ class AppBrowsePanel extends Page {
 
     async clickOnInstallButton() {
         try {
-            await this.waitForElementEnabled(XPATH.installButton, appConst.mediumTimeout);
+            await this.waitForElementEnabled(XPATH.installButton);
             return await this.clickOnElement(XPATH.installButton);
         } catch (err) {
             await this.handleError('Clicked on Install button', 'err_click_install_button', err);
@@ -177,7 +177,7 @@ class AppBrowsePanel extends Page {
 
     async clickOnUninstallButton() {
         try {
-            await this.waitForElementEnabled(XPATH.unInstallButton, appConst.mediumTimeout);
+            await this.waitForElementEnabled(XPATH.unInstallButton);
             await this.clickOnElement(XPATH.unInstallButton);
         } catch (err) {
             await this.handleError('Clicked on Uninstall button', 'err_click_uninstall_button', err);
@@ -186,7 +186,7 @@ class AppBrowsePanel extends Page {
 
     async clickOnStartButton() {
         try {
-            await this.waitForElementEnabled(XPATH.startButton, appConst.mediumTimeout);
+            await this.waitForElementEnabled(XPATH.startButton);
             await this.clickOnElement(XPATH.startButton);
             return await this.pause(1500);
         } catch (err) {
@@ -196,7 +196,7 @@ class AppBrowsePanel extends Page {
 
     async clickOnStopButton() {
         try {
-            await this.waitForElementEnabled(XPATH.stopButton, appConst.mediumTimeout);
+            await this.waitForElementEnabled(XPATH.stopButton);
             await this.clickOnElement(XPATH.stopButton);
             return await this.pause(1500);
         } catch (err) {
@@ -204,29 +204,33 @@ class AppBrowsePanel extends Page {
         }
     }
 
-    waitForInstallButtonEnabled() {
-        return this.waitForElementEnabled(XPATH.installButton, appConst.mediumTimeout).catch(err => {
-            throw new Error('Button Install-app is not enabled! ' + err);
-        });
+    async waitForInstallButtonEnabled() {
+        try {
+            await this.waitForElementEnabled(XPATH.installButton);
+        } catch (err) {
+            await this.handleError('Button Install-app is not enabled!', 'err_install_button_enabled', err);
+        }
     }
 
     async waitForStartButtonEnabled() {
         try {
-            await this.waitForElementEnabled(XPATH.startButton, appConst.mediumTimeout)
+            await this.waitForElementEnabled(XPATH.startButton);
         } catch (err) {
             await this.handleError('Button Start-app is not enabled', 'err_start_button_enabled', err);
         }
     }
 
-    waitForStartButtonDisabled() {
-        return this.waitForElementDisabled(XPATH.startButton, appConst.mediumTimeout).catch(err => {
-            throw new Error(`Button Start-app is not disabled ` + err);
-        });
+    async waitForStartButtonDisabled() {
+        try {
+            await this.waitForElementDisabled(XPATH.startButton);
+        } catch (err) {
+            await this.handleError('Button Start-app is not disabled', 'err_start_button_disabled', err);
+        }
     }
 
     async waitForStopButtonEnabled() {
         try {
-            return await this.waitForElementEnabled(XPATH.stopButton, appConst.mediumTimeout)
+            return await this.waitForElementEnabled(XPATH.stopButton);
         } catch (err) {
             await this.handleError('Button Stop-app is not enabled', 'err_stop_button_enabled', err);
         }
@@ -234,7 +238,7 @@ class AppBrowsePanel extends Page {
 
     async waitForStopButtonDisabled() {
         try {
-            return await this.waitForElementDisabled(XPATH.stopButton, appConst.mediumTimeout)
+            return await this.waitForElementDisabled(XPATH.stopButton);
         } catch (err) {
             await this.handleError('Button Stop-app is not disabled', 'err_stop_button_disabled', err);
         }
@@ -243,7 +247,7 @@ class AppBrowsePanel extends Page {
     async rightClickOnRowByDisplayName(name) {
         try {
             const nameXpath = XPATH.rowByDisplayName(name) + "//div[contains(@id,'ApplicationsListViewer')]";
-            await this.waitForElementDisplayed(nameXpath, appConst.mediumTimeout);
+            await this.waitForElementDisplayed(nameXpath);
             await this.doRightClick(nameXpath);
             return await this.pause(500);
         } catch (err) {
@@ -253,7 +257,7 @@ class AppBrowsePanel extends Page {
 
     async waitForUninstallButtonEnabled() {
         try {
-            await this.waitForElementEnabled(XPATH.unInstallButton, appConst.mediumTimeout)
+            await this.waitForElementEnabled(XPATH.unInstallButton);
         } catch (err) {
             await this.handleError('Button Uninstall-app is not enabled', 'err_uninstall_button_enabled', err);
         }
@@ -261,7 +265,7 @@ class AppBrowsePanel extends Page {
 
     async waitForUninstallButtonDisabled() {
         try {
-            await this.waitForElementDisabled(XPATH.unInstallButton, appConst.mediumTimeout)
+            await this.waitForElementDisabled(XPATH.unInstallButton);
         } catch (err) {
             await this.handleError('Button Uninstall-app is not disabled', 'err_uninstall_button_disabled', err);
         }
@@ -291,7 +295,7 @@ class AppBrowsePanel extends Page {
     async clickOnSelectAllCheckbox() {
         try {
             let checkboxXpath = XPATH.treeGridToolbarDiv + XPATH.selectAllCheckbox;
-            await this.waitForElementDisplayed(checkboxXpath, appConst.mediumTimeout);
+            await this.waitForElementDisplayed(checkboxXpath);
             await this.clickOnElement(checkboxXpath);
             return await this.pause(500);
         } catch (err) {
@@ -302,7 +306,7 @@ class AppBrowsePanel extends Page {
     async clickOnCheckboxAndSelectRowByDisplayName(displayName) {
         const displayNameXpath = XPATH.checkboxByDisplayName(displayName);
         try {
-            await this.waitForElementDisplayed(displayNameXpath, appConst.mediumTimeout);
+            await this.waitForElementDisplayed(displayNameXpath);
             await this.clickOnElement(displayNameXpath);
             return await this.pause(500);
         } catch (err) {
@@ -331,7 +335,7 @@ class AppBrowsePanel extends Page {
 
     async waitForContextMenuNotDisplayed() {
         try {
-            return await this.waitForElementNotDisplayed(XPATH.contextMenu, appConst.shortTimeout)
+            return await this.waitForElementNotDisplayed(XPATH.contextMenu);
         } catch (err) {
             await this.handleError('Browse context menu was not closed', 'err_close_context_menu', err);
         }
@@ -339,7 +343,7 @@ class AppBrowsePanel extends Page {
 
     async waitForContextMenuDisplayed() {
         try {
-            await this.waitForElementDisplayed(XPATH.contextMenu, appConst.shortTimeout)
+            await this.waitForElementDisplayed(XPATH.contextMenu);
         } catch (err) {
             await this.handleError('Browse context menu was not opened', 'err_open_context_menu', err);
         }
@@ -347,7 +351,7 @@ class AppBrowsePanel extends Page {
 
     async isRowByIndexChecked(rowNumber) {
         let locator = `//li[contains(@class,'item-view-wrapper')]`;
-        await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
+        await this.waitForElementDisplayed(locator);
         let listItems = await this.findElements(locator);
         let attr = await listItems[rowNumber].getAttribute('class');
         return attr.includes('checked');
@@ -370,7 +374,7 @@ class AppBrowsePanel extends Page {
     async waitForContextMenuItemEnabled(menuItem) {
         try {
             let nameXpath = XPATH.enabledContextMenuButton(menuItem);
-            await this.waitForElementDisplayed(nameXpath, appConst.shortTimeout)
+            await this.waitForElementDisplayed(nameXpath);
         } catch (err) {
             await this.handleError(`Context menu item ${menuItem} should be enabled`, 'err_context_menu_item_enabled', err);
         }
@@ -379,7 +383,7 @@ class AppBrowsePanel extends Page {
     async getApplicationState(appName) {
         try {
             let stateXpath = XPATH.appStateByName(appName);
-            await this.waitForElementDisplayed(stateXpath, appConst.mediumTimeout);
+            await this.waitForElementDisplayed(stateXpath);
             return await this.getText(stateXpath);
         } catch (err) {
             await this.handleError(`Getting application state for ${appName}`, 'err_get_app_state', err);
@@ -396,7 +400,7 @@ class AppBrowsePanel extends Page {
     }
 
     async doOpenLauncherPanel() {
-        await this.waitForElementDisplayed(XPATH.launcherButton, appConst.shortTimeout);
+        await this.waitForElementDisplayed(XPATH.launcherButton);
         await this.clickOnElement(XPATH.launcherButton);
         let launcherPanel = new LauncherPanel();
         let isLoaded = await launcherPanel.waitForPanelDisplayed(appConst.shortTimeout);
@@ -408,7 +412,7 @@ class AppBrowsePanel extends Page {
     //wait for the "Show Selection" circle appears in the toolbar
     async waitForSelectionTogglerVisible() {
         try {
-            await this.waitForElementDisplayed(this.selectionPanelToggler, appConst.mediumTimeout);
+            await this.waitForElementDisplayed(this.selectionPanelToggler);
             let attr = await this.getAttribute(this.selectionPanelToggler, 'class');
             return attr.includes('any-selected');
         } catch (err) {
@@ -418,7 +422,7 @@ class AppBrowsePanel extends Page {
 
     async waitForSelectionTogglerNotVisible() {
         try {
-            await this.waitForElementNotDisplayed(this.selectionPanelToggler, appConst.mediumTimeout);
+            await this.waitForElementNotDisplayed(this.selectionPanelToggler);
         } catch (err) {
             await this.handleError('Selection toggle should not be visible', 'err_selection_toggler_should_not_visible', err);
         }
@@ -455,7 +459,7 @@ class AppBrowsePanel extends Page {
 
     async isRowHighlighted(appDisplayName) {
         let locator = lib.TREE_GRID.rowByDisplayName(appDisplayName);
-        await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
+        await this.waitForElementDisplayed(locator);
         let attribute = await this.getAttribute(locator, 'class');
         return attribute.includes('selected') && !attribute.includes('checked');
     }
