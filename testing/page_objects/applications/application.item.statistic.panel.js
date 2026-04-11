@@ -46,7 +46,7 @@ class ApplicationItemStatisticsPanel extends Page {
 
     async waitForAppNameDisplayed() {
         try {
-            return await this.waitForElementDisplayed(xpath.title, appConst.mediumTimeout);
+            return await this.waitForElementDisplayed(xpath.title);
         } catch (err) {
             await this.handleError('App Statistic Panel - app name is not displayed in the panel', 'err_app_name_not_displayed', err);
         }
@@ -58,7 +58,7 @@ class ApplicationItemStatisticsPanel extends Page {
 
     async waitForAppNameNotDisplayed() {
         try {
-            return await this.waitForElementNotDisplayed(xpath.title, appConst.mediumTimeout);
+            return await this.waitForElementNotDisplayed(xpath.title);
         } catch (err) {
             await this.handleError('App Statistic Panel - app name should not be displayed in the panel', 'err_app_name_displayed', err);
         }
@@ -68,7 +68,7 @@ class ApplicationItemStatisticsPanel extends Page {
     async getContentTypes() {
         try {
             // Wait for list of content types is displayed
-            await this.waitForElementDisplayed(this.contentTypes, appConst.mediumTimeout);
+            await this.waitForElementDisplayed(this.contentTypes);
             return await this.getTextInElements(this.contentTypes);
         } catch (err) {
             // otherwise returns empty list:
@@ -80,7 +80,7 @@ class ApplicationItemStatisticsPanel extends Page {
     async waitForContentTypesHeaderNotDisplayed() {
         try {
             let locator = xpath.main + "//ul[@class='data-list' and descendant::li[text()='Content Types']]";
-            await this.waitForElementNotDisplayed(locator, appConst.mediumTimeout);
+            await this.waitForElementNotDisplayed(locator);
         } catch (err) {
             await this.handleError('Content Types header should not be displayed in the statistics panel', 'err_content_types_header', err);
         }
@@ -89,7 +89,7 @@ class ApplicationItemStatisticsPanel extends Page {
     async waitForContentTypesHeaderDisplayed() {
         try {
             let locator = xpath.main + "//ul[@class='data-list' and descendant::li[text()='Content Types']]";
-            await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
+            await this.waitForElementDisplayed(locator);
         } catch (err) {
             await this.handleError('Content Types header should be displayed in the statistics panel', 'err_content_types_header', err);
         }
@@ -110,7 +110,7 @@ class ApplicationItemStatisticsPanel extends Page {
     async waitForPartHeaderNotDisplayed() {
         try {
             let locator = xpath.main + "//ul[@class='data-list' and descendant::li[text()='Part']]";
-            await this.waitForElementNotDisplayed(locator, appConst.mediumTimeout);
+            await this.waitForElementNotDisplayed(locator);
         } catch (err) {
             await this.handleError('Parts header should not be displayed in the statistics panel', 'err_part_header', err);
         }
@@ -148,7 +148,7 @@ class ApplicationItemStatisticsPanel extends Page {
 
     async waitForSiteDataDisplayed() {
         try {
-            return await this.waitForElementDisplayed(xpath.siteDataHeaders, appConst.mediumTimeout);
+            return await this.waitForElementDisplayed(xpath.siteDataHeaders);
         } catch (err) {
             await this.handleError('Site data should be displayed in the statistics panel', 'err_site_data', err);
         }
@@ -156,7 +156,7 @@ class ApplicationItemStatisticsPanel extends Page {
 
     async clickOnStopActionMenuItem() {
         try {
-            await this.waitForElementDisplayed(xpath.stopActionMenuItem, appConst.mediumTimeout);
+            await this.waitForElementDisplayed(xpath.stopActionMenuItem);
             return await this.clickOnElement(xpath.stopActionMenuItem);
         } catch (err) {
             await this.handleError('Clicked on Stop menu item', 'err_click_stop_menu_item', err);
@@ -172,7 +172,7 @@ class ApplicationItemStatisticsPanel extends Page {
     async getDropDownButtonText() {
         try {
             let locator = xpath.main + xpath.dropDownButton;
-            await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
+            await this.waitForElementDisplayed(locator);
             return await this.getText(locator);
         } catch (err) {
             await this.handleError('Tried to get the text from the drop-down button', 'err_get_text_dropdown', err);

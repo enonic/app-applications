@@ -41,7 +41,7 @@ module.exports = Object.freeze({
     },
     REMOVE_ICON: "//a[@class='remove']",
     DIV: {
-        CHECKBOX_DIV: "//div[contains(@id,'Checkbox')]",
+        CHECKBOX_DIV: "//div[contains(@class,'checkbox')]",
         DROPDOWN_DIV: "//div[contains(@id,'Dropdown')]",
         NOTIFICATION_ACTIONS_DIV: "//div[@class='notification-actions']",
     },
