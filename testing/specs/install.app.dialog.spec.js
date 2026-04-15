@@ -150,7 +150,7 @@ describe('Install Application Dialog specification', function () {
 
     beforeEach(() => studioUtils.navigateToApplicationsApp());
     afterEach(() => {
-        return studioUtils.doCloseCurrentBrowserTab();
+        return studioUtils.goToHomePage();
     });
     before(() => {
         return console.log('specification is starting: ' + this.title);

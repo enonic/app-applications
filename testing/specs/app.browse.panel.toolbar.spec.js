@@ -131,7 +131,7 @@ describe('Application Browse Panel, check buttons in the toolbar', function () {
         });
 
     beforeEach(() => studioUtils.navigateToApplicationsApp());
-    afterEach(() => studioUtils.doCloseCurrentBrowserTab());
+    afterEach(() => studioUtils.goToHomePage());
     before(() => {
         return console.log('specification is starting: ' + this.title);
     });
