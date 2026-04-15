@@ -16,12 +16,11 @@ module.exports = {
             return webDriverHelper.browser;
         }
     },
-    async doCloseCurrentBrowserTab() {
-        let title = await this.getBrowser().getTitle();
-        if (title != 'Enonic XP Home') {
-            await this.getBrowser().closeWindow();
-            return await this.doSwitchToHome();
-        }
+    async goToHomePage() {
+        await this.getBrowser().url('http://localhost:8080/admin');
+        let homePage = new HomePage();
+        await homePage.waitForDashboardLinkDisplayed();
+        await homePage.pause(1000);
     },
     async doLogout() {
         let launcherPanel = new LauncherPanel();
@@ -50,27 +49,18 @@ module.exports = {
     },
     async navigateToApplicationsApp(userName, password) {
         try {
-            let launcherPanel = new LauncherPanel();
-            let result = await launcherPanel.waitForPanelDisplayed(appConst.shortTimeout);
-            if (result) {
-                console.log("Launcher Panel is opened, click on the `Applications` link...");
-                await launcherPanel.clickOnApplicationsLink();
-            } else {
-                console.log("Login Page is opened, type a password and name...");
-                await this.doLoginAndClickOnApplicationsLink(userName, password);
-            }
-            return await this.doSwitchToApplicationsBrowsePanel();
+            await this.doLogin(userName, password);
+            let homePage = new HomePage();
+            await homePage.clickOnApplicationsLink();
+            await this.waitForAppsBrowsePanelLoaded();
         } catch (err) {
-            console.log('tried to navigate to applications app, but: ' + err);
             let screenshot = await this.saveScreenshotUniqueName('err_navigate_to_applications');
             throw new Error(`Error during navigate to Applications app, screenshot: ${screenshot} ` + err);
         }
     },
-    async doSwitchToApplicationsBrowsePanel() {
+    async waitForAppsBrowsePanelLoaded() {
         let browsePanel = new BrowsePanel();
         console.log('testUtils:switching to Applications app...');
-        await this.getBrowser().switchWindow(appConst.BROWSER_TITLES.APPLICATION_TITLE);
-        console.log("switched to Applications app...");
         await browsePanel.waitForSpinnerNotVisible();
         return await browsePanel.waitForGridLoaded(appConst.mediumTimeout);
     },
@@ -125,5 +115,19 @@ module.exports = {
         let screenshotName = appConst.generateRandomName(namePart);
         await this.saveScreenshot(screenshotName);
         return screenshotName;
-    }
+    },
+    async doLogin(userName, password) {
+        try {
+            let loginPage = new LoginPage();
+            let result = await loginPage.isLoaded();
+            if (result) {
+                await loginPage.doLogin(userName, password);
+            }
+            let homePage = new HomePage();
+            await homePage.waitForUsersLinkDisplayed();
+        } catch (err) {
+            let screenshot = await this.saveScreenshotUniqueName('err_login');
+            throw new Error(`Login page error,  screenshot:${screenshot}  ` + err);
+        }
+    },
 };

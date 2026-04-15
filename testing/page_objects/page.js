@@ -258,6 +258,15 @@ class Page {
         let screenshot = await this.saveScreenshotUniqueName(screenshotName);
         throw new Error(`${errorMessage}, screenshot: ${screenshot} ` + error);
     }
+    async getXpMenuShadowHost() {
+        try {
+            const host = await this.findElement('xp-menu');
+            await host.waitForExist({timeout: appConst.mediumTimeout});
+            return host;
+        } catch (err) {
+            await this.handleError('Home page, xp menu - failed to get shadow root', 'err_home_page_shadow', err);
+        }
+    }
 }
 
 module.exports = Page;

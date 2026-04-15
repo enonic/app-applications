@@ -75,7 +75,7 @@ describe('Applications Browse panel - `Application Selection Toggle` spec', func
         });
 
     beforeEach(() => studioUtils.navigateToApplicationsApp());
-    afterEach(() => studioUtils.doCloseCurrentBrowserTab());
+    afterEach(() => studioUtils.goToHomePage());
     before(() => {
         return console.log('specification is starting: ' + this.title);
     });

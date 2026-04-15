@@ -45,7 +45,7 @@ describe(`Applications Grid context menu, application is stopped`, function () {
         });
 
     beforeEach(() => studioUtils.navigateToApplicationsApp());
-    afterEach(() => studioUtils.doCloseCurrentBrowserTab());
+    afterEach(() => studioUtils.goToHomePage());
     before(() => {
         return console.log('specification is starting: ' + this.title);
     });
