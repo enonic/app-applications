@@ -101,7 +101,7 @@ describe('Application Browse Panel, multiple selection in grid', function () {
         });
 
     beforeEach(() => studioUtils.navigateToApplicationsApp());
-    afterEach(() => studioUtils.doCloseCurrentBrowserTab());
+    afterEach(() => studioUtils.goToHomePage());
 });
 
 function restartApps() {

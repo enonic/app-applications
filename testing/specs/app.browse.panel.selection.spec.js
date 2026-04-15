@@ -121,7 +121,7 @@ describe('Applications Browse panel - selection of items spec', function () {
         });
 
     beforeEach(() => studioUtils.navigateToApplicationsApp());
-    afterEach(() => studioUtils.doCloseCurrentBrowserTab());
+    afterEach(() => studioUtils.goToHomePage());
     before(() => {
         return console.log('specification is starting: ' + this.title);
     });

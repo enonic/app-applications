@@ -72,7 +72,7 @@ describe("Tests for Applications Grid context menu", function () {
         });
 
     beforeEach(() => studioUtils.navigateToApplicationsApp());
-    afterEach(() => studioUtils.doCloseCurrentBrowserTab());
+    afterEach(() => studioUtils.goToHomePage());
     before(() => {
         return console.log('specification is starting: ' + this.title);
     });
