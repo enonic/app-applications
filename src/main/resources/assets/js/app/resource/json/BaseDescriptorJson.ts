@@ -7,7 +7,7 @@ export interface BaseDescriptorJson {
 
     name: string;
 
-    displayName: string;
+    title: string;
 
     description: string;
 }

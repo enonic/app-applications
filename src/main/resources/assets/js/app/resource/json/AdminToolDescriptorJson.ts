@@ -5,7 +5,7 @@ export interface AdminToolDescriptorJson {
 
     name: string;
 
-    displayName: string;
+    title: string;
 
     description: string;
 

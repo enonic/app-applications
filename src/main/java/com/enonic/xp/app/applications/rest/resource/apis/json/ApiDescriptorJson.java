@@ -12,7 +12,7 @@ public final class ApiDescriptorJson
 
     public String name;
 
-    public String displayName;
+    public String title;
 
     public String description;
 
@@ -26,7 +26,7 @@ public final class ApiDescriptorJson
     {
         this.key = apiDescriptor.getKey().toString();
         this.name = apiDescriptor.getKey().getName();
-        this.displayName = apiDescriptor.getTitle();
+        this.title = apiDescriptor.getTitle();
         this.description = apiDescriptor.getDescription();
         this.documentationUrl = apiDescriptor.getDocumentationUrl();
         this.mount = apiDescriptor.getMount();

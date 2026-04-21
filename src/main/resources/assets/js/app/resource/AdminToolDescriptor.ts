@@ -1,4 +1,3 @@
-import {BaseDescriptor} from './BaseDescriptor';
 import {ApplicationKey} from '@enonic/lib-admin-ui/application/ApplicationKey';
 import {AdminToolDescriptorJson} from './json/AdminToolDescriptorJson';
 
@@ -10,7 +9,7 @@ export class AdminToolDescriptor {
 
     private name: string;
 
-    private displayName: string;
+    private title: string;
 
     private description: string;
 
@@ -22,7 +21,7 @@ export class AdminToolDescriptor {
         this.key = builder.key;
         this.applicationKey = builder.applicationKey;
         this.name = builder.name;
-        this.displayName = builder.displayName;
+        this.title = builder.title;
         this.description = builder.description;
         this.icon = builder.icon;
         this.toolUrl = builder.toolUrl;
@@ -37,7 +36,7 @@ export class AdminToolDescriptor {
             .setKey(json.key)
             .setApplicationKey(ApplicationKey.fromString(json.application))
             .setName(json.name)
-            .setDisplayName(json.displayName)
+            .setTitle(json.title)
             .setDescription(json.description)
             .setIcon(json.icon)
             .setToolUrl(json.toolUrl)
@@ -56,8 +55,8 @@ export class AdminToolDescriptor {
         return this.name;
     }
 
-    getDisplayName(): string {
-        return this.displayName;
+    getTitle(): string {
+        return this.title;
     }
 
     getDescription(): string {
@@ -81,7 +80,7 @@ class AdminToolDescriptorBuilder {
 
     name: string;
 
-    displayName: string;
+    title: string;
 
     description: string;
 
@@ -104,8 +103,8 @@ class AdminToolDescriptorBuilder {
         return this;
     }
 
-    public setDisplayName(value: string) {
-        this.displayName = value;
+    public setTitle(value: string) {
+        this.title = value;
         return this;
     }
 

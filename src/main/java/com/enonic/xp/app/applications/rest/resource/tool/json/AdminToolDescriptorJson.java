@@ -10,7 +10,7 @@ public final class AdminToolDescriptorJson
 
     public String name;
 
-    public String displayName;
+    public String title;
 
     public String description;
 
@@ -23,7 +23,7 @@ public final class AdminToolDescriptorJson
         this.key = adminToolDescriptor.getKey().toString();
         this.application = adminToolDescriptor.getApplicationKey().toString();
         this.name = adminToolDescriptor.getName();
-        this.displayName = adminToolDescriptor.getTitle();
+        this.title = adminToolDescriptor.getTitle();
         this.description = adminToolDescriptor.getDescription();
         this.icon = iconPath;
         this.toolUrl = toolUrl;
