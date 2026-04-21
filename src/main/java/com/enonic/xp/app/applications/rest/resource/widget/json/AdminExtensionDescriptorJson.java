@@ -14,7 +14,7 @@ public final class AdminExtensionDescriptorJson
 
     public String key;
 
-    public String displayName;
+    public String title;
 
     public String description;
 
@@ -25,7 +25,7 @@ public final class AdminExtensionDescriptorJson
     public AdminExtensionDescriptorJson( final AdminExtensionDescriptor widgetDescriptor )
     {
         this.key = widgetDescriptor.getKey().toString();
-        this.displayName = widgetDescriptor.getTitle();
+        this.title = widgetDescriptor.getTitle();
         this.description = widgetDescriptor.getDescription();
         this.interfaces = ImmutableSet.copyOf( widgetDescriptor.getInterfaces() );
         this.config = widgetDescriptor.getSchemaConfig().properties().stream().collect(

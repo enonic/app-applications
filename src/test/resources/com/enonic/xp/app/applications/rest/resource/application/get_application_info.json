@@ -3,21 +3,21 @@
       "descriptors" : [ {
           "allowedPrincipals" : [ "role:system.everyone" ],
           "description" : "description",
-          "displayName" : "displayName1",
           "documentationUrl" : "url",
           "key" : "testapplication:myapi1",
           "mount": [
               "xp"
           ],
-          "name" : "myapi1"
+          "name" : "myapi1",
+          "title" : "displayName1"
       }, {
           "allowedPrincipals" : [ "role:system.everyone" ],
           "description" : "description",
-          "displayName" : "displayName2",
           "documentationUrl" : "url",
           "key" : "testapplication:myapi2",
           "mount" : [],
-          "name" : "myapi2"
+          "name" : "myapi2",
+          "title" : "displayName2"
       } ]
   },
   "contentTypes": {
@@ -48,10 +48,10 @@
     "descriptors": [
       {
         "application": "myapp",
-        "displayName": "My tool",
         "icon": "icon-source",
         "key": "myapp:my-tool",
         "name": "my-tool",
+        "title": "My tool",
         "toolUrl": "/admin/myapp/my-tool"
       }
     ]
@@ -61,12 +61,12 @@
       {
         "config": {},
         "description": "My widget description",
-        "displayName": "My widget",
         "interfaces": [
           "com.enonic.xp.my-interface",
           "com.enonic.xp.my-interface-2"
         ],
-        "key": "myapp:my-widget"
+        "key": "myapp:my-widget",
+        "title": "My widget"
       }
     ]
   }

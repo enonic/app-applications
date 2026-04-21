@@ -15,13 +15,13 @@ public class MacroDescriptorJson
 
     private final String name;
 
-    private final String displayName;
+    private final String title;
 
     private final String description;
 
     private final FormJson form;
 
-    private final String displayNameI18nKey;
+    private final String titleI18nKey;
 
     private final LocaleMessageResolver localeMessageResolver;
 
@@ -36,8 +36,8 @@ public class MacroDescriptorJson
 
         this.key = builder.macroDescriptor.getKey().toString();
         this.name = builder.macroDescriptor.getName();
-        this.displayName = builder.macroDescriptor.getTitle();
-        this.displayNameI18nKey = builder.macroDescriptor.getTitleI18nKey();
+        this.title = builder.macroDescriptor.getTitle();
+        this.titleI18nKey = builder.macroDescriptor.getTitleI18nKey();
         this.descriptionI18nKey = builder.macroDescriptor.getDescriptionI18nKey();
         this.description = builder.macroDescriptor.getDescription();
         this.form = new FormJson( builder.macroDescriptor.getForm(), builder.localeMessageResolver, builder.inlineMixinResolver );
@@ -55,13 +55,13 @@ public class MacroDescriptorJson
 
     public String getDisplayName()
     {
-        if ( !nullToEmpty( displayNameI18nKey ).isBlank() )
+        if ( !nullToEmpty( titleI18nKey ).isBlank() )
         {
-            return localeMessageResolver.localizeMessage( displayNameI18nKey, displayName );
+            return localeMessageResolver.localizeMessage( titleI18nKey, title );
         }
         else
         {
-            return displayName;
+            return title;
         }
     }
 

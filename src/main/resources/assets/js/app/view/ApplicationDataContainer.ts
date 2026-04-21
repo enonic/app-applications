@@ -183,7 +183,7 @@ export class ApplicationDataContainer
     }
 
     private apiDescriptorToElement(apiDescriptor: ApiDescriptor): Element {
-        const displayName = apiDescriptor.getDisplayName() || apiDescriptor.getName();
+        const displayName = apiDescriptor.getTitle() || apiDescriptor.getName();
 
         const spanEl = new SpanEl().setHtml(displayName);
         new Tooltip(spanEl, apiDescriptor.getKey(), 200).setMode(Tooltip.MODE_GLOBAL_STATIC);
@@ -195,7 +195,7 @@ export class ApplicationDataContainer
     }
 
     private adminToolDescriptorToElement(adminToolDescriptor: AdminToolDescriptor): Element {
-        const aEl = new AEl().setUrl(adminToolDescriptor.getToolUrl(), '_blank').setHtml(adminToolDescriptor.getDisplayName());
+        const aEl = new AEl().setUrl(adminToolDescriptor.getToolUrl(), '_blank').setHtml(adminToolDescriptor.getTitle());
         new Tooltip(aEl, adminToolDescriptor.getKey(), 200).setMode(Tooltip.MODE_GLOBAL_STATIC);
         return aEl;
     }

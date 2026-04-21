@@ -5,14 +5,14 @@ export class BaseDescriptor {
 
     name: string;
 
-    displayName: string;
+    title: string;
 
     description: string;
 
     constructor(builder: BaseDescriptorBuilder) {
         this.name = builder.name;
         this.key = builder.key;
-        this.displayName = builder.displayName;
+        this.title = builder.title;
         this.description = builder.description;
     }
 
@@ -28,8 +28,8 @@ export class BaseDescriptor {
         return this.name;
     }
 
-    getDisplayName(): string {
-        return this.displayName;
+    getTitle(): string {
+        return this.title;
     }
 
     getDescription(): string {
@@ -43,7 +43,7 @@ export class BaseDescriptorBuilder {
 
     name: string;
 
-    displayName: string;
+    title: string;
 
     description: string;
 
@@ -51,7 +51,7 @@ export class BaseDescriptorBuilder {
         if (source) {
             this.key = source.getKey();
             this.name = source.getName();
-            this.displayName = source.getDisplayName();
+            this.title = source.getTitle();
             this.description = source.getDescription();
         }
     }
@@ -60,7 +60,7 @@ export class BaseDescriptorBuilder {
 
         return new BaseDescriptorBuilder()
             .setName(json.name)
-            .setDisplayName(json.displayName)
+            .setTitle(json.title)
             .setDescription(json.description)
             .setKey(json.key);
     }
@@ -75,8 +75,8 @@ export class BaseDescriptorBuilder {
         return this;
     }
 
-    public setDisplayName(value: string): BaseDescriptorBuilder {
-        this.displayName = value;
+    public setTitle(value: string): BaseDescriptorBuilder {
+        this.title = value;
         return this;
     }
 

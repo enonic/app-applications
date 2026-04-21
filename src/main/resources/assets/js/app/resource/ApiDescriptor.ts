@@ -6,7 +6,7 @@ export class ApiDescriptor {
 
     private readonly name: string;
 
-    private readonly displayName: string;
+    private readonly title: string;
 
     private readonly description: string;
 
@@ -19,7 +19,7 @@ export class ApiDescriptor {
     public constructor(builder: ApiDescriptorBuilder) {
         this.key = builder.key;
         this.name = builder.name;
-        this.displayName = builder.displayName;
+        this.title = builder.title;
         this.description = builder.description;
         this.documentationUrl = builder.documentationUrl;
         this.mount = builder.mount;
@@ -34,7 +34,7 @@ export class ApiDescriptor {
         return ApiDescriptor.create()
             .setKey(json.key)
             .setName(json.name)
-            .setDisplayName(json.displayName)
+            .setTitle(json.title)
             .setDescription(json.description)
             .setDocumentationUrl(json.documentationUrl)
             .setMount(json.mount)
@@ -50,8 +50,8 @@ export class ApiDescriptor {
         return this.name;
     }
 
-    getDisplayName(): string {
-        return this.displayName;
+    getTitle(): string {
+        return this.title;
     }
 
     getDescription(): string {
@@ -77,7 +77,7 @@ class ApiDescriptorBuilder {
 
     name: string;
 
-    displayName: string;
+    title: string;
 
     description: string;
 
@@ -98,8 +98,8 @@ class ApiDescriptorBuilder {
         return this;
     }
 
-    public setDisplayName(value: string) {
-        this.displayName = value;
+    public setTitle(value: string) {
+        this.title = value;
         return this;
     }
 
