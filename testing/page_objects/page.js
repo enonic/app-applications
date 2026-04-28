@@ -89,17 +89,22 @@ class Page {
     }
 
     async typeTextInInput(selector, text) {
-        let inputElement = await this.findElement(selector);
+        try {
+            let inputElement = await this.findElement(selector);
 
-        await inputElement.setValue(text);
-        await this.pause(300);
-        let value = await inputElement.getValue();
-        //workaround for issue in WebdriverIO
-        if (value !== text) {
             await inputElement.setValue(text);
             await this.pause(300);
+            let value = await inputElement.getValue();
+            //workaround for issue in WebdriverIO
+            if (value !== text) {
+                await inputElement.setValue(text);
+                await this.pause(300);
+            }
+            return await this.pause(300);
+        } catch (err) {
+            await this.saveScreenshotUniqueName('err_type_text_input');
+            throw new Error('Error when type text in input: ' + err);
         }
-        return await this.pause(300);
     }
 
     async getTextInInput(selector) {

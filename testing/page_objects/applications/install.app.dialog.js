@@ -186,9 +186,16 @@ class InstallAppDialog extends Page {
     }
 
     async typeSearchTextAndEnter(text) {
-        await this.typeTextInInput(this.searchInput, text);
-        await this.pause(700);
-        return await this.keys('Enter');
+        try {
+            await this.waitForElementEnabled(this.searchInput, appConst.mediumTimeout);
+            await this.typeTextInInput(this.searchInput, text);
+            await this.pause(1000);
+            await this.saveScreenshotUniqueName('search_input');
+            return await this.keys('Enter');
+        } catch (err) {
+            let screenshot = await this.saveScreenshotUniqueName('err_search_input_enter');
+            throw new Error(`Error when type text in search input and press 'Enter', screenshot: ${screenshot} ` + err);
+        }
     }
 
     async clickOnInstallLink(appName) {
