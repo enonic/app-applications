@@ -167,7 +167,7 @@ export class MarketAppsTreeGrid
         marketApplication.setStatus(MarketAppStatus.INSTALLING);
         this.replaceItems(marketApplication);
 
-        void new InstallUrlApplicationRequest(marketApplication.getLatestVersionDownloadUrl())
+        void new InstallUrlApplicationRequest(marketApplication.getLatestVersionDownloadUrl(), marketApplication.getLatestVersionSha512())
             .sendAndParse().then((application) => {
                 const status: MarketAppStatus = MarketHelper.installedAppCanBeUpdated(marketApplication, application)
                                                 ? MarketAppStatus.OLDER_VERSION_INSTALLED

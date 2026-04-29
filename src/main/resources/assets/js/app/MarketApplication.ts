@@ -87,6 +87,14 @@ export class MarketApplication implements IDentifiable {
         }
     }
 
+    public getLatestVersionSha512(): string {
+        if (this.getLatestVersion()) {
+            return this.getVersions()[this.getLatestVersion()]['sha512'];
+        } else {
+            return null;
+        }
+    }
+
     public getVersions(): object {
         return this.versions;
     }

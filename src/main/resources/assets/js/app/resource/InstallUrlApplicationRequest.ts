@@ -11,16 +11,20 @@ export class InstallUrlApplicationRequest
 
     private readonly applicationUrl: string;
 
-    constructor(applicationUrl: string) {
+    private readonly sha512: string;
+
+    constructor(applicationUrl: string, sha512?: string) {
         super();
         this.setMethod(HttpMethod.POST);
         this.applicationUrl = applicationUrl;
+        this.sha512 = sha512;
         this.setHeavyOperation(true);
     }
 
     getParams(): object {
         return {
-            URL: this.applicationUrl
+            URL: this.applicationUrl,
+            ...(this.sha512 && {sha512: this.sha512})
         };
     }
 
