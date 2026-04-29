@@ -13,9 +13,11 @@ const home = {
 const selectors = {
     usersLink: 'a[id="com.enonic.xp.app.users"] span.app-tile-name',
     applicationsLink: 'a[id="com.enonic.xp.app.applications"] span.app-tile-name',
-    dashboardLink: 'a.home-app span.app-tile-name',
+    dashboardLink: 'a[id="com.enonic.xp.app.main"] span.app-tile-name',
     avatarButton:'button#avatar-button',
     logoutMenuItem: 'a.avatar-dropdown-item',
+    menuButton: 'button#menu-button',
+    menuPanelVisible: 'nav#menu-panel.visible',
 };
 
 class HomePage extends Page {
@@ -69,17 +71,6 @@ class HomePage extends Page {
         }
     }
 
-    async clickOnDashboardLink() {
-        try {
-            const host = await this.getXpMenuShadowHost();
-            const span = await host.shadow$(selectors.dashboardLink);
-            await span.waitForDisplayed({timeout: appConst.mediumTimeout});
-            await span.click();
-        } catch (err) {
-            await this.handleError('Dashboard link was not found', 'err_dashboard_link', err);
-        }
-    }
-
     async clickOnUsersLink() {
         try {
             const host = await this.getXpMenuShadowHost();
@@ -120,6 +111,19 @@ class HomePage extends Page {
             await logoutLink.click();
         } catch (err) {
             await this.handleError('Logout menu item was not found', 'err_logout_menu_item', err);
+        }
+    }
+
+    async openMenuPanel() {
+        try {
+            const host = await this.getXpMenuShadowHost();
+            const menuButton = await host.shadow$(selectors.menuButton);
+            await menuButton.waitForDisplayed({timeout: appConst.mediumTimeout});
+            await menuButton.click();
+            const menuPanel = await host.shadow$(selectors.menuPanelVisible);
+            await menuPanel.waitForDisplayed({timeout: appConst.mediumTimeout});
+        } catch (err) {
+            await this.handleError('Failed to open menu panel', 'err_open_menu_panel', err);
         }
     }
 }

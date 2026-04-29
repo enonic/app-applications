@@ -1,4 +1,3 @@
-const LauncherPanel = require('../page_objects/launcher.panel');
 const HomePage = require('../page_objects/home.page');
 const LoginPage = require('../page_objects/login.page');
 const appConst = require("./app_const");
@@ -23,13 +22,11 @@ module.exports = {
         await homePage.pause(1000);
     },
     async doLogout() {
-        let launcherPanel = new LauncherPanel();
-        let appBrowsePanel = new BrowsePanel();
-        await appBrowsePanel.doOpenLauncherPanel();
-        await launcherPanel.clickOnLogoutLink();
-        await launcherPanel.pause(1000);
+        let homePage = new HomePage();
+        await homePage.clickOnAvatarButton();
+        await homePage.clickOnLogoutDropdownMenuItem();
+        await homePage.pause(1000);
         return await this.doSwitchToLoginPage();
-
     },
     async startSelectedApp(appName) {
         let appBrowsePanel = new BrowsePanel();
@@ -94,9 +91,9 @@ module.exports = {
 
     async doLoginAndClickOnApplicationsLink(userName, password) {
         let loginPage = new LoginPage();
+        let homePage = new HomePage();
         await loginPage.doLogin(userName, password);
-        let launcherPanel = new LauncherPanel();
-        await launcherPanel.clickOnApplicationsLink();
+        await homePage.clickOnApplicationsLink();
         return await loginPage.pause(1500);
     },
 
