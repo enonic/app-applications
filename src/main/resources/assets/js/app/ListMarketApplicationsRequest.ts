@@ -135,14 +135,15 @@ export class ListMarketApplicationsRequest {
         // Filter versions to only include those that support the xpVersion
         const supportedVersions = (item.data.version || []).filter(ver => this.isVersionSupported(ver));
 
-        const versions: Record<string, { applicationUrl: string }> = {};
+        const versions: Record<string, { applicationUrl: string; sha512?: string }> = {};
         let latestVersion = '';
 
         if (supportedVersions.length > 0) {
             for (const ver of supportedVersions) {
                 if (ver.versionNumber && ver.downloadUrl) {
                     versions[ver.versionNumber] = {
-                        applicationUrl: ver.downloadUrl
+                        applicationUrl: ver.downloadUrl,
+                        sha512: ver.sha512
                     };
                 }
             }
