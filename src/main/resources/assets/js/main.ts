@@ -13,7 +13,7 @@ import {i18n} from '@enonic/lib-admin-ui/util/Messages';
 import {AppInstalledEvent} from './app/installation/AppInstalledEvent';
 import {CONFIG, ConfigObject} from '@enonic/lib-admin-ui/util/Config';
 import {AppUninstalledEvent} from './app/installation/AppUninstalledEvent';
-import {LauncherHelper} from '@enonic/lib-admin-ui/util/LauncherHelper';
+import {CustomElement} from '@enonic/lib-admin-ui/dom/CustomElement';
 
 const body = Body.get();
 
@@ -72,7 +72,22 @@ function startApplication() {
        installAppDialog.updateAppUninstalled(event.getApplication());
     });
 
-    LauncherHelper.appendLauncherPanel();
+    appendMenuPanel();
+}
+
+function appendMenuPanel(): void {
+    const menuUrl = CONFIG.getString('menuUrl');
+    if (!menuUrl) {
+        throw new Error('Menu URL is not defined');
+    }
+    const menuElement = CustomElement.create('xp-menu');
+    document.body.appendChild(menuElement);
+    fetch(menuUrl)
+        .then(response => response.text())
+        .then((html: string) => menuElement.setHtml(html))
+        .catch((e: Error) => {
+            throw new Error(`Failed to fetch the Menu extension panel at ${menuUrl}: ${e.toString()}`);
+        });
 }
 
 (async () => {

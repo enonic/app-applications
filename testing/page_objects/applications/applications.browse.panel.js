@@ -1,11 +1,10 @@
 const Page = require('../page');
 const lib = require('../../libs/elements');
 const appConst = require('../../libs/app_const');
-const LauncherPanel = require('../launcher.panel');
+const HomePage = require('../home.page');
 
 const XPATH = {
     container: "//div[contains(@id,'ApplicationBrowsePanel')]",
-    launcherButton: "//button[contains(@class,'launcher-button')]",
     applicationsGridListUL: "//ul[contains(@id,'ApplicationsGridList')]",
     GRID_LIST_ITEM: "//li[contains(@class,'item-view-wrapper')]",
     toolbar: "//div[contains(@id,'Toolbar')]",
@@ -399,14 +398,9 @@ class AppBrowsePanel extends Page {
         }
     }
 
-    async doOpenLauncherPanel() {
-        await this.waitForElementDisplayed(XPATH.launcherButton);
-        await this.clickOnElement(XPATH.launcherButton);
-        let launcherPanel = new LauncherPanel();
-        let isLoaded = await launcherPanel.waitForPanelDisplayed(appConst.shortTimeout);
-        if (!isLoaded) {
-            throw new Error('Launcher Panel was not loaded');
-        }
+    async doOpenMenuPanel() {
+        let homePage = new HomePage();
+        await homePage.openMenuPanel();
     }
 
     //wait for the "Show Selection" circle appears in the toolbar
