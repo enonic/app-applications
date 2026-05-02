@@ -145,25 +145,22 @@ public final class AppsApplicationResource
         for ( final Application application : applications )
         {
             final ApplicationKey applicationKey = application.getKey();
-            if ( !application.isSystem() )
-            {
-                final CmsDescriptor cmsDescriptor = this.cmsService.getDescriptor( applicationKey );
-                final IdProviderDescriptor idProviderDescriptor = this.idProviderDescriptorService.getDescriptor( applicationKey );
-                final boolean localApplication = this.applicationService.isLocalApplication( applicationKey );
-                final ApplicationDescriptor appDescriptor = this.applicationDescriptorService.get( applicationKey );
+            final CmsDescriptor cmsDescriptor = this.cmsService.getDescriptor( applicationKey );
+            final IdProviderDescriptor idProviderDescriptor = this.idProviderDescriptorService.getDescriptor( applicationKey );
+            final boolean localApplication = this.applicationService.isLocalApplication( applicationKey );
+            final ApplicationDescriptor appDescriptor = this.applicationDescriptorService.get( applicationKey );
 
-                appJsonList.add( ApplicationJson.create()
-                                     .setApplication( application )
-                                     .setLocal( localApplication )
-                                     .setApplicationDescriptor( appDescriptor )
-                                     .setCmsDescriptor( cmsDescriptor )
-                                     .setIdProviderDescriptor( idProviderDescriptor )
-                                     .setIconUrlResolver( new ApplicationIconUrlResolver( request ) )
-                                     .setLocaleMessageResolver( new LocaleMessageResolver( this.localeService, applicationKey,
-                                                                                           Collections.list( request.getLocales() ) ) )
-                                     .setInlineMixinResolver( new CmsFormFragmentServiceResolver( this.cmsFormFragmentService ) )
-                                     .build() );
-            }
+            appJsonList.add( ApplicationJson.create()
+                                 .setApplication( application )
+                                 .setLocal( localApplication )
+                                 .setApplicationDescriptor( appDescriptor )
+                                 .setCmsDescriptor( cmsDescriptor )
+                                 .setIdProviderDescriptor( idProviderDescriptor )
+                                 .setIconUrlResolver( new ApplicationIconUrlResolver( request ) )
+                                 .setLocaleMessageResolver( new LocaleMessageResolver( this.localeService, applicationKey,
+                                                                                       Collections.list( request.getLocales() ) ) )
+                                 .setInlineMixinResolver( new CmsFormFragmentServiceResolver( this.cmsFormFragmentService ) )
+                                 .build() );
         }
 
         appJsonList.sort( Comparator.comparing(

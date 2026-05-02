@@ -7,6 +7,7 @@ import {TreeGridActions} from '@enonic/lib-admin-ui/ui/treegrid/actions/TreeGrid
 import {Application} from '@enonic/lib-admin-ui/application/Application';
 import {Action} from '@enonic/lib-admin-ui/ui/Action';
 import {SelectableListBoxWrapper} from '@enonic/lib-admin-ui/ui/selector/list/SelectableListBoxWrapper';
+import {SystemAppsHelper} from '../SystemAppsHelper';
 
 export class ApplicationBrowseActions implements TreeGridActions<Application> {
 
@@ -39,6 +40,8 @@ export class ApplicationBrowseActions implements TreeGridActions<Application> {
             let anyStarted = false;
             let anyStopped = false;
             let localAppSelected = false;
+            let systemAppSelected = false;
+            const helper = SystemAppsHelper.get();
 
             browseItems.forEach((browseItem: Application) => {
                 let state = browseItem.getState();
@@ -50,11 +53,14 @@ export class ApplicationBrowseActions implements TreeGridActions<Application> {
                 if (browseItem.isLocal()) {
                     localAppSelected = true;
                 }
+                if (helper.isSystemApp(browseItem)) {
+                    systemAppSelected = true;
+                }
             });
 
             this.START_APPLICATION.setEnabled(anyStopped);
-            this.STOP_APPLICATION.setEnabled(anyStarted);
-            this.UNINSTALL_APPLICATION.setEnabled(anySelected && !localAppSelected);
+            this.STOP_APPLICATION.setEnabled(anyStarted && !systemAppSelected);
+            this.UNINSTALL_APPLICATION.setEnabled(anySelected && !localAppSelected && !systemAppSelected);
         });
     }
 }

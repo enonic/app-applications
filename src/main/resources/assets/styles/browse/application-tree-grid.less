@@ -44,4 +44,31 @@
     }
   }
 
+  .application-viewer.system {
+    .names-and-icon-view .@{_COMMON_PREFIX}wrapper {
+      position: relative;
+
+      &::after {
+        font-family: 'icomoon', monospace;
+        content: "\e1df";
+        position: absolute;
+        right: -4px;
+        bottom: -4px;
+        font-size: 14px;
+        line-height: 14px;
+        color: @admin-bg-dark-gray;
+        background: @admin-white;
+        border-radius: 50%;
+        padding: 1px;
+        pointer-events: none;
+      }
+    }
+  }
+
+  &.hide-system-apps {
+    .item-view-wrapper:has(.applications-list-viewer.system-app) {
+      display: none;
+    }
+  }
+
 }

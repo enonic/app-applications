@@ -222,6 +222,28 @@ public class AppsApplicationResourceTest
     }
 
     @Test
+    public void getApplicationListIncludesSystemApps()
+        throws Exception
+    {
+        final Application systemApp = mock( Application.class );
+        when( systemApp.getKey() ).thenReturn( ApplicationKey.from( "com.enonic.xp.app.systemapp" ) );
+        when( systemApp.getVersion() ).thenReturn( Version.parseVersion( "1.0.0" ) );
+        when( systemApp.isSystem() ).thenReturn( true );
+        when( systemApp.isStarted() ).thenReturn( true );
+        when( systemApp.getModifiedTime() ).thenReturn( Instant.parse( "2012-01-01T00:00:00.00Z" ) );
+
+        final Applications applications = Applications.from( createApplication(), systemApp );
+        when( this.applicationService.getInstalledApplications() ).thenReturn( applications );
+        when( this.applicationDescriptorService.get( ApplicationKey.from( "testapplication" ) ) ).thenReturn( createApplicationDescriptor() );
+        when( cmsFormFragmentService.inlineFormItems( isA( Form.class ) ) ).then( AdditionalAnswers.returnsFirstArg() );
+
+        String response = request().path( "application/list" ).get().getAsString();
+        assertTrue( response.contains( "\"key\":\"com.enonic.xp.app.systemapp\"" ),
+                    "system app should be included in the list response" );
+        assertTrue( response.contains( "\"system\":true" ), "system flag should be exposed in JSON" );
+    }
+
+    @Test
     public void getApplicationListWithQuery()
         throws Exception
     {

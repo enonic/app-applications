@@ -23,8 +23,8 @@ import {CONFIG} from '@enonic/lib-admin-ui/util/Config';
 import {SelectableListBoxPanel} from '@enonic/lib-admin-ui/ui/panel/SelectableListBoxPanel';
 import {SelectableListBoxWrapper, SelectionMode} from '@enonic/lib-admin-ui/ui/selector/list/SelectableListBoxWrapper';
 import {TreeGridContextMenu} from '@enonic/lib-admin-ui/ui/treegrid/TreeGridContextMenu';
-import {ListBoxToolbar} from '@enonic/lib-admin-ui/ui/selector/list/ListBoxToolbar';
 import {ApplicationsGridList} from './ApplicationsGridList';
+import {ApplicationsListToolbar} from './ApplicationsListToolbar';
 import {GetApplicationRequest} from '../resource/GetApplicationRequest';
 import Q from 'q';
 import {Element} from '@enonic/lib-admin-ui/dom/Element';
@@ -38,7 +38,7 @@ export class ApplicationBrowsePanel
 
     declare protected treeActions: ApplicationBrowseActions;
 
-    declare protected toolbar: ListBoxToolbar<Application>;
+    declare protected toolbar: ApplicationsListToolbar;
 
     declare protected contextMenu: TreeGridContextMenu;
 
@@ -122,8 +122,9 @@ export class ApplicationBrowsePanel
             highlightMode: true,
         });
 
-        this.toolbar = new ListBoxToolbar<Application>(this.selectionWrapper, {
+        this.toolbar = new ApplicationsListToolbar(this.selectionWrapper, {
             refreshAction: () => this.treeListBox.load(),
+            onHideSystemAppsToggled: (hide: boolean) => this.treeListBox.setHideSystemApps(hide),
         });
 
         if (!readonlyMode) {
@@ -165,7 +166,7 @@ export class ApplicationBrowsePanel
     }
 
     private handleAppEvent(event: ApplicationEvent) {
-        if (event.isSystemApplication() || event.getApplicationKey()?.toString() === 'com.enonic.xp.app.applications') {
+        if (event.getApplicationKey()?.toString() === 'com.enonic.xp.app.applications') {
             return;
         }
 

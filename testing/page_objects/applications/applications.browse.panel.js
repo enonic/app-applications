@@ -9,7 +9,10 @@ const XPATH = {
     GRID_LIST_ITEM: "//li[contains(@class,'item-view-wrapper')]",
     toolbar: "//div[contains(@id,'Toolbar')]",
     contextMenu: "//ul[contains(@class,'context-menu')]",
-    treeGridToolbarDiv: `//div[contains(@id,'ListBoxToolbar')]`,
+    treeGridToolbarDiv: `//div[contains(@class,'tree-grid-toolbar')]`,
+    hideSystemAppsToggle: "//button[contains(@class,'hide-system-apps-toggler')]",
+    systemAppRow: "//li[contains(@class,'item-view-wrapper') and descendant::div[contains(@class,'applications-list-viewer') and contains(@class,'system-app')]]",
+    systemAppViewerByName: displayName => `//li[contains(@class,'item-view-wrapper') and descendant::h6[contains(@class,'main-name') and contains(.,'${displayName}')]]//div[contains(@class,'application-viewer') and contains(@class,'system')]`,
     installButton: `//div[contains(@id,'Toolbar')]/button[contains(@id, 'ActionButton') and child::span[contains(.,'Install')]]`,
     unInstallButton: `//div[contains(@id,'Toolbar')]/button[contains(@id, 'ActionButton') and child::span[contains(.,'Uninstall')]]`,
     stopButton: "//div[contains(@id,'Toolbar')]/button[contains(@id, 'ActionButton') and child::span[contains(.,'Stop')]]",
@@ -456,6 +459,52 @@ class AppBrowsePanel extends Page {
         await this.waitForElementDisplayed(locator);
         let attribute = await this.getAttribute(locator, 'class');
         return attribute.includes('selected') && !attribute.includes('checked');
+    }
+
+    async getSystemAppDisplayNames() {
+        try {
+            const displayNameXpath = XPATH.systemAppRow + lib.H6_DISPLAY_NAME;
+            return await this.getTextInDisplayedElements(displayNameXpath);
+        } catch (err) {
+            await this.handleError('Getting system application display names', 'err_get_system_app_display_names', err);
+        }
+    }
+
+    async isSystemAppRowDisplayed(appDisplayName) {
+        try {
+            const locator = `//li[contains(@class,'item-view-wrapper') and descendant::div[contains(@class,'applications-list-viewer') and contains(@class,'system-app')] and descendant::h6[contains(@class,'main-name') and contains(.,'${appDisplayName}')]]`;
+            return await this.isElementDisplayed(locator);
+        } catch (err) {
+            return false;
+        }
+    }
+
+    async hasCogOverlayForSystemApp(appDisplayName) {
+        try {
+            const locator = XPATH.systemAppViewerByName(appDisplayName);
+            return await this.isElementDisplayed(locator);
+        } catch (err) {
+            return false;
+        }
+    }
+
+    async clickOnHideSystemAppsToggle() {
+        try {
+            await this.waitForElementDisplayed(XPATH.hideSystemAppsToggle);
+            await this.clickOnElement(XPATH.hideSystemAppsToggle);
+            return await this.pause(500);
+        } catch (err) {
+            await this.handleError('Click on hide-system-apps toggle', 'err_click_hide_system_apps', err);
+        }
+    }
+
+    async isHideSystemAppsToggleActive() {
+        try {
+            const attr = await this.getAttribute(XPATH.hideSystemAppsToggle, 'class');
+            return attr.includes('active');
+        } catch (err) {
+            return false;
+        }
     }
 }
 

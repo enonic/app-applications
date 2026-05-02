@@ -3,13 +3,15 @@ import {Application} from '@enonic/lib-admin-ui/application/Application';
 import {ApplicationJson} from '@enonic/lib-admin-ui/application/json/ApplicationJson';
 import {JsonResponse} from '@enonic/lib-admin-ui/rest/JsonResponse';
 import {UrlHelper} from '../util/UrlHelper';
+import {SystemAppsHelper} from '../SystemAppsHelper';
 
-interface ApplicationJsonWithTitle extends ApplicationJson {
+interface ApplicationJsonExt extends ApplicationJson {
     title?: string;
+    system?: boolean;
 }
 
 interface ListApplicationsJson {
-    applications: ApplicationJsonWithTitle[];
+    applications: ApplicationJsonExt[];
 }
 
 export class ListApplicationsRequest
@@ -21,8 +23,10 @@ export class ListApplicationsRequest
 
     protected parseResponse(response: JsonResponse<ListApplicationsJson>): Application[] {
         const result = response.getResult();
-        result.applications?.forEach((app: ApplicationJsonWithTitle) => {
+        const helper = SystemAppsHelper.get();
+        result.applications?.forEach((app: ApplicationJsonExt) => {
             app.displayName = app.title || app.key;
+            helper.setSystemFlag(app.key, !!app.system);
         });
         return Application.fromJsonArray(result.applications);
     }
