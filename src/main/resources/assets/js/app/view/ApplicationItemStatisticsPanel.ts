@@ -12,6 +12,7 @@ import {Action} from '@enonic/lib-admin-ui/ui/Action';
 import {StartApplicationEvent} from '../browse/StartApplicationEvent';
 import {StopApplicationEvent} from '../browse/StopApplicationEvent';
 import {CONFIG} from '@enonic/lib-admin-ui/util/Config';
+import {SystemAppsHelper} from '../SystemAppsHelper';
 import Q from 'q';
 
 export class ApplicationItemStatisticsPanel
@@ -71,9 +72,10 @@ export class ApplicationItemStatisticsPanel
     private updateActionMenu() {
         if (!!this.actionMenu) {
             const app: Application = this.getItem();
+            const isSystemApp: boolean = SystemAppsHelper.get().isSystemApp(app);
             this.actionMenu.setLabel(this.getLocalizedState(app.getState()));
-            this.startAction.setVisible(!app.isStarted());
-            this.stopAction.setVisible(app.isStarted());
+            this.startAction.setVisible(!app.isStarted() && !isSystemApp);
+            this.stopAction.setVisible(app.isStarted() && !isSystemApp);
         }
     }
 
