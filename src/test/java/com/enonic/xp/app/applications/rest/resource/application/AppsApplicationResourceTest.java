@@ -234,7 +234,8 @@ public class AppsApplicationResourceTest
 
         final Applications applications = Applications.from( createApplication(), systemApp );
         when( this.applicationService.getInstalledApplications() ).thenReturn( applications );
-        when( this.applicationDescriptorService.get( ApplicationKey.from( "testapplication" ) ) ).thenReturn( createApplicationDescriptor() );
+        when( this.applicationDescriptorService.get( ApplicationKey.from( "testapplication" ) ) ).thenReturn(
+            createApplicationDescriptor() );
         when( cmsFormFragmentService.inlineFormItems( isA( Form.class ) ) ).then( AdditionalAnswers.returnsFirstArg() );
 
         String response = request().path( "application/list" ).get().getAsString();
