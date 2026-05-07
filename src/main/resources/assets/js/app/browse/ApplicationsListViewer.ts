@@ -4,6 +4,7 @@ import {ApplicationViewer} from '@enonic/lib-admin-ui/application/ApplicationVie
 import Q from 'q';
 import {SpanEl} from '@enonic/lib-admin-ui/dom/SpanEl';
 import {ProgressBar} from '@enonic/lib-admin-ui/ui/ProgressBar';
+import {SystemAppsHelper} from '../SystemAppsHelper';
 
 export class ApplicationsListViewer extends DivEl {
 
@@ -29,6 +30,10 @@ export class ApplicationsListViewer extends DivEl {
         this.itemViewer.setObject(application as Application);
         this.versionBlock.setItem(application);
         this.stateBlock.setItem(application);
+
+        const isSystem = application instanceof Application && SystemAppsHelper.get().isSystemApp(application);
+        this.toggleClass('system-app', isSystem);
+        this.itemViewer.toggleClass('system', isSystem);
     }
 
     getItem(): Application {

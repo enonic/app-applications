@@ -117,6 +117,11 @@ public class ApplicationJson
         return local;
     }
 
+    public boolean getSystem()
+    {
+        return application.isSystem();
+    }
+
     public FormJson getConfig()
     {
         return config;

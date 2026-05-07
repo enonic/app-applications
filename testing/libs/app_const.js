@@ -16,6 +16,7 @@ module.exports = Object.freeze({
         TEST_APP_WITH_METADATA_MIXIN: 'Test Selenium App',
         MY_FIRST_APP: 'My First App',
         TEST_ADFS_PROVIDER_APP: 'Test ADFS ID Provider',
+        STANDARD_ID_PROVIDER_APP: 'Standard ID Provider',
     },
 
     TEST_IMAGES: {

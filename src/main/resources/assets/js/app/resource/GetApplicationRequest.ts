@@ -4,9 +4,11 @@ import {ApplicationJson} from '@enonic/lib-admin-ui/application/json/Application
 import {JsonResponse} from '@enonic/lib-admin-ui/rest/JsonResponse';
 import {ApplicationCache} from '@enonic/lib-admin-ui/application/ApplicationCache';
 import {UrlHelper} from '../util/UrlHelper';
+import {SystemAppsHelper} from '../SystemAppsHelper';
 
-interface ApplicationJsonWithTitle extends ApplicationJson {
+interface ApplicationJsonExt extends ApplicationJson {
     title?: string;
+    system?: boolean;
 }
 
 export class GetApplicationRequest
@@ -16,9 +18,10 @@ export class GetApplicationRequest
         return UrlHelper.getRestUri('');
     }
 
-    protected parseResponse(response: JsonResponse<ApplicationJsonWithTitle>): Application {
+    protected parseResponse(response: JsonResponse<ApplicationJsonExt>): Application {
         const json = response.getResult();
         json.displayName = json.title || json.key;
+        SystemAppsHelper.get().setSystemFlag(json.key, !!json.system);
         const app = Application.fromJson(json);
         ApplicationCache.get().put(app);
         return app;

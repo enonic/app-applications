@@ -85,19 +85,19 @@ describe('Application Browse Panel, multiple selection in grid', function () {
             await appBrowsePanel.waitForContextMenuItemEnabled('Stop');
         });
 
-    it('GIVEN at least one app is stopped AND `select all` checkbox is checked WHEN right click on selected apps THEN Start and Stop menu item should be enabled in the opened context menu',
+    it('GIVEN at least one app is stopped AND `select all` checkbox is checked WHEN right click on selected apps THEN Start should be enabled but Stop should be disabled (system apps in selection)',
         async () => {
             let appBrowsePanel = new AppBrowsePanel();
-            // 1. Select all applications(one app is stopped):
+            // 1. Select all applications(one app is stopped); system apps are included:
             await appBrowsePanel.clickOnSelectAllCheckbox();
             // 2. Open the context menu:
             await appBrowsePanel.rightClickOnRowByDisplayName(appConst.TEST_APPS_NAME.MY_FIRST_APP);
             await appBrowsePanel.waitForContextMenuDisplayed();
             await studioUtils.saveScreenshot('all_apps_context_menu');
-            // 3. Verify that Start and Stop menu items are enabled:
+            // 3. Start should be enabled (some apps are stopped):
             await appBrowsePanel.waitForContextMenuItemEnabled('Start');
-            // 'Stop' menu item should be enabled'
-            await appBrowsePanel.waitForContextMenuItemEnabled('Stop');
+            // Stop should be disabled because system apps are part of the selection:
+            await appBrowsePanel.waitForContextMenuItemDisabled('Stop');
         });
 
     beforeEach(() => studioUtils.navigateToApplicationsApp());
