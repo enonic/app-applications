@@ -63,11 +63,11 @@ describe('Applications Browse panel - selection of items spec', function () {
             await studioUtils.saveScreenshot('arrow_down_key');
             // 3. Verify that another application is shown in the Statistic Panel
             let appName = await appStatisticPanel.getApplicationName();
-            assert.equal(appName, appConst.TEST_APPS_NAME.STANDARD_ID_PROVIDER_APP,
+            assert.equal(appName, appConst.TEST_APPS_NAME.TEST_ADFS_PROVIDER_APP,
                 'the application which is below should be shown in the Statistic Panel');
             isChecked = await appBrowsePanel.isRowChecked(appConst.TEST_APPS_NAME.SIMPLE_SITE_APP);
             assert.ok(isChecked === false, 'the application should not be checked');
-            let isHighlighted = await appBrowsePanel.isRowHighlighted(appConst.TEST_APPS_NAME.STANDARD_ID_PROVIDER_APP);
+            let isHighlighted = await appBrowsePanel.isRowHighlighted(appConst.TEST_APPS_NAME.TEST_ADFS_PROVIDER_APP);
             assert.ok(isHighlighted, 'but the app which is below gets highlighted');
         });
 
@@ -82,13 +82,13 @@ describe('Applications Browse panel - selection of items spec', function () {
             await studioUtils.saveScreenshot('arrow_up_key');
             // 3. Verify the application which is above should be shown in the Statistic Panel
             let result = await appStatisticPanel.getApplicationName();
-            assert.equal(result, appConst.TEST_APPS_NAME.STANDARD_ID_PROVIDER_APP,
+            assert.equal(result, appConst.TEST_APPS_NAME.SIMPLE_SITE_APP,
                 'the application which is above should be shown in the Statistic Panel');
             // 4. Verify that the gets unchecked:
             let isChecked = await appBrowsePanel.isRowChecked(appConst.TEST_APPS_NAME.TEST_ADFS_PROVIDER_APP);
             assert.ok(isChecked === false, 'the application should not be checked');
             // 5. Verify that the application which is above gets highlighted:
-            let isHighlighted = await appBrowsePanel.isRowHighlighted(appConst.TEST_APPS_NAME.STANDARD_ID_PROVIDER_APP);
+            let isHighlighted = await appBrowsePanel.isRowHighlighted(appConst.TEST_APPS_NAME.SIMPLE_SITE_APP);
             assert.ok(isHighlighted, 'but the app which is above above gets highlighted');
         });
 

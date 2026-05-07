@@ -30,6 +30,7 @@ import Q from 'q';
 import {Element} from '@enonic/lib-admin-ui/dom/Element';
 import {ApplicationsListViewer} from './ApplicationsListViewer';
 import {AppUninstalledEvent} from '../installation/AppUninstalledEvent';
+import {SystemAppsHelper} from '../SystemAppsHelper';
 
 export class ApplicationBrowsePanel
     extends BrowsePanel {
@@ -68,6 +69,7 @@ export class ApplicationBrowsePanel
                     this.contextMenu.showAt(event.clientX, event.clientY);
                 });
             });
+            this.selectionWrapper.setSystemAppsVisibility(this.toolbar.isShowingSystemApps());
         });
     }
 
@@ -124,8 +126,12 @@ export class ApplicationBrowsePanel
 
         this.toolbar = new ApplicationsListToolbar(this.selectionWrapper, {
             refreshAction: () => this.treeListBox.load(),
-            onHideSystemAppsToggled: (hide: boolean) => this.treeListBox.setHideSystemApps(hide),
+            onSystemAppsVisibilityToggled: (show: boolean) => {
+                this.treeListBox.setHideSystemApps(!show);
+                this.selectionWrapper.setSystemAppsVisibility(show);
+            },
         });
+        this.treeListBox.setHideSystemApps(!this.toolbar.isShowingSystemApps());
 
         if (!readonlyMode) {
             this.treeActions = new ApplicationBrowseActions(this.selectionWrapper);
@@ -228,7 +234,7 @@ export class ApplicationBrowsePanel
     }
 
     private removeItemFromList(appKeyAsString: string, deselect?: boolean) {
-        const itemToRemove = this.treeListBox.getItems().find(
+        const itemToRemove = this.treeListBox.getAllItems().find(
             (item: Application) => item.getName() === appKeyAsString);
 
         if (itemToRemove) {
@@ -283,7 +289,7 @@ export class ApplicationBrowsePanel
     }
 
     private isItemUploading(newItemToUpload: UploadItem<Application>): boolean {
-        return  this.treeListBox.getItems().some((item: Application) => item.getName() === newItemToUpload.getName());
+        return  this.treeListBox.getAllItems().some((item: Application) => item.getName() === newItemToUpload.getName());
     }
 
     protected enableSelectionMode(): void {
@@ -297,18 +303,35 @@ export class ApplicationBrowsePanel
 
 class SelectionWrapperExt extends SelectableListBoxWrapper<Application> {
 
+    private showSystemApps = false;
+
+    setSystemAppsVisibility(showSystemApps: boolean): void {
+        this.showSystemApps = showSystemApps;
+
+        if (!showSystemApps) {
+            this.getSelectedItems()
+                .filter((item: Application) => SystemAppsHelper.get().isSystemApp(item))
+                .forEach((item: Application) => this.deselect(item));
+        }
+
+        this.resetFilter();
+    }
+
     filterSelectedItems(): void {
         const selectedItems = this.getSelectedItems();
 
         this.itemsWrappers.forEach((itemWrapper: Element[], key: string) => {
-            itemWrapper[0].setVisible(selectedItems.some((item: Application) => item.getApplicationKey().getName() === key));
+            const isSelected = selectedItems.some((item: Application) => item.getApplicationKey().getName() === key);
+            const isSystem = SystemAppsHelper.get().isSystemKey(key);
+
+            itemWrapper[0].setVisible(isSelected && (this.showSystemApps || !isSystem));
         });
     }
 
     resetFilter(): void {
-        this.itemsWrappers.forEach((itemWrapper: Element[]) => {
-            itemWrapper[0].setVisible(true);
+        this.itemsWrappers.forEach((itemWrapper: Element[], key: string) => {
+            const isSystem = SystemAppsHelper.get().isSystemKey(key);
+            itemWrapper[0].setVisible(this.showSystemApps || !isSystem);
         });
     }
 }
-
