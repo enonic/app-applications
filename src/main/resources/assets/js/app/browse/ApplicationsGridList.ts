@@ -3,6 +3,7 @@ import {ListApplicationsRequest} from '../resource/ListApplicationsRequest';
 import {ListBox} from '@enonic/lib-admin-ui/ui/selector/list/ListBox';
 import {ApplicationsListViewer} from './ApplicationsListViewer';
 import {DefaultErrorHandler} from '@enonic/lib-admin-ui/DefaultErrorHandler';
+import {SystemAppsHelper} from '../SystemAppsHelper';
 
 export class ApplicationsGridList
     extends ListBox<Application> {
@@ -37,5 +38,18 @@ export class ApplicationsGridList
 
     isHidingSystemApps(): boolean {
         return this.hasClass('hide-system-apps');
+    }
+
+    getItems(): Application[] {
+        const items = super.getItems();
+        if (!this.isHidingSystemApps()) {
+            return items;
+        }
+        const helper = SystemAppsHelper.get();
+        return items.filter((item: Application) => !helper.isSystemApp(item));
+    }
+
+    getAllItems(): Application[] {
+        return super.getItems();
     }
 }
