@@ -354,7 +354,7 @@ class AppBrowsePanel extends Page {
     async isRowByIndexChecked(rowNumber) {
         let locator = `//li[contains(@class,'item-view-wrapper')]`;
         await this.waitForElementDisplayed(locator);
-        let listItems = await this.findElements(locator);
+        let listItems = await this.getDisplayedElements(locator);
         let attr = await listItems[rowNumber].getAttribute('class');
         return attr.includes('checked');
     }
