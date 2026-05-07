@@ -30,4 +30,12 @@ export class ApplicationsGridList
             this.setItems(applications);
         }).catch(DefaultErrorHandler.handle);
     }
+
+    setHideSystemApps(hide: boolean): void {
+        this.toggleClass('hide-system-apps', hide);
+    }
+
+    isHidingSystemApps(): boolean {
+        return this.hasClass('hide-system-apps');
+    }
 }
