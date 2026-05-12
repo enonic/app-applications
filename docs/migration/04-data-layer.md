@@ -1,6 +1,6 @@
 # Phase 4 — Data layer (`fetch` wrappers)
 
-**Status:** Not started
+**Status:** Done
 **Depends on:** 2
 **Blocks:** 5, 6, 7, 8
 
@@ -30,22 +30,22 @@ Timeouts: replicate `heavyOperation` by **omitting** `AbortSignal`. Default 10 s
 
 ## Tasks
 
-- [ ] Create `v2/features/utils/url/api.ts` with helpers — see [references.md §8](./references.md#8-utilsurlapits).
-- [ ] Create `v2/features/api/errors/AppError.ts` — `Error` with `cause`, status code, optional response message.
-- [ ] Create `v2/features/api/applications.ts`:
-  - [ ] `listApplications(query?: string)`
-  - [ ] `getApplication(key: string)` (heavy)
-  - [ ] `getApplicationInfo(key: string)`
-  - [ ] `startApplications(keys: string[])`
-  - [ ] `stopApplications(keys: string[])`
-  - [ ] `uninstallApplications(keys: string[])`
-- [ ] Create `v2/features/api/install.ts`:
-  - [ ] `installApplicationFromUrl(url: string, sha512?: string)` (heavy)
-  - [ ] `uploadApplication(file: File, params?)` — wrap `fine-uploader` later in Phase 7; for now a thin XHR/`fetch` POST will do
-- [ ] Create `v2/features/api/market.ts`:
-  - [ ] `listMarketApplications(query: string, version: string)` — port `ListMarketApplicationsRequest`, drop `Q.defer`, return native `Promise`.
-- [ ] Shared helper `unwrapError(response: Response): never` — parses non-2xx body, throws `AppError`.
-- [ ] Vitest tests for each function — mock `fetch` (`vi.spyOn(global, 'fetch')`), one happy + one error case each.
+- [x] Create `v2/features/utils/url/api.ts` with helpers — see [references.md §8](./references.md#8-utilsurlapits).
+- [x] Create `v2/features/api/errors/AppError.ts` — `Error` with `cause`, status code, optional response message.
+- [x] Create `v2/features/api/applications.ts`:
+  - [x] `listApplications(query?: string)`
+  - [x] `getApplication(key: string)` (heavy)
+  - [x] `getApplicationInfo(key: string)`
+  - [x] `startApplications(keys: string[])`
+  - [x] `stopApplications(keys: string[])`
+  - [x] `uninstallApplications(keys: string[])`
+- [x] Create `v2/features/api/install.ts`:
+  - [x] `installApplicationFromUrl(url: string, sha512?: string)` (heavy)
+  - [x] `uploadApplication(file: File, params?)` — uses raw `XMLHttpRequest` for upload progress; `fine-uploader` wrapping is deferred to Phase 7.
+- [x] Create `v2/features/api/market.ts`:
+  - [x] `listMarketApplications(query?: string, version?: string)` — port `ListMarketApplicationsRequest`, drop `Q.defer`, return native `Promise`. `query` reserved for future server-side filtering; today's filtering still happens client-side in the store.
+- [x] Shared helper `fromResponse(response: Response, operation: string): Promise<never>` (in `errors/AppError.ts`) — parses non-2xx body, throws `AppError`.
+- [x] Vitest tests for each function — mock `fetch` (`vi.spyOn(globalThis, 'fetch')`), one happy + one error case each (plus mapping edge cases).
 
 ## Canonical shape
 
@@ -73,9 +73,9 @@ export async function listApplications(query?: string): Promise<ApplicationDto[]
 
 ## Acceptance criteria
 
-- [ ] All 6+3 fetch functions exist with types and tests.
-- [ ] `pnpm test` green.
-- [ ] No legacy `*Request.ts` deleted yet (callers still use them); deletion happens in feature phases 6–8.
+- [x] All 6+3 fetch functions exist with types and tests.
+- [x] `pnpm test` green (126 tests pass).
+- [x] No legacy `*Request.ts` deleted yet (callers still use them); deletion happens in feature phases 6–8.
 
 ## Notes / gotchas
 

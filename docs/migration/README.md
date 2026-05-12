@@ -24,7 +24,7 @@ All new code lives under `src/main/resources/assets/js/v2/`. Legacy code under `
 | 1 | [Foundation — build, deps, Tailwind](./01-foundation.md) | Done |
 | 2 | [App shell — LegacyElement + App.tsx](./02-app-shell.md) | Done |
 | 3 | [Global state — nanostores](./03-global-state.md) | Done |
-| 4 | [Data layer — fetch wrappers](./04-data-layer.md) | Not started |
+| 4 | [Data layer — fetch wrappers](./04-data-layer.md) | Done |
 | 5 | [Server events — WS → stores](./05-server-events.md) | Not started |
 | 6 | [Browse panel](./06-browse-panel.md) | Not started |
 | 7 | [Install dialog](./07-install-dialog.md) | Not started |
