@@ -14,6 +14,7 @@ import {AppInstalledEvent} from './app/installation/AppInstalledEvent';
 import {CONFIG, ConfigObject} from '@enonic/lib-admin-ui/util/Config';
 import {AppUninstalledEvent} from './app/installation/AppUninstalledEvent';
 import {CustomElement} from '@enonic/lib-admin-ui/dom/CustomElement';
+import {AppElement} from './v2/App';
 
 const body = Body.get();
 
@@ -47,6 +48,8 @@ function startApplication() {
 
     body.appendChild(appBar);
     body.appendChild(appPanel);
+
+    AppElement.initialize();
 
     AppHelper.preventDragRedirect();
 

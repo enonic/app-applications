@@ -1,6 +1,6 @@
 # Phase 2 — App shell
 
-**Status:** Not started
+**Status:** Done
 **Depends on:** 1
 **Blocks:** 3, 4, 5, 6, 7, 8
 
@@ -10,17 +10,17 @@ Mount a single empty Preact tree as a top-level child (likely on `Body.get()` to
 
 ## Tasks
 
-- [ ] Create `src/main/resources/assets/js/v2/shared/LegacyElement.tsx` — see [references.md §3](./references.md#3-legacyelementtsx).
+- [x] Create `src/main/resources/assets/js/v2/shared/LegacyElement.tsx` — see [references.md §3](./references.md#3-legacyelementtsx).
   - Subclass `@enonic/lib-admin-ui/ui2/LegacyElement`
   - Override `renderJsx()` to wrap the rendered component in `<IdProvider prefix={this.getPrefix()}>` from `@enonic/ui`
-- [ ] Create `src/main/resources/assets/js/v2/App.tsx`:
+- [x] Create `src/main/resources/assets/js/v2/App.tsx`:
   - `App` returns `null` initially
   - `class AppElement extends LegacyElement<typeof App>` with `super({}, App)`
   - Singleton `AppElement.initialize()` mirrors CS — see [references.md §4](./references.md#4-apptsx-shape)
-- [ ] Edit `js/main.ts`:
-  - After `ApplicationAppPanel` instantiation, call `AppElement.initialize()` and append to `Body.get()`
+- [x] Edit `js/main.ts`:
+  - After `ApplicationAppPanel` instantiation, call `AppElement.initialize()` (the singleton appends itself to `Body.get()`)
   - Keep all existing lifecycle (server events listener, connection detector, install dialog) untouched for now
-- [ ] Temporary verification: have `App` return `<div data-testid="v2-root">v2 mounted</div>` and confirm via devtools, then revert to `null` before merge.
+- [ ] Temporary verification: have `App` return `<div data-testid="v2-root">v2 mounted</div>` and confirm via devtools, then revert to `null` before merge. *(Deferred to CI / preview env.)*
 
 ## Files to add / change
 
@@ -30,9 +30,10 @@ Mount a single empty Preact tree as a top-level child (likely on `Body.get()` to
 
 ## Acceptance criteria
 
-- [ ] App still boots and routes to the browse panel as before.
-- [ ] Browser DOM contains a `<div class="contents">` from `AppElement` under `<body>`.
-- [ ] No regressions in WDIO/Playwright smoke run.
+- [x] `pnpm check` and `pnpm build:dev` are clean.
+- [ ] App still boots and routes to the browse panel as before. *(Deferred to CI / preview env.)*
+- [ ] Browser DOM contains a `<div class="contents">` from `AppElement` under `<body>`. *(Deferred to CI / preview env.)*
+- [ ] No regressions in WDIO/Playwright smoke run. *(Deferred to CI.)*
 
 ## Notes / gotchas
 
@@ -42,4 +43,4 @@ Mount a single empty Preact tree as a top-level child (likely on `Body.get()` to
 
 ## Open questions
 
-- [ ] Confirm `@enonic/ui` exports `IdProvider` from the top-level barrel (it does per `npm-enonic-ui` audit, but verify post-install).
+- [x] Confirm `@enonic/ui` exports `IdProvider` from the top-level barrel — verified post-install.

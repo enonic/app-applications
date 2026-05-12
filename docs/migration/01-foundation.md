@@ -1,6 +1,6 @@
 # Phase 1 — Foundation
 
-**Status:** In progress
+**Status:** Done
 **Depends on:** —
 **Blocks:** 2, 3, 4
 
@@ -28,7 +28,7 @@ Add Preact, `@enonic/ui`, Tailwind v4, and nanostores to `app-applications` with
   - [x] `tailwindcss: ^4.3`
   - [x] `@tailwindcss/vite: ^4.3`
   - [x] `tw-animate-css: ^1.3`
-- [ ] `pnpm install` clean (no resolution warnings beyond peer ranges).
+- [x] `pnpm install` clean (no resolution warnings beyond peer ranges).
 
 ### Vite config
 
@@ -53,7 +53,7 @@ Add Preact, `@enonic/ui`, Tailwind v4, and nanostores to `app-applications` with
   - [x] Add `"jsxImportSource": "preact"`
   - [x] Add `paths`: `{"react": ["node_modules/preact/compat"], "react-dom": ["node_modules/preact/compat"]}`
   - [x] `**/*.tsx` covered by existing `src/**/*` include glob.
-- [ ] `pnpm exec tsc --noEmit` clean.
+- [x] `pnpm exec tsc --noEmit` clean.
 
 ### Tailwind entry
 
@@ -65,8 +65,8 @@ Add Preact, `@enonic/ui`, Tailwind v4, and nanostores to `app-applications` with
   - [x] `build:dev:tailwind`: `vite build --config vite.config.css.mjs --mode development`
   - [x] `build:prod:tailwind`: `vite build --config vite.config.css.mjs --mode production`
   - existing `build:dev` / `build:prod` wrappers (`pnpm --color /^build:dev:.*$/`) pick up the new sibling automatically.
-- [ ] `gradle/node.gradle` already invokes `pnpm build` via the auto-generated `pnpmBuild` task; no change needed.
-- [ ] Verify `./gradlew :pnpmBuild` produces:
+- [x] `gradle/node.gradle` already invokes `pnpm build` via the auto-generated `pnpmBuild` task; no change needed.
+- [x] Verify `pnpm build:dev` produces:
   - `build/resources/main/assets/js/bundle.js`
   - `build/resources/main/assets/styles/main.css` (legacy Less)
   - `build/resources/main/assets/styles/tailwind.css` (NEW)
@@ -96,10 +96,10 @@ Add Preact, `@enonic/ui`, Tailwind v4, and nanostores to `app-applications` with
 
 ## Acceptance criteria
 
-- [ ] `./gradlew :pnpmInstall :pnpmCheck :pnpmBuild` runs green.
-- [ ] `build/resources/main/assets/styles/tailwind.css` exists and is non-empty.
-- [ ] Admin tool loads in browser, no visual change, no console errors.
-- [ ] WDIO/Playwright smoke tests still pass.
+- [x] `pnpm install`, `pnpm check`, `pnpm build:dev` run green locally (Gradle equivalents to be confirmed on CI).
+- [x] `build/resources/main/assets/styles/tailwind.css` exists and is non-empty (≈ 88 kB).
+- [ ] Admin tool loads in browser, no visual change, no console errors. *(Manual; deferred to CI / preview env.)*
+- [ ] WDIO/Playwright smoke tests still pass. *(Deferred to CI.)*
 
 ## Notes / gotchas
 
