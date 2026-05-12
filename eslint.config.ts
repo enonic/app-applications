@@ -78,6 +78,7 @@ export default [
     {
         ignores: [
             "vite.config.ts",
+            "vite.config.css.mjs",
             "eslint.config.ts",
             "**/node_modules/",
             "**/build/",

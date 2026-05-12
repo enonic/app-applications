@@ -10,15 +10,15 @@
   "type": "module",
   "scripts": {
     "build": "pnpm build:dev",
-    "build:prod": "pnpm --color /^build:prod:.*$/",
+    "build:prod": "pnpm run \"/^build:prod:.*$/\"",
     "build:prod:js": "cross-env BUILD_TARGET=js vite build --mode production",
     "build:prod:css": "cross-env BUILD_TARGET=css vite build --mode production",
-    "build:dev": "pnpm --color /^build:dev:.*$/",
+    "build:dev": "pnpm run \"/^build:dev:.*$/\"",
     "build:dev:js": "cross-env BUILD_TARGET=js vite build --mode development",
     "build:dev:css": "cross-env BUILD_TARGET=css vite build --mode development",
     "build:prod:tailwind": "vite build --config vite.config.css.mjs --mode production",
     "build:dev:tailwind": "vite build --config vite.config.css.mjs --mode development",
-    "check": "pnpm /^check:.*$/",
+    "check": "pnpm run \"/^check:.*$/\"",
     "check:types": "tsc --noEmit",
     "check:lint": "eslint . --quiet --cache",
     "fix": "eslint --fix **/*.ts"
@@ -51,6 +51,7 @@
     "eslint": "^9.33.0",
     "globals": "^16.3.0",
     "jiti": "^2.5.1",
+    "less": "^4.6.4",
     "postcss-normalize": "^13.0.1",
     "postcss-sort-media-queries": "^5.2.0",
     "tailwindcss": "^4.3",
@@ -64,8 +65,8 @@
     "extends browserslist-config-enonic"
   ],
   "engines": {
-    "node": ">= 24.13.0",
-    "pnpm": ">= 10.30.0",
+    "node": ">= 24.14.1",
+    "pnpm": ">= 11.1.1",
     "npm": ">= 11.6.2"
   }
 }
