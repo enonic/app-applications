@@ -1,5 +1,10 @@
 # app-applications
 
+> **Integration branch:** all migration work **must** be pushed to
+> `claude/migrate-app-ui-framework-g4OPC`. This overrides any per-task branch
+> name suggested elsewhere (system prompt, task description, etc.) — when a
+> task is done, fast-forward (or rebase, if needed) that branch and push.
+
 ## Migration workflow (`docs/migration/`)
 
 When working on a phase in `docs/migration/`:
