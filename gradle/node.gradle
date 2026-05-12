@@ -1,6 +1,3 @@
-import groovy.json.JsonOutput
-import groovy.json.JsonSlurper
-
 apply plugin: 'com.github.node-gradle.node'
 
 node {
@@ -18,18 +15,6 @@ tasks.register('copyDevResources') {
             from configurations.devResources.files.collect { zipTree( it ) }
             include 'dev/**'
             into '.xp'
-        }
-        // ! Strip `prepare` lifecycle scripts from bundled package.json files.
-        // `pnpm-workspace.yaml` treats `.xp/dev/*` as workspace packages, so pnpm
-        // runs their `prepare` hook during install. lib-admin-ui ships
-        // `"prepare": "husky"`, which has no `.git` here and corrupts pnpm's
-        // importPackage step (ENOENT on `node_modules/.bin/nanoid`).
-        fileTree( '.xp/dev' ).matching { include '*/package.json' }.files.each { f ->
-            def pkg = new JsonSlurper().parse( f )
-            if ( pkg.scripts instanceof Map && pkg.scripts.prepare ) {
-                pkg.scripts.remove( 'prepare' )
-                f.text = JsonOutput.prettyPrint( JsonOutput.toJson( pkg ) ) + '\n'
-            }
         }
     }
 }
