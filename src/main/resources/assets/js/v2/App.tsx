@@ -1,5 +1,6 @@
 import {Body} from '@enonic/lib-admin-ui/dom/Body';
 import type {ReactElement} from 'react';
+import {registerApplicationEvents} from './features/events/applicationEvents';
 import {LegacyElement} from './shared/LegacyElement';
 
 /**
@@ -24,6 +25,7 @@ export class AppElement extends LegacyElement<typeof App> {
         if (!AppElement.INSTANCE) {
             AppElement.INSTANCE = new AppElement();
             Body.get().appendChild(AppElement.INSTANCE);
+            registerApplicationEvents();
         }
     }
 }
