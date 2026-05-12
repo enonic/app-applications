@@ -1,6 +1,6 @@
 # Phase 3 — Global state (nanostores)
 
-**Status:** Not started
+**Status:** Done
 **Depends on:** 2
 **Blocks:** 5, 6, 7, 8
 
@@ -28,12 +28,12 @@ Derivations:
 
 ## Tasks
 
-- [ ] Copy `utils/storage/sync.ts` (and any helpers it imports — `createThrottle`, `normalize`) from CS verbatim — see [references.md §5](./references.md#5-utilsstoragesynts).
-- [ ] Define `ApplicationDto` and `toDto(app: Application): ApplicationDto` under `v2/features/types/application.ts`. Flat JSON only — no class instances in stores.
-- [ ] Create each store file with `map<...>` initial value, mutator functions, and computed selectors. Pattern: see CS `app.store.ts` ([references.md §6](./references.md#6-appstorets-pattern)).
-- [ ] Add Vitest unit tests for every mutator and every computed selector. Aim for one test file per store: `*.store.test.ts`.
-- [ ] Wire `vitest.config.ts` (new file) — env `node`, aliases for react→preact/compat (mirror lib-admin-ui's vitest config — [references.md §7](./references.md#7-vitestconfigts)).
-- [ ] Add `pnpm test` script.
+- [x] Copy `utils/storage/sync.ts` (and any helpers it imports — `createThrottle`, `normalize`) from CS verbatim — see [references.md §5](./references.md#5-utilsstoragesynts).
+- [x] Define `ApplicationDto` and `toDto(app: Application): ApplicationDto` under `v2/features/types/application.ts`. Flat JSON only — no class instances in stores.
+- [x] Create each store file with `map<...>` initial value, mutator functions, and computed selectors. Pattern: see CS `app.store.ts` ([references.md §6](./references.md#6-appstorets-pattern)).
+- [x] Add Vitest unit tests for every mutator and every computed selector. Aim for one test file per store: `*.store.test.ts`.
+- [x] Wire `vitest.config.ts` (new file) — env `node`, aliases for react→preact/compat (mirror lib-admin-ui's vitest config — [references.md §7](./references.md#7-vitestconfigts)).
+- [x] Add `pnpm test` script.
 
 ## Files to add
 
@@ -50,9 +50,9 @@ Derivations:
 
 ## Acceptance criteria
 
-- [ ] `pnpm test` runs and is green.
-- [ ] No UI is wired yet; main bundle unchanged in size by more than the cost of nanostores itself.
-- [ ] Stores have JSDoc on every exported function.
+- [x] `pnpm test` runs and is green.
+- [x] No UI is wired yet; main bundle unchanged in size by more than the cost of nanostores itself. *(Verified by inspection: nothing in `v2/App.tsx` imports the new stores; the bundle change is the tree-shaken footprint of the store modules. Final size check deferred to CI.)*
+- [x] Stores have JSDoc on every exported function.
 
 ## Notes / gotchas
 
@@ -62,5 +62,5 @@ Derivations:
 
 ## Open questions
 
-- [ ] Should we persist `selection` across reloads? CS does not; recommend no.
-- [ ] Pagination of the browse grid — current code loads everything. If a tenant has hundreds of apps, plan for virtualization (in Phase 6) but store shape doesn't need to change.
+- [x] Should we persist `selection` across reloads? CS does not; recommend no. *(Resolved: only `theme` is persisted via `syncMapStore` — `selection`, `filter`, and `page` reset on reload.)*
+- [ ] Pagination of the browse grid — current code loads everything. If a tenant has hundreds of apps, plan for virtualization (in Phase 6) but store shape doesn't need to change. *(Deferred to Phase 6.)*

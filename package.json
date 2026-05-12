@@ -21,6 +21,8 @@
     "check": "pnpm run \"/^check:.*$/\"",
     "check:types": "tsc --noEmit",
     "check:lint": "eslint . --quiet --cache",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "fix": "eslint --fix **/*.ts"
   },
   "dependencies": {
@@ -59,7 +61,8 @@
     "tw-animate-css": "^1.3",
     "typescript": "^5.9.2",
     "typescript-eslint": "8.40.0",
-    "vite": "^7.1.2"
+    "vite": "^7.1.2",
+    "vitest": "^3.2"
   },
   "browserslist": [
     "extends browserslist-config-enonic"
