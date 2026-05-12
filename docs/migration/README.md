@@ -21,7 +21,7 @@ All new code lives under `src/main/resources/assets/js/v2/`. Legacy code under `
 | # | Phase | Status |
 |---|-------|--------|
 | — | [Overview & principles](./00-overview.md) | — |
-| 1 | [Foundation — build, deps, Tailwind](./01-foundation.md) | Not started |
+| 1 | [Foundation — build, deps, Tailwind](./01-foundation.md) | In progress |
 | 2 | [App shell — LegacyElement + App.tsx](./02-app-shell.md) | Not started |
 | 3 | [Global state — nanostores](./03-global-state.md) | Not started |
 | 4 | [Data layer — fetch wrappers](./04-data-layer.md) | Not started |

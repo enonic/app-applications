@@ -1,6 +1,6 @@
 # Phase 1 — Foundation
 
-**Status:** Not started
+**Status:** In progress
 **Depends on:** —
 **Blocks:** 2, 3, 4
 
@@ -12,61 +12,60 @@ Add Preact, `@enonic/ui`, Tailwind v4, and nanostores to `app-applications` with
 
 ### Dependencies
 
-- [ ] Bump `gradle.properties.libAdminUiVersion` to match `app-contentstudio` master.
-- [ ] Add to `package.json` `dependencies`:
-  - [ ] `@enonic/ui: ~1.0.0-beta.1`
-  - [ ] `preact: ^10.29`
-  - [ ] `nanostores: ^0.11.4`
-  - [ ] `@nanostores/preact: ^1.0.0`
-  - [ ] `@radix-ui/react-slot: ^1.2`
-  - [ ] `focus-trap-react: ^11.0`
-  - [ ] `lucide-react: ^0.577`
-  - [ ] `class-variance-authority: ^0.7`
-  - [ ] `clsx: ^2.1`
-  - [ ] `tailwind-merge: ^3.0`
-- [ ] Add to `package.json` `devDependencies`:
-  - [ ] `tailwindcss: ^4.3`
-  - [ ] `@tailwindcss/vite: ^4.3`
-  - [ ] `tw-animate-css: ^1.3`
+- [x] Bump `gradle.properties.libAdminUiVersion` to match `app-contentstudio` master.
+- [x] Add to `package.json` `dependencies`:
+  - [x] `@enonic/ui: ~1.0.0-beta.1`
+  - [x] `preact: ^10.29`
+  - [x] `nanostores: ^0.11.4`
+  - [x] `@nanostores/preact: ^1.0.0`
+  - [x] `@radix-ui/react-slot: ^1.2`
+  - [x] `focus-trap-react: ^11.0`
+  - [x] `lucide-react: ^0.577`
+  - [x] `class-variance-authority: ^0.7`
+  - [x] `clsx: ^2.1`
+  - [x] `tailwind-merge: ^3.0`
+- [x] Add to `package.json` `devDependencies`:
+  - [x] `tailwindcss: ^4.3`
+  - [x] `@tailwindcss/vite: ^4.3`
+  - [x] `tw-animate-css: ^1.3`
 - [ ] `pnpm install` clean (no resolution warnings beyond peer ranges).
 
 ### Vite config
 
-- [ ] Edit `vite.config.ts` (JS pipeline):
-  - [ ] Add `resolve.alias`:
+- [x] Edit `vite.config.ts` (JS pipeline):
+  - [x] Add `resolve.alias`:
     - `react → preact/compat`
     - `react-dom → preact/compat`
     - `react/jsx-runtime → preact/jsx-runtime`
     - `react/jsx-dev-runtime → preact/jsx-dev-runtime`
-  - [ ] Add `resolve.dedupe: ['preact', 'preact/compat']`
-  - [ ] Add `optimizeDeps.include: ['preact', 'preact/hooks', 'preact/compat', '@enonic/ui']`
-  - [ ] Set `esbuild.jsx: 'automatic'`, `esbuild.jsxImportSource: 'preact'`
-- [ ] Create `vite.config.css.mjs` — see [references.md §1](./references.md#1-viteconfigcssmjs).
-  - [ ] `@tailwindcss/vite` plugin
-  - [ ] Input: `src/main/resources/assets/styles/tailwind.css`
-  - [ ] Output to `build/resources/main/assets/styles/` with `emptyOutDir: false`
+  - [x] Add `resolve.dedupe: ['preact', 'preact/compat']`
+  - [x] Add `optimizeDeps.include: ['preact', 'preact/hooks', 'preact/compat', '@enonic/ui']`
+  - [x] Set `esbuild.jsx: 'automatic'`, `esbuild.jsxImportSource: 'preact'`
+- [x] Create `vite.config.css.mjs` — see [references.md §1](./references.md#1-viteconfigcssmjs).
+  - [x] `@tailwindcss/vite` plugin
+  - [x] Input: `src/main/resources/assets/styles/tailwind.css`
+  - [x] Output to `build/resources/main/assets/styles/` with `emptyOutDir: false`
 
 ### TypeScript
 
-- [ ] Edit `tsconfig.json`:
-  - [ ] Add `"jsx": "react-jsx"`
-  - [ ] Add `"jsxImportSource": "preact"`
-  - [ ] Add `paths`: `{"react": ["node_modules/preact/compat"], "react-dom": ["node_modules/preact/compat"]}`
-  - [ ] Add `**/*.tsx` to `include`
+- [x] Edit `tsconfig.json`:
+  - [x] Add `"jsx": "react-jsx"`
+  - [x] Add `"jsxImportSource": "preact"`
+  - [x] Add `paths`: `{"react": ["node_modules/preact/compat"], "react-dom": ["node_modules/preact/compat"]}`
+  - [x] `**/*.tsx` covered by existing `src/**/*` include glob.
 - [ ] `pnpm exec tsc --noEmit` clean.
 
 ### Tailwind entry
 
-- [ ] Create `src/main/resources/assets/styles/tailwind.css` — see [references.md §2](./references.md#2-tailwindcss).
+- [x] Create `src/main/resources/assets/styles/tailwind.css` — see [references.md §2](./references.md#2-tailwindcss).
 
 ### Gradle / pnpm scripts
 
-- [ ] Add npm scripts to `package.json`:
-  - [ ] `build:js`: `vite build`
-  - [ ] `build:css`: existing Less build (keep)
-  - [ ] `build:tailwind`: `vite build --config vite.config.css.mjs`
-  - [ ] `build`: `pnpm --color /^build:.*$/` (parallel)
-- [ ] Update `gradle/node.gradle` so `pnpmBuild` invokes the parallel `build` script.
+- [x] Add npm scripts to `package.json`:
+  - [x] `build:dev:tailwind`: `vite build --config vite.config.css.mjs --mode development`
+  - [x] `build:prod:tailwind`: `vite build --config vite.config.css.mjs --mode production`
+  - existing `build:dev` / `build:prod` wrappers (`pnpm --color /^build:dev:.*$/`) pick up the new sibling automatically.
+- [ ] `gradle/node.gradle` already invokes `pnpm build` via the auto-generated `pnpmBuild` task; no change needed.
 - [ ] Verify `./gradlew :pnpmBuild` produces:
   - `build/resources/main/assets/js/bundle.js`
   - `build/resources/main/assets/styles/main.css` (legacy Less)
@@ -74,14 +73,14 @@ Add Preact, `@enonic/ui`, Tailwind v4, and nanostores to `app-applications` with
 
 ### Admin tool HTML
 
-- [ ] Edit `src/main/resources/admin/tools/main/main.html`:
-  - [ ] Add `<link rel="stylesheet" href="…/styles/tailwind.css">` AFTER the existing `main.css` link.
+- [x] Edit `src/main/resources/admin/tools/main/main.html`:
+  - [x] Add `<link rel="stylesheet" href="…/styles/tailwind.css">` AFTER the existing `main.css` link.
 
 ### ESLint
 
-- [ ] Edit `eslint.config.ts`:
-  - [ ] Add `.tsx` to file matchers.
-  - [ ] Add `no-restricted-imports` banning `q` and `Q.defer` under `src/main/resources/assets/js/v2/**`.
+- [x] Edit `eslint.config.ts`:
+  - [x] `.tsx` already covered by existing `["**/*.ts", "**/*.tsx"]` files matcher.
+  - [x] Add `no-restricted-imports` banning `q` under `src/main/resources/assets/js/v2/**`.
 
 ## Files to add / change
 
