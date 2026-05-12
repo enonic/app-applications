@@ -26,7 +26,7 @@
     "fix": "eslint --fix **/*.ts"
   },
   "dependencies": {
-    "@enonic/lib-admin-ui": "file:./.xp/dev/lib-admin-ui",
+    "@enonic/lib-admin-ui": "workspace:*",
     "@enonic/ui": "~1.0.0-beta.1",
     "@nanostores/preact": "^1.0.0",
     "@radix-ui/react-slot": "^1.2",
