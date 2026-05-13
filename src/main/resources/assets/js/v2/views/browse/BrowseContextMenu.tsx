@@ -2,12 +2,11 @@ import {ContextMenu} from '@enonic/ui';
 import {useStore} from '@nanostores/preact';
 import type {ReactElement, ReactNode} from 'react';
 import {useI18n} from '../../features/hooks/useI18n';
-import {InstallAppPromptEvent} from '../../../app/installation/InstallAppPromptEvent';
 import {startApplications, stopApplications} from '../../features/api/applications';
 import {$applications, $selectionInfo} from '../../features/store/applications.store';
 import {$app} from '../../features/store/app.store';
 import {markStarting, markStopping} from '../../features/store/app-actions.store';
-import {openUninstallConfirm} from '../../features/store/dialogs.store';
+import {openInstallDialog, openUninstallConfirm} from '../../features/store/dialogs.store';
 
 interface Props {
     children: ReactNode;
@@ -34,7 +33,7 @@ export const BrowseContextMenu = ({children}: Props): ReactElement => {
     const hasSelection = info.count > 0;
 
     const handleInstall = (): void => {
-        new InstallAppPromptEvent([]).fire();
+        openInstallDialog();
     };
 
     const handleStart = (): void => {

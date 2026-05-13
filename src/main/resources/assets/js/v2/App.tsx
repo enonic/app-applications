@@ -5,13 +5,19 @@ import {registerApplicationEvents} from './features/events/applicationEvents';
 import {setReadonly} from './features/store/app.store';
 import {LegacyElement} from './shared/LegacyElement';
 import {BrowsePage} from './views/browse/BrowsePage';
+import {InstallDialog} from './views/install/InstallDialog';
 
 /**
  * AppShell component that renders the v2 application tree. Mounted under
  * `Body` so dialog portals attach above the legacy AppBar.
  */
 const App = (): ReactElement => {
-    return <BrowsePage />;
+    return (
+        <>
+            <BrowsePage />
+            <InstallDialog />
+        </>
+    );
 };
 
 App.displayName = 'App';

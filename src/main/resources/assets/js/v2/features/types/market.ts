@@ -21,3 +21,14 @@ export interface MarketItemDto {
     /** True when the app is already installed locally. */
     installed: boolean;
 }
+
+/**
+ * Derived status of a market item against the currently installed applications.
+ * Mirrors the legacy `MarketAppStatus` so the install dialog can render the
+ * familiar `Install` / `Update` / `Installing` / `Installed` labels.
+ */
+export type MarketAppStatus =
+    | 'not_installed'
+    | 'installed'
+    | 'older_version_installed'
+    | 'installing';

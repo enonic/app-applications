@@ -1,6 +1,4 @@
 import {Application} from '@enonic/lib-admin-ui/app/Application';
-import {InstallAppDialog} from './app/installation/InstallAppDialog';
-import {InstallAppPromptEvent} from './app/installation/InstallAppPromptEvent';
 import {Body} from '@enonic/lib-admin-ui/dom/Body';
 import {Path} from '@enonic/lib-admin-ui/rest/Path';
 import {ConnectionDetector} from '@enonic/lib-admin-ui/system/ConnectionDetector';
@@ -9,9 +7,7 @@ import {AppHelper} from '@enonic/lib-admin-ui/util/AppHelper';
 import {ServerEventsListener} from '@enonic/lib-admin-ui/event/ServerEventsListener';
 import {i18nInit} from '@enonic/lib-admin-ui/util/MessagesInitializer';
 import {i18n} from '@enonic/lib-admin-ui/util/Messages';
-import {AppInstalledEvent} from './app/installation/AppInstalledEvent';
 import {CONFIG, ConfigObject} from '@enonic/lib-admin-ui/util/Config';
-import {AppUninstalledEvent} from './app/installation/AppUninstalledEvent';
 import {CustomElement} from '@enonic/lib-admin-ui/dom/CustomElement';
 import {AppElement} from './v2/App';
 
@@ -56,21 +52,6 @@ function startApplication() {
     serverEventsListener.start();
 
     startLostConnectionDetector();
-
-    const installAppDialog = new InstallAppDialog();
-
-    InstallAppPromptEvent.on((event) => {
-        installAppDialog.setInstalledApplications(event.getInstalledApplications());
-        installAppDialog.open();
-    });
-
-    AppInstalledEvent.on((event) => {
-        installAppDialog.updateAppInstalled(event.getApplication());
-    });
-
-    AppUninstalledEvent.on((event) => {
-       installAppDialog.updateAppUninstalled(event.getApplication());
-    });
 
     appendMenuPanel();
 }

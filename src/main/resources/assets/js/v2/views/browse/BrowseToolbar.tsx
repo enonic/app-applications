@@ -2,13 +2,12 @@ import {Button, Toolbar} from '@enonic/ui';
 import {useStore} from '@nanostores/preact';
 import {Play, Plus, RefreshCw, Square, Trash2} from 'lucide-react';
 import type {ReactElement} from 'react';
-import {InstallAppPromptEvent} from '../../../app/installation/InstallAppPromptEvent';
 import {useI18n} from '../../features/hooks/useI18n';
 import {listApplications, startApplications, stopApplications} from '../../features/api/applications';
 import {$app} from '../../features/store/app.store';
 import {markStarting, markStopping} from '../../features/store/app-actions.store';
 import {$applications, $selectionInfo, setApplications, setStatus} from '../../features/store/applications.store';
-import {openUninstallConfirm} from '../../features/store/dialogs.store';
+import {openInstallDialog, openUninstallConfirm} from '../../features/store/dialogs.store';
 
 /**
  * Top toolbar above the browse grid. Action buttons read `$selectionInfo` for
@@ -47,7 +46,7 @@ export const BrowseToolbar = (): ReactElement => {
     }
 
     const handleInstall = (): void => {
-        new InstallAppPromptEvent([]).fire();
+        openInstallDialog();
     };
 
     const handleUninstall = (): void => {
