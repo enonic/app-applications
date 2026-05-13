@@ -9,6 +9,7 @@ import {
     resetApplications,
     setApplications,
     setFilter,
+    setHideSystem,
     setSelection,
     setStatus,
     upsertApplication,
@@ -112,6 +113,16 @@ describe('applications.store', () => {
         });
     });
 
+    describe('setHideSystem', () => {
+        it('toggles the hideSystem flag', () => {
+            expect($applications.get().hideSystem).toBe(false);
+            setHideSystem(true);
+            expect($applications.get().hideSystem).toBe(true);
+            setHideSystem(false);
+            expect($applications.get().hideSystem).toBe(false);
+        });
+    });
+
     describe('setSelection', () => {
         it('keeps known keys only', () => {
             setApplications([makeApp({key: 'a'}), makeApp({key: 'b'})]);
@@ -166,6 +177,26 @@ describe('applications.store', () => {
             setApplications([makeApp({key: 'com.enonic.app.foo'}), makeApp({key: 'com.enonic.app.bar'})]);
             setFilter('foo');
             expect($visibleApps.get().map((i) => i.key)).toEqual(['com.enonic.app.foo']);
+        });
+
+        it('excludes system apps when hideSystem is on', () => {
+            setApplications([
+                makeApp({key: 'a', system: false}),
+                makeApp({key: 'b', system: true}),
+            ]);
+            setHideSystem(true);
+            expect($visibleApps.get().map((i) => i.key)).toEqual(['a']);
+        });
+
+        it('combines hideSystem with text filter', () => {
+            setApplications([
+                makeApp({key: 'a', displayName: 'Apple', system: false}),
+                makeApp({key: 'b', displayName: 'Apricot', system: true}),
+                makeApp({key: 'c', displayName: 'Banana', system: false}),
+            ]);
+            setHideSystem(true);
+            setFilter('ap');
+            expect($visibleApps.get().map((i) => i.key)).toEqual(['a']);
         });
     });
 

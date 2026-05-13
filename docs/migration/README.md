@@ -26,7 +26,7 @@ All new code lives under `src/main/resources/assets/js/v2/`. Legacy code under `
 | 3 | [Global state — nanostores](./03-global-state.md) | Done |
 | 4 | [Data layer — fetch wrappers](./04-data-layer.md) | Done |
 | 5 | [Server events — WS → stores](./05-server-events.md) | Done |
-| 6 | [Browse panel](./06-browse-panel.md) | Not started |
+| 6 | [Browse panel](./06-browse-panel.md) | Done |
 | 7 | [Install dialog](./07-install-dialog.md) | Not started |
 | 8 | [Detail / statistics panel](./08-detail-panel.md) | Not started |
 | 9 | [Component gap-filling](./09-component-gaps.md) | Not started |

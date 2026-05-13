@@ -9,8 +9,8 @@ import {Application} from '@enonic/lib-admin-ui/application/Application';
 import {DefaultErrorHandler} from '@enonic/lib-admin-ui/DefaultErrorHandler';
 import {ApplicationItemStatisticsHeader} from './ApplicationItemStatisticsHeader';
 import {Action} from '@enonic/lib-admin-ui/ui/Action';
-import {StartApplicationEvent} from '../browse/StartApplicationEvent';
-import {StopApplicationEvent} from '../browse/StopApplicationEvent';
+import {startApplications, stopApplications} from '../../v2/features/api/applications';
+import {markStarting, markStopping} from '../../v2/features/store/app-actions.store';
 import {CONFIG} from '@enonic/lib-admin-ui/util/Config';
 import {SystemAppsHelper} from '../SystemAppsHelper';
 import Q from 'q';
@@ -43,8 +43,16 @@ export class ApplicationItemStatisticsPanel
             return;
         }
 
-        this.startAction = new Action(i18n('action.start')).onExecuted(() => new StartApplicationEvent([this.getItem()]).fire());
-        this.stopAction = new Action(i18n('action.stop')).onExecuted(() => new StopApplicationEvent([this.getItem()]).fire());
+        this.startAction = new Action(i18n('action.start')).onExecuted(() => {
+            const key = this.getItem().getApplicationKey().toString();
+            markStarting([key]);
+            void startApplications([key]);
+        });
+        this.stopAction = new Action(i18n('action.stop')).onExecuted(() => {
+            const key = this.getItem().getApplicationKey().toString();
+            markStopping([key]);
+            void stopApplications([key]);
+        });
         this.actionMenu = new ActionMenu(i18n('application.state.stopped'), this.startAction, this.stopAction);
     }
 

@@ -12,6 +12,7 @@ interface ApplicationsStore {
     byKey: Record<string, ApplicationDto>;
     status: LoadStatus;
     filter: string;
+    hideSystem: boolean;
     selection: string[];
 }
 
@@ -35,6 +36,7 @@ function initialState(): ApplicationsStore {
         byKey: {},
         status: 'idle',
         filter: '',
+        hideSystem: false,
         selection: [],
     };
 }
@@ -107,6 +109,11 @@ export function setFilter(filter: string): void {
     $applications.setKey('filter', filter);
 }
 
+/** Toggles whether system-reserved applications are excluded from `$visibleApps`. */
+export function setHideSystem(hide: boolean): void {
+    $applications.setKey('hideSystem', hide);
+}
+
 /** Replaces the current selection (existing keys only — unknown keys are dropped). */
 export function setSelection(keys: string[]): void {
     const {byKey} = $applications.get();
@@ -129,14 +136,15 @@ export function resetApplications(): void {
 //
 
 /**
- * Apps visible after applying the current text filter. Matches `displayName`, `name`,
- * `vendorName`, or `description` case-insensitively.
+ * Apps visible after applying the current text filter and the hide-system-apps toggle.
+ * Filter matches `displayName`, `name`, `vendorName`, or `description` case-insensitively.
  */
-export const $visibleApps = computed($applications, ({items, filter}) => {
+export const $visibleApps = computed($applications, ({items, filter, hideSystem}) => {
     const needle = filter.trim().toLowerCase();
-    if (!needle) return items;
+    const base = hideSystem ? items.filter((it) => !it.system) : items;
+    if (!needle) return base;
 
-    return items.filter((it) => {
+    return base.filter((it) => {
         return (
             it.displayName.toLowerCase().includes(needle) ||
             it.name.toLowerCase().includes(needle) ||

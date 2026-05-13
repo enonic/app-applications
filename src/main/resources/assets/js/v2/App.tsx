@@ -1,15 +1,17 @@
 import {Body} from '@enonic/lib-admin-ui/dom/Body';
+import {CONFIG} from '@enonic/lib-admin-ui/util/Config';
 import type {ReactElement} from 'react';
 import {registerApplicationEvents} from './features/events/applicationEvents';
+import {setReadonly} from './features/store/app.store';
 import {LegacyElement} from './shared/LegacyElement';
+import {BrowsePage} from './views/browse/BrowsePage';
 
 /**
- * AppShell component that renders the v2 application tree.
- * Rendered at the app root so dialogs can portal correctly.
- * Returns null until BrowsePage / dialogs land in later phases.
+ * AppShell component that renders the v2 application tree. Mounted under
+ * `Body` so dialog portals attach above the legacy AppBar.
  */
-const App = (): ReactElement | null => {
-    return null;
+const App = (): ReactElement => {
+    return <BrowsePage />;
 };
 
 App.displayName = 'App';
@@ -24,7 +26,9 @@ export class AppElement extends LegacyElement<typeof App> {
     static initialize(): void {
         if (!AppElement.INSTANCE) {
             AppElement.INSTANCE = new AppElement();
+            AppElement.INSTANCE.addClass('flex-1 min-h-0 w-full');
             Body.get().appendChild(AppElement.INSTANCE);
+            setReadonly(CONFIG.isTrue('readonlyMode'));
             registerApplicationEvents();
         }
     }
