@@ -1,30 +1,23 @@
 [versions]
-
-junit = "6.0.3"
-mockito = "5.23.0"
-enonicDefaults = "2.1.6"
-enonicXpGradle = "4.0.0-A1"
-nodeGradle = "7.1.0"
-
-# App
-libMustache = "2.1.1"
-libAsset = "2.0.0-SNAPSHOT"
+asset = "2.0.0-B1"
+enonic-defaults = "2.1.6"
+enonic-xp-gradle = "4.0.0-A1"
+junit-bom = "6.0.3"
+mockito-bom = "5.23.0"
+mustache = "3.0.0-B1"
+node-gradle = "7.1.0"
 
 [libraries]
-
-junit-bom = { module = "org.junit:junit-bom", version.ref = "junit" }
-junit-jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit" }
+junit-bom = { module = "org.junit:junit-bom", version.ref = "junit-bom" }
+junit-jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit-bom" }
 junit-launcher = { module = "org.junit.platform:junit-platform-launcher" }
-
-mockito-bom = { module = "org.mockito:mockito-bom", version.ref = "mockito" }
-mockito-jupiter = { module = "org.mockito:mockito-junit-jupiter", version.ref = "mockito" }
-
-# App
-lib-mustache = { module = "com.enonic.lib:lib-mustache", version.ref = "libMustache" }
-lib-asset = { module = "com.enonic.lib:lib-asset", version.ref = "libAsset" }
+lib-asset = { module = "com.enonic.lib:lib-asset", version.ref = "asset" }
+lib-mustache = { module = "com.enonic.lib:lib-mustache", version.ref = "mustache" }
+mockito-bom = { module = "org.mockito:mockito-bom", version.ref = "mockito-bom" }
+mockito-jupiter = { module = "org.mockito:mockito-junit-jupiter", version.ref = "mockito-bom" }
 
 [plugins]
-enonic-defaults = { id = "com.enonic.defaults", version.ref = "enonicDefaults" }
-enonic-xp-app = { id = "com.enonic.xp.app", version.ref = "enonicXpGradle" }
+enonic-defaults = { id = "com.enonic.defaults", version.ref = "enonic-defaults" }
+enonic-xp-app = { id = "com.enonic.xp.app", version.ref = "enonic-xp-gradle" }
 enonic-xp-base = { id = "com.enonic.xp.base" }
-node-gradle = { id = "com.github.node-gradle.node", version.ref = "nodeGradle" }
+node-gradle = { id = "com.github.node-gradle.node", version.ref = "node-gradle" }
