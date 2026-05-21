@@ -6,6 +6,8 @@ import {startApplications, stopApplications} from '../../features/api/applicatio
 import {useI18n} from '../../features/hooks/useI18n';
 import {$app} from '../../features/store/app.store';
 import {markStarting, markStopping} from '../../features/store/app-actions.store';
+import {Badge} from '../../shared/ui/Badge';
+import type {BadgeProps} from '../../shared/ui/Badge';
 import type {ApplicationDto, ApplicationState} from '../../features/types/application';
 
 interface Props {
@@ -52,9 +54,9 @@ export const DetailHeader = ({app}: Props): ReactElement => {
                 <Menu>
                     <Menu.Trigger
                         className={cn(
-                            'inline-flex items-center gap-2 rounded-sm border border-bdr-subtle bg-surface-primary px-3 py-1.5 text-sm font-semibold text-main',
+                            'inline-flex items-center gap-2 rounded-sm border border-bdr-subtle px-3 py-1.5 text-sm font-semibold',
                             'hover:bg-surface-primary-hover',
-                            stateTone(app.state),
+                            badgeTone(stateTone(app.state)),
                         )}
                         data-testid="DetailPanel.Header.Actions"
                     >
@@ -77,15 +79,13 @@ export const DetailHeader = ({app}: Props): ReactElement => {
                     </Menu.Portal>
                 </Menu>
             ) : (
-                <span
-                    className={cn(
-                        'inline-flex items-center rounded-sm px-3 py-1.5 text-sm font-semibold',
-                        stateTone(app.state),
-                    )}
+                <Badge
+                    tone={stateTone(app.state)}
+                    size="md"
                     data-testid="DetailPanel.Header.State"
                 >
                     {stateLabel}
-                </span>
+                </Badge>
             )}
         </header>
     );
@@ -124,12 +124,27 @@ function useStateLabel(state: ApplicationState): string {
     }
 }
 
-function stateTone(state: ApplicationState): string {
+function stateTone(state: ApplicationState): BadgeProps['tone'] {
     switch (state) {
         case 'started':
-            return 'bg-success/15 text-success';
+            return 'success';
         case 'stopped':
-            return 'bg-warning/15 text-warning';
+            return 'warning';
+        default:
+            return 'neutral';
+    }
+}
+
+function badgeTone(tone: BadgeProps['tone']): string {
+    switch (tone) {
+        case 'success':
+            return 'bg-success/15 text-success';
+        case 'warning':
+            return 'bg-warn/15 text-warn';
+        case 'error':
+            return 'bg-error/15 text-error';
+        case 'info':
+            return 'bg-info/15 text-info';
         default:
             return 'bg-bdr-subtle/40 text-subtle';
     }

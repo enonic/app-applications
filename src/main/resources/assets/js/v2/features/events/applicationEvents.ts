@@ -1,5 +1,6 @@
 import {ApplicationEvent, ApplicationEventType} from '@enonic/lib-admin-ui/application/ApplicationEvent';
 import {getApplication} from '../api/applications';
+import {i18n} from '../hooks/useI18n';
 import {
     clearInstalling,
     clearStarting,
@@ -8,7 +9,8 @@ import {
     markStopping,
     setInstalling,
 } from '../store/app-actions.store';
-import {removeApplications, upsertApplication} from '../store/applications.store';
+import {$applications, removeApplications, upsertApplication} from '../store/applications.store';
+import {pushToast} from '../store/notifications.store';
 
 //
 // * Registration
@@ -45,15 +47,21 @@ export async function handleApplicationEvent(event: ApplicationEvent): Promise<v
     const key = applicationKey.toString();
 
     switch (event.getEventType()) {
-        case ApplicationEventType.INSTALLED:
+        case ApplicationEventType.INSTALLED: {
             await refetchAndUpsert(key);
             clearInstalling(key);
+            const installed = $applications.get().byKey[key];
+            pushToast({tone: 'success', message: i18n('notify.installed', installed?.displayName ?? key)});
             return;
+        }
 
-        case ApplicationEventType.UNINSTALLED:
+        case ApplicationEventType.UNINSTALLED: {
+            const removed = $applications.get().byKey[key];
             removeApplications([key]);
             clearInstalling(key);
+            pushToast({tone: 'success', message: i18n('notify.uninstalled', removed?.displayName ?? key)});
             return;
+        }
 
         case ApplicationEventType.STARTING:
             markStarting([key]);

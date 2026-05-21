@@ -2,7 +2,9 @@ import {useStore} from '@nanostores/preact';
 import type {ReactElement} from 'react';
 import {useEffect} from 'react';
 import {listApplications} from '../../features/api/applications';
+import {useI18n} from '../../features/hooks/useI18n';
 import {$applications, setApplications, setStatus} from '../../features/store/applications.store';
+import {pushToast} from '../../features/store/notifications.store';
 import {BrowseFilters} from './BrowseFilters';
 import {BrowseGrid} from './BrowseGrid';
 import {BrowseToolbar} from './BrowseToolbar';
@@ -15,6 +17,7 @@ import {UninstallConfirmDialog} from './UninstallConfirmDialog';
  */
 export const BrowsePage = (): ReactElement => {
     const {status} = useStore($applications);
+    const listFailedLabel = useI18n('notify.error.listFailed');
 
     useEffect(() => {
         if ($applications.get().status !== 'idle') return;
@@ -29,12 +32,13 @@ export const BrowsePage = (): ReactElement => {
             } catch {
                 if (cancelled) return;
                 setStatus('error');
+                pushToast({tone: 'error', message: listFailedLabel});
             }
         })();
         return () => {
             cancelled = true;
         };
-    }, []);
+    }, [listFailedLabel]);
 
     return (
         <div className="flex flex-col h-full w-full bg-surface-primary text-main" data-testid="BrowsePage">
@@ -42,7 +46,7 @@ export const BrowsePage = (): ReactElement => {
             <BrowseFilters />
             {status === 'error' ? (
                 <div className="flex-1 flex items-center justify-center text-error text-sm py-10">
-                    Failed to load applications.
+                    {listFailedLabel}
                 </div>
             ) : (
                 <BrowseGrid />

@@ -2,6 +2,8 @@ import {cn} from '@enonic/ui';
 import {Package} from 'lucide-react';
 import type {ReactElement} from 'react';
 import {useI18n} from '../../features/hooks/useI18n';
+import {Badge} from '../../shared/ui/Badge';
+import type {BadgeProps} from '../../shared/ui/Badge';
 import type {ApplicationDto, ApplicationState} from '../../features/types/application';
 
 interface Props {
@@ -40,21 +42,23 @@ export const BrowseRow = ({app, selected}: Props): ReactElement => {
             <span className="text-sm tabular-nums text-subtle group-data-[tone=inverse]:text-alt">
                 {app.version}
             </span>
-            <span
-                className={cn(
-                    'text-xs uppercase tracking-wide font-semibold px-2 py-0.5 rounded-sm',
-                    app.state === 'started' && 'bg-success/15 text-success',
-                    app.state === 'stopped' && 'bg-warning/15 text-warning',
-                    app.state === 'unknown' && 'bg-bdr-subtle/40 text-subtle',
-                )}
-            >
-                {stateLabel}
-            </span>
+            <Badge tone={stateTone(app.state)} size="sm">{stateLabel}</Badge>
         </div>
     );
 };
 
 BrowseRow.displayName = 'BrowseRow';
+
+function stateTone(state: ApplicationState): BadgeProps['tone'] {
+    switch (state) {
+        case 'started':
+            return 'success';
+        case 'stopped':
+            return 'warning';
+        default:
+            return 'neutral';
+    }
+}
 
 const Icon = ({iconUrl}: {iconUrl: string}): ReactElement => {
     if (iconUrl) {

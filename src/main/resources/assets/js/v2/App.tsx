@@ -4,6 +4,7 @@ import type {ReactElement} from 'react';
 import {registerApplicationEvents} from './features/events/applicationEvents';
 import {setReadonly} from './features/store/app.store';
 import {LegacyElement} from './shared/LegacyElement';
+import {Toaster} from './shared/ui/Toaster';
 import {BrowsePage} from './views/browse/BrowsePage';
 import {DetailPanel} from './views/detail/DetailPanel';
 import {InstallDialog} from './views/install/InstallDialog';
@@ -22,6 +23,7 @@ const App = (): ReactElement => {
                 <DetailPanel />
             </div>
             <InstallDialog />
+            <Toaster />
         </>
     );
 };

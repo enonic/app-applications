@@ -9,6 +9,7 @@ import {
     setInstalling,
 } from '../store/app-actions.store';
 import {$applications, resetApplications, setApplications} from '../store/applications.store';
+import {$notifications, resetNotifications} from '../store/notifications.store';
 import type {ApplicationDto} from '../types/application';
 import {handleApplicationEvent} from './applicationEvents';
 
@@ -79,6 +80,7 @@ describe('events/applicationEvents', () => {
     beforeEach(() => {
         resetAppActions();
         resetApplications();
+        resetNotifications();
     });
 
     afterEach(() => {
@@ -105,12 +107,32 @@ describe('events/applicationEvents', () => {
             expect($appActions.get().installing['com.enonic.app.demo']).toBeUndefined();
         });
 
+        it('INSTALLED pushes a success toast', async () => {
+            mockFetchOnce(APP_JSON);
+
+            await handleApplicationEvent(makeEvent(ApplicationEventType.INSTALLED, {key: 'com.enonic.app.demo'}));
+
+            const items = $notifications.get();
+            expect(items).toHaveLength(1);
+            expect(items[0].tone).toBe('success');
+        });
+
         it('UNINSTALLED removes the application from the store', async () => {
             setApplications([makeApp({key: 'com.enonic.app.demo'})]);
 
             await handleApplicationEvent(makeEvent(ApplicationEventType.UNINSTALLED, {key: 'com.enonic.app.demo'}));
 
             expect($applications.get().byKey['com.enonic.app.demo']).toBeUndefined();
+        });
+
+        it('UNINSTALLED pushes a success toast', async () => {
+            setApplications([makeApp({key: 'com.enonic.app.demo', displayName: 'Demo App'})]);
+
+            await handleApplicationEvent(makeEvent(ApplicationEventType.UNINSTALLED, {key: 'com.enonic.app.demo'}));
+
+            const items = $notifications.get();
+            expect(items).toHaveLength(1);
+            expect(items[0].tone).toBe('success');
         });
 
         it('UNINSTALLED also drops any in-flight install record', async () => {

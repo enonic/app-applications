@@ -1,9 +1,11 @@
 import {Button} from '@enonic/ui';
-import {CheckCircle2, Download, Loader2, RefreshCw} from 'lucide-react';
+import {CheckCircle2, Download, RefreshCw} from 'lucide-react';
 import type {ReactElement} from 'react';
 import {useState} from 'react';
 import {installApplicationFromUrl} from '../../features/api/install';
 import {useI18n} from '../../features/hooks/useI18n';
+import {pushToast} from '../../features/store/notifications.store';
+import {Spinner} from '../../shared/ui/Spinner';
 import type {MarketAppStatus, MarketItemDto} from '../../features/types/market';
 
 interface Props {
@@ -27,6 +29,7 @@ export const MarketRow = ({item, status}: Props): ReactElement => {
     const updateLabel = useI18n('action.update');
     const installingLabel = useI18n('text.installing');
     const installedLabel = useI18n('text.installed');
+    const installFailedLabel = useI18n('notify.error.installFailed');
 
     const [requested, setRequested] = useState(false);
     const showInstalling = status === 'installing' || requested;
@@ -34,9 +37,14 @@ export const MarketRow = ({item, status}: Props): ReactElement => {
     const handleInstall = (): void => {
         if (!item.downloadUrl) return;
         setRequested(true);
-        void installApplicationFromUrl(item.downloadUrl, item.sha512 || undefined).finally(() => {
-            setRequested(false);
-        });
+        installApplicationFromUrl(item.downloadUrl, item.sha512 || undefined)
+            .catch((cause): void => {
+                const detail = cause instanceof Error ? cause.message : String(cause);
+                pushToast({tone: 'error', message: `${installFailedLabel}: ${detail}`});
+            })
+            .finally((): void => {
+                setRequested(false);
+            });
     };
 
     return (
@@ -109,14 +117,10 @@ function renderAction({
 }: ActionProps): ReactElement {
     if (status === 'installing') {
         return (
-            <Button
-                variant="outline"
-                size="sm"
-                startIcon={Loader2}
-                label={installingLabel}
-                disabled
-                data-testid="MarketRow.Installing"
-            />
+            <div className="flex items-center gap-2 text-sm text-subtle" data-testid="MarketRow.Installing">
+                <Spinner size="sm" label={installingLabel} />
+                {installingLabel}
+            </div>
         );
     }
     if (status === 'installed') {

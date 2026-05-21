@@ -2,7 +2,9 @@ import {useStore} from '@nanostores/preact';
 import type {ReactElement} from 'react';
 import {useEffect} from 'react';
 import {getApplicationInfo} from '../../features/api/applications';
+import {useI18n} from '../../features/hooks/useI18n';
 import {$applications, setApplicationInfo} from '../../features/store/applications.store';
+import {pushToast} from '../../features/store/notifications.store';
 import {DetailHeader} from './DetailHeader';
 import {AppInfoSection} from './sections/AppInfoSection';
 import {DeploymentSection} from './sections/DeploymentSection';
@@ -22,6 +24,7 @@ import {TasksSection} from './sections/TasksSection';
  */
 export const DetailPanel = (): ReactElement => {
     const {byKey, infoByKey, selection} = useStore($applications);
+    const infoFailedLabel = useI18n('notify.error.infoFailed');
 
     const selectedKey = selection[0];
     const app = selectedKey ? byKey[selectedKey] : undefined;
@@ -36,13 +39,14 @@ export const DetailPanel = (): ReactElement => {
                 if (cancelled) return;
                 setApplicationInfo(selectedKey, next);
             } catch {
-                /* surface via toast once notifications.store is wired (phase 9) */
+                if (cancelled) return;
+                pushToast({tone: 'error', message: infoFailedLabel});
             }
         })();
         return () => {
             cancelled = true;
         };
-    }, [selectedKey]);
+    }, [selectedKey, infoFailedLabel]);
 
     if (!app) {
         return (

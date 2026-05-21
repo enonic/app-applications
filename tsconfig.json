@@ -29,6 +29,9 @@
     "src/**/*",
     ".xp/dev/lib-admin-ui/**/*.ts"
   ],
+  "exclude": [
+    "src/**/*.stories.tsx"
+  ],
   "compileOnSave": false,
   "buildOnSave": false
 }

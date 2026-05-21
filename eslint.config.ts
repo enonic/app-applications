@@ -89,6 +89,7 @@ export default [
             "**/*.js",
             "**/*.d.ts",
             "**/spec/**/*",
+            "**/*.stories.tsx",
         ]
     }
 ];

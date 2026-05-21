@@ -11,6 +11,7 @@ import {
     setItems,
     setStatus,
 } from '../../features/store/market.store';
+import {Spinner} from '../../shared/ui/Spinner';
 import {MarketRow} from './MarketRow';
 
 /**
@@ -59,7 +60,8 @@ export const MarketGrid = (): ReactElement => {
     return (
         <div className="flex flex-col flex-1 min-h-60 border border-bdr-soft rounded-md overflow-auto" data-testid="MarketGrid">
             {market.status === 'loading' ? (
-                <div className="flex items-center justify-center py-10 text-sm text-subtle" data-testid="MarketGrid.Loading">
+                <div className="flex items-center justify-center gap-2 py-10 text-sm text-subtle" data-testid="MarketGrid.Loading">
+                    <Spinner size="sm" label={loadingLabel} />
                     {loadingLabel}
                 </div>
             ) : market.status === 'error' ? (
