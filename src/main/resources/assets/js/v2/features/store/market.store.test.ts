@@ -35,6 +35,7 @@ function makeApp(overrides: Partial<ApplicationDto> & {key: string}): Applicatio
         system: overrides.system ?? false,
         minSystemVersion: overrides.minSystemVersion ?? '',
         maxSystemVersion: overrides.maxSystemVersion ?? '',
+        modifiedTime: overrides.modifiedTime ?? '',
     };
 }
 

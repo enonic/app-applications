@@ -1,5 +1,6 @@
 import {beforeEach, describe, expect, it} from 'vitest';
 import type {ApplicationDto, ApplicationState} from '../types/application';
+import type {ApplicationInfoDto} from '../types/application-info';
 import {
     $applications,
     $selectionInfo,
@@ -7,6 +8,7 @@ import {
     clearSelection,
     removeApplications,
     resetApplications,
+    setApplicationInfo,
     setApplications,
     setFilter,
     setHideSystem,
@@ -31,6 +33,23 @@ function makeApp(overrides: Partial<ApplicationDto> & {key: string}): Applicatio
         system: overrides.system ?? false,
         minSystemVersion: overrides.minSystemVersion ?? '',
         maxSystemVersion: overrides.maxSystemVersion ?? '',
+        modifiedTime: overrides.modifiedTime ?? '',
+    };
+}
+
+function makeInfo(): ApplicationInfoDto {
+    return {
+        contentTypes: [],
+        pages: [],
+        parts: [],
+        layouts: [],
+        macros: [],
+        tasks: [],
+        tools: [],
+        widgets: [],
+        apis: [],
+        idProviderApplication: undefined,
+        deploymentUrl: '',
     };
 }
 
@@ -137,6 +156,46 @@ describe('applications.store', () => {
             setSelection(['a']);
             clearSelection();
             expect($applications.get().selection).toEqual([]);
+        });
+    });
+
+    describe('setApplicationInfo', () => {
+        it('caches info under the application key', () => {
+            const info = makeInfo();
+            setApplicationInfo('a', info);
+            expect($applications.get().infoByKey['a']).toBe(info);
+        });
+
+        it('overwrites a previously cached entry', () => {
+            const first = makeInfo();
+            const second = {...makeInfo(), deploymentUrl: 'https://example.com/'};
+            setApplicationInfo('a', first);
+            setApplicationInfo('a', second);
+            expect($applications.get().infoByKey['a']).toBe(second);
+        });
+    });
+
+    describe('infoByKey pruning', () => {
+        it('drops cached info for apps removed via removeApplications', () => {
+            setApplications([makeApp({key: 'a'}), makeApp({key: 'b'})]);
+            setApplicationInfo('a', makeInfo());
+            setApplicationInfo('b', makeInfo());
+
+            removeApplications(['a']);
+
+            expect($applications.get().infoByKey['a']).toBeUndefined();
+            expect($applications.get().infoByKey['b']).toBeDefined();
+        });
+
+        it('drops cached info for apps missing from a setApplications replace', () => {
+            setApplications([makeApp({key: 'a'}), makeApp({key: 'b'})]);
+            setApplicationInfo('a', makeInfo());
+            setApplicationInfo('b', makeInfo());
+
+            setApplications([makeApp({key: 'b'})]);
+
+            expect($applications.get().infoByKey['a']).toBeUndefined();
+            expect($applications.get().infoByKey['b']).toBeDefined();
         });
     });
 

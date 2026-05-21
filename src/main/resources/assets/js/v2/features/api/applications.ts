@@ -1,7 +1,11 @@
 import type {ApplicationJson} from '@enonic/lib-admin-ui/application/json/ApplicationJson';
 import {ApplicationKey} from '@enonic/lib-admin-ui/application/ApplicationKey';
-import type {ApplicationInfoJson} from '../../../app/resource/json/ApplicationInfoJson';
 import {type ApplicationDto, type ApplicationState} from '../types/application';
+import {
+    type ApplicationInfoDto,
+    type ApplicationInfoJson,
+    toApplicationInfoDto,
+} from '../types/application-info';
 import {getApiUrl, getServerAppUrl, type ServerAppAction} from '../utils/url/api';
 import {fromResponse} from './errors/AppError';
 
@@ -60,7 +64,7 @@ export async function getApplication(key: string): Promise<ApplicationDto> {
 }
 
 /** Gets extended information (descriptors, deployment, references…) for a single application. */
-export async function getApplicationInfo(key: string): Promise<ApplicationInfoJson> {
+export async function getApplicationInfo(key: string): Promise<ApplicationInfoDto> {
     const url = getApiUrl('application/info') + `?applicationKey=${encodeURIComponent(key)}`;
 
     const response = await fetch(url, {
@@ -70,7 +74,8 @@ export async function getApplicationInfo(key: string): Promise<ApplicationInfoJs
 
     if (!response.ok) await fromResponse(response, 'getApplicationInfo');
 
-    return (await response.json()) as ApplicationInfoJson;
+    const json = (await response.json()) as ApplicationInfoJson;
+    return toApplicationInfoDto(json);
 }
 
 //
@@ -151,6 +156,7 @@ function toDto(json: ApplicationJsonExt): ApplicationDto {
         system: isSystemApp(key, json.system),
         minSystemVersion: json.minSystemVersion ?? '',
         maxSystemVersion: json.maxSystemVersion ?? '',
+        modifiedTime: json.modifiedTime ?? '',
     };
 }
 

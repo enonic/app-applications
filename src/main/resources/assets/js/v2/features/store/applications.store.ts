@@ -1,5 +1,6 @@
 import {computed, map} from 'nanostores';
 import {type ApplicationDto, isStarted, isStopped} from '../types/application';
+import {type ApplicationInfoDto} from '../types/application-info';
 
 //
 // * Types
@@ -10,6 +11,7 @@ export type LoadStatus = 'idle' | 'loading' | 'loaded' | 'error';
 interface ApplicationsStore {
     items: ApplicationDto[];
     byKey: Record<string, ApplicationDto>;
+    infoByKey: Record<string, ApplicationInfoDto>;
     status: LoadStatus;
     filter: string;
     hideSystem: boolean;
@@ -34,6 +36,7 @@ function initialState(): ApplicationsStore {
     return {
         items: [],
         byKey: {},
+        infoByKey: {},
         status: 'idle',
         filter: '',
         hideSystem: false,
@@ -45,7 +48,7 @@ function initialState(): ApplicationsStore {
 // * Mutators
 //
 
-/** Replaces the full list of applications, rebuilds the `byKey` index, and prunes orphan selections. */
+/** Replaces the full list of applications, rebuilds the `byKey` index, and prunes orphan selections / cached info. */
 export function setApplications(items: ApplicationDto[]): void {
     const sorted = [...items].sort((a, b) => a.displayName.localeCompare(b.displayName));
     const byKey: Record<string, ApplicationDto> = {};
@@ -53,13 +56,18 @@ export function setApplications(items: ApplicationDto[]): void {
         byKey[item.key] = item;
     }
 
-    const currentSelection = $applications.get().selection;
+    const {selection: currentSelection, infoByKey: currentInfo} = $applications.get();
     const selection = currentSelection.filter((key) => key in byKey);
+    const infoByKey: Record<string, ApplicationInfoDto> = {};
+    for (const [k, v] of Object.entries(currentInfo)) {
+        if (k in byKey) infoByKey[k] = v;
+    }
 
     $applications.set({
         ...$applications.get(),
         items: sorted,
         byKey,
+        infoByKey,
         selection,
     });
 }
@@ -83,20 +91,31 @@ export function removeApplications(keys: string[]): void {
     if (keys.length === 0) return;
 
     const dropped = new Set(keys);
-    const {items, byKey, selection} = $applications.get();
+    const {items, byKey, infoByKey, selection} = $applications.get();
 
     const nextItems = items.filter((it) => !dropped.has(it.key));
     const nextByKey: Record<string, ApplicationDto> = {};
     for (const [k, v] of Object.entries(byKey)) {
         if (!dropped.has(k)) nextByKey[k] = v;
     }
+    const nextInfoByKey: Record<string, ApplicationInfoDto> = {};
+    for (const [k, v] of Object.entries(infoByKey)) {
+        if (!dropped.has(k)) nextInfoByKey[k] = v;
+    }
 
     $applications.set({
         ...$applications.get(),
         items: nextItems,
         byKey: nextByKey,
+        infoByKey: nextInfoByKey,
         selection: selection.filter((k) => !dropped.has(k)),
     });
+}
+
+/** Caches the resolved info for one application. Overwrites any previous entry. */
+export function setApplicationInfo(key: string, info: ApplicationInfoDto): void {
+    const {infoByKey} = $applications.get();
+    $applications.setKey('infoByKey', {...infoByKey, [key]: info});
 }
 
 /** Sets the load status reported by the data layer. */

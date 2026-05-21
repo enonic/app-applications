@@ -28,7 +28,7 @@ All new code lives under `src/main/resources/assets/js/v2/`. Legacy code under `
 | 5 | [Server events — WS → stores](./05-server-events.md) | Done |
 | 6 | [Browse panel](./06-browse-panel.md) | Done |
 | 7 | [Install dialog](./07-install-dialog.md) | Done |
-| 8 | [Detail / statistics panel](./08-detail-panel.md) | Not started |
+| 8 | [Detail / statistics panel](./08-detail-panel.md) | Done |
 | 9 | [Component gap-filling](./09-component-gaps.md) | Not started |
 | 10 | [Storybook integration](./10-storybook.md) | Not started |
 | 11 | [Playwright E2E](./11-playwright-tests.md) | Not started |

@@ -21,6 +21,7 @@ export interface ApplicationDto {
     system: boolean;
     minSystemVersion: string;
     maxSystemVersion: string;
+    modifiedTime: string;
 }
 
 export type ApplicationState = 'started' | 'stopped' | 'unknown';
@@ -55,6 +56,7 @@ export function toDto(app: Application): ApplicationDto {
         system: ApplicationKey.SYSTEM_RESERVED_APPLICATION_KEYS.some((k) => k.equals(key)),
         minSystemVersion: app.getMinSystemVersion() ?? '',
         maxSystemVersion: app.getMaxSystemVersion() ?? '',
+        modifiedTime: app.getModifiedTime()?.toISOString() ?? '',
     };
 }
 

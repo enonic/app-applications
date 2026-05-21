@@ -5,6 +5,7 @@ import {registerApplicationEvents} from './features/events/applicationEvents';
 import {setReadonly} from './features/store/app.store';
 import {LegacyElement} from './shared/LegacyElement';
 import {BrowsePage} from './views/browse/BrowsePage';
+import {DetailPanel} from './views/detail/DetailPanel';
 import {InstallDialog} from './views/install/InstallDialog';
 
 /**
@@ -14,7 +15,12 @@ import {InstallDialog} from './views/install/InstallDialog';
 const App = (): ReactElement => {
     return (
         <>
-            <BrowsePage />
+            <div className="flex h-full w-full min-h-0 flex-1 flex-row">
+                <div className="flex h-full min-w-0 flex-1 flex-col border-r border-bdr-soft">
+                    <BrowsePage />
+                </div>
+                <DetailPanel />
+            </div>
             <InstallDialog />
         </>
     );
