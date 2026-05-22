@@ -75,8 +75,8 @@ export const BrowseGrid = (): ReactElement => {
                             key={app.key}
                             id={app.key}
                             className={cn(
-                                'cursor-pointer hover:bg-surface-primary-hover',
-                                isSelected && 'bg-surface-selected text-alt',
+                                'group cursor-pointer hover:bg-surface-neutral-hover transition-highlight',
+                                isSelected && 'bg-surface-selected text-alt hover:bg-surface-selected',
                             )}
                             data-tone={isSelected ? 'inverse' : undefined}
                             data-system={app.system || undefined}

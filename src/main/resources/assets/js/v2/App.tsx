@@ -16,8 +16,8 @@ import {InstallDialog} from './views/install/InstallDialog';
 const App = (): ReactElement => {
     return (
         <>
-            <div className="flex h-full w-full min-h-0 flex-1 flex-row">
-                <div className="flex h-full min-w-0 flex-1 flex-col border-r border-bdr-soft">
+            <div className="flex h-full w-full min-h-0 flex-1 flex-row bg-surface-primary">
+                <div className="flex h-full min-w-0 flex-1 flex-col">
                     <BrowsePage />
                 </div>
                 <DetailPanel />

@@ -6,6 +6,7 @@ import {useI18n} from '../../features/hooks/useI18n';
 import {$applications, setApplicationInfo} from '../../features/store/applications.store';
 import {pushToast} from '../../features/store/notifications.store';
 import {DetailHeader} from './DetailHeader';
+import {DetailToolbar} from './DetailToolbar';
 import {AppInfoSection} from './sections/AppInfoSection';
 import {DeploymentSection} from './sections/DeploymentSection';
 import {ExtensionsSection} from './sections/ExtensionsSection';
@@ -15,12 +16,17 @@ import {SiteSection} from './sections/SiteSection';
 import {TasksSection} from './sections/TasksSection';
 
 /**
- * Right-hand statistics pane that replaces the legacy `ApplicationItemStatisticsPanel`.
+ * Right-hand statistics pane. Mirrors the design in
+ * `chats/chat1.md`:
  *
- * Subscribes to the first selected application; when it changes, fetches
- * `application/info` and caches the resolved DTO in `$applications.infoByKey`.
- * The body renders header + sections in a single scrollable column — no tabs,
- * matching the legacy layout.
+ * 1. 56px toolbar header with the `APPLICATION DETAILS` label and external /
+ *    more / close icon buttons.
+ * 2. Hero — large app icon, display name, description.
+ * 3. Status row (`Started | Source`) above the Start/Stop split button and
+ *    Uninstall button.
+ * 4. `Application` separator, then the metadata table (display name, key,
+ *    version, installed, system required, source).
+ * 5. `Admin extensions` separator, then the existing extensions section.
  */
 export const DetailPanel = (): ReactElement => {
     const {byKey, infoByKey, selection} = useStore($applications);
@@ -51,19 +57,22 @@ export const DetailPanel = (): ReactElement => {
     if (!app) {
         return (
             <aside
-                className="h-full w-full min-w-0 flex-1 bg-surface-primary"
+                className="h-full w-[440px] shrink-0 bg-surface-neutral border-l border-bdr-soft flex flex-col"
                 data-testid="DetailPanel.Empty"
-            />
+            >
+                <DetailToolbar />
+            </aside>
         );
     }
 
     return (
         <aside
-            className="flex h-full w-full min-w-0 flex-1 flex-col overflow-hidden bg-surface-primary"
+            className="flex h-full w-[440px] shrink-0 flex-col overflow-hidden bg-surface-neutral border-l border-bdr-soft"
             data-testid="DetailPanel"
         >
-            <DetailHeader app={app} />
-            <div className="flex-1 overflow-y-auto px-8 pb-8">
+            <DetailToolbar app={app} />
+            <div className="flex-1 overflow-y-auto">
+                <DetailHeader app={app} />
                 <AppInfoSection app={app} />
                 {info ? (
                     <>
@@ -75,6 +84,7 @@ export const DetailPanel = (): ReactElement => {
                         <DeploymentSection info={info} />
                     </>
                 ) : null}
+                <div className="h-6" />
             </div>
         </aside>
     );

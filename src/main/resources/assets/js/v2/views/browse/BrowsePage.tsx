@@ -41,7 +41,7 @@ export const BrowsePage = (): ReactElement => {
     }, [listFailedLabel]);
 
     return (
-        <div className="flex flex-col h-full w-full bg-surface-primary text-main" data-testid="BrowsePage">
+        <div className="flex flex-col h-full w-full bg-surface-neutral text-main" data-testid="BrowsePage">
             <BrowseToolbar />
             <BrowseFilters />
             {status === 'error' ? (

@@ -1,45 +1,64 @@
-import {SearchField, Toggle} from '@enonic/ui';
+import {Checkbox, Toggle, Tooltip} from '@enonic/ui';
 import {useStore} from '@nanostores/preact';
 import {Cog} from 'lucide-react';
 import type {ReactElement} from 'react';
 import {useI18n} from '../../features/hooks/useI18n';
-import {$applications, setFilter, setHideSystem} from '../../features/store/applications.store';
+import {$applications, $visibleApps, setHideSystem, setSelection} from '../../features/store/applications.store';
 
 /**
- * Filter strip beneath the toolbar: free-text search + hide-system-apps toggle.
- * Both controls are controlled inputs bound to `$applications.{filter,hideSystem}`.
+ * Header strip directly above the list. Holds the master "Select all" checkbox,
+ * a counter and the System-apps filter toggle on the right.
+ *
+ * 56px tall to match the actions toolbar and detail-panel header.
  */
 export const BrowseFilters = (): ReactElement => {
-    const {filter, hideSystem} = useStore($applications);
+    const {hideSystem, selection} = useStore($applications);
+    const items = useStore($visibleApps);
 
-    const searchPlaceholder = useI18n('field.search.placeholder');
+    const selectAllLabel = useI18n('action.selectAll');
     const hideLabel = useI18n('action.hideSystemApps');
     const showLabel = useI18n('action.showSystemApps');
     const toggleLabel = hideSystem ? showLabel : hideLabel;
 
+    const total = items.length;
+    const selectedVisible = selection.filter((k) => items.some((it) => it.key === k)).length;
+    const allSelected = total > 0 && selectedVisible === total;
+    const someSelected = selectedVisible > 0 && selectedVisible < total;
+    const counterLabel = useI18n(total === 1 ? 'field.applications.one' : 'field.applications');
+
+    const handleSelectAll = (): void => {
+        if (allSelected) {
+            setSelection([]);
+            return;
+        }
+        setSelection(items.map((it) => it.key));
+    };
+
     return (
-        <div className="flex items-center gap-3 px-5 py-3 border-b border-bdr-soft bg-surface-primary">
-            <SearchField
-                value={filter}
-                onChange={setFilter}
-                placeholder={searchPlaceholder}
-                className="flex-1 max-w-150"
-                data-testid="BrowseFilters.Search"
-            >
-                <SearchField.Icon />
-                <SearchField.Input />
-                <SearchField.Clear />
-            </SearchField>
-            <Toggle
-                pressed={hideSystem}
-                onPressedChange={setHideSystem}
-                variant="outline"
-                size="md"
-                startIcon={Cog}
-                label={toggleLabel}
-                title={toggleLabel}
-                data-testid="BrowseFilters.HideSystem"
+        <div className="flex items-center gap-3 px-5 h-14 border-b border-bdr-soft bg-surface-neutral shrink-0">
+            <Checkbox
+                checked={allSelected ? true : someSelected ? 'indeterminate' : false}
+                onCheckedChange={handleSelectAll}
+                label={selectAllLabel}
+                data-testid="BrowseFilters.SelectAll"
             />
+            <div className="flex-1" />
+            <span className="text-sm text-subtle tabular-nums" data-testid="BrowseFilters.Count">
+                {total} {counterLabel}
+            </span>
+            <Tooltip delay={300} value={toggleLabel} asChild>
+                <Toggle
+                    variant="filled"
+                    size="sm"
+                    className="size-9 p-0"
+                    startIcon={Cog}
+                    pressed={!hideSystem}
+                    onPressedChange={(pressed) => setHideSystem(!pressed)}
+                    title={toggleLabel}
+                    aria-label={toggleLabel}
+                    data-testid="BrowseFilters.SystemToggle"
+                />
+            </Tooltip>
         </div>
     );
 };

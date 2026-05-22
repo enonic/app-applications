@@ -4,14 +4,42 @@
 
 @import "new/new-schema-dialog";
 
+// Modernize the legacy AppBar to match the white-chrome design. AppIcon is
+// the only element AppBar appends itself; the avatar / XP button on the right
+// come from the `xp-menu` panel injected by the launcher application, so we
+// only restyle our own side here.
 .appbar {
-  height: 60px;
+  height: 56px;
+  background-color: #ffffff;
+  border-bottom: 1px solid var(--color-bdr-soft);
 
   .home-button {
     align-items: center;
+    padding-left: 8px;
+
+    .app-name {
+      color: var(--color-main);
+      font-weight: 600;
+      font-size: 16px;
+      font-family: var(--font-sans);
+    }
+
+    .app-icon {
+      width: 24px;
+      height: 24px;
+      padding: 0;
+      margin-right: 10px;
+    }
   }
 
   .appbar-tab-menu {
     align-self: flex-end;
   }
+}
+
+// `.appbar` is `position: absolute; top: 0` so the rest of the page needs to
+// start 56px below it. The v2 React root is appended to <body> as a sibling.
+body {
+  padding-top: 56px;
+  box-sizing: border-box;
 }

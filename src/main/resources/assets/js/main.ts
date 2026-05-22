@@ -19,7 +19,7 @@ function getApplication(): Application {
         CONFIG.getString('appId'),
         i18n('admin.tool.displayName'),
         i18n('app.abbr'),
-        `${assetsUri}/icons/icon-white.svg`
+        `${assetsUri}/icons/icon-black.svg`
     );
     application.setPath(Path.fromString('/'));
     application.setWindow(window);

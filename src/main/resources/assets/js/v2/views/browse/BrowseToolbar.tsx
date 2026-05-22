@@ -1,44 +1,41 @@
-import {Button, Toolbar} from '@enonic/ui';
+import {Button, IconButton, Toolbar} from '@enonic/ui';
 import {useStore} from '@nanostores/preact';
-import {Play, Plus, RefreshCw, Square, Trash2} from 'lucide-react';
+import {Play, Search, Square} from 'lucide-react';
 import type {ReactElement} from 'react';
 import {useI18n} from '../../features/hooks/useI18n';
-import {listApplications, startApplications, stopApplications} from '../../features/api/applications';
+import {startApplications, stopApplications} from '../../features/api/applications';
 import {$app} from '../../features/store/app.store';
 import {markStarting, markStopping} from '../../features/store/app-actions.store';
-import {$applications, $selectionInfo, setApplications, setStatus} from '../../features/store/applications.store';
+import {$applications, $selectionInfo} from '../../features/store/applications.store';
 import {openInstallDialog, openUninstallConfirm} from '../../features/store/dialogs.store';
 
 /**
- * Top toolbar above the browse grid. Action buttons read `$selectionInfo` for
- * their disabled state and call the relevant API directly — store updates
- * follow optimistically and reconcile when the server emits the matching
- * `ApplicationEvent`.
+ * Actions toolbar above the browse list. Matches the design: 56px tall, search
+ * icon on the left, Install/Uninstall as text buttons, Start/Stop with their
+ * play/square glyphs. No refresh button on the right.
  */
 export const BrowseToolbar = (): ReactElement => {
     const info = useStore($selectionInfo);
     const readonly = useStore($app).readonly;
 
-    const labels = {
-        install: useI18n('action.install'),
-        uninstall: useI18n('action.uninstall'),
-        start: useI18n('action.start'),
-        stop: useI18n('action.stop'),
-        refresh: useI18n('action.refresh'),
-        managed: useI18n('field.managed'),
-        managedHelp: useI18n('field.managed.help'),
-    };
+    const installLabel = useI18n('action.install');
+    const uninstallLabel = useI18n('action.uninstall');
+    const startLabel = useI18n('action.start');
+    const stopLabel = useI18n('action.stop');
+    const searchLabel = useI18n('action.search');
+    const managedLabel = useI18n('field.managed');
+    const managedHelpLabel = useI18n('field.managed.help');
 
     if (readonly) {
         return (
             <Toolbar>
                 <Toolbar.Container
-                    aria-label={labels.managed}
-                    className="bg-surface-neutral h-15 px-5 py-2 flex items-center gap-3 border-b border-bdr-soft"
+                    aria-label={managedLabel}
+                    className="bg-surface-neutral h-14 px-3 flex items-center gap-3 border-b border-bdr-soft"
                 >
                     <div className="flex flex-col">
-                        <span className="font-semibold">{labels.managed}</span>
-                        <small className="text-sm text-subtle">{labels.managedHelp}</small>
+                        <span className="font-semibold">{managedLabel}</span>
+                        <small className="text-sm text-subtle">{managedHelpLabel}</small>
                     </div>
                 </Toolbar.Container>
             </Toolbar>
@@ -69,53 +66,46 @@ export const BrowseToolbar = (): ReactElement => {
         void stopApplications(keys);
     };
 
-    const handleRefresh = (): void => {
-        setStatus('loading');
-        (async () => {
-            try {
-                const items = await listApplications();
-                setApplications(items);
-                setStatus('loaded');
-            } catch {
-                setStatus('error');
-            }
-        })();
-    };
-
     return (
         <Toolbar>
             <Toolbar.Container
-                aria-label={labels.install}
-                className="bg-surface-neutral h-15 px-5 py-2 flex items-center gap-2 border-b border-bdr-soft"
+                aria-label={installLabel}
+                className="bg-surface-neutral h-14 px-3 flex items-center gap-1 border-b border-bdr-soft"
             >
                 <Toolbar.Item asChild>
+                    <IconButton
+                        variant="text"
+                        size="sm"
+                        icon={Search}
+                        title={searchLabel}
+                        data-testid="BrowseToolbar.Search"
+                    />
+                </Toolbar.Item>
+                <Toolbar.Item asChild>
                     <Button
-                        variant="solid"
-                        size="md"
-                        startIcon={Plus}
-                        label={labels.install}
+                        variant="text"
+                        size="sm"
+                        label={installLabel}
                         onClick={handleInstall}
                         data-testid="BrowseToolbar.Install"
                     />
                 </Toolbar.Item>
                 <Toolbar.Item asChild>
                     <Button
-                        variant="outline"
-                        size="md"
-                        startIcon={Trash2}
-                        label={labels.uninstall}
+                        variant="text"
+                        size="sm"
+                        label={uninstallLabel}
                         disabled={info.count === 0 || !info.canUninstall}
                         onClick={handleUninstall}
                         data-testid="BrowseToolbar.Uninstall"
                     />
                 </Toolbar.Item>
-                <Toolbar.Separator />
                 <Toolbar.Item asChild>
                     <Button
-                        variant="outline"
-                        size="md"
+                        variant="text"
+                        size="sm"
                         startIcon={Play}
-                        label={labels.start}
+                        label={startLabel}
                         disabled={info.count === 0 || !info.canStart}
                         onClick={handleStart}
                         data-testid="BrowseToolbar.Start"
@@ -123,24 +113,13 @@ export const BrowseToolbar = (): ReactElement => {
                 </Toolbar.Item>
                 <Toolbar.Item asChild>
                     <Button
-                        variant="outline"
-                        size="md"
+                        variant="text"
+                        size="sm"
                         startIcon={Square}
-                        label={labels.stop}
+                        label={stopLabel}
                         disabled={info.count === 0 || !info.canStop}
                         onClick={handleStop}
                         data-testid="BrowseToolbar.Stop"
-                    />
-                </Toolbar.Item>
-                <div className="flex-1" />
-                <Toolbar.Item asChild>
-                    <Button
-                        variant="text"
-                        size="md"
-                        startIcon={RefreshCw}
-                        label={labels.refresh}
-                        onClick={handleRefresh}
-                        data-testid="BrowseToolbar.Refresh"
                     />
                 </Toolbar.Item>
             </Toolbar.Container>
