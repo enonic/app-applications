@@ -1,95 +1,73 @@
-import {GridList, cn} from '@enonic/ui';
+import {TreeList} from '@enonic/ui';
 import {useStore} from '@nanostores/preact';
-import type {JSX} from 'preact';
 import type {ReactElement} from 'react';
 import {useCallback, useMemo} from 'react';
-import type {ApplicationDto} from '../../features/types/application';
+import {useI18n} from '../../features/hooks/useI18n';
 import {$applications, $visibleApps, setSelection} from '../../features/store/applications.store';
 import {BrowseContextMenu} from './BrowseContextMenu';
 import {BrowseRow} from './BrowseRow';
 
 /**
- * Grid of installed applications. Renders `$visibleApps` (post-filter), wires
- * multi-select with Cmd/Ctrl + click and Shift + click, and wraps the whole
- * grid in a single `ContextMenu` that reads the current selection.
+ * Browse list. Mirrors the TreeList rendering pattern used by app-contentstudio:
+ * a `bg-surface-neutral` container, rows stacked with TreeList's default
+ * `gap-y-1.5`, checkbox-driven multi-select via `RowSelectionControl`, and
+ * row-click "select single" through TreeList's built-in selection handling.
  */
 export const BrowseGrid = (): ReactElement => {
     const items = useStore($visibleApps);
     const selection = useStore($applications).selection;
+    const emptyLabel = useI18n('text.noApplications');
+    const ariaLabel = useI18n('field.installedApplications');
 
     const selectionSet = useMemo(() => new Set(selection), [selection]);
 
-    const visibleKeys = useMemo(() => items.map((it) => it.key), [items]);
-
-    const handleRowClick = useCallback(
-        (key: string, event: JSX.TargetedMouseEvent<HTMLDivElement>) => {
-            const multi = event.ctrlKey || event.metaKey;
-            const range = event.shiftKey;
-
-            if (range && selection.length > 0) {
-                const last = selection[selection.length - 1];
-                const startIdx = visibleKeys.indexOf(last);
-                const endIdx = visibleKeys.indexOf(key);
-                if (startIdx >= 0 && endIdx >= 0) {
-                    const [from, to] = startIdx < endIdx ? [startIdx, endIdx] : [endIdx, startIdx];
-                    setSelection(visibleKeys.slice(from, to + 1));
-                    return;
-                }
-            }
-
-            if (multi) {
-                const next = selectionSet.has(key)
-                    ? selection.filter((k) => k !== key)
-                    : [...selection, key];
-                setSelection(next);
-                return;
-            }
-
-            setSelection([key]);
-        },
-        [selection, selectionSet, visibleKeys],
-    );
+    const handleSelectionChange = useCallback((next: ReadonlySet<string>) => {
+        setSelection(Array.from(next));
+    }, []);
 
     if (items.length === 0) {
         return (
             <div
-                className="flex-1 flex items-center justify-center text-subtle text-sm py-10"
+                className="flex flex-1 items-center justify-center py-10 text-sm text-subtle"
                 data-testid="BrowseGrid.Empty"
             >
-                No applications found.
+                {emptyLabel}
             </div>
         );
     }
 
     return (
         <BrowseContextMenu>
-            <GridList
-                label="Installed applications"
-                className="flex-1 min-h-0 overflow-auto"
+            <TreeList
+                selection={selectionSet}
+                onSelectionChange={handleSelectionChange}
+                selectionMode="multiple"
+                aria-label={ariaLabel}
+                className="flex min-h-0 flex-1 flex-col bg-surface-neutral"
                 data-testid="BrowseGrid"
             >
-                {items.map((app: ApplicationDto) => {
-                    const isSelected = selectionSet.has(app.key);
-                    return (
-                        <GridList.Row
-                            key={app.key}
-                            id={app.key}
-                            className={cn(
-                                'group cursor-pointer hover:bg-surface-neutral-hover transition-highlight',
-                                isSelected && 'bg-surface-selected text-alt hover:bg-surface-selected',
-                            )}
-                            data-tone={isSelected ? 'inverse' : undefined}
-                            data-system={app.system || undefined}
-                            data-testid="BrowseGrid.Row"
-                            onClick={(event) => handleRowClick(app.key, event as unknown as JSX.TargetedMouseEvent<HTMLDivElement>)}
-                        >
-                            <GridList.Cell className="w-full">
-                                <BrowseRow app={app} selected={isSelected} />
-                            </GridList.Cell>
-                        </GridList.Row>
-                    );
-                })}
-            </GridList>
+                <TreeList.Container className="px-5 py-2.5">
+                    {items.map((app) => {
+                        const isSelected = selectionSet.has(app.key);
+                        return (
+                            <TreeList.Row
+                                key={app.key}
+                                id={app.key}
+                                data-system={app.system || undefined}
+                                data-testid="BrowseGrid.Row"
+                                className="group min-h-12 px-3"
+                            >
+                                <TreeList.RowLeft>
+                                    <TreeList.RowSelectionControl rowId={app.key} />
+                                </TreeList.RowLeft>
+                                <TreeList.RowContent>
+                                    <BrowseRow app={app} selected={isSelected} />
+                                </TreeList.RowContent>
+                            </TreeList.Row>
+                        );
+                    })}
+                </TreeList.Container>
+            </TreeList>
         </BrowseContextMenu>
     );
 };

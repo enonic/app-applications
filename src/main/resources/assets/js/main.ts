@@ -1,8 +1,6 @@
 import {Application} from '@enonic/lib-admin-ui/app/Application';
-import {Body} from '@enonic/lib-admin-ui/dom/Body';
 import {Path} from '@enonic/lib-admin-ui/rest/Path';
 import {ConnectionDetector} from '@enonic/lib-admin-ui/system/ConnectionDetector';
-import {AppBar} from '@enonic/lib-admin-ui/app/bar/AppBar';
 import {AppHelper} from '@enonic/lib-admin-ui/util/AppHelper';
 import {ServerEventsListener} from '@enonic/lib-admin-ui/event/ServerEventsListener';
 import {i18nInit} from '@enonic/lib-admin-ui/util/MessagesInitializer';
@@ -10,8 +8,6 @@ import {i18n} from '@enonic/lib-admin-ui/util/Messages';
 import {CONFIG, ConfigObject} from '@enonic/lib-admin-ui/util/Config';
 import {CustomElement} from '@enonic/lib-admin-ui/dom/CustomElement';
 import {AppElement} from './v2/App';
-
-const body = Body.get();
 
 function getApplication(): Application {
     const assetsUri: string = CONFIG.getString('assetsUri');
@@ -36,13 +32,9 @@ function startLostConnectionDetector() {
 }
 
 function startApplication() {
-
     const application: Application = getApplication();
-    const appBar = new AppBar(application);
 
-    body.appendChild(appBar);
-
-    AppElement.initialize();
+    AppElement.initialize(application);
 
     AppHelper.preventDragRedirect();
 
