@@ -33,6 +33,7 @@ export const DetailPanel = (): ReactElement => {
     const {byKey, infoByKey} = useStore($applications);
     const selection = useStore($selection);
     const infoFailedLabel = useI18n('notify.error.infoFailed');
+    const emptyLabel = useI18n('text.detailPanel.empty');
 
     const selectedKey = selection[0];
     const app = selectedKey ? byKey[selectedKey] : undefined;
@@ -60,9 +61,16 @@ export const DetailPanel = (): ReactElement => {
         return (
             <aside
                 className="h-full w-[440px] shrink-0 bg-surface-neutral border-l border-bdr-soft flex flex-col"
-                data-testid="DetailPanel.Empty"
+                data-component="DetailPanel.Empty"
             >
                 <DetailToolbar />
+                <div className="flex-1 flex items-center justify-center px-6">
+                    <div className="w-full">
+                        <span className="block text-subtle font-normal leading-normal">
+                            {emptyLabel}
+                        </span>
+                    </div>
+                </div>
             </aside>
         );
     }
@@ -70,7 +78,7 @@ export const DetailPanel = (): ReactElement => {
     return (
         <aside
             className="flex h-full w-[440px] shrink-0 flex-col overflow-hidden bg-surface-neutral border-l border-bdr-soft"
-            data-testid="DetailPanel"
+            data-component="DetailPanel"
         >
             <DetailToolbar app={app} />
             <div className="flex-1 overflow-y-auto">

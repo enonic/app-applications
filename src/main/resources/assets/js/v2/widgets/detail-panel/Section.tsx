@@ -3,7 +3,7 @@ import type {ReactElement, ReactNode} from 'react';
 
 interface SectionProps {
     title: string;
-    'data-testid'?: string;
+    'data-component'?: string;
     children: ReactNode;
 }
 
@@ -12,9 +12,9 @@ interface SectionProps {
  * `Separator` label with a 1px baseline rule, followed by a 4 + 12 + 4
  * column layout matching the Enonic UI screenshot pattern.
  */
-export const Section = ({title, 'data-testid': testId, children}: SectionProps): ReactElement => {
+export const Section = ({title, 'data-component': testId, children}: SectionProps): ReactElement => {
     return (
-        <section className="px-6 pt-6" data-testid={testId}>
+        <section className="px-6 pt-6" data-component={testId}>
             <Separator label={title} className="mb-3" />
             <div className="flex flex-col gap-2">{children}</div>
         </section>

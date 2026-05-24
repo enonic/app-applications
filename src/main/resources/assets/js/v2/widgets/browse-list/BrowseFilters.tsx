@@ -42,10 +42,11 @@ export const BrowseFilters = (): ReactElement => {
                 checked={allSelected ? true : someSelected ? 'indeterminate' : false}
                 onCheckedChange={handleSelectAll}
                 label={selectAllLabel}
-                data-testid="BrowseFilters.SelectAll"
+                className="text-base"
+                data-component="BrowseFilters.SelectAll"
             />
             <div className="flex-1" />
-            <span className="text-sm text-subtle tabular-nums" data-testid="BrowseFilters.Count">
+            <span className="text-sm text-subtle tabular-nums" data-component="BrowseFilters.Count">
                 {total} {counterLabel}
             </span>
             <Tooltip delay={300} value={toggleLabel} asChild>
@@ -56,9 +57,8 @@ export const BrowseFilters = (): ReactElement => {
                     startIcon={Cog}
                     pressed={!hideSystem}
                     onPressedChange={(pressed) => setHideSystem(!pressed)}
-                    title={toggleLabel}
                     aria-label={toggleLabel}
-                    data-testid="BrowseFilters.SystemToggle"
+                    data-component="BrowseFilters.SystemToggle"
                 />
             </Tooltip>
         </div>

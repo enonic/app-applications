@@ -30,7 +30,7 @@ export const BrowseGrid = (): ReactElement => {
         return (
             <div
                 className="flex flex-1 items-center justify-center py-10 text-sm text-subtle"
-                data-testid="BrowseGrid.Empty"
+                data-component="BrowseGrid.Empty"
             >
                 {emptyLabel}
             </div>
@@ -45,7 +45,7 @@ export const BrowseGrid = (): ReactElement => {
                 selectionMode="multiple"
                 aria-label={ariaLabel}
                 className="flex min-h-0 flex-1 flex-col bg-surface-neutral"
-                data-testid="BrowseGrid"
+                data-component="BrowseGrid"
             >
                 <TreeList.Container className="px-5 py-2.5">
                     {items.map((app) => {
@@ -55,7 +55,7 @@ export const BrowseGrid = (): ReactElement => {
                                 key={app.key}
                                 id={app.key}
                                 data-system={app.system || undefined}
-                                data-testid="BrowseGrid.Row"
+                                data-component="BrowseGrid.Row"
                                 className="group min-h-12 px-3"
                             >
                                 <TreeList.RowLeft>

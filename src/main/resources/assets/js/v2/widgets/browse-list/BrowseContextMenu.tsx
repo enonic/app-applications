@@ -54,7 +54,7 @@ export const BrowseContextMenu = ({children}: Props): ReactElement => {
                 <div className="contents">{children}</div>
             </ContextMenu.Trigger>
             <ContextMenu.Portal>
-                <ContextMenu.Content className="min-w-44" data-testid="BrowseGrid.ContextMenu">
+                <ContextMenu.Content className="min-w-44" data-component="BrowseGrid.ContextMenu">
                     <ContextMenu.Item onSelect={handleInstall}>{installLabel}</ContextMenu.Item>
                     <ContextMenu.Separator />
                     <ContextMenu.Item

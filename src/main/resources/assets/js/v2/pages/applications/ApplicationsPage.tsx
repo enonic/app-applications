@@ -53,7 +53,7 @@ export const ApplicationsPage = ({application}: Props): ReactElement => {
             <TopBar application={application} />
             <div className="flex w-full min-h-0 flex-1 flex-row bg-surface-primary">
                 <div className="flex h-full min-w-0 flex-1 flex-col">
-                    <div className="flex flex-col h-full w-full bg-surface-neutral text-main" data-testid="BrowsePage">
+                    <div className="flex flex-col h-full w-full bg-surface-neutral text-main" data-component="BrowsePage">
                         <BrowseToolbar />
                         <BrowseFilters />
                         {status === 'error' ? (

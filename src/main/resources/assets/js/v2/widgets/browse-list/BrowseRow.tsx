@@ -18,7 +18,7 @@ export const BrowseRow = ({app, selected}: Props): ReactElement => {
         <div
             className="flex w-full items-center gap-3"
             data-system={app.system || undefined}
-            data-testid="BrowseRow"
+            data-component="BrowseRow"
         >
             <Icon iconUrl={app.iconUrl} />
             <div className="flex min-w-0 flex-1 flex-col text-left">
@@ -28,14 +28,14 @@ export const BrowseRow = ({app, selected}: Props): ReactElement => {
                     </span>
                     {sourceLabel ? <SourceTag label={sourceLabel} system={app.system} /> : null}
                 </div>
-                <small className="truncate text-sm leading-4.5 text-subtle group-data-[tone=inverse]:text-alt/70">
+                <small className="truncate text-sm leading-4.5 text-subtle group-data-[tone=inverse]:text-alt">
                     {app.description || app.vendorName}
                 </small>
             </div>
             <span
                 className={cn(
                     'min-w-25 text-right font-mono text-sm tabular-nums',
-                    'text-subtle group-data-[tone=inverse]:text-alt/70',
+                    'text-subtle group-data-[tone=inverse]:text-alt',
                 )}
             >
                 {app.version}
@@ -54,7 +54,7 @@ const Icon = ({iconUrl}: {iconUrl: string}): ReactElement => {
                 src={iconUrl}
                 alt=""
                 aria-hidden="true"
-                className="size-9 shrink-0 rounded-sm object-cover"
+                className="size-9 shrink-0 rounded-sm object-contain"
                 loading="lazy"
             />
         );
@@ -86,7 +86,7 @@ const SourceTag = ({label, system}: SourceTagProps): ReactElement => {
                 tone,
                 'group-data-[tone=inverse]:bg-white/20 group-data-[tone=inverse]:text-alt',
             )}
-            data-testid="BrowseRow.SourceTag"
+            data-component="BrowseRow.SourceTag"
         >
             {label}
         </span>
@@ -96,9 +96,7 @@ const SourceTag = ({label, system}: SourceTagProps): ReactElement => {
 SourceTag.displayName = 'BrowseRow.SourceTag';
 
 function stateColorClass(state: ApplicationState, selected: boolean): string {
-    if (selected) {
-        return state === 'started' ? 'text-success-rev' : 'text-alt/70';
-    }
+    if (selected) return 'text-alt';
     return state === 'started' ? 'text-success' : 'text-subtle';
 }
 

@@ -15,7 +15,7 @@ export const TopBar = ({application}: Props): ReactElement => {
     return (
         <header
             className="shrink-0 h-14 flex items-center gap-3 px-4 bg-surface-neutral border-b border-bdr-soft relative"
-            data-testid="TopBar"
+            data-component="TopBar"
         >
             <div className="flex items-center gap-2.5">
                 <span className="inline-flex size-7 items-center justify-center text-main">
@@ -24,7 +24,7 @@ export const TopBar = ({application}: Props): ReactElement => {
                 <span className="text-base font-semibold text-main">{application.getName()}</span>
             </div>
             <div className="flex-1" />
-            <div className="appbar" aria-hidden="true" data-testid="TopBar.LegacyMount" style={{display: 'none'}} />
+            <div className="appbar" aria-hidden="true" data-component="TopBar.LegacyMount" style={{display: 'none'}} />
         </header>
     );
 };

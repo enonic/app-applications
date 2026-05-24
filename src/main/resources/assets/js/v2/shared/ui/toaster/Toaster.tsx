@@ -25,7 +25,7 @@ export const Toaster = (): ReactElement | null => {
     return (
         <div
             className="fixed top-4 right-4 z-50 flex flex-col gap-2 pointer-events-none"
-            data-testid="Toaster"
+            data-component="Toaster"
         >
             {items.map((item) => (
                 <div key={item.id} className="pointer-events-auto">
@@ -67,7 +67,7 @@ const ToasterItem = ({item}: ToasterItemProps): ReactElement => {
                 open
                 onOpenChange={handleOpenChange}
                 withClose
-                data-testid={`Toaster.Item.${item.tone}`}
+                data-component={`Toaster.Item.${item.tone}`}
             >
                 <Toast.Icon tone={item.tone} />
                 {item.title ? <Toast.Title>{item.title}</Toast.Title> : null}

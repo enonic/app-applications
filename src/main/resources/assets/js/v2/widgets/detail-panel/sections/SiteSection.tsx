@@ -23,7 +23,7 @@ export const SiteSection = ({info}: Props): ReactElement | null => {
     if (contentTypes.length + pages.length + parts.length + layouts.length === 0) return null;
 
     return (
-        <Section title={title} data-testid="DetailPanel.SiteSection">
+        <Section title={title} data-component="DetailPanel.SiteSection">
             {contentTypes.length > 0 ? (
                 <SectionRow label={contentTypesLabel}>
                     <NameList items={contentTypes} />

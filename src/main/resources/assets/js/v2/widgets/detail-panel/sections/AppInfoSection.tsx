@@ -30,7 +30,7 @@ export const AppInfoSection = ({app}: Props): ReactElement => {
     };
 
     return (
-        <Section title={title} data-testid="DetailPanel.AppInfoSection">
+        <Section title={title} data-component="DetailPanel.AppInfoSection">
             <SectionRow label={displayNameLabel}>{app.displayName}</SectionRow>
             <SectionRow
                 label={keyLabel}
@@ -43,8 +43,8 @@ export const AppInfoSection = ({app}: Props): ReactElement => {
                             className="size-6"
                             iconSize={14}
                             onClick={handleCopyKey}
-                            title={keyLabel}
-                            data-testid="DetailPanel.AppInfoSection.Copy"
+                            aria-label={keyLabel}
+                            data-component="DetailPanel.AppInfoSection.Copy"
                         />
                     </Tooltip>
                 }

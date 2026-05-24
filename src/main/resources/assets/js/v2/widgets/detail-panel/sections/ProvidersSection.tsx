@@ -19,7 +19,7 @@ export const ProvidersSection = ({info}: Props): ReactElement | null => {
     const paths = provider.idProviders.map((p) => p.path).filter(Boolean);
 
     return (
-        <Section title={title} data-testid="DetailPanel.ProvidersSection">
+        <Section title={title} data-component="DetailPanel.ProvidersSection">
             <SectionRow label={modeLabel}>{provider.mode}</SectionRow>
             {paths.length > 0 ? (
                 <SectionRow label={usedByLabel}>

@@ -6,6 +6,7 @@ import {LegacyElement} from './app/legacy/LegacyElement';
 import {registerApplicationEvents} from './app/events/registerApplicationEvents';
 import {ApplicationsPage} from './pages/applications/ApplicationsPage';
 import {setReadonly} from './shared/config/readonly';
+import './shared/config/theme';
 import {Toaster} from './shared/ui/toaster/Toaster';
 
 interface AppProps {

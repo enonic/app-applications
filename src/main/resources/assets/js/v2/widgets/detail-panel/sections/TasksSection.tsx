@@ -19,7 +19,7 @@ export const TasksSection = ({info}: Props): ReactElement | null => {
     const descriptions = info.tasks.map((t) => t.description).filter(Boolean);
 
     return (
-        <Section title={title} data-testid="DetailPanel.TasksSection">
+        <Section title={title} data-component="DetailPanel.TasksSection">
             <SectionRow label={keyLabel}>
                 <NameList items={keys} />
             </SectionRow>

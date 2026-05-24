@@ -21,11 +21,6 @@ import {MarketRow} from './MarketRow';
  * - First mount kicks off `listMarketApplications()` when the store is still
  *   `idle`.
  * - Subsequent renders read items + per-item status from the market store.
- *
- * Virtualisation is deliberately omitted — the registry currently returns ~50
- * apps and a flat list is cheaper than wiring `react-virtuoso`. The phase doc
- * leaves switching to a virtualised list as a future optimisation if catalog
- * size grows.
  */
 export const MarketGrid = (): ReactElement => {
     const market = useStore($market);
@@ -58,24 +53,37 @@ export const MarketGrid = (): ReactElement => {
     }, []);
 
     return (
-        <div className="flex flex-col flex-1 min-h-60 border border-bdr-soft rounded-md overflow-auto" data-testid="MarketGrid">
+        <div className="flex flex-col flex-1 min-h-60" data-component="MarketGrid">
             {market.status === 'loading' ? (
-                <div className="flex items-center justify-center gap-2 py-10 text-sm text-subtle" data-testid="MarketGrid.Loading">
+                <div
+                    className="flex items-center justify-center gap-2 py-10 text-sm text-subtle"
+                    data-component="MarketGrid.Loading"
+                >
                     <Spinner size="sm" label={loadingLabel} />
                     {loadingLabel}
                 </div>
             ) : market.status === 'error' ? (
-                <div className="flex items-center justify-center py-10 text-sm text-error" data-testid="MarketGrid.Error">
+                <div
+                    className="flex items-center justify-center py-10 text-sm text-error"
+                    data-component="MarketGrid.Error"
+                >
                     {errorLabel}
                 </div>
             ) : isEmpty ? (
-                <div className="flex items-center justify-center py-10 text-sm text-subtle" data-testid="MarketGrid.Empty">
+                <div
+                    className="flex items-center justify-center py-10 text-sm text-subtle"
+                    data-component="MarketGrid.Empty"
+                >
                     {emptyLabel}
                 </div>
             ) : (
-                visible.map((item) => (
-                    <MarketRow key={item.key} item={item} status={statuses[item.key] ?? 'not_installed'} />
-                ))
+                <ul className="flex flex-col gap-y-1.5 py-2.5">
+                    {visible.map((item) => (
+                        <li key={item.key}>
+                            <MarketRow item={item} status={statuses[item.key] ?? 'not_installed'} />
+                        </li>
+                    ))}
+                </ul>
             )}
         </div>
     );

@@ -14,7 +14,7 @@ export const DeploymentSection = ({info}: Props): ReactElement | null => {
     if (!info.deploymentUrl) return null;
 
     return (
-        <Section title={title} data-testid="DetailPanel.DeploymentSection">
+        <Section title={title} data-component="DetailPanel.DeploymentSection">
             <SectionRow label={deploymentLabel}>
                 <a
                     href={info.deploymentUrl}

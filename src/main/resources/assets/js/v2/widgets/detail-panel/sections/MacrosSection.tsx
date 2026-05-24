@@ -16,7 +16,7 @@ export const MacrosSection = ({info}: Props): ReactElement | null => {
     if (names.length === 0) return null;
 
     return (
-        <Section title={title} data-testid="DetailPanel.MacrosSection">
+        <Section title={title} data-component="DetailPanel.MacrosSection">
             <SectionRow label={nameLabel}>
                 <NameList items={names} />
             </SectionRow>

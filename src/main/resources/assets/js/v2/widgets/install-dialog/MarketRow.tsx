@@ -1,5 +1,5 @@
-import {Button} from '@enonic/ui';
-import {CheckCircle2, Download, RefreshCw} from 'lucide-react';
+import {Button, cn} from '@enonic/ui';
+import {CheckCircle2, Download, Package, RefreshCw} from 'lucide-react';
 import type {ReactElement} from 'react';
 import {useState} from 'react';
 import {installApplicationFromUrl} from '../../features/install-app/api/install';
@@ -14,15 +14,11 @@ interface Props {
 }
 
 /**
- * Single market application row used inside `MarketGrid`. The action button
- * encodes the derived `MarketAppStatus` — Install for a fresh install, Update
- * for a newer version, Installing… while in flight, Installed when current.
- *
- * The "installing" badge is driven by `$appActions.installing[item.key]`,
- * which the server-events bridge populates on the `PROGRESS` event using the
- * authoritative application key. To bridge the click → first-PROGRESS gap
- * (sub-second under normal conditions) the button briefly disables itself via
- * local state.
+ * Single market application row used inside `MarketGrid`. Visually mirrors
+ * `BrowseRow` minus the checkbox — icon, display name + description, and a
+ * trailing action that encodes the derived `MarketAppStatus`: Install for a
+ * fresh install, Update for a newer version, Installing… while in flight,
+ * Installed when current.
  */
 export const MarketRow = ({item, status}: Props): ReactElement => {
     const installLabel = useI18n('action.install');
@@ -49,40 +45,23 @@ export const MarketRow = ({item, status}: Props): ReactElement => {
 
     return (
         <div
-            className="flex items-center gap-3 px-4 py-3 border-b border-bdr-soft last:border-b-0"
+            className="flex w-full items-center gap-3 px-3 min-h-12"
+            data-component="MarketRow"
             data-status={status}
-            data-testid="MarketRow"
         >
-            {item.iconUrl ? (
-                <img src={item.iconUrl} alt="" className="size-10 rounded-sm shrink-0" />
-            ) : (
-                <div className="size-10 rounded-sm bg-surface-neutral shrink-0" aria-hidden="true" />
-            )}
-            <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2">
-                    {item.url ? (
-                        <a
-                            href={item.url}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="font-medium truncate text-main hover:underline"
-                            title={item.displayName}
-                        >
-                            {item.displayName}
-                        </a>
-                    ) : (
-                        <span className="font-medium truncate" title={item.displayName}>{item.displayName}</span>
-                    )}
+            <Icon iconUrl={item.iconUrl} />
+            <div className="flex min-w-0 flex-1 flex-col text-left">
+                <div className="flex min-w-0 items-center gap-2">
+                    <span className="truncate font-semibold leading-5.5">{item.displayName}</span>
                     {item.latestVersion ? (
-                        <span className="text-xs text-subtle tabular-nums">{item.latestVersion}</span>
+                        <span className="text-sm text-subtle font-mono tabular-nums shrink-0">
+                            {item.latestVersion}
+                        </span>
                     ) : null}
                 </div>
-                {item.vendorName ? (
-                    <p className="text-xs text-subtle truncate">{item.vendorName}</p>
-                ) : null}
-                {item.description ? (
-                    <p className="text-sm text-subtle truncate" title={item.description}>{item.description}</p>
-                ) : null}
+                <small className="truncate text-sm leading-4.5 text-subtle">
+                    {item.description || item.vendorName}
+                </small>
             </div>
             {renderAction({
                 status: showInstalling ? 'installing' : status,
@@ -97,6 +76,33 @@ export const MarketRow = ({item, status}: Props): ReactElement => {
 };
 
 MarketRow.displayName = 'MarketRow';
+
+const Icon = ({iconUrl}: {iconUrl: string}): ReactElement => {
+    if (iconUrl) {
+        return (
+            <img
+                src={iconUrl}
+                alt=""
+                aria-hidden="true"
+                className="size-9 shrink-0 rounded-sm object-contain"
+                loading="lazy"
+            />
+        );
+    }
+    return (
+        <span
+            aria-hidden="true"
+            className={cn(
+                'inline-flex size-9 shrink-0 items-center justify-center rounded-sm',
+                'bg-surface-primary text-subtle',
+            )}
+        >
+            <Package className="size-5" />
+        </span>
+    );
+};
+
+Icon.displayName = 'MarketRow.Icon';
 
 interface ActionProps {
     status: MarketAppStatus;
@@ -117,7 +123,10 @@ function renderAction({
 }: ActionProps): ReactElement {
     if (status === 'installing') {
         return (
-            <div className="flex items-center gap-2 text-sm text-subtle" data-testid="MarketRow.Installing">
+            <div
+                className="flex items-center gap-2 text-sm text-subtle min-w-25 justify-end"
+                data-component="MarketRow.Installing"
+            >
                 <Spinner size="sm" label={installingLabel} />
                 {installingLabel}
             </div>
@@ -131,7 +140,7 @@ function renderAction({
                 startIcon={CheckCircle2}
                 label={installedLabel}
                 disabled
-                data-testid="MarketRow.Installed"
+                data-component="MarketRow.Installed"
             />
         );
     }
@@ -143,7 +152,7 @@ function renderAction({
                 startIcon={RefreshCw}
                 label={updateLabel}
                 onClick={onInstall}
-                data-testid="MarketRow.Update"
+                data-component="MarketRow.Update"
             />
         );
     }
@@ -154,7 +163,7 @@ function renderAction({
             startIcon={Download}
             label={installLabel}
             onClick={onInstall}
-            data-testid="MarketRow.Install"
+            data-component="MarketRow.Install"
         />
     );
 }

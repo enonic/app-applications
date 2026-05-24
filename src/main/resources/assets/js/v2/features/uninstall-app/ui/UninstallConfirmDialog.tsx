@@ -34,7 +34,7 @@ export const UninstallConfirmDialog = (): ReactElement => {
         <Dialog open={uninstallConfirm.open} onOpenChange={handleOpenChange}>
             <Dialog.Portal>
                 <Dialog.Overlay />
-                <Dialog.Content className="max-w-150 w-fit min-w-100" data-testid="UninstallConfirmDialog">
+                <Dialog.Content className="max-w-150 w-fit min-w-100" data-component="UninstallConfirmDialog">
                     <Dialog.DefaultHeader title={title} />
                     <Dialog.Body>
                         <p>{question}</p>
@@ -48,7 +48,7 @@ export const UninstallConfirmDialog = (): ReactElement => {
                             size="lg"
                             label={yesLabel}
                             onClick={handleConfirm}
-                            data-testid="UninstallConfirmDialog.Confirm"
+                            data-component="UninstallConfirmDialog.Confirm"
                         />
                     </Dialog.Footer>
                 </Dialog.Content>

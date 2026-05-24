@@ -21,7 +21,7 @@ export const ExtensionsSection = ({info}: Props): ReactElement | null => {
     if (tools.length + widgets.length + apis.length === 0) return null;
 
     return (
-        <Section title={title} data-testid="DetailPanel.ExtensionsSection">
+        <Section title={title} data-component="DetailPanel.ExtensionsSection">
             {tools.length > 0 ? (
                 <SectionRow label={toolsLabel}>
                     <InlineList>

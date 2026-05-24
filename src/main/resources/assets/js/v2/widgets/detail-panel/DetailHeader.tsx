@@ -47,7 +47,7 @@ export const DetailHeader = ({app}: Props): ReactElement => {
     const stateTextColor = isStarted ? 'text-success' : 'text-subtle';
 
     return (
-        <header className="px-6 pt-6 pb-2" data-testid="DetailPanel.Header">
+        <header className="px-6 pt-6 pb-2" data-component="DetailPanel.Header">
             <div className="flex items-start gap-4">
                 <Icon iconUrl={app.iconUrl} />
                 <div className="flex min-w-0 flex-1 flex-col gap-1.5">
@@ -60,7 +60,7 @@ export const DetailHeader = ({app}: Props): ReactElement => {
 
             <div className="mt-4">
                 <div className="text-sm text-subtle mb-1">{statusTitle}</div>
-                <div className="flex items-baseline gap-2.5 flex-wrap" data-testid="DetailPanel.Header.Status">
+                <div className="flex items-baseline gap-2.5 flex-wrap" data-component="DetailPanel.Header.Status">
                     <span className={cn('text-base font-semibold', stateTextColor)}>{stateLabel}</span>
                     <span aria-hidden="true" className="text-bdr-subtle text-base font-light">|</span>
                     <span className="text-base font-semibold italic text-main">{sourceLabel}</span>
@@ -68,7 +68,7 @@ export const DetailHeader = ({app}: Props): ReactElement => {
             </div>
 
             {canControl || canUninstall ? (
-                <div className="mt-4 flex items-stretch gap-2" data-testid="DetailPanel.Header.Actions">
+                <div className="mt-4 flex items-stretch gap-2" data-component="DetailPanel.Header.Actions">
                     {canControl ? (
                         <div className="flex flex-1 min-w-0 items-stretch">
                             <Button
@@ -77,7 +77,7 @@ export const DetailHeader = ({app}: Props): ReactElement => {
                                 className="flex-1 rounded-r-none border-r-0 justify-center"
                                 label={primaryLabel}
                                 onClick={handlePrimary}
-                                data-testid="DetailPanel.Header.Primary"
+                                data-component="DetailPanel.Header.Primary"
                             />
                             <Menu>
                                 <Menu.Trigger asChild>
@@ -86,8 +86,8 @@ export const DetailHeader = ({app}: Props): ReactElement => {
                                         size="sm"
                                         className="rounded-l-none px-2 border-l border-white/20"
                                         startIcon={ChevronDown}
-                                        title={primaryLabel}
-                                        data-testid="DetailPanel.Header.More"
+                                        aria-label={primaryLabel}
+                                        data-component="DetailPanel.Header.More"
                                     />
                                 </Menu.Trigger>
                                 <Menu.Portal>
@@ -109,7 +109,7 @@ export const DetailHeader = ({app}: Props): ReactElement => {
                             size="sm"
                             label={uninstallLabel}
                             onClick={handleUninstall}
-                            data-testid="DetailPanel.Header.Uninstall"
+                            data-component="DetailPanel.Header.Uninstall"
                         />
                     ) : null}
                 </div>
@@ -127,7 +127,7 @@ const Icon = ({iconUrl}: {iconUrl: string}): ReactElement => {
                 src={iconUrl}
                 alt=""
                 aria-hidden="true"
-                className="size-13 shrink-0 rounded-sm object-cover"
+                className="size-13 shrink-0 rounded-sm object-contain"
                 loading="lazy"
             />
         );

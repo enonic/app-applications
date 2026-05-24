@@ -68,17 +68,17 @@ export const UploadDropZone = (): ReactElement => {
     const items = Object.values(uploads);
 
     return (
-        <div className="flex flex-col gap-2" data-testid="UploadDropZone">
+        <div className="flex flex-col flex-1 gap-2" data-component="UploadDropZone">
             <div
                 ref={dropZoneRef}
                 className={
-                    'flex flex-col items-center justify-center gap-2 px-5 py-6 border-2 border-dashed rounded-md text-sm transition-colors ' +
+                    'flex flex-col flex-1 items-center justify-center gap-2 px-5 py-6 border-2 border-dashed rounded-md text-sm transition-colors ' +
                     (dragOver
                         ? 'border-interactive-primary bg-surface-interactive-soft text-interactive-primary'
                         : 'border-bdr-soft bg-surface-secondary text-subtle')
                 }
                 data-state={dragOver ? 'over' : 'idle'}
-                data-testid="UploadDropZone.Target"
+                data-component="UploadDropZone.Target"
             >
                 <Upload className="size-6" />
                 <p className="text-center">{dropHere}</p>
@@ -88,7 +88,7 @@ export const UploadDropZone = (): ReactElement => {
                     size="sm"
                     label={browse}
                     onClick={(): void => fileInputRef.current?.click()}
-                    data-testid="UploadDropZone.Browse"
+                    data-component="UploadDropZone.Browse"
                 />
                 <input
                     ref={fileInputRef}
@@ -104,13 +104,13 @@ export const UploadDropZone = (): ReactElement => {
                 />
             </div>
             {items.length > 0 ? (
-                <ul className="flex flex-col gap-1" data-testid="UploadDropZone.List">
+                <ul className="flex flex-col gap-1" data-component="UploadDropZone.List">
                     {items.map((item) => (
                         <li
                             key={item.id}
                             className="flex items-center gap-2 px-3 py-2 border border-bdr-soft rounded-md text-sm"
                             data-status={item.status}
-                            data-testid="UploadDropZone.Item"
+                            data-component="UploadDropZone.Item"
                         >
                             <span className="flex-1 truncate" title={item.name}>{item.name}</span>
                             <span className="text-subtle w-16 text-right tabular-nums">{formatProgress(item)}</span>
@@ -121,7 +121,7 @@ export const UploadDropZone = (): ReactElement => {
                                 title={remove}
                                 aria-label={remove}
                                 onClick={(): void => removeUpload(item.id)}
-                                data-testid="UploadDropZone.Remove"
+                                data-component="UploadDropZone.Remove"
                             />
                         </li>
                     ))}
