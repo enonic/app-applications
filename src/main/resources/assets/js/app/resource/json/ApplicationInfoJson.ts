@@ -19,6 +19,10 @@ export interface ApplicationInfoJson {
 
     layouts: BaseDescriptorsJson;
 
+    mixins: BaseDescriptorsJson;
+
+    formFragments: BaseDescriptorsJson;
+
     macros: MacrosJson;
 
     references: ContentReferencesJson;

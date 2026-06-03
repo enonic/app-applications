@@ -30,10 +30,21 @@ import com.enonic.xp.region.PartDescriptorService;
 import com.enonic.xp.region.PartDescriptors;
 import com.enonic.xp.region.RegionDescriptor;
 import com.enonic.xp.region.RegionDescriptors;
+import com.enonic.xp.resource.ResourceKey;
+import com.enonic.xp.resource.ResourceKeys;
+import com.enonic.xp.resource.ResourceService;
+import com.enonic.xp.schema.content.CmsFormFragmentService;
 import com.enonic.xp.schema.content.ContentType;
 import com.enonic.xp.schema.content.ContentTypeName;
 import com.enonic.xp.schema.content.ContentTypeService;
 import com.enonic.xp.schema.content.ContentTypes;
+import com.enonic.xp.schema.formfragment.FormFragmentDescriptor;
+import com.enonic.xp.schema.formfragment.FormFragmentDescriptors;
+import com.enonic.xp.schema.formfragment.FormFragmentName;
+import com.enonic.xp.schema.mixin.MixinDescriptor;
+import com.enonic.xp.schema.mixin.MixinDescriptors;
+import com.enonic.xp.schema.mixin.MixinName;
+import com.enonic.xp.schema.mixin.MixinService;
 import com.enonic.xp.security.IdProvider;
 import com.enonic.xp.security.IdProviderConfig;
 import com.enonic.xp.security.IdProviderKey;
@@ -54,6 +65,12 @@ public class ApplicationInfoServiceImplTest
     private PartDescriptorService partDescriptorService;
 
     private LayoutDescriptorService layoutDescriptorService;
+
+    private MixinService mixinService;
+
+    private CmsFormFragmentService cmsFormFragmentService;
+
+    private ResourceService resourceService;
 
     private MacroDescriptorService macroDescriptorService;
 
@@ -78,6 +95,9 @@ public class ApplicationInfoServiceImplTest
         this.pageDescriptorService = Mockito.mock( PageDescriptorService.class );
         this.partDescriptorService = Mockito.mock( PartDescriptorService.class );
         this.layoutDescriptorService = Mockito.mock( LayoutDescriptorService.class );
+        this.mixinService = Mockito.mock( MixinService.class );
+        this.cmsFormFragmentService = Mockito.mock( CmsFormFragmentService.class );
+        this.resourceService = Mockito.mock( ResourceService.class );
         this.macroDescriptorService = Mockito.mock( MacroDescriptorService.class );
         this.taskDescriptorService = Mockito.mock( TaskDescriptorService.class );
         this.securityService = Mockito.mock( SecurityService.class );
@@ -87,6 +107,9 @@ public class ApplicationInfoServiceImplTest
         this.service.setPageDescriptorService( this.pageDescriptorService );
         this.service.setPartDescriptorService( this.partDescriptorService );
         this.service.setLayoutDescriptorService( this.layoutDescriptorService );
+        this.service.setMixinService( this.mixinService );
+        this.service.setCmsFormFragmentService( this.cmsFormFragmentService );
+        this.service.setResourceService( this.resourceService );
         this.service.setMacroDescriptorService( this.macroDescriptorService );
         this.service.setTaskDescriptorService( this.taskDescriptorService );
         this.service.setSecurityService( this.securityService );
@@ -137,6 +160,24 @@ public class ApplicationInfoServiceImplTest
     }
 
     @Test
+    public void testMixins()
+    {
+        mockMixinDescriptors( this.applicationKey );
+        final MixinDescriptors mixinDescriptors = this.service.getMixinDescriptors( this.applicationKey );
+
+        assertEquals( mixinDescriptors.getSize(), 2 );
+    }
+
+    @Test
+    public void testFormFragments()
+    {
+        mockFormFragmentDescriptors( this.applicationKey );
+        final FormFragmentDescriptors formFragmentDescriptors = this.service.getFormFragmentDescriptors( this.applicationKey );
+
+        assertEquals( formFragmentDescriptors.getSize(), 2 );
+    }
+
+    @Test
     public void testTasks()
     {
         mockTasks( this.applicationKey );
@@ -177,6 +218,8 @@ public class ApplicationInfoServiceImplTest
         assertEquals( applicationInfo.getPages().getSize(), 2 );
         assertEquals( applicationInfo.getParts().getSize(), 2 );
         assertEquals( applicationInfo.getLayouts().getSize(), 2 );
+        assertEquals( applicationInfo.getMixins().getSize(), 2 );
+        assertEquals( applicationInfo.getFormFragments().getSize(), 2 );
         assertEquals( applicationInfo.getTasks().getSize(), 2 );
         assertEquals( applicationInfo.getMacros().getSize(), 2 );
         assertEquals( applicationInfo.getIdProviderReferences().getSize(), 2 );
@@ -271,6 +314,42 @@ public class ApplicationInfoServiceImplTest
 
     }
 
+    private void mockMixinDescriptors( final ApplicationKey applicationKey )
+    {
+        final MixinDescriptor mixinDescriptor1 = MixinDescriptor.create().
+            name( MixinName.from( applicationKey, "personal-info" ) ).
+            title( "Personal info" ).
+            form( Form.empty() ).
+            build();
+
+        final MixinDescriptor mixinDescriptor2 = MixinDescriptor.create().
+            name( MixinName.from( applicationKey, "address" ) ).
+            title( "Address" ).
+            form( Form.empty() ).
+            build();
+
+        Mockito.when( this.mixinService.getByApplication( applicationKey ) ).
+            thenReturn( MixinDescriptors.from( mixinDescriptor1, mixinDescriptor2 ) );
+    }
+
+    private void mockFormFragmentDescriptors( final ApplicationKey applicationKey )
+    {
+        final ResourceKeys resourceKeys = ResourceKeys.from(
+            ResourceKey.from( applicationKey, "/cms/form-fragments/address/address.yml" ),
+            ResourceKey.from( applicationKey, "/cms/form-fragments/norwegian-county/norwegian-county.yml" ) );
+
+        Mockito.when( this.resourceService.findFiles( Mockito.eq( applicationKey ), Mockito.anyString() ) ).thenReturn( resourceKeys );
+
+        Mockito.when( this.cmsFormFragmentService.getByName( Mockito.isA( FormFragmentName.class ) ) ).thenAnswer( invocation -> {
+            final FormFragmentName name = invocation.getArgument( 0 );
+            return FormFragmentDescriptor.create().
+                name( name ).
+                title( name.getLocalName() ).
+                form( Form.empty() ).
+                build();
+        } );
+    }
+
     private void mockMacros( final ApplicationKey applicationKey )
     {
         final MacroDescriptor macroDescriptor1 = MacroDescriptor.create().
@@ -352,6 +431,8 @@ public class ApplicationInfoServiceImplTest
         mockPageDescriptors( applicationKey );
         mockPartDescriptors( applicationKey );
         mockLayoutDescriptors( applicationKey );
+        mockMixinDescriptors( applicationKey );
+        mockFormFragmentDescriptors( applicationKey );
         mockMacros( applicationKey );
         mockTasks( applicationKey );
         mockIdProviderApplication( applicationKey );

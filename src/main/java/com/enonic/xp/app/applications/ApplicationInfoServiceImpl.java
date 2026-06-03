@@ -1,10 +1,14 @@
 package com.enonic.xp.app.applications;
 
+import java.util.Objects;
+
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 import com.enonic.xp.app.ApplicationKey;
 import com.enonic.xp.app.ApplicationKeys;
+import com.enonic.xp.descriptor.DescriptorKey;
+import com.enonic.xp.descriptor.DescriptorKeyLocator;
 import com.enonic.xp.descriptor.Descriptors;
 import com.enonic.xp.idprovider.IdProviderDescriptor;
 import com.enonic.xp.idprovider.IdProviderDescriptorService;
@@ -16,8 +20,14 @@ import com.enonic.xp.region.LayoutDescriptorService;
 import com.enonic.xp.region.LayoutDescriptors;
 import com.enonic.xp.region.PartDescriptorService;
 import com.enonic.xp.region.PartDescriptors;
+import com.enonic.xp.resource.ResourceService;
+import com.enonic.xp.schema.content.CmsFormFragmentService;
 import com.enonic.xp.schema.content.ContentTypeService;
 import com.enonic.xp.schema.content.ContentTypes;
+import com.enonic.xp.schema.formfragment.FormFragmentDescriptors;
+import com.enonic.xp.schema.formfragment.FormFragmentName;
+import com.enonic.xp.schema.mixin.MixinDescriptors;
+import com.enonic.xp.schema.mixin.MixinService;
 import com.enonic.xp.security.IdProviders;
 import com.enonic.xp.security.SecurityService;
 import com.enonic.xp.task.TaskDescriptor;
@@ -32,6 +42,12 @@ public final class ApplicationInfoServiceImpl
     private PartDescriptorService partDescriptorService;
 
     private LayoutDescriptorService layoutDescriptorService;
+
+    private MixinService mixinService;
+
+    private CmsFormFragmentService cmsFormFragmentService;
+
+    private ResourceService resourceService;
 
     private MacroDescriptorService macroDescriptorService;
 
@@ -65,6 +81,23 @@ public final class ApplicationInfoServiceImpl
     public LayoutDescriptors getLayoutDescriptors( final ApplicationKey applicationKey )
     {
         return this.layoutDescriptorService.getByApplication( applicationKey );
+    }
+
+    @Override
+    public MixinDescriptors getMixinDescriptors( final ApplicationKey applicationKey )
+    {
+        return this.mixinService.getByApplication( applicationKey );
+    }
+
+    @Override
+    public FormFragmentDescriptors getFormFragmentDescriptors( final ApplicationKey applicationKey )
+    {
+        return new DescriptorKeyLocator( this.resourceService, "/cms/form-fragments", true ).findKeys( applicationKey )
+            .stream()
+            .map( DescriptorKey::getName )
+            .map( name -> this.cmsFormFragmentService.getByName( FormFragmentName.from( applicationKey, name ) ) )
+            .filter( Objects::nonNull )
+            .collect( FormFragmentDescriptors.collector() );
     }
 
     @Override
@@ -103,6 +136,8 @@ public final class ApplicationInfoServiceImpl
             setPages( this.getPageDescriptors( applicationKey ) ).
             setParts( this.getPartDescriptors( applicationKey ) ).
             setLayouts( this.getLayoutDescriptors( applicationKey ) ).
+            setMixins( this.getMixinDescriptors( applicationKey ) ).
+            setFormFragments( this.getFormFragmentDescriptors( applicationKey ) ).
             setIdProviderReferences( this.getIdProviderReferences( applicationKey ) ).
             setMacros( this.getMacroDescriptors( applicationKey ) ).
             setTasks( this.getTaskDescriptors( applicationKey ) ).
@@ -126,6 +161,24 @@ public final class ApplicationInfoServiceImpl
     public void setLayoutDescriptorService( final LayoutDescriptorService layoutDescriptorService )
     {
         this.layoutDescriptorService = layoutDescriptorService;
+    }
+
+    @Reference
+    public void setMixinService( final MixinService mixinService )
+    {
+        this.mixinService = mixinService;
+    }
+
+    @Reference
+    public void setCmsFormFragmentService( final CmsFormFragmentService cmsFormFragmentService )
+    {
+        this.cmsFormFragmentService = cmsFormFragmentService;
+    }
+
+    @Reference
+    public void setResourceService( final ResourceService resourceService )
+    {
+        this.resourceService = resourceService;
     }
 
     @Reference
