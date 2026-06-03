@@ -19,6 +19,10 @@ export class ApplicationInfo {
 
     private layouts: BaseDescriptor[];
 
+    private mixins: BaseDescriptor[];
+
+    private formFragments: BaseDescriptor[];
+
     private macros: MacroDescriptor[];
 
     private tasks: ApplicationTask[];
@@ -46,6 +50,12 @@ export class ApplicationInfo {
 
         result.layouts = (json.layouts && json.layouts.descriptors) ?
             json.layouts.descriptors.map((descriptorJson => BaseDescriptor.fromJson(descriptorJson))) : [];
+
+        result.mixins = (json.mixins && json.mixins.descriptors) ?
+            json.mixins.descriptors.map((descriptorJson => BaseDescriptor.fromJson(descriptorJson))) : [];
+
+        result.formFragments = (json.formFragments && json.formFragments.descriptors) ?
+            json.formFragments.descriptors.map((descriptorJson => BaseDescriptor.fromJson(descriptorJson))) : [];
 
         result.macros = (json.macros && json.macros.macros) ? json.macros.macros.map((macroJson) => {
             return MacroDescriptor.fromJson(macroJson);
@@ -88,6 +98,14 @@ export class ApplicationInfo {
 
     getLayouts(): BaseDescriptor[] {
         return this.layouts;
+    }
+
+    getMixins(): BaseDescriptor[] {
+        return this.mixins;
+    }
+
+    getFormFragments(): BaseDescriptor[] {
+        return this.formFragments;
     }
 
     getMacros(): MacroDescriptor[] {

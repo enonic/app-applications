@@ -7,6 +7,8 @@ import com.enonic.xp.page.PageDescriptors;
 import com.enonic.xp.region.LayoutDescriptors;
 import com.enonic.xp.region.PartDescriptors;
 import com.enonic.xp.schema.content.ContentTypes;
+import com.enonic.xp.schema.formfragment.FormFragmentDescriptors;
+import com.enonic.xp.schema.mixin.MixinDescriptors;
 import com.enonic.xp.security.IdProviders;
 import com.enonic.xp.task.TaskDescriptor;
 
@@ -19,6 +21,10 @@ public final class ApplicationInfo
     private final PartDescriptors parts;
 
     private final LayoutDescriptors layouts;
+
+    private final MixinDescriptors mixins;
+
+    private final FormFragmentDescriptors formFragments;
 
     private final MacroDescriptors macros;
 
@@ -35,6 +41,8 @@ public final class ApplicationInfo
         this.pages = builder.pages;
         this.parts = builder.parts;
         this.layouts = builder.layouts;
+        this.mixins = builder.mixins;
+        this.formFragments = builder.formFragments;
         this.macros = builder.macros;
         this.tasks = builder.tasks;
         this.idProviderReferences = builder.idProviderReferences;
@@ -59,6 +67,16 @@ public final class ApplicationInfo
     public LayoutDescriptors getLayouts()
     {
         return layouts;
+    }
+
+    public MixinDescriptors getMixins()
+    {
+        return mixins;
+    }
+
+    public FormFragmentDescriptors getFormFragments()
+    {
+        return formFragments;
     }
 
     public MacroDescriptors getMacros()
@@ -97,6 +115,10 @@ public final class ApplicationInfo
 
         private LayoutDescriptors layouts;
 
+        private MixinDescriptors mixins;
+
+        private FormFragmentDescriptors formFragments;
+
         private MacroDescriptors macros;
 
         private Descriptors<TaskDescriptor> tasks;
@@ -130,6 +152,18 @@ public final class ApplicationInfo
         public Builder setLayouts( final LayoutDescriptors layouts )
         {
             this.layouts = layouts;
+            return this;
+        }
+
+        public Builder setMixins( final MixinDescriptors mixins )
+        {
+            this.mixins = mixins;
+            return this;
+        }
+
+        public Builder setFormFragments( final FormFragmentDescriptors formFragments )
+        {
+            this.formFragments = formFragments;
             return this;
         }
 
