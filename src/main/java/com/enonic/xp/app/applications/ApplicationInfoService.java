@@ -9,6 +9,8 @@ import com.enonic.xp.page.PageDescriptors;
 import com.enonic.xp.region.LayoutDescriptors;
 import com.enonic.xp.region.PartDescriptors;
 import com.enonic.xp.schema.content.ContentTypes;
+import com.enonic.xp.schema.formfragment.FormFragmentDescriptors;
+import com.enonic.xp.schema.mixin.MixinDescriptors;
 import com.enonic.xp.security.IdProviders;
 import com.enonic.xp.task.TaskDescriptor;
 
@@ -22,6 +24,10 @@ public interface ApplicationInfoService
     PartDescriptors getPartDescriptors( ApplicationKey applicationKey );
 
     LayoutDescriptors getLayoutDescriptors( ApplicationKey applicationKey );
+
+    MixinDescriptors getMixinDescriptors( ApplicationKey applicationKey );
+
+    FormFragmentDescriptors getFormFragmentDescriptors( ApplicationKey applicationKey );
 
     MacroDescriptors getMacroDescriptors( ApplicationKey applicationKey );
 

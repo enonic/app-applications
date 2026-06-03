@@ -80,6 +80,14 @@ export class ApplicationDataContainer
             this.sortAlphabeticallyAsc);
         siteGroup.addDataArray(i18n('field.layout'), layoutNames);
 
+        const mixinNames: string[] = applicationInfo.getMixins().map(this.getDescriptorName).sort(
+            this.sortAlphabeticallyAsc);
+        siteGroup.addDataArray(i18n('field.mixins'), mixinNames);
+
+        const formFragmentNames: string[] = applicationInfo.getFormFragments().map(this.getDescriptorName).sort(
+            this.sortAlphabeticallyAsc);
+        siteGroup.addDataArray(i18n('field.formFragments'), formFragmentNames);
+
         return siteGroup;
     }
 
@@ -166,7 +174,18 @@ export class ApplicationDataContainer
     }
 
     private getExtensions(applicationInfo: ApplicationInfo): Element[] {
-        return applicationInfo.getExtensions().map(this.extensionToElement).sort(this.sortElInAlphabeticallyAsc);
+        return applicationInfo.getExtensions().slice().sort(this.sortExtensionsByInterfaceThenName).map(this.extensionToElement);
+    }
+
+    private sortExtensionsByInterfaceThenName(a: Extension, b: Extension): number {
+        const interfaceComparison: number = a.getInterfaces().join(', ').toLocaleLowerCase().localeCompare(
+            b.getInterfaces().join(', ').toLocaleLowerCase());
+
+        if (interfaceComparison !== 0) {
+            return interfaceComparison;
+        }
+
+        return a.getDisplayName().toLocaleLowerCase().localeCompare(b.getDisplayName().toLocaleLowerCase());
     }
 
     private getApis(applicationInfo: ApplicationInfo): Element[] {
