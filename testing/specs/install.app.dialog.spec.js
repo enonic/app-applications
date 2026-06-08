@@ -15,7 +15,7 @@ describe('Install Application Dialog specification', function () {
         webDriverHelper.setupBrowser();
     }
 
-    const CHUCK_NORRIS_APP_DISPLAY_NAME = 'com.enonic.app.chucknorris';//'Chuck Norris';
+    const CHUCK_NORRIS_APP_DISPLAY_NAME = 'Chuck Norris';
 
     it("SHOULD show install app dialog WHEN 'Install' button has been clicked",
         async () => {

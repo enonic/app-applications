@@ -13,9 +13,7 @@ describe('Application Browse Panel, check buttons in the toolbar', function () {
         webDriverHelper.setupBrowser();
     }
 
-    const CONTENT_VIEWER_APP = 'Content Viewer App'; // This displayName should be in grid
-    const APP_1_CONTENT_VIEWER = 'Content viewer'; // This displayName should be in Uninstall modal dialog
-    const APP_CHUCK = 'com.enonic.app.chucknorris';//'Chuck Norris';
+    const APP_CHUCK = 'Chuck Norris';
     const APP_CHUCK_DESCRIPTION = 'chucknorris';
     const APP_1_DESCRIPTION = 'Inspect your content object JSON';
     const APP_2_DESCRIPTION = 'Add Auth0 authentication to your Enonic XP installation';
@@ -54,13 +52,10 @@ describe('Application Browse Panel, check buttons in the toolbar', function () {
             await installAppDialog.waitForClosed(2000);
             await studioUtils.saveScreenshot('provider_installed');
             // 5. Verify the apps by their description
-            // TODO
             //await appBrowsePanel.waitForAppByDescriptionDisplayed(APP_CHUCK);
             await appBrowsePanel.waitForAppByDisplayNameDisplayed(APP_CHUCK)
-            //await appBrowsePanel.waitForAppByDescriptionDisplayed(APP2);
         });
 
-    // TODO
     it('WHEN An installed application is selected or unselected THEN the toolbar buttons must be updated',
         async () => {
             let appBrowsePanel = new AppBrowsePanel();
