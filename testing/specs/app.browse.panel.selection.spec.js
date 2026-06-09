@@ -24,6 +24,7 @@ describe('Applications Browse panel - selection of items spec', function () {
     it(`WHEN 'selection controller'-checkbox has been clicked THEN all rows in grid should be selected`,
         async () => {
             let appBrowsePanel = new AppBrowsePanel();
+            await appBrowsePanel.pause(2000);
             await appBrowsePanel.clickOnSelectionControllerCheckbox();
             await studioUtils.saveScreenshot('selection_controller_checked');
             let number = await appBrowsePanel.getNumberOfCheckedRows();
