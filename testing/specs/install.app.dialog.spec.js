@@ -16,7 +16,6 @@ describe('Install Application Dialog specification', function () {
     }
 
     const CHUCK_NORRIS_APP_DISPLAY_NAME = 'Chuck Norris';
-    //test
 
     it("SHOULD show install app dialog WHEN 'Install' button has been clicked",
         async () => {
