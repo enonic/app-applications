@@ -110,7 +110,7 @@ describe('api/market', () => {
             ...MARKET_ITEM,
             data: {
                 ...MARKET_ITEM.data,
-                identifier: undefined,
+                identifier: undefined as string | undefined,
                 groupId: 'com.enonic.app',
                 artifactId: 'demo',
             },

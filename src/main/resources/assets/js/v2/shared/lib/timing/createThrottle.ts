@@ -22,7 +22,7 @@
  * @param delay - The throttle delay in milliseconds
  * @returns Throttled function with cancel and flush methods
  */
-export function createThrottle<T extends(...args: unknown[]) => void>(
+export function createThrottle<T extends(...args: never[]) => void>(
     fn: T,
     delay: number
 ): T & {cancel: () => void; flush: () => void} {

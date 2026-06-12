@@ -5,6 +5,7 @@ import type {ReactElement} from 'react';
 import {useEffect, useRef, useState} from 'react';
 import {uploadApplication} from '../../features/install-app/api/install';
 import {useI18n} from '../../shared/i18n/useI18n';
+import {toErrorMessage} from '../../shared/api/errors/AppError';
 import {
     $upload,
     patchUpload,
@@ -155,7 +156,7 @@ async function runUpload(id: string, file: File): Promise<void> {
     } catch (cause) {
         patchUpload(id, {
             status: 'error',
-            error: cause instanceof Error ? cause.message : String(cause),
+            error: toErrorMessage(cause),
         });
     }
 }

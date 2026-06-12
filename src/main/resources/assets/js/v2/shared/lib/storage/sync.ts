@@ -241,7 +241,7 @@ function getStorage(type: StorageType): Storage | null {
         return storageCache.get(type) ?? null;
     }
 
-    let storage: Storage | null = null;
+    let storage: Storage | null;
 
     try {
         const storageImpl = type === 'local' ? window.localStorage : window.sessionStorage;

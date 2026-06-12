@@ -16,6 +16,7 @@ import {
 import type {ApplicationDto} from '../../entities/application/types/Application';
 import {$notifications, resetNotifications} from '../../shared/ui/toaster/store/notifications';
 import {handleApplicationEvent} from './handleApplicationEvent';
+import {type ApplicationJsonExt} from '../../entities/application/api/applications';
 
 // ! lib-admin-ui's AbstractEvent constructor calls ClassHelper.getFullName,
 // which references `window`. The test environment is Node, so stub it.
@@ -57,7 +58,12 @@ function makeEvent(
     return new ApplicationEvent(key, type, options.systemApplication ?? false, undefined, options.progress);
 }
 
-const APP_JSON = {
+const APP_JSON: ApplicationJsonExt = {
+    id: 'com.enonic.app.demo',
+    createdTime: '2026-01-01T00:00:00Z',
+    modifiedTime: '2026-01-02T00:00:00Z',
+    editable: false,
+    deletable: false,
     key: 'com.enonic.app.demo',
     title: 'Demo App',
     displayName: '',

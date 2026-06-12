@@ -55,3 +55,17 @@ function safeParseJson(text: string): unknown {
         return undefined;
     }
 }
+
+/**
+ * Human-readable message for an unknown thrown value. Prefers `Error#message`,
+ * then plain strings, and falls back to JSON to avoid `[object Object]`.
+ */
+export function toErrorMessage(cause: unknown): string {
+    if (cause instanceof Error) return cause.message;
+    if (typeof cause === 'string') return cause;
+    try {
+        return JSON.stringify(cause) ?? Object.prototype.toString.call(cause);
+    } catch {
+        return Object.prototype.toString.call(cause);
+    }
+}

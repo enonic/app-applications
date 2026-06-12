@@ -67,7 +67,7 @@ function makeFakeXhr(): FakeXhr {
         },
         fakeProgress(loaded: number, total: number, lengthComputable = true) {
             const event = {loaded, total, lengthComputable} as ProgressEvent;
-            (uploadListeners.progress ?? []).forEach((cb) => cb(event as unknown as Event));
+            (uploadListeners.progress ?? []).forEach((cb) => cb(event));
         },
     };
     fake.abort = vi.fn(() => {

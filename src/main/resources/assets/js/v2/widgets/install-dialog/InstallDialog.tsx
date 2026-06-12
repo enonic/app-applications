@@ -10,6 +10,7 @@ import {$dialogs, closeInstallDialog} from '../../pages/applications/store/dialo
 import {$market, resetMarket, setQuery} from '../../features/install-app/store/market-search';
 import {MarketGrid} from './MarketGrid';
 import {UploadDropZone} from './UploadDropZone';
+import {toErrorMessage} from '../../shared/api/errors/AppError';
 
 const URL_PATTERN = /^https?:\/\/\S+$/i;
 
@@ -52,7 +53,7 @@ export const InstallDialog = (): ReactElement => {
             await installApplicationFromUrl(trimmed);
             setQuery('');
         } catch (cause) {
-            const detail = cause instanceof Error ? cause.message : String(cause);
+            const detail = toErrorMessage(cause);
             pushToast({tone: 'error', message: `${installFailedLabel}: ${detail}`});
         } finally {
             setUrlBusy(false);

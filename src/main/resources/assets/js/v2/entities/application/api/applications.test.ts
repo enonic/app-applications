@@ -1,6 +1,6 @@
 import {CONFIG} from '@enonic/lib-admin-ui/util/Config';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
-import {getApplication, getApplicationInfo, listApplications} from './applications';
+import {type ApplicationJsonExt, getApplication, getApplicationInfo, listApplications} from './applications';
 
 function mockFetchOnce(body: unknown, init: ResponseInit = {status: 200}) {
     const response = new Response(typeof body === 'string' ? body : JSON.stringify(body), {
@@ -10,7 +10,12 @@ function mockFetchOnce(body: unknown, init: ResponseInit = {status: 200}) {
     return vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(response);
 }
 
-const APP_JSON = {
+const APP_JSON: ApplicationJsonExt = {
+    id: 'com.enonic.app.demo',
+    createdTime: '2026-01-01T00:00:00Z',
+    modifiedTime: '2026-01-02T00:00:00Z',
+    editable: false,
+    deletable: false,
     key: 'com.enonic.app.demo',
     version: '1.2.3',
     displayName: '',
