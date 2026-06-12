@@ -33,6 +33,10 @@ public class ApplicationInfoJson
 
     private final LayoutDescriptorsJson layouts;
 
+    private final MixinDescriptorsJson mixins;
+
+    private final FormFragmentDescriptorsJson formFragments;
+
     private final MacrosJson macros;
 
     private final ApplicationTaskDescriptorsJson tasks;
@@ -57,6 +61,8 @@ public class ApplicationInfoJson
         this.layouts =
             new LayoutDescriptorsJson( LayoutDescriptors.from( builder.applicationInfo.getLayouts() ), builder.localeMessageResolver,
                                        builder.inlineMixinResolver );
+        this.mixins = new MixinDescriptorsJson( builder.applicationInfo.getMixins(), builder.localeMessageResolver );
+        this.formFragments = new FormFragmentDescriptorsJson( builder.applicationInfo.getFormFragments(), builder.localeMessageResolver );
         this.macros = MacrosJson.
             create().
             setMacroDescriptors( builder.applicationInfo.getMacros() ).
@@ -90,6 +96,16 @@ public class ApplicationInfoJson
     public LayoutDescriptorsJson getLayouts()
     {
         return layouts;
+    }
+
+    public MixinDescriptorsJson getMixins()
+    {
+        return mixins;
+    }
+
+    public FormFragmentDescriptorsJson getFormFragments()
+    {
+        return formFragments;
     }
 
     public MacrosJson getMacros()

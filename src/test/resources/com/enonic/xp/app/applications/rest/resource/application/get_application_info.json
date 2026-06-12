@@ -27,6 +27,9 @@
   "deployment": {
     "url": "http://localhost:80/webapp/testapplication"
   },
+  "formFragments": {
+    "descriptors": []
+  },
   "idProviderApplication": {
   },
   "layouts": {
@@ -34,6 +37,9 @@
   },
   "macros": {
     "macros": []
+  },
+  "mixins": {
+    "descriptors": []
   },
   "pages": {
     "descriptors": []
