@@ -26,6 +26,19 @@ export interface ApplicationInfoJson {
     apis?: {
         descriptors?: ApiDescriptorJson[];
     };
+    mixins?: SchemaDescriptorsJson;
+    formFragments?: SchemaDescriptorsJson;
+}
+
+interface SchemaDescriptorJson {
+    key: string;
+    name: string;
+    displayName?: string;
+    description?: string;
+}
+
+interface SchemaDescriptorsJson {
+    descriptors?: SchemaDescriptorJson[];
 }
 
 interface BaseDescriptorJson {
@@ -151,6 +164,8 @@ export interface ApplicationInfoDto {
     pages: DescriptorDto[];
     parts: DescriptorDto[];
     layouts: DescriptorDto[];
+    mixins: DescriptorDto[];
+    formFragments: DescriptorDto[];
     macros: MacroDto[];
     tasks: TaskDto[];
     tools: AdminToolDto[];
@@ -177,6 +192,8 @@ export function toApplicationInfoDto(json: ApplicationInfoJson): ApplicationInfo
         pages: mapDescriptors(json.pages?.descriptors),
         parts: mapDescriptors(json.parts?.descriptors),
         layouts: mapDescriptors(json.layouts?.descriptors),
+        mixins: mapDescriptors(json.mixins?.descriptors),
+        formFragments: mapDescriptors(json.formFragments?.descriptors),
         macros: mapMacros(json.macros?.macros ?? []),
         tasks: mapTasks(json.tasks?.tasks ?? []),
         tools: mapTools(json.tools?.descriptors ?? []),
@@ -197,7 +214,7 @@ function localName(qualifiedName: string): string {
     return colon < 0 ? qualifiedName : qualifiedName.substring(colon + 1);
 }
 
-function mapDescriptors(descriptors: BaseDescriptorJson[] | undefined): DescriptorDto[] {
+function mapDescriptors(descriptors: {key: string; name: string}[] | undefined): DescriptorDto[] {
     return (descriptors ?? []).map((d) => ({key: d.key, name: d.name}));
 }
 

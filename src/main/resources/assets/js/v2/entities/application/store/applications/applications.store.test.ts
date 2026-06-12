@@ -37,6 +37,8 @@ function makeInfo(): ApplicationInfoDto {
         pages: [],
         parts: [],
         layouts: [],
+        mixins: [],
+        formFragments: [],
         macros: [],
         tasks: [],
         tools: [],

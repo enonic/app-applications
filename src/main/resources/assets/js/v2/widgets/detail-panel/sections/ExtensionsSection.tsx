@@ -15,7 +15,7 @@ export const ExtensionsSection = ({info}: Props): ReactElement | null => {
     const apisLabel = useI18n('field.apis');
 
     const tools = sortBy(info.tools, (t) => t.title);
-    const widgets = sortBy(info.widgets, (w) => widgetDisplay(w));
+    const widgets = sortWidgets(info.widgets);
     const apis = sortBy(info.apis, (a) => apiDisplay(a));
 
     if (tools.length + widgets.length + apis.length === 0) return null;
@@ -94,4 +94,13 @@ function apiDisplay(a: ApiDescriptorDto): string {
 
 function sortBy<T>(items: T[], key: (item: T) => string): T[] {
     return [...items].sort((a, b) => key(a).toLocaleLowerCase().localeCompare(key(b).toLocaleLowerCase()));
+}
+
+/** Widgets sort by their interface list first, then by display name (parity with the legacy info panel). */
+function sortWidgets(widgets: ExtensionDto[]): ExtensionDto[] {
+    return [...widgets].sort((a, b) => {
+        const byInterface = a.interfaces.join(', ').toLocaleLowerCase().localeCompare(b.interfaces.join(', ').toLocaleLowerCase());
+        if (byInterface !== 0) return byInterface;
+        return a.displayName.toLocaleLowerCase().localeCompare(b.displayName.toLocaleLowerCase());
+    });
 }

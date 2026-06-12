@@ -40,12 +40,15 @@ describe('features/filter-applications/store/filter-applications', () => {
     });
 
     describe('setHideSystem', () => {
+        it('hides system apps by default (#2170)', () => {
+            expect($filter.get().hideSystem).toBe(true);
+        });
+
         it('toggles the hideSystem flag', () => {
+            setHideSystem(false);
             expect($filter.get().hideSystem).toBe(false);
             setHideSystem(true);
             expect($filter.get().hideSystem).toBe(true);
-            setHideSystem(false);
-            expect($filter.get().hideSystem).toBe(false);
         });
     });
 

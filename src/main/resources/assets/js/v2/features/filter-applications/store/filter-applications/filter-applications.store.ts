@@ -5,7 +5,8 @@ import type {FilterState} from './filter-applications.types';
 function initialState(): FilterState {
     return {
         filter: '',
-        hideSystem: false,
+        // System apps are hidden until explicitly toggled on (#2170).
+        hideSystem: true,
     };
 }
 

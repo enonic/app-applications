@@ -8,6 +8,8 @@ describe('toApplicationInfoDto', () => {
             pages: [],
             parts: [],
             layouts: [],
+            mixins: [],
+            formFragments: [],
             macros: [],
             tasks: [],
             tools: [],
@@ -41,6 +43,16 @@ describe('toApplicationInfoDto', () => {
         expect(dto.pages).toEqual([{key: 'k1', name: 'pageA'}]);
         expect(dto.parts).toEqual([{key: 'k2', name: 'partA'}]);
         expect(dto.layouts).toEqual([{key: 'k3', name: 'layoutA'}]);
+    });
+
+    it('maps mixin and form-fragment descriptors to {key, name} (#2193)', () => {
+        const json: ApplicationInfoJson = {
+            mixins: {descriptors: [{key: 'app:meta', name: 'meta', displayName: 'Meta'}]},
+            formFragments: {descriptors: [{key: 'app:address', name: 'address', displayName: 'Address'}]},
+        };
+        const dto = toApplicationInfoDto(json);
+        expect(dto.mixins).toEqual([{key: 'app:meta', name: 'meta'}]);
+        expect(dto.formFragments).toEqual([{key: 'app:address', name: 'address'}]);
     });
 
     it('filters out system-owned macros', () => {
