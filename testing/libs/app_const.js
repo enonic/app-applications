@@ -15,6 +15,14 @@ module.exports = Object.freeze({
         THIRD_APP: 'Third Selenium App',
         FOURTH_APP: 'Fourth Selenium App',
     },
+    TEST_APPS_NAME: {
+        TEST_AUTH0_PROVIDER_APP: 'Test Auth0 ID Provider',
+        SIMPLE_SITE_APP: 'Simple Site App',
+        TEST_APP_WITH_METADATA_MIXIN: 'Test Selenium App',
+        MY_FIRST_APP: 'My First App',
+        TEST_ADFS_PROVIDER_APP: 'Test ADFS ID Provider',
+        STANDARD_ID_PROVIDER_APP: 'Standard ID Provider',
+    },
     TEST_IMAGES: {
         HAND: 'hand',
         WHALE: 'whale'

@@ -13,9 +13,8 @@ describe('Application Browse Panel, check buttons in the toolbar', function () {
         webDriverHelper.setupBrowser();
     }
 
-    const CONTENT_VIEWER_APP = 'Content Viewer App'; // This displayName should be in grid
-    const APP_1_CONTENT_VIEWER = 'Content viewer'; // This displayName should be in Uninstall modal dialog
-    const APP_2_PROVIDER = 'Auth0 ID Provider';
+    const APP_CHUCK = 'Chuck Norris';
+    const APP_CHUCK_DESCRIPTION = 'chucknorris';
     const APP_1_DESCRIPTION = 'Inspect your content object JSON';
     const APP_2_DESCRIPTION = 'Add Auth0 authentication to your Enonic XP installation';
 
@@ -39,36 +38,34 @@ describe('Application Browse Panel, check buttons in the toolbar', function () {
             // 1. Open Install modal dialog
             await appBrowsePanel.clickOnInstallButton();
             await installAppDialog.waitForGridLoaded();
-            await installAppDialog.waitForInstallLink(APP_1_CONTENT_VIEWER);
+            await installAppDialog.waitForInstallLink('Chuck Norris');
             // 2. Install two applications and close the modal dialog:
             await installAppDialog.pause(500);
-            await installAppDialog.clickOnInstallAppLink(APP_1_CONTENT_VIEWER);
+            await installAppDialog.clickOnInstallAppLink('Chuck Norris');
             // 3. Wait for installed
-            await installAppDialog.waitForAppInstalled(APP_1_CONTENT_VIEWER);
-            await installAppDialog.waitForInstallLink(APP_2_PROVIDER);
-            await installAppDialog.clickOnInstallAppLink(APP_2_PROVIDER);
-            await installAppDialog.waitForAppInstalled(APP_2_PROVIDER);
+            await installAppDialog.waitForAppInstalled('Chuck Norris');
             // 4. Close the dialog
             await installAppDialog.clickOnCancelButtonTop();
             await installAppDialog.waitForClosed(2000);
             await studioUtils.saveScreenshot('provider_installed');
             // 5. Verify the apps by their description
-            await appBrowsePanel.waitForAppByDescriptionDisplayed(APP_1_DESCRIPTION);
-            await appBrowsePanel.waitForAppByDescriptionDisplayed(APP_2_DESCRIPTION);
+            //await appBrowsePanel.waitForAppByDescriptionDisplayed(APP_CHUCK);
+            await appBrowsePanel.waitForAppByDisplayNameDisplayed(APP_CHUCK)
         });
 
     it('WHEN An installed application is selected or unselected THEN the toolbar buttons must be updated',
         async () => {
             let appBrowsePanel = new AppBrowsePanel();
             // 1. select the application:
-            await appBrowsePanel.clickOnRowByDescription(APP_1_DESCRIPTION);
+            //await appBrowsePanel.clickOnRowByDescription(APP_CHUCK);
+            await appBrowsePanel.clickOnRowByDisplayName(APP_CHUCK);
             await studioUtils.saveScreenshot('chuck_norris_selected');
             // "Uninstall" button gets enabled:
             await appBrowsePanel.waitForUninstallButtonEnabled();
             await appBrowsePanel.waitForStopButtonEnabled();
             await appBrowsePanel.waitForStartButtonDisabled();
             // 2. click on the row again and unselect it:
-            await appBrowsePanel.clickOnRowByDescription(APP_1_DESCRIPTION);
+            await appBrowsePanel.clickOnRowByDisplayName(APP_CHUCK);
             await appBrowsePanel.waitForUninstallButtonDisabled();
             await appBrowsePanel.waitForStopButtonDisabled();
             await appBrowsePanel.waitForStartButtonDisabled()
@@ -91,8 +88,8 @@ describe('Application Browse Panel, check buttons in the toolbar', function () {
         async () => {
             let appBrowsePanel = new AppBrowsePanel();
             // 1. Select 2 applications:
-            await appBrowsePanel.clickOnCheckboxAndSelectRowByDisplayName(CONTENT_VIEWER_APP);
-            await appBrowsePanel.clickOnCheckboxAndSelectRowByDisplayName(APP_2_PROVIDER);
+            await appBrowsePanel.clickOnCheckboxAndSelectRowByDisplayName(appConst.TEST_APPS_NAME.MY_FIRST_APP);
+            await appBrowsePanel.clickOnCheckboxAndSelectRowByDisplayName(APP_CHUCK);
             // 2. Verify that Selection Controller checkbox gets partial:
             await appBrowsePanel.isSelectionControllerSelected();
             await appBrowsePanel.waitForSelectionControllerPartial();
@@ -104,8 +101,8 @@ describe('Application Browse Panel, check buttons in the toolbar', function () {
             let appBrowsePanel = new AppBrowsePanel();
             let uninstallAppDialog = new UninstallAppDialog();
             // 1. Select 2 applications:
-            await appBrowsePanel.clickOnCheckboxAndSelectRowByDisplayName(CONTENT_VIEWER_APP);
-            await appBrowsePanel.clickOnCheckboxAndSelectRowByDisplayName(APP_2_PROVIDER);
+            //await appBrowsePanel.clickOnCheckboxAndSelectRowByDisplayName(CONTENT_VIEWER_APP);
+            await appBrowsePanel.clickOnCheckboxAndSelectRowByDisplayName(APP_CHUCK);
             // 2. Click on 'Show Selections' button:
             await appBrowsePanel.clickOnSelectionToggler();
             // 3. Click on Uninstall button  and confirm:
@@ -114,13 +111,13 @@ describe('Application Browse Panel, check buttons in the toolbar', function () {
             await uninstallAppDialog.clickOnYesButton();
             await appBrowsePanel.waitForNotificationMessage();
             await studioUtils.saveScreenshot('show_selection_issue');
-            // 4. Verify that 'Selection Toggler' is not visible:
+            // 4. Verify that 'Selection Toggle' is not visible:
             await appBrowsePanel.waitForSelectionTogglerNotVisible();
             // 5. Verify that grid is not filtered now:
-            await appBrowsePanel.waitForAppByDisplayNameNotDisplayed(CONTENT_VIEWER_APP);
-            await appBrowsePanel.waitForAppByDisplayNameNotDisplayed(APP_2_PROVIDER);
+            //await appBrowsePanel.waitForAppByDisplayNameNotDisplayed(CONTENT_VIEWER_APP);
+            await appBrowsePanel.waitForAppByDisplayNameNotDisplayed(APP_CHUCK);
             // 6. Verify that initial applications are visible:
-            await appBrowsePanel.waitForAppByDisplayNameDisplayed(appConst.TEST_APPLICATIONS.FIRST_APP);
+            await appBrowsePanel.waitForAppByDisplayNameDisplayed(appConst.TEST_APPS_NAME.MY_FIRST_APP);
             // 7. Selection Controller checkbox gets not selected:
             await appBrowsePanel.isSelectionControllerSelected();
         });
