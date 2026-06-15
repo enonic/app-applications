@@ -87,6 +87,7 @@ describe('Install Application Dialog specification', function () {
             let dialog = new InstallDialog();
             await appBrowsePanel.clickOnInstallButton();
             await dialog.waitForOpened();
+            await dialog.typeSearchText(CHUCK_NORRIS_APP_DISPLAY_NAME);
             await dialog.waitForSpinnerNotVisible();
             // 1. Install the app:
             await dialog.clickOnInstallAppLink(CHUCK_NORRIS_APP_DISPLAY_NAME);
