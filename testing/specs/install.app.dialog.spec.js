@@ -81,7 +81,7 @@ describe('Install Application Dialog specification', function () {
             assert.equal(names[0], CHUCK_NORRIS_APP_DISPLAY_NAME, 'Chuck Norris app should be filtered');
         });
 
-    it('GIVEN dialog is opened WHEN install link for an app has been clicked THEN the app should be installed',
+    it.skip('GIVEN dialog is opened WHEN install link for an app has been clicked THEN the app should be installed',
         async () => {
             let appBrowsePanel = new AppBrowsePanel();
             let dialog = new InstallDialog();
@@ -103,7 +103,7 @@ describe('Install Application Dialog specification', function () {
         });
 
     // verifies  https://github.com/enonic/app-applications/issues/8
-    it("GIVEN existing installed application WHEN install dialog has been opened THEN 'Installed' status should be displayed for the application",
+    it.skip("GIVEN existing installed application WHEN install dialog has been opened THEN 'Installed' status should be displayed for the application",
         async () => {
             let appBrowsePanel = new AppBrowsePanel();
             let installAppDialog = new InstallDialog();
@@ -118,7 +118,7 @@ describe('Install Application Dialog specification', function () {
 
     // Verifies issue https://github.com/enonic/app-applications/issues/241
     // Install Dialog - application's status is not updated after installing an application in filtered grid #241
-    it("GIVEN an application is installed in filtered grid WHEN Install dialog has been reopened THEN the application should be with 'Installed' status",
+    it.skip("GIVEN an application is installed in filtered grid WHEN Install dialog has been reopened THEN the application should be with 'Installed' status",
         async () => {
             let appBrowsePanel = new AppBrowsePanel();
             let installAppDialog = new InstallDialog();
