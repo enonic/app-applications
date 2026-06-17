@@ -80,16 +80,26 @@ export default defineConfig(({mode}) => {
         minifyIdentifiers: false,
         keepNames: true,
         treeShaking: true,
+        jsx: 'automatic',
+        jsxImportSource: 'preact',
         ...(isProduction && {
           drop: ['console', 'debugger'],
           legalComments: 'none'
         })
       },
+      optimizeDeps: {
+        include: ['preact', 'preact/hooks', 'preact/compat', '@enonic/ui']
+      },
       resolve: {
         alias: {
-          '@enonic/lib-admin-ui': path.join(__dirname, '.xp/dev/lib-admin-ui')
+          '@enonic/lib-admin-ui': path.join(__dirname, '.xp/dev/lib-admin-ui'),
+          'react': 'preact/compat',
+          'react-dom': 'preact/compat',
+          'react/jsx-runtime': 'preact/jsx-runtime',
+          'react/jsx-dev-runtime': 'preact/jsx-dev-runtime'
         },
-        extensions: ['.ts', '.js']
+        dedupe: ['preact', 'preact/compat'],
+        extensions: ['.ts', '.tsx', '.js', '.jsx']
       },
       ...(isDevelopment && {
         server: {

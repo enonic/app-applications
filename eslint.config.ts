@@ -66,8 +66,20 @@ export default [
         },
     },
     {
+        files: ['src/main/resources/assets/js/v2/**/*.{ts,tsx}'],
+        rules: {
+            'no-restricted-imports': ['error', {
+                paths: [
+                    {name: 'q', message: 'Use async/await in v2/ instead of q promises.'},
+                ],
+            }],
+        },
+    },
+    {
         ignores: [
             "vite.config.ts",
+            "vite.config.css.mjs",
+            "vitest.config.ts",
             "eslint.config.ts",
             "**/node_modules/",
             "**/build/",
@@ -77,6 +89,7 @@ export default [
             "**/*.js",
             "**/*.d.ts",
             "**/spec/**/*",
+            "**/*.stories.tsx",
         ]
     }
 ];

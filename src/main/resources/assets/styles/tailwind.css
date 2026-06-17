@@ -1,0 +1,23 @@
+@layer theme, base, legacy, utilities, overrides;
+
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/preflight.css" layer(base);
+@import "@enonic/ui/preset.css";
+@import "tw-animate-css";
+@import "tailwindcss/utilities.css" layer(utilities);
+
+@source "../../../../../node_modules/@enonic/ui/";
+@source "../../../../../node_modules/@enonic/lib-admin-ui/ui2/";
+@source "../../../../../node_modules/@enonic/lib-admin-ui/form2/";
+@source "../../../../../src/main/resources/assets/js/v2/";
+
+@theme {
+  /* Add app-specific theme overrides here when needed. */
+}
+
+@layer overrides {
+  /* Hide launcher buttons injected by the Launcher app */
+  #launcher-button { display: none !important; }
+  /* Make Preact roots ignore legacy outline styles */
+  .contents * { outline-style: none; }
+}
