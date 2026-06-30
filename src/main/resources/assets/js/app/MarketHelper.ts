@@ -8,6 +8,9 @@ export class MarketHelper {
     }
 
     private static compareVersionNumbers(v1: string, v2: string): number {
+        const v1HasPrerelease = v1.includes('-');
+        const v2HasPrerelease = v2.includes('-');
+
         let v1parts = v1.split('.').map((el) => {
             return parseInt(el, 10);
         });
@@ -31,6 +34,14 @@ export class MarketHelper {
 
         if (v1parts.length !== v2parts.length) {
             return -1;
+        }
+
+        if (v1HasPrerelease && !v2HasPrerelease) {
+            return -1;
+        }
+
+        if (!v1HasPrerelease && v2HasPrerelease) {
+            return 1;
         }
 
         return 0;
