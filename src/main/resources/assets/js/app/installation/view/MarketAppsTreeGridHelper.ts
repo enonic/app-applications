@@ -8,14 +8,16 @@ export class MarketAppsTreeGridHelper {
     }
 
     private static compareVersionNumbers(v1: string, v2: string): number {
-        const v1HasPrerelease = v1.includes('-');
-        const v2HasPrerelease = v2.includes('-');
+        const v1HasPrerelease = /^\d+(?:\.\d+)*-.+/.test(v1);
+        const v2HasPrerelease = /^\d+(?:\.\d+)*-.+/.test(v2);
+        const v1Core = v1.split('-', 2)[0];
+        const v2Core = v2.split('-', 2)[0];
 
-        const v1parts: number[] = v1.split('.').map((el) => {
+        const v1parts: number[] = v1Core.split('.').map((el) => {
             return parseInt(el, 10);
         });
 
-        const v2parts: number[] = v2.split('.').map((el) => {
+        const v2parts: number[] = v2Core.split('.').map((el) => {
             return parseInt(el, 10);
         });
 
