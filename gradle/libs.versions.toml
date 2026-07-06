@@ -1,5 +1,5 @@
 [versions]
-asset = "2.0.0"
+asset = "2.0.1"
 enonic-defaults = "2.1.7"
 junit-bom = "6.1.1"
 mockito-bom = "5.23.0"
