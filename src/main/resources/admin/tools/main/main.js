@@ -15,6 +15,7 @@ function getConfigAsJson() {
     const readonlyMode = app.config['readonlyMode'] === 'true' || false;
 
     return JSON.stringify({
+        adminUrl: admin.getHomeToolUrl(),
         appId: app.name,
         assetsUri: assetLib.assetUrl({path: ''}),
         marketApi: getMarketApiUrl(),
