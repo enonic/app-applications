@@ -22,8 +22,13 @@
     "fix": "eslint --fix **/*.ts"
   },
   "dependencies": {
-    "@enonic/lib-admin-ui": "file:./.xp/dev/lib-admin-ui",
+    "@enonic/lib-admin-ui": "link:.xp/dev/lib-admin-ui",
+    "dompurify": "~3.3.1",
+    "fine-uploader": "^5.16.2",
     "jquery": "^3.7.1",
+    "jquery-simulate": "^1.0.2",
+    "jquery-ui": "^1.14.2",
+    "mousetrap": "^1.6.5",
     "q": "^1.5.1"
   },
   "devDependencies": {
@@ -39,6 +44,7 @@
     "eslint": "^9.33.0",
     "globals": "^16.3.0",
     "jiti": "^2.5.1",
+    "less": "^4.6.0",
     "postcss-normalize": "^13.0.1",
     "postcss-sort-media-queries": "^5.2.0",
     "typescript": "^5.9.2",
@@ -48,6 +54,7 @@
   "browserslist": [
     "extends browserslist-config-enonic"
   ],
+  "packageManager": "pnpm@10.33.4",
   "engines": {
     "node": ">= 24.15.0",
     "pnpm": ">= 10.33.4",
