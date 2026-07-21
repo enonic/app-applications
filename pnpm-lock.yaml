@@ -105,8 +105,8 @@ importers:
         specifier: ^13.0.1
         version: 13.0.1(browserslist@4.28.6)(postcss@8.5.20)
       postcss-sort-media-queries:
-        specifier: ^5.2.0
-        version: 5.2.0(postcss@8.5.20)
+        specifier: ^6.6.2
+        version: 6.6.2(postcss@8.5.20)
       typescript:
         specifier: ^5.9.3
         version: 5.9.3
@@ -1637,11 +1637,11 @@ packages:
     resolution: {integrity: sha512-HeP7D2wyhkR+XaK6v4W8oRF62Dsz4flyuczALJp61GckGm42u1saSSJ/0auvcBqxs3jMRFEcPK34At/0JBKdOg==}
     engines: {node: '>=4'}
 
-  postcss-sort-media-queries@5.2.0:
-    resolution: {integrity: sha512-AZ5fDMLD8SldlAYlvi8NIqo0+Z8xnXU2ia0jxmuhxAU+Lqt9K+AlmLNJ/zWEnE9x+Zx3qL3+1K20ATgNOr3fAA==}
-    engines: {node: '>=14.0.0'}
+  postcss-sort-media-queries@6.6.2:
+    resolution: {integrity: sha512-4whmLOUtFFX2V0w5JM7Wqp1Du+DiOsfgFhJuxdy1d5kBoNy/dfkq4He8eNDGI3ZEJlCk95yQhG75aVcEMKGaFQ==}
+    engines: {node: '>=20.0.0'}
     peerDependencies:
-      postcss: '>=8.4.31'
+      postcss: ^8.5.6
 
   postcss-svgo@8.0.1:
     resolution: {integrity: sha512-HpnvWii7W0/FPrsejJa6ZTi0kNtTJP/Iba7CUMPX0xPV6QpnndOp+SDP74tFtgjA2cYKYNWJPOlmLXMsvi/9yA==}
@@ -1738,9 +1738,9 @@ packages:
     resolution: {integrity: sha512-7++dFhtcx3353uBaq8DDR4NuxBetBzC7ZQOhmTQInHEd6bSrXdiEyzCvG07Z44UYdLShWUyXt5M/yhz8ekcb1A==}
     engines: {node: '>=8'}
 
-  sort-css-media-queries@2.2.0:
-    resolution: {integrity: sha512-0xtkGhWCC9MGt/EzgnvbbbKhqWjl1+/rncmhTh5qCpbYguXh6S/qwePfv/JQ8jePXXmqingylxoC49pCkSPIbA==}
-    engines: {node: '>= 6.3.0'}
+  sort-css-media-queries@3.0.5:
+    resolution: {integrity: sha512-wRgTa9kOgx5nV+lp/uwT0XBlH/WN5dpsOxyIkbtQud65Ie66TYjHceWH/8d1C0siMjcdSjjXg4zV022QmvLsaw==}
+    engines: {node: '>= 16'}
 
   source-map-js@1.2.1:
     resolution: {integrity: sha512-UXWMKhLOwVKb728IUtQPXxfYU+usdybtUrK/8uGE8CQMvrhOpwvzDBwj0QhSL7MQc7vIsISBG8VQ8+IDQxpfQA==}
@@ -3273,10 +3273,10 @@ snapshots:
       cssesc: 3.0.0
       util-deprecate: 1.0.2
 
-  postcss-sort-media-queries@5.2.0(postcss@8.5.20):
+  postcss-sort-media-queries@6.6.2(postcss@8.5.20):
     dependencies:
       postcss: 8.5.20
-      sort-css-media-queries: 2.2.0
+      sort-css-media-queries: 3.0.5
 
   postcss-svgo@8.0.1(postcss@8.5.20):
     dependencies:
@@ -3372,7 +3372,7 @@ snapshots:
 
   shebang-regex@3.0.0: {}
 
-  sort-css-media-queries@2.2.0: {}
+  sort-css-media-queries@3.0.5: {}
 
   source-map-js@1.2.1: {}
 
