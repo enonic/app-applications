@@ -60,8 +60,8 @@ importers:
         version: 1.5.1
     devDependencies:
       '@enonic/eslint-config':
-        specifier: ^2.1.0
-        version: 2.1.0(@typescript-eslint/parser@8.65.0(eslint@9.39.5(jiti@2.7.0))(typescript@5.9.3))(typescript-eslint@8.65.0(eslint@9.39.5(jiti@2.7.0))(typescript@5.9.3))(typescript@5.9.3)
+        specifier: ^2.3.0
+        version: 2.3.0(@typescript-eslint/parser@8.65.0(eslint@9.39.5(jiti@2.7.0))(typescript@5.9.3))(typescript-eslint@8.65.0(eslint@9.39.5(jiti@2.7.0))(typescript@5.9.3))(typescript@5.9.3)
       '@rollup/plugin-inject':
         specifier: ^5.0.5
         version: 5.0.5
@@ -128,12 +128,12 @@ packages:
   '@csstools/normalize.css@12.1.1':
     resolution: {integrity: sha512-YAYeJ+Xqh7fUou1d1j9XHl44BmsuThiTr4iNrgCQ3J27IbhXsxXDGZ1cXv8Qvs99d4rBbLiSKy3+WZiet32PcQ==}
 
-  '@enonic/eslint-config@2.1.0':
-    resolution: {integrity: sha512-K/Qygr9fxiDa0wCp+HXtbJLNmaQHTPeFfaNlXjUWT7a2smLZw9a24i8+xKW8YhEjqfBUzXc6AoObcRVxFNz2Qg==}
+  '@enonic/eslint-config@2.3.0':
+    resolution: {integrity: sha512-k7e7acKN6WamFGvRXP6ZYE8tEdUgtWtgnIUcKxeCp1q4Z+UkY32l+x29a/Z3n+moX0qTWR/5pJ5xPrv4JihVUw==}
     peerDependencies:
-      '@typescript-eslint/parser': ^8.39.0
+      '@typescript-eslint/parser': ^8.50.0
       typescript: ^5.8.3
-      typescript-eslint: ^8.39.0
+      typescript-eslint: ^8.50.0
 
   '@epic-web/invariant@1.0.0':
     resolution: {integrity: sha512-lrTPqgvfFQtR/eY/qkIzp98OGdNJu0m5ji3q/nJI8v3SXkRKEnWiOxMmbvcSoAIzv/cGiuvRy57k4suKQSAdwA==}
@@ -1719,9 +1719,10 @@ snapshots:
 
   '@csstools/normalize.css@12.1.1': {}
 
-  '@enonic/eslint-config@2.1.0(@typescript-eslint/parser@8.65.0(eslint@9.39.5(jiti@2.7.0))(typescript@5.9.3))(typescript-eslint@8.65.0(eslint@9.39.5(jiti@2.7.0))(typescript@5.9.3))(typescript@5.9.3)':
+  '@enonic/eslint-config@2.3.0(@typescript-eslint/parser@8.65.0(eslint@9.39.5(jiti@2.7.0))(typescript@5.9.3))(typescript-eslint@8.65.0(eslint@9.39.5(jiti@2.7.0))(typescript@5.9.3))(typescript@5.9.3)':
     dependencies:
       '@typescript-eslint/parser': 8.65.0(eslint@9.39.5(jiti@2.7.0))(typescript@5.9.3)
+      globals: 17.8.0
       typescript: 5.9.3
       typescript-eslint: 8.65.0(eslint@9.39.5(jiti@2.7.0))(typescript@5.9.3)
 
