@@ -62,8 +62,8 @@ importers:
         specifier: ^9.30.0
         version: 9.30.0
       '@wdio/spec-reporter':
-        specifier: ^9.29.1
-        version: 9.29.1
+        specifier: ^9.30.1
+        version: 9.30.1
       allure-commandline:
         specifier: ^2.43.0
         version: 2.43.0
@@ -533,6 +533,10 @@ packages:
     resolution: {integrity: sha512-CKAcVy9BGwvufokMcl3H+yNcvD11Klku/1BPz8bKSRv7/KzueXR06s1cPbJH3tv9r9zxPErxgdVMpulN8I0qAg==}
     engines: {node: '>=18.20.0'}
 
+  '@wdio/reporter@9.30.1':
+    resolution: {integrity: sha512-0whWaLfJtOAy3PzbGUxGrCAGitgaUCMe8qUgAuP2l7ess70AXqvp1wJibw74a/Z2giegJlJiAc4PxS0abs9/tw==}
+    engines: {node: '>=18.20.0'}
+
   '@wdio/runner@9.30.0':
     resolution: {integrity: sha512-gvUExYXZtziIM4TmWMd98cvVUt2jTQ54k8gIYxBJ8w8N6BQfrko08IKWrVjoNOanJzLMHjqtCWWx4DXR3JtozQ==}
     engines: {node: '>=18.20.0'}
@@ -540,12 +544,16 @@ packages:
       expect-webdriverio: ^5.6.5
       webdriverio: ^9.0.0
 
-  '@wdio/spec-reporter@9.29.1':
-    resolution: {integrity: sha512-iqlHW/qGDRGmxQKN7XyCHxfKphTbPNnniV3yxNXZRSGHCCQok5KFKOnj4fpUCKEyD5jtPAmP6Y0qc1UyR3Dc3Q==}
+  '@wdio/spec-reporter@9.30.1':
+    resolution: {integrity: sha512-En74iLuj8xjNanSPA05rTCii0qHZQe6Zpwi74vTGO6LtfGxvcNr1Z1zUj8xWwnoclnAne3DtmCAyXTezLX1pEA==}
     engines: {node: '>=18.20.0'}
 
   '@wdio/types@9.29.1':
     resolution: {integrity: sha512-jp8jgMv6TS35G96YzHZxw3PVN0Dz6xQ6tnMAicndAJ8Jt9AIXb0ywIse4TjaFywakO3dLoEhlyA3ZtR26vmt+w==}
+    engines: {node: '>=18.20.0'}
+
+  '@wdio/types@9.30.1':
+    resolution: {integrity: sha512-umKQDbSmu3/ucUsIA5UUTK5gCWnClyVpWz3fC39044rCXQ3zCd1a3GoJibbAITKiwnPFf2yU3LvTa+C78sh9Lg==}
     engines: {node: '>=18.20.0'}
 
   '@wdio/utils@9.30.0':
@@ -2383,6 +2391,14 @@ snapshots:
       diff: 9.0.0
       object-inspect: 1.13.4
 
+  '@wdio/reporter@9.30.1':
+    dependencies:
+      '@types/node': 20.19.43
+      '@wdio/logger': 9.29.1
+      '@wdio/types': 9.30.1
+      diff: 9.0.0
+      object-inspect: 1.13.4
+
   '@wdio/runner@9.30.0(expect-webdriverio@5.7.0)(webdriverio@9.30.0)':
     dependencies:
       '@types/node': 20.19.43
@@ -2404,15 +2420,19 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  '@wdio/spec-reporter@9.29.1':
+  '@wdio/spec-reporter@9.30.1':
     dependencies:
-      '@wdio/reporter': 9.29.1
-      '@wdio/types': 9.29.1
+      '@wdio/reporter': 9.30.1
+      '@wdio/types': 9.30.1
       chalk: 5.6.2
       easy-table: 1.2.0
       pretty-ms: 9.3.0
 
   '@wdio/types@9.29.1':
+    dependencies:
+      '@types/node': 20.19.43
+
+  '@wdio/types@9.30.1':
     dependencies:
       '@types/node': 20.19.43
 
