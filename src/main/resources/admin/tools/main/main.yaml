@@ -10,8 +10,8 @@ allow:
 apis:
   - "i18n"
   - "asset"
-  - "com.enonic.xp.app.main:asset"
   - "admin:extension"
   - "admin:status"
   - "admin:event"
   - "server:app"
+  - "com.enonic.xp.app.main:events"
