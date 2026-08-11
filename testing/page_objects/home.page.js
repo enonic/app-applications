@@ -11,9 +11,9 @@ const home = {
 };
 
 const selectors = {
-    usersLink: 'a[id="com.enonic.xp.app.users"] span.app-tile-name',
-    applicationsLink: 'a[id="com.enonic.xp.app.applications"] span.app-tile-name',
-    dashboardLink: 'a[id="com.enonic.xp.app.main"] span.app-tile-name',
+    usersLink: 'a[data-tool-id="com.enonic.xp.app.users:main"] span.app-tile-name',
+    applicationsLink: 'a[data-tool-id="com.enonic.xp.app.applications:main"] span.app-tile-name',
+    dashboardLink: 'a[data-tool-id="com.enonic.xp.app.main:dashboard"] span.app-tile-name',
     avatarButton:'button#avatar-button',
     logoutMenuItem: 'a.avatar-dropdown-item',
     menuButton: 'button#menu-button',
