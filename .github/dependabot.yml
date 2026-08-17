@@ -19,6 +19,11 @@ updates:
       - "alansemenov"
     reviewers:
       - "alansemenov"
+    ignore:
+      # jQuery 4 dropped $.camelCase, which jquery-simulate needs.
+      # Unpin once lib-admin-ui moves to jQuery 4.
+      - dependency-name: "jquery"
+        update-types: ["version-update:semver-major"]
   - package-ecosystem: "npm"
     directory: "/testing"
     schedule:
