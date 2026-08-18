@@ -43,7 +43,7 @@
     "enonic-admin-artifacts": "^2.5.0",
     "esbuild": "^0.28.2",
     "eslint": "^9.39.5",
-    "globals": "^17.9.0",
+    "globals": "^17.11.0",
     "jiti": "^2.7.0",
     "less": "^4.8.1",
     "postcss": "^8.5.26",
