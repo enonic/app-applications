@@ -41,7 +41,7 @@
     "cross-env": "^10.1.0",
     "cssnano": "^8.0.4",
     "enonic-admin-artifacts": "^2.5.0",
-    "esbuild": "^0.28.1",
+    "esbuild": "^0.28.2",
     "eslint": "^9.39.5",
     "globals": "^17.9.0",
     "jiti": "^2.7.0",
