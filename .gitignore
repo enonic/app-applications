@@ -57,3 +57,5 @@ pnpm-debug.log*
 generated-java/
 .tsbuildinfo
 .eslintcache
+
+.gh-actions/
