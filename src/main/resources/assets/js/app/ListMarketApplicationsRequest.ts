@@ -271,7 +271,7 @@ export class ListMarketApplicationsRequest {
                     _path
                     displayName
                     ... on com_enonic_app_market_Application {
-                        pageUrl
+                        pageUrl(type: absolute)
                         type
                         data {
                             version {
