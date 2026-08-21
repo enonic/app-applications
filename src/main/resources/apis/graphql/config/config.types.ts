@@ -7,8 +7,8 @@ import { generator } from '../schema/generator';
  * page of its own — the shell renders it and the module is imported into that page — so the only
  * moment this app's server code runs is a request to its own endpoint. Hence a root field.
  */
-export const SectionConfigType: GraphQLType = generator.createObjectType({
-  name: 'SectionConfig',
+export const ConfigType: GraphQLType = generator.createObjectType({
+  name: 'Config',
   description: "Values the section needs from its own application's context.",
   fields: {
     appId: {

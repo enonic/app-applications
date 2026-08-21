@@ -19,6 +19,9 @@
     "test:watch": "vp test"
   },
   "dependencies": {
+    "@nanostores/preact": "^1.1.0",
+    "nanostores": "^1.5.2",
+    "neverthrow": "^8.2.0",
     "preact": "^10.29.8"
   },
   "devDependencies": {
