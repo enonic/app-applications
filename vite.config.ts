@@ -17,7 +17,7 @@ export default defineConfig(({ mode }) => {
   const fmt = {
     singleQuote: true,
     sortImports: true,
-    ignorePatterns: ['build/**', 'src/main/resources/admin/**'],
+    ignorePatterns: ['build/**', 'src/main/resources/admin/**', '.github/**'],
   };
 
   // `vp pack` (tsdown) compiles server-side .ts (all under resources except assets/) to
