@@ -25,6 +25,7 @@ dependencies {
     include xplibs.admin
     include xplibs.portal
     include xplibs.io
+    include 'com.enonic.lib:lib-graphql:3.0.0'
 }
 
 repositories {

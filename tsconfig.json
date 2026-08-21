@@ -12,5 +12,5 @@
     "isolatedModules": true,
     "noEmit": true
   },
-  "include": ["src/main/resources/assets/js", "vite.config.ts"]
+  "include": ["src/main/resources/assets/js", "src/test", "vite.config.ts"]
 }

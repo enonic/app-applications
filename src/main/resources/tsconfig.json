@@ -12,6 +12,7 @@
     "paths": {
       "/lib/xp/core": ["../../../node_modules/@enonic-types/core"],
       "/lib/xp/*": ["../../../node_modules/@enonic-types/lib-*"],
+      "/lib/graphql": ["./types/graphql.d.ts"],
       "/lib/*": ["./lib/*"]
     }
   },

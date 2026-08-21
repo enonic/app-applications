@@ -52,6 +52,10 @@ export default defineConfig(({ mode }) => {
     environment: 'node' as const,
     include: ['src/**/*.{test,spec}.{ts,tsx}'],
     passWithNoTests: true,
+    // XP supplies these at runtime; under vitest they resolve to local doubles.
+    alias: {
+      '/lib/graphql': join(import.meta.dirname, 'src/test/mocks/lib-graphql.ts'),
+    },
   };
 
   return {
