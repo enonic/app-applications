@@ -1,5 +1,6 @@
 import { join } from 'node:path';
 
+import tailwindcss from '@tailwindcss/vite';
 import { defineConfig } from 'vite-plus';
 
 const ASSETS = join(import.meta.dirname, 'src/main/resources/assets'); // UI source root
@@ -55,6 +56,7 @@ export default defineConfig(({ mode }) => {
 
   return {
     root: ASSETS,
+    plugins: [tailwindcss()],
     // Default would be <root>/node_modules/.vite — inside the resources tree, which
     // processResources then copies into the jar.
     cacheDir: join(import.meta.dirname, 'node_modules/.vite'),
@@ -67,14 +69,15 @@ export default defineConfig(({ mode }) => {
       sourcemap: !isProd,
       rollupOptions: {
         // The host loads this with `import()`, so it stays one ES module entry.
-        input: { 'js/section': join(ASSETS, 'js/section.ts') },
+        input: { '_static/main': join(ASSETS, 'js/main.ts') },
         // ! Without this the entry's exports are dropped — an app build assumes nothing
         // ! imports the entry, and the host would load an inert module.
         preserveEntrySignatures: 'strict' as const,
         output: {
           format: 'es',
-          entryFileNames: '[name].js', // js/section → js/section.js
-          chunkFileNames: 'js/chunks/[name]-[hash].js',
+          entryFileNames: '[name].js', // _static/main → _static/main.js
+          chunkFileNames: '_static/chunks/[name]-[hash].js',
+          assetFileNames: '_static/[name][extname]', // the stylesheet → _static/main.css
         },
       },
     },

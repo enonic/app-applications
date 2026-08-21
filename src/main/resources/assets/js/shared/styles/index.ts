@@ -1,0 +1,1 @@
+export { adoptStyleSheet } from './stylesheet';

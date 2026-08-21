@@ -54,6 +54,7 @@ tasks.named('pnpmInstall', PnpmInstallTask) {
 // versions into build/resources/main instead.
 tasks.named('processResources') {
     exclude 'assets/js/**'
+    exclude 'assets/css/**' // Tailwind source; the build emits it as _static/main.css
     exclude '**/*.ts' // server TS emitted as .js by pnpmPack
     exclude '**/*.tsx'
     exclude '**/tsconfig.json' // type-check config, not an app resource

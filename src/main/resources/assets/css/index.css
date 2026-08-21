@@ -1,0 +1,7 @@
+@import 'tailwindcss';
+
+/* Tailwind scans for class names; node_modules is not scanned by default. */
+@source '../js/';
+
+/* The host owns the palette at `:root` and the theme class on `<html>`. Custom properties inherit
+   through the shadow boundary, so a `var(--color-*)` here follows the host's theme with no work. */
