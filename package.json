@@ -24,6 +24,7 @@
   "devDependencies": {
     "@enonic-types/core": "^8.0.4",
     "@enonic-types/global": "^8.0.4",
+    "@enonic-types/lib-i18n": "^8.0.4",
     "@enonic-types/lib-io": "^8.0.4",
     "@tailwindcss/vite": "^4.3.3",
     "@types/node": "^26.2.0",

@@ -1,10 +1,14 @@
 kind: 'AdminExtension'
-title: 'Applications'
-description: 'The Applications section, provided to app-settings as an extension'
+title:
+  text: 'Applications'
+  i18n: 'section.applications.title'
+description:
+  text: 'Install, update and manage applications'
+  i18n: 'section.applications.description'
 allow:
   - 'role:system.admin'
 interfaces:
   - 'settings.section'
 config:
-  order: 1
+  order: 10
   path: 'applications'

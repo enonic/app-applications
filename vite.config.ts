@@ -56,6 +56,8 @@ export default defineConfig(({ mode }) => {
     // XP supplies these at runtime; under vitest they resolve to local doubles.
     alias: {
       '/lib/graphql': join(import.meta.dirname, 'src/test/mocks/lib-graphql.ts'),
+      '/lib/xp/i18n': join(import.meta.dirname, 'src/test/mocks/lib-xp-i18n.ts'),
+      '/lib/i18n': join(import.meta.dirname, 'src/main/resources/lib/i18n.ts'),
     },
   };
 
