@@ -47,24 +47,22 @@ export function bootstrap(host: Host): Promise<void> {
 function load({ baseUrl, locale }: Host): Promise<void> {
   setGraphQlEndpoint(`${baseUrl}/graphql`);
 
-  return (
-    requestGraphQlRoots<BootstrapData>([CONFIG_ROOT, PHRASES_ROOT], 'Bootstrap', {
-      values: { locale },
-    })
-      .match(({ data, message }) => {
-        const phrases = toPhrases(data.phrases);
+  return requestGraphQlRoots<BootstrapData>([CONFIG_ROOT, PHRASES_ROOT], 'Bootstrap', {
+    values: { locale },
+  })
+    .match(({ data, message }) => {
+      const phrases = toPhrases(data.phrases);
 
-        if (data.config == null || phrases == null) {
-          bootstrapFailed(message ?? 'The section could not read its own configuration');
-          return;
-        }
+      if (data.config == null || phrases == null) {
+        bootstrapFailed(message ?? 'The section could not read its own configuration');
+        return;
+      }
 
-        setConfig(data.config);
-        setPhrases(phrases, locale);
-        bootstrapReady();
-      }, fail)
-      .catch(fail)
-  );
+      setConfig(data.config);
+      setPhrases(phrases, locale);
+      bootstrapReady();
+    }, fail)
+    .catch(fail);
 }
 
 function fail(cause: unknown): void {

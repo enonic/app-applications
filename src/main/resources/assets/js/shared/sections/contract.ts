@@ -1,6 +1,6 @@
 /**
  * The client-side contract between the app-settings shell and this section. The rules these names
- * cannot express are in `../app-settings/docs/extensions.md` § 2, and the host owns them.
+ * cannot express are in `../app-settings/docs/extensions/docs.md` § 2, and the host owns them.
  *
  * ! A verbatim copy of the host's file of the same path until `@enonic/toolkit/section`
  * ! publishes it — change every copy, or this app compiles against a contract the host lacks.
