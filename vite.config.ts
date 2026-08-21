@@ -61,9 +61,18 @@ export default defineConfig(({ mode }) => {
     },
   };
 
+  // @enonic/ui is Preact; alias React to preact/compat so everything shares one runtime.
+  const alias = {
+    react: 'preact/compat',
+    'react-dom': 'preact/compat',
+    'react-dom/client': 'preact/compat',
+    'react/jsx-runtime': 'preact/jsx-runtime',
+  };
+
   return {
     root: ASSETS,
     plugins: [tailwindcss()],
+    resolve: { alias, dedupe: ['preact', 'preact/compat'] },
     // Default would be <root>/node_modules/.vite — inside the resources tree, which
     // processResources then copies into the jar.
     cacheDir: join(import.meta.dirname, 'node_modules/.vite'),

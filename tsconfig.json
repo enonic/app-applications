@@ -10,7 +10,14 @@
     "skipLibCheck": true,
     "esModuleInterop": true,
     "isolatedModules": true,
-    "noEmit": true
+    "noEmit": true,
+    // @enonic/ui is Preact — map the React types to preact/compat so its components
+    // type-check in our .tsx (mirrors the Vite alias).
+    "paths": {
+      "react": ["./node_modules/preact/compat"],
+      "react-dom": ["./node_modules/preact/compat"],
+      "react-dom/client": ["./node_modules/preact/compat"]
+    }
   },
   "include": ["src/main/resources/assets/js", "src/test", "vite.config.ts"]
 }

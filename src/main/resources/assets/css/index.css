@@ -1,7 +1,16 @@
 @import 'tailwindcss';
+@import 'tw-animate-css';
+@import '@enonic/ui/preset.css';
 
 /* Tailwind scans for class names; node_modules is not scanned by default. */
+@source '../../../../../node_modules/@enonic/ui/';
 @source '../js/';
 
-/* The host owns the palette at `:root` and the theme class on `<html>`. Custom properties inherit
-   through the shadow boundary, so a `var(--color-*)` here follows the host's theme with no work. */
+@theme {
+  --font-sans: 'Open Sans', Helvetica, sans-serif;
+}
+
+/* The host guarantees the font at document level: `@font-face` does not cross a shadow boundary.
+   Theme tokens do — but `@enonic/ui`'s preset defines its light values under `:root, :host`, which
+   matches the shadow host and so overrides what would have been inherited. The theme class therefore
+   has to be applied inside this root, on the section's own wrapper: see `app/App.tsx`. */
