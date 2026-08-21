@@ -1,10 +1,10 @@
-kind: "AdminExtension"
-title: "Applications"
-description: "The Applications section, provided to app-settings as an extension"
+kind: 'AdminExtension'
+title: 'Applications'
+description: 'The Applications section, provided to app-settings as an extension'
 allow:
-  - "role:system.admin"
+  - 'role:system.admin'
 interfaces:
-  - "settings.section"
+  - 'settings.section'
 config:
   order: 1
-  path: "applications"
+  path: 'applications'

@@ -1,13 +1,14 @@
+import { handleGraphQlRequest } from '/apis/graphql/request';
 import type { Request, Response } from '/lib/xp/core';
 import { getMimeType, getResource, readText } from '/lib/xp/io';
 
 const STATIC_BASE = '/_static';
 const ASSET_ROOT = '/assets';
+const GRAPHQL_PATH = '/graphql';
 
-export function all(request: Request): Response {
-  const path = request.rawPath.slice((request.contextPath ?? '').length);
+export function get(request: Request): Response {
+  const path = extensionPath(request);
 
-  // `_static/main.js` is the host's contract-fixed entry, and its chunks resolve beside it.
   if (path.startsWith(`${STATIC_BASE}/`) && !path.includes('..')) {
     return serveText(`${ASSET_ROOT}${path}`);
   }
@@ -15,9 +16,18 @@ export function all(request: Request): Response {
   return { status: 404 };
 }
 
+export function post(request: Request): Response {
+  return extensionPath(request) === GRAPHQL_PATH ? handleGraphQlRequest(request) : { status: 404 };
+}
+
 //
 // * Internal
 //
+
+/** What the caller asked for below the prefix this extension owns. */
+function extensionPath(request: Request): string {
+  return request.rawPath.slice((request.contextPath ?? '').length);
+}
 
 // ! lib-static cannot serve anything from this app: it answers with a `ByteSource` body, and GraalJS
 // ! hands the serializer a host object, which reaches the browser as a JSON map of its own method

@@ -11,14 +11,15 @@ export default defineConfig(({ mode }) => {
 
   const lint = {
     options: { typeAware: true, typeCheck: true },
-    // admin/** is CJS + XP globals (outside tsconfig); build/** is generated output.
-    ignorePatterns: ['build/**', 'src/main/resources/admin/**', '**/*.d.ts'],
+    // Server code included: oxlint resolves it against src/main/resources/tsconfig.json, which
+    // carries the XP globals and the absolute `/lib/*` paths. build/** is generated output.
+    ignorePatterns: ['build/**', '**/*.d.ts'],
   };
 
   const fmt = {
     singleQuote: true,
     sortImports: true,
-    ignorePatterns: ['build/**', 'src/main/resources/admin/**', '.github/**'],
+    ignorePatterns: ['build/**', '.github/**'],
   };
 
   // `vp pack` (tsdown) compiles server-side .ts (all under resources except assets/) to
@@ -36,7 +37,7 @@ export default defineConfig(({ mode }) => {
     platform: 'node' as const,
     unbundle: true, // per-file output, not one bundle
     outExtensions: () => ({ js: '.js' }), // XP wants .js, not the cjs default .cjs
-    deps: { neverBundle: [/^\/lib\//] }, // XP /lib/* requires stay external
+    deps: { neverBundle: [/^\/lib\//, /^\/apis\//] }, // absolute XP requires stay external
     target: 'es2023',
     treeshake: false, // XP calls exports.get/all at runtime — don't drop as dead
     clean: false, // must not wipe the assets output `vp build` emits here

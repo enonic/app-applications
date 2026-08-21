@@ -13,6 +13,9 @@
       "/lib/xp/core": ["../../../node_modules/@enonic-types/core"],
       "/lib/xp/*": ["../../../node_modules/@enonic-types/lib-*"],
       "/lib/graphql": ["./types/graphql.d.ts"],
+      // Not `graphql/`: graphql-java unpacks its own `graphql.schema` package to that
+      // jar path, and our modules would land inside it.
+      "/apis/*": ["./apis/*"],
       "/lib/*": ["./lib/*"]
     }
   },
