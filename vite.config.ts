@@ -1,160 +1,86 @@
-import inject from '@rollup/plugin-inject';
-import autoprefixer from 'autoprefixer';
-import cssnano from 'cssnano';
-import path from 'path';
-import postcssNormalize from 'postcss-normalize';
-import postcssSortMediaQueries from 'postcss-sort-media-queries';
-import {fileURLToPath} from 'url';
-import {defineConfig, type UserConfig} from 'vite';
+import { join } from 'node:path';
 
-const allowedTargets = ['js', 'css'] as const;
-type BuildTarget = (typeof allowedTargets)[number];
+import { defineConfig } from 'vite-plus';
 
-const isBuildTarget = (target: string | undefined): target is BuildTarget => {
-  return allowedTargets.includes(target as BuildTarget);
-};
+const ASSETS = join(import.meta.dirname, 'src/main/resources/assets'); // UI source root
+const OUT = join(import.meta.dirname, 'build/resources/main/assets'); // compiled output
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url)) ?? '';
+export default defineConfig(({ mode }) => {
+  const isProd = mode === 'production';
 
-export default defineConfig(({mode}) => {
-  const {BUILD_TARGET} = process.env;
-  const target = isBuildTarget(BUILD_TARGET) ? BUILD_TARGET : 'js';
-
-  const isProduction = mode === 'production';
-  const isDevelopment = mode === 'development';
-
-  const IN_PATH = path.join(__dirname, 'src/main/resources/assets');
-  const OUT_PATH = path.join(__dirname, 'build/resources/main/assets');
-
-  const CONFIGS: Record<BuildTarget, UserConfig> = {
-    js: {
-      root: IN_PATH,
-      base: './',
-
-      build: {
-        outDir: OUT_PATH,
-        emptyOutDir: false,
-        target: 'ES2023',
-        minify: isProduction ? 'esbuild' : false,
-        sourcemap: isDevelopment,
-        ...(isProduction && {
-          reportCompressedSize: true,
-          chunkSizeWarningLimit: 1000
-        }),
-        rollupOptions: {
-          plugins: [
-            inject({
-              $: 'jquery',
-              jQuery: 'jquery',
-              'window.jQuery': 'jquery'
-            }),
-          ],
-          input: {
-            'js/bundle': path.join(IN_PATH, 'js/main.ts')
-          },
-          output: {
-            format: 'es',
-            entryFileNames: '[name].js',
-            chunkFileNames: 'js/chunks/[name]-[hash].js',
-            assetFileNames: (assetInfo) => {
-              const assetName = assetInfo.names?.[0] ?? '';
-              if (/\.(svg|png|jpg|gif|ico)$/.test(assetName)) {
-                return 'icons/[name][extname]';
-              }
-              if (/\.(woff|woff2|ttf|eot)$/.test(assetName)) {
-                return 'fonts/[name][extname]';
-              }
-              return '[name][extname]';
-            },
-            ...(isProduction && {
-              compact: true,
-              generatedCode: {
-                constBindings: true
-              }
-            })
-          },
-          external: []
-        }
-      },
-      esbuild: {
-        minifyIdentifiers: false,
-        keepNames: true,
-        treeShaking: true,
-        ...(isProduction && {
-          drop: ['console', 'debugger'],
-          legalComments: 'none'
-        })
-      },
-      resolve: {
-        alias: {
-          '@enonic/lib-admin-ui': path.join(__dirname, '.xp/dev/lib-admin-ui')
-        },
-        extensions: ['.ts', '.js']
-      },
-      ...(isDevelopment && {
-        server: {
-          open: false,
-          hmr: true
-        },
-        clearScreen: false
-      }),
-      ...(isProduction && {
-        logLevel: 'warn'
-      })
-    },
-    css: {
-      root: IN_PATH,
-      base: './',
-      build: {
-        outDir: OUT_PATH,
-        emptyOutDir: false,
-        minify: isProduction,
-        sourcemap: isDevelopment,
-        rollupOptions: {
-          input: {
-            'styles/main': path.join(IN_PATH, 'styles/main.less')
-          },
-          output: {
-            assetFileNames: (assetInfo) => {
-              const assetName = assetInfo.names?.[0] ?? '';
-              if (assetName.endsWith('.css')) {
-                const name = assetName.replace(/\.(less|css)$/, '');
-                return `${name}.css`;
-              }
-              if (/\.(svg|png|jpg|gif|ico)$/.test(assetName)) {
-                return 'icons/[name][extname]';
-              }
-              if (/\.(woff|woff2|ttf|eot)$/.test(assetName)) {
-                return 'fonts/[name][extname]';
-              }
-              return '[name][extname]';
-            }
-          }
-        }
-      },
-      resolve: {
-        alias: {
-          '~enonic-admin-artifacts': 'enonic-admin-artifacts/index.less'
-        },
-        extensions: ['.less', '.css']
-      },
-      css: {
-        preprocessorOptions: {
-          less: {
-            javascriptEnabled: true
-          }
-        },
-        postcss: {
-          plugins: [
-            postcssNormalize(),
-            autoprefixer(),
-            postcssSortMediaQueries({sort: 'desktop-first'}),
-            ...(isProduction ? [cssnano({preset: ['default', {normalizeUrl: false}]})] : [])
-          ]
-        }
-      }
-    }
+  const lint = {
+    options: { typeAware: true, typeCheck: true },
+    // admin/** is CJS + XP globals (outside tsconfig); build/** is generated output.
+    ignorePatterns: ['build/**', 'src/main/resources/admin/**', '**/*.d.ts'],
   };
 
-  return CONFIGS[target];
+  const fmt = {
+    singleQuote: true,
+    sortImports: true,
+    ignorePatterns: ['build/**', 'src/main/resources/admin/**'],
+  };
+
+  // `vp pack` (tsdown) compiles server-side .ts (all under resources except assets/) to
+  // per-file CommonJS, mirroring the tree into build/ so XP runs each file in place.
+  const pack = {
+    entry: [
+      'src/main/resources/**/*.ts',
+      '!src/main/resources/assets/**',
+      '!src/main/resources/**/*.d.ts',
+      '!src/main/resources/**/*.test.ts',
+    ],
+    root: 'src/main/resources',
+    outDir: 'build/resources/main',
+    format: 'cjs' as const,
+    platform: 'node' as const,
+    unbundle: true, // per-file output, not one bundle
+    outExtensions: () => ({ js: '.js' }), // XP wants .js, not the cjs default .cjs
+    deps: { neverBundle: [/^\/lib\//] }, // XP /lib/* requires stay external
+    target: 'es2023',
+    treeshake: false, // XP calls exports.get/all at runtime — don't drop as dead
+    clean: false, // must not wipe the assets output `vp build` emits here
+    dts: false,
+    sourcemap: false,
+    report: false,
+  };
+
+  // Vitest inherits the Vite config, so `root` has to be pointed back at the repo:
+  // the build root is assets/, which would hide every server-side test.
+  const test = {
+    root: import.meta.dirname,
+    environment: 'node' as const,
+    include: ['src/**/*.{test,spec}.{ts,tsx}'],
+    passWithNoTests: true,
+  };
+
+  return {
+    root: ASSETS,
+    // Default would be <root>/node_modules/.vite — inside the resources tree, which
+    // processResources then copies into the jar.
+    cacheDir: join(import.meta.dirname, 'node_modules/.vite'),
+    base: './', // relative asset URLs — served under the extension's own path
+    build: {
+      outDir: OUT,
+      emptyOutDir: false, // shared with `vp pack` output — don't clear it
+      target: 'es2023',
+      minify: isProd,
+      sourcemap: !isProd,
+      rollupOptions: {
+        // The host loads this with `import()`, so it stays one ES module entry.
+        input: { 'js/section': join(ASSETS, 'js/section.ts') },
+        // ! Without this the entry's exports are dropped — an app build assumes nothing
+        // ! imports the entry, and the host would load an inert module.
+        preserveEntrySignatures: 'strict' as const,
+        output: {
+          format: 'es',
+          entryFileNames: '[name].js', // js/section → js/section.js
+          chunkFileNames: 'js/chunks/[name]-[hash].js',
+        },
+      },
+    },
+    lint,
+    fmt,
+    pack,
+    test,
+  };
 });

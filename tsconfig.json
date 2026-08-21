@@ -1,28 +1,16 @@
 {
   "compilerOptions": {
-    "module": "ES2022",
-    "moduleResolution": "bundler",
     "target": "ES2023",
-    "lib": ["ES2023", "DOM"],
-    "baseUrl": ".",
-    "outDir": "build/resources/main/assets/js/",
-    "allowSyntheticDefaultImports": true,
-    "forceConsistentCasingInFileNames": true,
-    "useDefineForClassFields": false,
-    "allowJs": false,
-    "noImplicitReturns": false,
-    "noImplicitThis": true,
-    "strictNullChecks": false,
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "lib": ["ES2023", "DOM", "DOM.Iterable"],
+    "jsx": "react-jsx",
+    "jsxImportSource": "preact",
+    "strict": true,
     "skipLibCheck": true,
-    "incremental": true,
+    "esModuleInterop": true,
     "isolatedModules": true,
-    "types": ["q"]
+    "noEmit": true
   },
-  "files": ["./src/main/resources/assets/js/main.ts"],
-  "include": [
-    "src/**/*",
-    ".xp/dev/lib-admin-ui/**/*.ts"
-  ],
-  "compileOnSave": false,
-  "buildOnSave": false
+  "include": ["src/main/resources/assets/js", "vite.config.ts"]
 }
