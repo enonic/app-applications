@@ -19,7 +19,7 @@
     "test:watch": "vp test"
   },
   "dependencies": {
-    "@enonic/ui": "^1.1.1",
+    "@enonic/ui": "^1.2.0",
     "@nanostores/preact": "^1.1.0",
     "@radix-ui/react-slot": "^1.3.3",
     "focus-trap-react": "^12.0.3",

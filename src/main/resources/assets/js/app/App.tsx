@@ -1,9 +1,10 @@
-import { Skeleton } from '@enonic/ui';
+import { AppRoot, Skeleton } from '@enonic/ui';
 import { useStore } from '@nanostores/preact';
 import { useEffect, useState } from 'preact/hooks';
 
 import { ApplicationsPage } from '../pages/applications/ApplicationsPage';
 import type { Host } from '../shared/sections';
+import { $stylesheets } from '../shared/styles';
 import { $bootstrap } from './bootstrap.store';
 
 export type AppProps = {
@@ -12,20 +13,19 @@ export type AppProps = {
 
 export function App({ host }: AppProps) {
   const { status, error } = useStore($bootstrap);
+  const stylesheets = useStore($stylesheets);
   const [theme, setTheme] = useState(host.theme.get());
 
   useEffect(() => host.theme.subscribe(setTheme), [host]);
 
-  // ! The theme class belongs on this wrapper, not on the document: `@enonic/ui` resolves its dark
-  // ! tokens from `.dark, :host(.dark)` and its `dark:` variants from `.dark, .dark *`, and neither
-  // ! selector crosses a shadow boundary — the host's `<html class="dark">` is in another tree. This
-  // ! is what `AppRoot` will own once npm-enonic-ui#533 lands.
+  // ! `AppRoot` adopts the sheet, sets the theme class (`.dark` never crosses the shadow boundary)
+  // ! and portals overlays inside this root. Needs `@enonic/ui` >= 1.2.0.
   return (
-    <div className={`flex min-h-0 flex-1 flex-col ${theme === 'dark' ? 'dark' : ''}`}>
+    <AppRoot theme={theme} stylesheets={stylesheets} className="flex min-h-0 flex-1 flex-col">
       {status === 'loading' && <BootstrapSkeleton />}
       {status === 'error' && <BootstrapFailed error={error} />}
-      {status === 'ready' && <ApplicationsPage host={host} theme={theme} />}
-    </div>
+      {status === 'ready' && <ApplicationsPage />}
+    </AppRoot>
   );
 }
 

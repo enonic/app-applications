@@ -1,1 +1,1 @@
-export { adoptStyleSheet } from './stylesheet';
+export { $stylesheets } from './stylesheet';
