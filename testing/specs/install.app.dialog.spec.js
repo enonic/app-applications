@@ -25,7 +25,7 @@ describe('Install Application Dialog specification', function () {
             await dialog.waitForSpinnerNotVisible();
             await dialog.waitForOpened();
             let actualMessage = await dialog.getPlaceholderMessage();
-            assert.equal(actualMessage, 'Search Enonic Market, paste url or upload directly',
+            assert.equal(actualMessage, 'Search Enonic Market or upload directly',
                 'expected message should be in the placeholder');
             await studioUtils.saveScreenshot('install_dialog_default_focus');
             let isFocused = await dialog.isDefaultFocused();
