@@ -14,21 +14,14 @@
 .cursor/
 
 # Build files
-dist/
 build/
-buildSrc/
-target/
 
 # Development files
-.storybook/
-storybook-static/
 docs/
-*storybook.log
 *.local
-.xp/
 
 # Coverage
-**/spec/coverage
+coverage/
 
 # Build tools
 node_modules/
@@ -40,7 +33,7 @@ node_modules/
 Thumbs.db
 
 # Enonic
-.enonic/
+.enonic
 
 # Logs
 logs/
@@ -54,8 +47,6 @@ pnpm-debug.log*
 .cache/
 .temp/
 .tmp/
-generated-java/
-.tsbuildinfo
-.eslintcache
+*.tsbuildinfo
 
 .gh-actions/

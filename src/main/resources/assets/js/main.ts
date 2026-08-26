@@ -1,109 +1,16 @@
-import {Application} from '@enonic/lib-admin-ui/app/Application';
-import {ApplicationAppPanel} from './app/ApplicationAppPanel';
-import {InstallAppDialog} from './app/installation/InstallAppDialog';
-import {InstallAppPromptEvent} from './app/installation/InstallAppPromptEvent';
-import {Body} from '@enonic/lib-admin-ui/dom/Body';
-import {Path} from '@enonic/lib-admin-ui/rest/Path';
-import {ConnectionDetector} from '@enonic/lib-admin-ui/system/ConnectionDetector';
-import {AppBar} from '@enonic/lib-admin-ui/app/bar/AppBar';
-import {AppHelper} from '@enonic/lib-admin-ui/util/AppHelper';
-import {ServerEventsListener} from '@enonic/lib-admin-ui/event/ServerEventsListener';
-import {i18nInit} from '@enonic/lib-admin-ui/util/MessagesInitializer';
-import {i18n} from '@enonic/lib-admin-ui/util/Messages';
-import {AppInstalledEvent} from './app/installation/AppInstalledEvent';
-import {CONFIG, ConfigObject} from '@enonic/lib-admin-ui/util/Config';
-import {AppUninstalledEvent} from './app/installation/AppUninstalledEvent';
-import {CustomElement} from '@enonic/lib-admin-ui/dom/CustomElement';
+import { h, render } from 'preact';
 
-const body = Body.get();
+import { App } from './app/App';
+import { bootstrap } from './app/bootstrap';
+import type { MountOptions, Unmount } from './shared/sections';
 
-function getApplication(): Application {
-    const assetsUri: string = CONFIG.getString('assetsUri');
-    const application = new Application(
-        CONFIG.getString('appId'),
-        i18n('admin.tool.displayName'),
-        i18n('app.abbr'),
-        `${assetsUri}/icons/icon-white.svg`
-    );
-    application.setPath(Path.fromString('/'));
-    application.setWindow(window);
+/** Renders the section into the container the host owns, inside the shadow root it created. */
+export function mount({ container, host }: MountOptions): Unmount {
+  // ! Not awaited. `mount` owes the shell its disposer synchronously, so the section paints while its
+  // ! own configuration is still in flight and `$bootstrap` is what moves it on.
+  void bootstrap(host);
 
-    return application;
+  render(h(App, { host }), container);
+
+  return () => render(null, container);
 }
-
-function startLostConnectionDetector() {
-    ConnectionDetector.get(CONFIG.getString('statusApiUrl'))
-        .setAuthenticated(true)
-        .setSessionExpireRedirectUrl(CONFIG.getString('toolUri'))
-        .setNotificationMessage(i18n('notify.connection.loss'))
-        .startPolling(true);
-}
-
-function startApplication() {
-
-    const application: Application = getApplication();
-    const appBar = new AppBar(application);
-    const appPanel = new ApplicationAppPanel(application.getPath());
-
-    body.appendChild(appBar);
-    body.appendChild(appPanel);
-
-    AppHelper.preventDragRedirect();
-
-    application.setLoaded(true);
-
-    const serverEventsListener = new ServerEventsListener([application], CONFIG.getString('eventApiUrl'));
-    serverEventsListener.start();
-
-    startLostConnectionDetector();
-
-    const installAppDialog = new InstallAppDialog();
-
-    InstallAppPromptEvent.on((event) => {
-        installAppDialog.setInstalledApplications(event.getInstalledApplications());
-        installAppDialog.open();
-    });
-
-    AppInstalledEvent.on((event) => {
-        installAppDialog.updateAppInstalled(event.getApplication());
-    });
-
-    AppUninstalledEvent.on((event) => {
-       installAppDialog.updateAppUninstalled(event.getApplication());
-    });
-
-    appendMenuPanel();
-}
-
-function appendMenuPanel(): void {
-    const menuUrl = CONFIG.getString('menuUrl');
-    if (!menuUrl) {
-        throw new Error('Menu URL is not defined');
-    }
-    const menuElement = CustomElement.create('xp-menu');
-    document.body.appendChild(menuElement);
-    fetch(menuUrl)
-        .then(response => response.text())
-        .then((html: string) => menuElement.setHtml(html))
-        .catch((e: Error) => {
-            throw new Error(`Failed to fetch the Menu extension panel at ${menuUrl}: ${e.toString()}`);
-        });
-}
-
-(async () => {
-    if (!document.currentScript) {
-        throw Error('Legacy browsers are not supported');
-    }
-
-    const configScriptId = document.currentScript.getAttribute('data-config-script-id');
-    if (!configScriptId) {
-        throw Error('Missing \'data-config-script-id\' attribute');
-    }
-
-    const configScriptEl: HTMLElement = document.getElementById(configScriptId);
-    CONFIG.setConfig(JSON.parse(configScriptEl.innerText) as ConfigObject);
-
-    await i18nInit(CONFIG.getString('apis.i18nUrl'));
-    startApplication();
-})();
-

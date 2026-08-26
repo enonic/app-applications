@@ -1,28 +1,23 @@
 {
   "compilerOptions": {
-    "module": "ES2022",
-    "moduleResolution": "bundler",
     "target": "ES2023",
-    "lib": ["ES2023", "DOM"],
-    "baseUrl": ".",
-    "outDir": "build/resources/main/assets/js/",
-    "allowSyntheticDefaultImports": true,
-    "forceConsistentCasingInFileNames": true,
-    "useDefineForClassFields": false,
-    "allowJs": false,
-    "noImplicitReturns": false,
-    "noImplicitThis": true,
-    "strictNullChecks": false,
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "lib": ["ES2023", "DOM", "DOM.Iterable"],
+    "jsx": "react-jsx",
+    "jsxImportSource": "preact",
+    "strict": true,
     "skipLibCheck": true,
-    "incremental": true,
+    "esModuleInterop": true,
     "isolatedModules": true,
-    "types": ["q"]
+    "noEmit": true,
+    // @enonic/ui is Preact — map the React types to preact/compat so its components
+    // type-check in our .tsx (mirrors the Vite alias).
+    "paths": {
+      "react": ["./node_modules/preact/compat"],
+      "react-dom": ["./node_modules/preact/compat"],
+      "react-dom/client": ["./node_modules/preact/compat"]
+    }
   },
-  "files": ["./src/main/resources/assets/js/main.ts"],
-  "include": [
-    "src/**/*",
-    ".xp/dev/lib-admin-ui/**/*.ts"
-  ],
-  "compileOnSave": false,
-  "buildOnSave": false
+  "include": ["src/main/resources/assets/js", "src/test", "vite.config.ts"]
 }

@@ -1,166 +1,124 @@
+import com.github.gradle.node.pnpm.task.PnpmInstallTask
+import com.github.gradle.node.pnpm.task.PnpmTask
+
 plugins {
-    id 'java'
-    id 'jacoco'
     id 'maven-publish'
-    alias( libs.plugins.enonic.defaults )
+    alias(libs.plugins.enonic.defaults)
     id 'com.enonic.xp.app'
-    alias( libs.plugins.node.gradle )
-}
-
-allprojects {
-    pluginManager.withPlugin( 'java' ) {
-        java {
-            toolchain {
-                languageVersion = JavaLanguageVersion.of( 25 )
-            }
-        }
-    }
-
-    apply from: "$rootDir/gradle/env.gradle"
-    apply from: "$rootDir/gradle/node.gradle"
-
-    if ( project.name != 'testing' ) {
-        apply from: "$rootDir/gradle/lib-admin.gradle"
-    }
-}
-
-repositories {
-    mavenLocal()
-    mavenCentral()
-    xp.enonicRepo( 'dev' )
-}
-
-configurations {
-    devResources {
-        attributes {
-            attribute( LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE, objects.named( LibraryElements, 'dev-resources' ) )
-        }
-    }
-}
-
-dependencies {
-    implementation xplibs.api.admin
-    implementation xplibs.api.jaxrs
-    implementation xplibs.api.portal
-    include xplibs.admin
-    include xplibs.i18n
-    include xplibs.portal
-    include libs.lib.asset
-    include libs.lib.mustache
-
-    include "com.enonic.lib:lib-admin-ui:${libAdminUiVersion}"
-    devResources "com.enonic.lib:lib-admin-ui:${libAdminUiVersion}"
-
-    testImplementation platform( libs.junit.bom )
-    testImplementation platform( libs.mockito.bom )
-    testImplementation libs.junit.jupiter
-    testImplementation libs.mockito.jupiter
-    testImplementation testFixtures( "com.enonic.xp:jaxrs-impl:${xpVersion}" )
-    testImplementation testFixtures( "com.enonic.xp:core-app:${xpVersion}" )
-    testRuntimeOnly libs.junit.launcher
+    alias(libs.plugins.node.gradle)
 }
 
 app {
     name = "${group}.${projectName}"
     systemApp = true
+
+    // Pin the script engine (not the XP instance default). GraalJS supports modern ES,
+    // so `vp pack` can target es2023 (see vite.config.ts).
+    scriptEngine = 'GraalJS'
 }
 
-// Verification tasks
-tasks.register( 'checkTypes', PnpmTask ) {
-    dependsOn tasks.named( 'pnpmInstall' )
+dependencies {
+    implementation xplibs.api.core
+    implementation xplibs.api.portal
+    implementation xplibs.api.script
+
+    include xplibs.admin
+    include xplibs.portal
+    include xplibs.io
+    include xplibs.i18n
+    include 'com.enonic.lib:lib-graphql:3.0.0'
+}
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+    xp.enonicRepo('dev')
+}
+
+// Download + pin Node + pnpm so the build is self-contained (clean checkout / CI).
+node {
+    download = true
+    version = '24.18.0'
+    pnpmVersion = '10.33.4' // match packageManager in package.json
+}
+
+// Prod by default; `-Penv=dev` → development build (sourcemaps, no minify).
+def isProd = { -> !((project.findProperty('env') ?: 'prod') in ['d', 'dev', 'development']) }
+
+// pnpmInstall is auto-registered; freeze the lockfile in CI.
+tasks.named('pnpmInstall', PnpmInstallTask) {
+    if (System.getenv('CI') != null) {
+        args.add('--frozen-lockfile')
+    }
+}
+
+// Keep raw sources (and dev-only config) out of the jar — pnpm emits the compiled
+// versions into build/resources/main instead.
+tasks.named('processResources') {
+    exclude 'assets/js/**'
+    exclude 'assets/css/**' // Tailwind source; the build emits it as _static/main.css
+    exclude '**/*.ts' // server TS emitted as .js by pnpmPack
+    exclude '**/*.tsx'
+    exclude '**/tsconfig.json' // type-check config, not an app resource
+    exclude '**/.gitkeep'
+    exclude '**/node_modules/**'
+    includeEmptyDirs = false
+}
+
+// Format + lint + type-check + tests before building.
+// CI must fail on violations; locally they get fixed in place.
+tasks.register('pnpmCheck', PnpmTask) {
+    dependsOn tasks.named('pnpmInstall')
+    description = 'Check UI + server resources (fmt, lint, types, tests) with vp check + tsc.'
     group = 'verification'
-    args = ['run', 'check:types']
-    outputs.cacheIf { false }
+    args = ['run', System.getenv('CI') != null ? 'check' : 'check:fix']
+    // No inputs/outputs on purpose: a verification task should always run.
 }
 
-tasks.register( 'checkLint', PnpmTask ) {
-    dependsOn tasks.named( 'pnpmInstall' )
-    group = 'verification'
-    args = ['run', 'check:lint']
-    outputs.cacheIf { false }
-}
-
-tasks.register( 'pnpmCheck', PnpmTask ) {
-    dependsOn tasks.named( 'pnpmInstall' )
-    group = 'verification'
-    args = ['run', 'check']
-    outputs.cacheIf { false }
-}
-
-// Build tasks
-tasks.register( 'pnpmBuild', PnpmTask ) {
-    dependsOn tasks.named( 'pnpmInstall' )
-    description = 'Build UI resources (ts, css, etc) with Vite.'
-    args = ['run', "build:${environmentShort()}"]
-    environment = ['NODE_ENV': nodeEnvironment()]
-    inputs.dir '.xp/dev'
+tasks.register('pnpmBuild', PnpmTask) {
+    dependsOn tasks.named('pnpmInstall')
+    dependsOn tasks.named('pnpmCheck')
+    mustRunAfter tasks.named('processResources')
+    description = 'Build UI resources (the section module) with Vite.'
+    group = 'build'
+    args = ['run', isProd() ? 'build' : 'build:dev']
+    environment = ['NODE_ENV': isProd() ? 'production' : 'development']
+    inputs.property 'env', project.findProperty('env') ?: 'prod' // re-run on env switch
     inputs.dir 'src/main'
     inputs.file 'vite.config.ts'
     inputs.file 'tsconfig.json'
-    outputs.dir "${buildDir}/resources/main"
+    inputs.file 'package.json'
+    outputs.dir layout.buildDirectory.dir('resources/main/assets')
 }
 
-tasks.register( 'yolo' ) {
-    description = 'Build without running install, check, or test tasks'
+// Compile server-side .ts → per-file CommonJS in build/resources/main (see vite.config pack).
+tasks.register('pnpmPack', PnpmTask) {
+    dependsOn tasks.named('pnpmInstall')
+    dependsOn tasks.named('pnpmCheck')
+    mustRunAfter tasks.named('processResources')
+    description = 'Build server-side resources (ts -> CommonJS js) with vp pack.'
+    group = 'build'
+    args = ['run', 'pack:server']
+    inputs.dir 'src/main'
+    inputs.file 'vite.config.ts'
+    inputs.file 'tsconfig.json'
+    inputs.file 'package.json'
+    outputs.dir layout.buildDirectory.dir('resources/main')
+    outputs.cacheIf { false } // output dir overlaps processResources — caching unreliable
 
-    dependsOn tasks.named( 'deploy' )
-    dependsOn tasks.named( 'checkTypes' )
-
-    nodeSetup.enabled = false
-    npmSetup.enabled = false
-    pnpmSetup.enabled = false
-    pnpmCheck.enabled = false
-    checkLint.enabled = false
-    check.enabled = false
-    test.enabled = false
-    javadoc.enabled = false
-}
-
-// Task configurations
-tasks.named( 'jar' ).configure {
-    exclude 'assets/**/tsconfig.tsbuildinfo'
-
-    if ( isProd() ) {
-        exclude 'assets/**/*.map'
+    // Required: vp pack runs clean:false, so without this a deleted .ts keeps shipping its .js.
+    doFirst {
+        delete fileTree(layout.buildDirectory.dir('resources/main')) {
+            include '**/*.js'
+            exclude 'assets/**'
+        }
     }
-
-    includeEmptyDirs = false
-
-    dependsOn tasks.named( 'pnpmBuild' )
 }
 
-tasks.named( 'processResources' ).configure {
-    // Don't need source files
-    exclude 'assets/js/**'
-    exclude 'assets/styles/**'
-
-    // Inlined by the Vite into CSS
-    exclude 'assets/fonts/**'
-    exclude 'assets/img/**'
-
-    includeEmptyDirs = false
-}
-
-tasks.named( 'compileTestJava' ).configure {
-    dependsOn tasks.named( 'pnpmBuild' )
-}
-
-tasks.named( 'test' ).configure {
-    useJUnitPlatform()
-    systemProperty 'java.awt.headless', 'true'
-    jvmArgs '-XX:TieredStopAtLevel=1'
-}
-
-tasks.named( 'jacocoTestReport' ).configure {
-    reports {
-        xml.required = true
-        html.required = true
+tasks.named('jar') {
+    dependsOn tasks.named('pnpmBuild')
+    dependsOn tasks.named('pnpmPack')
+    if (isProd()) {
+        exclude 'assets/**/*.map' // don't ship dev sourcemaps in a prod jar
     }
-    mustRunAfter jar
-}
-
-// Lifecycle wiring
-tasks.named( 'check' ).configure {
-    dependsOn tasks.named( 'pnpmCheck' )
-    dependsOn jacocoTestReport
 }

@@ -1,19 +1,6 @@
 [versions]
-asset = "2.0.1"
 enonic-defaults = "2.1.7"
-junit-bom = "6.1.3"
-mockito-bom = "5.23.0"
-mustache = "3.0.0"
 node-gradle = "7.1.0"
-
-[libraries]
-junit-bom = { module = "org.junit:junit-bom", version.ref = "junit-bom" }
-junit-jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit-bom" }
-junit-launcher = { module = "org.junit.platform:junit-platform-launcher" }
-lib-asset = { module = "com.enonic.lib:lib-asset", version.ref = "asset" }
-lib-mustache = { module = "com.enonic.lib:lib-mustache", version.ref = "mustache" }
-mockito-bom = { module = "org.mockito:mockito-bom", version.ref = "mockito-bom" }
-mockito-jupiter = { module = "org.mockito:mockito-junit-jupiter", version.ref = "mockito-bom" }
 
 [plugins]
 enonic-defaults = { id = "com.enonic.defaults", version.ref = "enonic-defaults" }
