@@ -56,8 +56,24 @@ export default defineConfig(({ mode }) => {
     // XP supplies these at runtime; under vitest they resolve to local doubles.
     alias: {
       '/lib/graphql': join(import.meta.dirname, 'src/test/mocks/lib-graphql.ts'),
+      '/lib/http-client': join(import.meta.dirname, 'src/test/mocks/http-client.ts'),
+      '/lib/xp/admin': join(import.meta.dirname, 'src/test/mocks/lib-xp-admin.ts'),
+      '/lib/xp/app': join(import.meta.dirname, 'src/test/mocks/lib-xp-app.ts'),
+      '/lib/xp/auth': join(import.meta.dirname, 'src/test/mocks/lib-xp-auth.ts'),
       '/lib/xp/i18n': join(import.meta.dirname, 'src/test/mocks/lib-xp-i18n.ts'),
+      '/lib/xp/schema': join(import.meta.dirname, 'src/test/mocks/lib-xp-schema.ts'),
+      '/lib/admin-extension': join(import.meta.dirname, 'src/test/mocks/lib-admin-extension.ts'),
+      '/lib/admin-tool': join(import.meta.dirname, 'src/test/mocks/lib-admin-tool.ts'),
+      '/lib/api': join(import.meta.dirname, 'src/test/mocks/lib-api.ts'),
+      '/lib/application': join(import.meta.dirname, 'src/test/mocks/lib-application.ts'),
+      '/lib/icon': join(import.meta.dirname, 'src/test/mocks/lib-icon.ts'),
+      '/lib/idprovider': join(import.meta.dirname, 'src/test/mocks/lib-idprovider.ts'),
+      '/lib/macro': join(import.meta.dirname, 'src/test/mocks/lib-macro.ts'),
+      '/lib/task': join(import.meta.dirname, 'src/test/mocks/lib-task.ts'),
+      '/lib/webapp': join(import.meta.dirname, 'src/test/mocks/lib-webapp.ts'),
+      // Real sources, not doubles: no bean behind them, so there is nothing to stand in for.
       '/lib/i18n': join(import.meta.dirname, 'src/main/resources/lib/i18n.ts'),
+      '/lib/market': join(import.meta.dirname, 'src/main/resources/lib/market.ts'),
     },
   };
 
