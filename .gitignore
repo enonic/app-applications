@@ -16,6 +16,13 @@
 # Build files
 build/
 
+# Eclipse / VS Code Java language server — shadow-compiles src/main/java and mirrors the
+# resources tree along with it.
+bin/
+.classpath
+.project
+.settings/
+
 # Development files
 docs/
 *.local

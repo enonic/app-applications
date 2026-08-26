@@ -13,13 +13,13 @@ export default defineConfig(({ mode }) => {
     options: { typeAware: true, typeCheck: true },
     // Server code included: oxlint resolves it against src/main/resources/tsconfig.json, which
     // carries the XP globals and the absolute `/lib/*` paths. build/** is generated output.
-    ignorePatterns: ['build/**', '**/*.d.ts'],
+    ignorePatterns: ['build/**', 'bin/**', '**/*.d.ts'],
   };
 
   const fmt = {
     singleQuote: true,
     sortImports: true,
-    ignorePatterns: ['build/**', '.github/**'],
+    ignorePatterns: ['build/**', 'bin/**', '.github/**'],
   };
 
   // `vp pack` (tsdown) compiles server-side .ts (all under resources except assets/) to
