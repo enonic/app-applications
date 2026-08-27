@@ -57,7 +57,7 @@ importers:
         version: 9.30.1
       '@wdio/local-runner':
         specifier: ^9.30.1
-        version: 9.30.1(@wdio/globals@9.29.1)(webdriverio@9.30.1)
+        version: 9.30.1(@wdio/globals@9.29.1)(webdriverio@9.31.2)
       '@wdio/mocha-framework':
         specifier: ^9.31.2
         version: 9.31.2
@@ -71,8 +71,8 @@ importers:
         specifier: ^3.0.1
         version: 3.0.1
       webdriverio:
-        specifier: ^9.30.1
-        version: 9.30.1
+        specifier: ^9.31.2
+        version: 9.31.2
 
 packages:
 
@@ -502,6 +502,10 @@ packages:
     resolution: {integrity: sha512-55D7g1RBCyHTwMkb4b6sQU0ET5lf5UUM3SgTHDGOo2KHfiydtCqOvfGwzxaf9nv200+QGY6BqI6yD0Ad1VGV0g==}
     engines: {node: '>=18.20.0'}
 
+  '@wdio/config@9.31.2':
+    resolution: {integrity: sha512-k+9jLYSh/4yBjNxaURNq5S0f9HOxcaEefS9GA+TscPchLzqbgSsFyGu1DFHP4i1IdOeDqIk7Ny4e1D4yxHTUhQ==}
+    engines: {node: '>=18.20.0'}
+
   '@wdio/dot-reporter@9.30.1':
     resolution: {integrity: sha512-YPRrKLuubvu9Gh39/fZqXiDM4nAYHqZ0yLlFCrPjHhmR7CX/tfBrMqVBSAHAE6xCrM8Txa193fcIzwzQtGxoFQ==}
     engines: {node: '>=18.20.0'}
@@ -527,6 +531,9 @@ packages:
 
   '@wdio/protocols@9.30.1':
     resolution: {integrity: sha512-kV0eHy6scYoXqZuAWvtYS5ebkyIF2/JdApSEu6kIdS2EppnROuvUzsNjTUzNkT6gk+0Ib9C/CbOqiuyZuhBUcA==}
+
+  '@wdio/protocols@9.31.1':
+    resolution: {integrity: sha512-/AEGY6hmEXaggUG9XJ5by6a1BLLpwbDfc6YN2NQ/66X1EZ+nPQKuYLNM/Z0BTOVClQvp+p7Uq3tc2oaNaePSDw==}
 
   '@wdio/repl@9.16.2':
     resolution: {integrity: sha512-FLTF0VL6+o5BSTCO7yLSXocm3kUnu31zYwzdsz4n9s5YWt83sCtzGZlZpt7TaTzb3jVUfxuHNQDTb8UMkCu0lQ==}
@@ -668,15 +675,6 @@ packages:
       bare-abort-controller:
         optional: true
 
-  bare-fs@4.8.0:
-    resolution: {integrity: sha512-fM+MhCvdQhZ7NV6S95a07gPSqjIYKn6mFaXfx266wN3ajZGl/+1AzH+ubkXQ0fFZvOe2nk9VHkzdYkQE5zMV3Q==}
-    engines: {bare: '>=1.28.0'}
-    peerDependencies:
-      bare-buffer: '*'
-    peerDependenciesMeta:
-      bare-buffer:
-        optional: true
-
   bare-fs@4.8.1:
     resolution: {integrity: sha512-N1nnXdHZAOSstz0XiHikGS4HGMH4CnSwhqWdGQQMqqdvp4Jybm9sE3R1WVnpWVd4SFkc8ryPDBLViNLwiEqECg==}
     engines: {bare: '>=1.28.0'}
@@ -702,9 +700,6 @@ packages:
         optional: true
       bare-events:
         optional: true
-
-  bare-url@2.5.1:
-    resolution: {integrity: sha512-cD5ciQuKlx+eumTCfqbfiL+fhQm+dHbVNB/cX4+d+I/nx4JsVop9VoFEPAs5RJ6I84QR6bZIBjpd2kjDOYeWcg==}
 
   bare-url@2.5.2:
     resolution: {integrity: sha512-L13PCJzKG8RGvx8V1/DdMi12ERhC3tprr7/8a94BxpmnRsFqxh5XZNdhtMxu5HPkRshYOOWRGY8lDP7ZhpG9Cg==}
@@ -1836,11 +1831,24 @@ packages:
     resolution: {integrity: sha512-qvtOsFiS0v3rrDPp+saWI8WQdOotT7nsPIFaML0T/uRUwr4QPjaFNbY+ZQwfzv07BQdpVGwiUEeLws5piVlEgA==}
     engines: {node: '>=18.20.0'}
 
+  webdriver@9.31.2:
+    resolution: {integrity: sha512-ivGDN0NvuLu27hKM02QWnXqVJfxAc4HpnP4GvXrrlURX3thN2DHZFRZ22B9lbvWDsSRjBc7XryUdvfuvYNfZtA==}
+    engines: {node: '>=18.20.0'}
+
   webdriverio@9.30.1:
     resolution: {integrity: sha512-HvoMHVPj1Ky04h0kEELKilWuzAi0Ctpmfw5V7LStQmOzbXkzfxxMutSB3SezJAYCWCnZ6zsEw7TdDWubWGY7qA==}
     engines: {node: '>=18.20.0'}
     peerDependencies:
       puppeteer-core: '>=22.x || <=24.x'
+    peerDependenciesMeta:
+      puppeteer-core:
+        optional: true
+
+  webdriverio@9.31.2:
+    resolution: {integrity: sha512-uVrh+ChODUwG01/Rp2nSb9tlTI46b3IFQe6P7CShMPKAJRJ6ONXn5qr2ZCp+gisp4vU3UXITcc5F9j6VDTgWpw==}
+    engines: {node: '>=18.20.0'}
+    peerDependencies:
+      puppeteer-core: '>=22.x <=24.x'
     peerDependenciesMeta:
       puppeteer-core:
         optional: true
@@ -2355,6 +2363,21 @@ snapshots:
       - react-native-b4a
       - supports-color
 
+  '@wdio/config@9.31.2':
+    dependencies:
+      '@wdio/logger': 9.29.1
+      '@wdio/types': 9.31.2
+      '@wdio/utils': 9.31.2
+      deepmerge-ts: 7.1.6
+      glob: 13.0.6
+      import-meta-resolve: 4.2.0
+      jiti: 2.7.0
+    transitivePeerDependencies:
+      - bare-abort-controller
+      - bare-buffer
+      - react-native-b4a
+      - supports-color
+
   '@wdio/dot-reporter@9.30.1':
     dependencies:
       '@wdio/reporter': 9.30.1
@@ -2363,19 +2386,24 @@ snapshots:
 
   '@wdio/globals@9.29.1(expect-webdriverio@5.7.0)(webdriverio@9.30.1)':
     dependencies:
-      expect-webdriverio: 5.7.0(@wdio/globals@9.29.1)(@wdio/logger@9.29.1)(webdriverio@9.30.1)
+      expect-webdriverio: 5.7.0(@wdio/globals@9.29.1)(@wdio/logger@9.29.1)(webdriverio@9.31.2)
       webdriverio: 9.30.1
 
-  '@wdio/local-runner@9.30.1(@wdio/globals@9.29.1)(webdriverio@9.30.1)':
+  '@wdio/globals@9.29.1(expect-webdriverio@5.7.0)(webdriverio@9.31.2)':
+    dependencies:
+      expect-webdriverio: 5.7.0(@wdio/globals@9.29.1)(@wdio/logger@9.29.1)(webdriverio@9.31.2)
+      webdriverio: 9.31.2
+
+  '@wdio/local-runner@9.30.1(@wdio/globals@9.29.1)(webdriverio@9.31.2)':
     dependencies:
       '@types/node': 20.19.43
       '@wdio/logger': 9.29.1
       '@wdio/repl': 9.16.2
-      '@wdio/runner': 9.30.1(expect-webdriverio@5.7.0)(webdriverio@9.30.1)
+      '@wdio/runner': 9.30.1(expect-webdriverio@5.7.0)(webdriverio@9.31.2)
       '@wdio/types': 9.30.1
       '@wdio/xvfb': 9.30.1
       exit-hook: 4.0.0
-      expect-webdriverio: 5.7.0(@wdio/globals@9.29.1)(@wdio/logger@9.29.1)(webdriverio@9.30.1)
+      expect-webdriverio: 5.7.0(@wdio/globals@9.29.1)(@wdio/logger@9.29.1)(webdriverio@9.31.2)
       split2: 4.2.0
       stream-buffers: 3.0.3
     transitivePeerDependencies:
@@ -2412,6 +2440,8 @@ snapshots:
 
   '@wdio/protocols@9.30.1': {}
 
+  '@wdio/protocols@9.31.1': {}
+
   '@wdio/repl@9.16.2':
     dependencies:
       '@types/node': 20.19.43
@@ -2432,19 +2462,19 @@ snapshots:
       diff: 9.0.0
       object-inspect: 1.13.4
 
-  '@wdio/runner@9.30.1(expect-webdriverio@5.7.0)(webdriverio@9.30.1)':
+  '@wdio/runner@9.30.1(expect-webdriverio@5.7.0)(webdriverio@9.31.2)':
     dependencies:
       '@types/node': 20.19.43
       '@wdio/config': 9.30.1
       '@wdio/dot-reporter': 9.30.1
-      '@wdio/globals': 9.29.1(expect-webdriverio@5.7.0)(webdriverio@9.30.1)
+      '@wdio/globals': 9.29.1(expect-webdriverio@5.7.0)(webdriverio@9.31.2)
       '@wdio/logger': 9.29.1
       '@wdio/types': 9.30.1
       '@wdio/utils': 9.30.1
       deepmerge-ts: 7.1.5
-      expect-webdriverio: 5.7.0(@wdio/globals@9.29.1)(@wdio/logger@9.29.1)(webdriverio@9.30.1)
+      expect-webdriverio: 5.7.0(@wdio/globals@9.29.1)(@wdio/logger@9.29.1)(webdriverio@9.31.2)
       webdriver: 9.30.1
-      webdriverio: 9.30.1
+      webdriverio: 9.31.2
     transitivePeerDependencies:
       - bare-abort-controller
       - bare-buffer
@@ -2592,17 +2622,6 @@ snapshots:
 
   bare-events@2.9.1: {}
 
-  bare-fs@4.8.0:
-    dependencies:
-      bare-events: 2.9.1
-      bare-path: 3.1.1
-      bare-stream: 2.13.3(bare-events@2.9.1)
-      bare-url: 2.5.1
-      fast-fifo: 1.3.2
-    transitivePeerDependencies:
-      - bare-abort-controller
-      - react-native-b4a
-
   bare-fs@4.8.1:
     dependencies:
       bare-events: 2.9.1
@@ -2613,7 +2632,6 @@ snapshots:
     transitivePeerDependencies:
       - bare-abort-controller
       - react-native-b4a
-    optional: true
 
   bare-path@3.1.1: {}
 
@@ -2627,14 +2645,9 @@ snapshots:
     transitivePeerDependencies:
       - react-native-b4a
 
-  bare-url@2.5.1:
-    dependencies:
-      bare-path: 3.1.1
-
   bare-url@2.5.2:
     dependencies:
       bare-path: 3.1.1
-    optional: true
 
   base64-js@1.5.1: {}
 
@@ -2981,15 +2994,15 @@ snapshots:
 
   exit-hook@4.0.0: {}
 
-  expect-webdriverio@5.7.0(@wdio/globals@9.29.1)(@wdio/logger@9.29.1)(webdriverio@9.30.1):
+  expect-webdriverio@5.7.0(@wdio/globals@9.29.1)(@wdio/logger@9.29.1)(webdriverio@9.31.2):
     dependencies:
       '@vitest/snapshot': 4.1.10
-      '@wdio/globals': 9.29.1(expect-webdriverio@5.7.0)(webdriverio@9.30.1)
+      '@wdio/globals': 9.29.1(expect-webdriverio@5.7.0)(webdriverio@9.31.2)
       '@wdio/logger': 9.29.1
       deep-eql: 5.0.2
       expect: 30.4.1
       jest-matcher-utils: 30.4.1
-      webdriverio: 9.30.1
+      webdriverio: 9.31.2
 
   expect@30.4.1:
     dependencies:
@@ -3758,7 +3771,7 @@ snapshots:
   tar-stream@3.2.0:
     dependencies:
       b4a: 1.8.1
-      bare-fs: 4.8.0
+      bare-fs: 4.8.1
       fast-fifo: 1.3.2
       streamx: 2.28.0
     transitivePeerDependencies:
@@ -3844,7 +3857,28 @@ snapshots:
       '@wdio/protocols': 9.30.1
       '@wdio/types': 9.30.1
       '@wdio/utils': 9.30.1
-      deepmerge-ts: 7.1.5
+      deepmerge-ts: 7.1.6
+      https-proxy-agent: 7.0.6
+      undici: 6.28.0
+      ws: 8.21.3
+    transitivePeerDependencies:
+      - bare-abort-controller
+      - bare-buffer
+      - bufferutil
+      - react-native-b4a
+      - supports-color
+      - utf-8-validate
+
+  webdriver@9.31.2:
+    dependencies:
+      '@types/node': 20.19.43
+      '@types/ws': 8.18.1
+      '@wdio/config': 9.31.2
+      '@wdio/logger': 9.29.1
+      '@wdio/protocols': 9.31.1
+      '@wdio/types': 9.31.2
+      '@wdio/utils': 9.31.2
+      deepmerge-ts: 7.1.6
       https-proxy-agent: 7.0.6
       undici: 6.28.0
       ws: 8.21.3
@@ -3883,6 +3917,41 @@ snapshots:
       serialize-error: 12.0.0
       urlpattern-polyfill: 10.1.0
       webdriver: 9.30.1
+    transitivePeerDependencies:
+      - bare-abort-controller
+      - bare-buffer
+      - bufferutil
+      - react-native-b4a
+      - supports-color
+      - utf-8-validate
+
+  webdriverio@9.31.2:
+    dependencies:
+      '@types/node': 20.19.43
+      '@types/sinonjs__fake-timers': 8.1.5
+      '@wdio/config': 9.31.2
+      '@wdio/logger': 9.29.1
+      '@wdio/protocols': 9.31.1
+      '@wdio/repl': 9.16.2
+      '@wdio/types': 9.31.2
+      '@wdio/utils': 9.31.2
+      archiver: 7.0.1
+      aria-query: 5.3.2
+      cheerio: 1.2.0
+      css-shorthand-properties: 1.1.2
+      css-value: 0.0.1
+      grapheme-splitter: 1.0.4
+      htmlfy: 0.8.1
+      is-plain-obj: 4.1.0
+      jszip: 3.10.1
+      lodash.clonedeep: 4.5.0
+      lodash.zip: 4.2.0
+      query-selector-shadow-dom: 1.0.1
+      resq: 1.11.0
+      rgb2hex: 0.2.5
+      serialize-error: 12.0.0
+      urlpattern-polyfill: 10.1.0
+      webdriver: 9.31.2
     transitivePeerDependencies:
       - bare-abort-controller
       - bare-buffer
