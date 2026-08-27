@@ -1,4 +1,4 @@
-import { GraphQLString, nonNull, type GraphQLType } from '/lib/graphql';
+import { GraphQLBoolean, GraphQLString, nonNull, type GraphQLType } from '/lib/graphql';
 
 import { generator } from '../schema/generator';
 
@@ -17,6 +17,11 @@ export const ConfigType: GraphQLType = generator.createObjectType({
     },
     appVersion: {
       type: nonNull(GraphQLString),
+    },
+    managedMode: {
+      type: nonNull(GraphQLBoolean),
+      description:
+        'Whether this instance forbids installing and uninstalling applications from the UI.',
     },
   },
 });
