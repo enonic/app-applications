@@ -12,8 +12,6 @@
  */
 export type Readable<T> = { get(): T; subscribe(cb: (v: T) => void): () => void };
 
-export type XpServerEvent = { type: string; timestamp?: number; data?: Record<string, unknown> };
-
 export type Notification = {
   level: 'info' | 'success' | 'warning' | 'error';
   /** Already localized by the guest: no i18n key crosses the boundary. */
@@ -35,8 +33,6 @@ export type Host = {
   navigate(subPath: string, opts?: { replace?: boolean }): void;
   /** Href builder for real anchors within the module's own segment. */
   url(subPath: string): string;
-  /** The host's single socket, fanned out; filter in the callback. */
-  subscribeEvents(cb: (event: XpServerEvent) => void): () => void;
   /** Toast on the host's stack; returns dismiss. */
   notify(n: Notification): () => void;
 };

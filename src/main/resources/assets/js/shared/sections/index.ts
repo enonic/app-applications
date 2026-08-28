@@ -5,5 +5,4 @@ export type {
   Readable,
   SectionModule,
   Unmount,
-  XpServerEvent,
 } from './contract';
