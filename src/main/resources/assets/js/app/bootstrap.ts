@@ -3,6 +3,7 @@ import { setConfig, type Config } from '../shared/config';
 import { setPhrases, type Phrases } from '../shared/i18n';
 import type { Host } from '../shared/sections';
 import { bootstrapFailed, bootstrapReady } from './bootstrap.store';
+import { startSectionEvents } from './events';
 
 const CONFIG_ROOT: GraphQlRoot = {
   field: 'config',
@@ -26,7 +27,9 @@ type BootstrapData = {
 /**
  * Everything a standalone tool would have had before its first render, and the one place that reads
  * the host object: where this section's data lives and which locale to ask in. One document, because
- * one round trip is what a screen costs on this app's single JS thread.
+ * one round trip is what a screen costs on this app's single JS thread. The event feed opens here
+ * too — a standalone tool would connect at startup, and this is the only thing in the app whose life
+ * is the module's, which is the subscription's life as well.
  *
  * ! Memoized for the life of the module, not the mount. A provider shipping several sections points
  * ! every descriptor at this one module, so `mount` runs per section while this must not: the locale
@@ -60,6 +63,7 @@ function load({ baseUrl, locale }: Host): Promise<void> {
 
       setConfig(data.config);
       setPhrases(phrases, locale);
+      startSectionEvents(data.config.eventsUrl);
       bootstrapReady();
     }, fail)
     .catch(fail);

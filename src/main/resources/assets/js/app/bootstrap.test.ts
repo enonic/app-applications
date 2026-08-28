@@ -7,8 +7,10 @@ const { requestGraphQlRoots, setGraphQlEndpoint } = vi.hoisted(() => ({
   requestGraphQlRoots: vi.fn(),
   setGraphQlEndpoint: vi.fn(),
 }));
+const startSectionEvents = vi.hoisted(() => vi.fn());
 
 vi.mock('../shared/api', () => ({ requestGraphQlRoots, setGraphQlEndpoint }));
+vi.mock('./events', () => ({ startSectionEvents }));
 
 const CONFIG = {
   appId: 'com.enonic.xp.app.applications',
@@ -48,6 +50,7 @@ async function run(locale = 'en') {
 beforeEach(() => {
   requestGraphQlRoots.mockReset();
   setGraphQlEndpoint.mockReset();
+  startSectionEvents.mockReset();
   answers({ config: CONFIG, phrases: PHRASES });
 });
 
@@ -105,6 +108,20 @@ describe('bootstrap', () => {
     await run();
 
     expect(setGraphQlEndpoint).toHaveBeenCalledWith(`${BASE_URL}/graphql`);
+  });
+
+  it("opens the event feed on the hub url the section's own schema answered with", async () => {
+    await run();
+
+    expect(startSectionEvents).toHaveBeenCalledExactlyOnceWith(CONFIG.eventsUrl);
+  });
+
+  it('leaves the event feed shut when the section never got its configuration', async () => {
+    answers({ config: null, phrases: PHRASES }, 'Field `config` blew up');
+
+    await run();
+
+    expect(startSectionEvents).not.toHaveBeenCalled();
   });
 
   it('reports a request that rejected rather than leaving the section on its skeleton', async () => {
