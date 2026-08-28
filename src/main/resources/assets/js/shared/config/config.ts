@@ -4,7 +4,7 @@
  * `../app-settings/docs/extensions/docs.md` § Data.
  */
 export type Config = {
-  /** This application, not the shell hosting it. */
   appId: string;
   appVersion: string;
+  eventsUrl: string;
 };

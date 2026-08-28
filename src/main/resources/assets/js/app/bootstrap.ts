@@ -6,7 +6,7 @@ import { bootstrapFailed, bootstrapReady } from './bootstrap.store';
 
 const CONFIG_ROOT: GraphQlRoot = {
   field: 'config',
-  selection: '{ appId appVersion }',
+  selection: '{ appId appVersion eventsUrl }',
 };
 
 // ! A `Json` scalar, so no selection — and the locale travels as a variable rather than as text, like
