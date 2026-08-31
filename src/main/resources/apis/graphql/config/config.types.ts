@@ -23,5 +23,9 @@ export const ConfigType: GraphQLType = generator.createObjectType({
       description:
         'Whether this instance forbids installing and uninstalling applications from the UI.',
     },
+    eventsUrl: {
+      type: nonNull(GraphQLString),
+      description: 'The admin events hub api; `client.js` under it is the client to import.',
+    },
   },
 });
