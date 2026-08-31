@@ -1,15 +1,7 @@
 /**
- * An application's icon, base64-encoded so it can travel inside a JSON response.
- *
- * `lib/xp/app`'s `getDescriptor` carries the icon as a `ByteSource`, and returning that straight from
- * a controller is what XP's own documentation shows. It cannot work on GraalJS, which this app pins:
- * `PortalResponseSerializer.populateBody` asks `ScriptValue.isObject()` first, and every Java object
- * read out of a JS object is wrapped in `GraalObjectScriptValue`, whose `isObject()` is always true —
- * so the body becomes a map of the `ByteSource`'s method names rather than its bytes. Serving the
- * bytes over their own endpoint fails for a second reason too: XP builds one single-threaded GraalJS
- * context per application, so the parallel image requests a list of rows makes collide.
- *
- * Hence base64 on the Java side, inside the same payload as the rest of the row.
+ * An application's icon, base64-encoded so it travels inside a JSON response. ! Returning the `ByteSource`
+ * `getDescriptor` carries cannot work on GraalJS: the serializer sees every Java object as an object, so
+ * the body becomes a map of method names. A bytes endpoint fails too — one JS thread, parallel row images.
  */
 
 export type EncodeApplicationIconParams = {

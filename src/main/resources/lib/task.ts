@@ -1,9 +1,7 @@
 /**
- * The task descriptors `lib/xp/task` does not expose.
- *
- * That lib is about running instances — `submitTask`, `list`, `progress`. What an application
- * *declares* is reachable only through `TaskDescriptorService`, an OSGi service, hence the bean.
- * Shaped after `lib/xp/schema`'s `listComponents`, like `/lib/macro`.
+ * The task descriptors `lib/xp/task` does not expose — that lib is about running instances. What an
+ * application *declares* is reachable only through the OSGi `TaskDescriptorService`, hence the bean;
+ * shaped after `lib/xp/schema`'s `listComponents`, like `/lib/macro`.
  */
 
 export type TaskDescriptor = {

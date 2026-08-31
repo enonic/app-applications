@@ -56,6 +56,10 @@ export default defineConfig(({ mode }) => {
     // XP supplies these at runtime; under vitest they resolve to local doubles.
     alias: {
       '/lib/graphql': join(import.meta.dirname, 'src/test/mocks/lib-graphql.ts'),
+      // Not XP libs, same problem: externalized CJS bypasses the react → preact/compat alias, and
+      // both — reached through the entity barrels — require `react`, not installed.
+      'lucide-react': join(import.meta.dirname, 'src/test/mocks/lucide-react.ts'),
+      '@enonic/ui': join(import.meta.dirname, 'src/test/mocks/enonic-ui.ts'),
       '/lib/http-client': join(import.meta.dirname, 'src/test/mocks/http-client.ts'),
       '/lib/xp/admin': join(import.meta.dirname, 'src/test/mocks/lib-xp-admin.ts'),
       '/lib/xp/app': join(import.meta.dirname, 'src/test/mocks/lib-xp-app.ts'),

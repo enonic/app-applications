@@ -10,7 +10,7 @@
 *~
 
 # AI
-.claude/
+.claude/settings.local.json
 .cursor/
 
 # Build files

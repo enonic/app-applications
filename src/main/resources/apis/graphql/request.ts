@@ -16,15 +16,9 @@ type GraphQlOperation = {
 };
 
 /**
- * The section's data plane, served from this app's own extension prefix rather than from a
- * `kind: API` descriptor — a universal API is reachable from an admin tool page only when the
- * *host tool's* descriptor lists it (`SlashApiHandler.verifyPathMountedOnAdminTool`), which would
- * mean an app-settings release for every provider.
- *
- * ! No role check here, deliberately. Four gates already ran before this module was loaded:
- * ! `role:system.admin.login` on the dispatcher, the host tool's `allow`, the interface/mount
- * ! check, and this extension's own `allow`. Re-requiring `role:system.admin` would lock out a
- * ! provider whose descriptor legitimately allows a narrower audience.
+ * The data plane, served from this app's own extension prefix: a `kind: API` descriptor would need the
+ * *host tool* to list it, i.e. a host release per provider. ! No role check — four gates ran before this
+ * module loaded, and re-requiring `role:system.admin` would lock out a narrower `allow`.
  */
 export function handleGraphQlRequest(request: GraphQlRequest): GraphQlResponse {
   if (!request.body) {

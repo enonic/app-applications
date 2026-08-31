@@ -7,7 +7,7 @@ import { startSectionEvents } from './events';
 
 const CONFIG_ROOT: GraphQlRoot = {
   field: 'config',
-  selection: '{ appId appVersion eventsUrl }',
+  selection: '{ appId appVersion eventsUrl serverAppUrl managedMode }',
 };
 
 // ! A `Json` scalar, so no selection — and the locale travels as a variable rather than as text, like
@@ -25,16 +25,11 @@ type BootstrapData = {
 };
 
 /**
- * Everything a standalone tool would have had before its first render, and the one place that reads
- * the host object: where this section's data lives and which locale to ask in. One document, because
- * one round trip is what a screen costs on this app's single JS thread. The event feed opens here
- * too — a standalone tool would connect at startup, and this is the only thing in the app whose life
- * is the module's, which is the subscription's life as well.
- *
- * ! Memoized for the life of the module, not the mount. A provider shipping several sections points
- * ! every descriptor at this one module, so `mount` runs per section while this must not: the locale
- * ! is the page's and a change to it reloads the page, and one schema answers from all of the
- * ! provider's prefixes, so every mount would ask the same question.
+ * What a standalone tool would have had before its first render, in one document. The event feed opens
+ * here too: a standalone tool would connect at startup, and this is the only thing whose life is the
+ * module's, which is the subscription's life as well. ! Memoized for the life of the module, not the
+ * mount: a provider shipping several sections points every descriptor here, so `mount` runs per section
+ * while this must not — every mount would ask the same question.
  */
 let started: Promise<void> | undefined;
 

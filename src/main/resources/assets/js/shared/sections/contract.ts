@@ -1,9 +1,9 @@
 /**
- * The client-side contract between the app-settings shell and this section. The rules these names
- * cannot express are in `../app-settings/docs/extensions/docs.md` § 2, and the host owns them.
+ * The client-side contract between this shell and a section another application provides. The rules
+ * these names cannot express are in `docs/extensions/docs.md` § 2.
  *
- * ! A verbatim copy of the host's file of the same path until `@enonic/toolkit/section`
- * ! publishes it — change every copy, or this app compiles against a contract the host lacks.
+ * ! Duplicated verbatim in every provider until `@enonic/toolkit/section` publishes it — change
+ * ! every copy, or a provider compiles against a contract the host does not implement.
  */
 
 /**
@@ -11,6 +11,18 @@
  * ? the contract names none — and why `subscribe` may call back straight away with the current value.
  */
 export type Readable<T> = { get(): T; subscribe(cb: (v: T) => void): () => void };
+
+/**
+ * Canonical admin events hub topics the host registers and publishes; a section subscribes with
+ * the platform-served client (`<eventsUrl>/client.js` → `connect().subscribe(topic)`). Each
+ * topic's `allow` is server-side; payloads carry ids only.
+ */
+export const HUB_TOPICS = {
+  /** Application lifecycle, `{eventType, key, systemApplication}`; `PROGRESS` excluded. */
+  applications: 'com.enonic.xp.app.settings:applications',
+  /** Principal changes, `{operation, changes: [{kind, key}]}`. */
+  principals: 'com.enonic.xp.app.settings:principals',
+} as const;
 
 export type Notification = {
   level: 'info' | 'success' | 'warning' | 'error';

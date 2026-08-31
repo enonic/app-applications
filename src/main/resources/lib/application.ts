@@ -1,10 +1,7 @@
 /**
- * Whether an application was installed from this instance's deploy directory.
- *
- * XP refuses to uninstall such an application — `ApplicationServiceImpl.uninstallApplication` throws
- * `ApplicationBundleException` for anything in its `localApplicationSet` — and no XP JS lib exposes the
- * flag: `lib-app`'s mapper does not carry it, and `getApplicationMode` answers a different question
- * (`BUNDLED` / `VIRTUAL` / `AUGMENTED`). Hence the bean.
+ * Whether an application was installed from this instance's deploy directory. XP refuses to uninstall one
+ * — `uninstallApplication` throws for anything in its `localApplicationSet` — and no XP JS lib carries the
+ * flag, `getApplicationMode` answering a different question. Hence the bean.
  */
 
 export type IsLocalApplicationParams = {

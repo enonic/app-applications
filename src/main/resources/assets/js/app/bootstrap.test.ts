@@ -16,6 +16,7 @@ const CONFIG = {
   appId: 'com.enonic.xp.app.applications',
   appVersion: '8.1.0',
   eventsUrl: '/_/admin:events',
+  serverAppUrl: '/_/server:app',
 };
 const PHRASES = { 'applications.heading': 'Applications' };
 
