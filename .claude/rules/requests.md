@@ -16,9 +16,11 @@ An `api/` segment is the only place that talks to the server. Two entity slices 
 `application`, and `market` — what Enonic Market offers, a different domain from what is installed.
 
 - Everything goes through `shared/api` and returns `ResultAsync<T, AppError>` — errors are values.
-- **Two url sources, both from the host.** Our own data plane is `POST <host.baseUrl>/graphql`, set
-  once by `setGraphQlEndpoint` in `app/bootstrap.ts`. XP core's apis come from `coreApiUrl(api, path)`
-  in `shared/host`, which answers `undefined` where the host page mounts none — handle it.
+- **Two url sources, one of them the host's.** Our own data plane is `POST <host.baseUrl>/graphql`, set
+  once by `setGraphQlEndpoint` in `app/bootstrap.ts`. XP core's apis come from our own server instead —
+  `config.serverAppUrl`, joined with a path by `serverAppUrl()` in `shared/config`. It answers
+  `undefined` only before the bootstrap has filled the config store, which is calling too early rather
+  than a state to render; a host whose tool descriptor does not mount the api answers 403.
 - **One request to this app at a time.** GraalJS gives an application one JS thread, so
   `requestGraphQl` queues; nothing may open a second channel.
 - Ask for a root field and a selection (`requestGraphQl`), not a document. `requestGraphQlDocument`

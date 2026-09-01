@@ -80,8 +80,8 @@ export function searchMarketRows(rows: readonly MarketRow[], query: string): Mar
 // * Internal
 // *
 
-// `updateAvailable` and `installedAhead` are resolved server-side against the installed applications,
-// so no version comparison happens here — see the market notes in `docs/unified-api.md`.
+// ! `updateAvailable` and `installedAhead` are resolved server-side against the installed
+// ! applications, so no version comparison belongs here.
 function rowStatus(application: MarketApplication): MarketRowStatus {
   if (application.installedVersion == null) {
     return 'install';

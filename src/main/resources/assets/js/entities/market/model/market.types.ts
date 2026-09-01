@@ -5,12 +5,7 @@ export type MarketApplicationVersion = {
   versionDate?: string;
 };
 
-/**
- * An application Enonic Market offers for this XP, with what this instance has of it.
- *
- * `installedVersion`, `updateAvailable` and `installedAhead` are resolved server-side against the
- * installed applications, so no version comparison happens in the browser — see `docs/unified-api.md`.
- */
+/** An application Enonic Market offers for this XP, with what this instance has of it. */
 export type MarketApplication = {
   key: string;
   displayName: string;

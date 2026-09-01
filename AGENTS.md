@@ -39,7 +39,7 @@ src/main/resources/
     widgets/                    the browse framework
     features/                   user actions: install, uninstall
     entities/                   application, market
-    shared/                     host, routing, api, config, i18n, notifications, server events, ui
+    shared/                     host, routing, api, config, i18n, notifications, admin events, ui
 ```
 
 Imports run one way: `app → pages → widgets/features → entities → shared`. Details in
@@ -52,9 +52,11 @@ Each is load-bearing and each is enforced somewhere in the code:
 - **GraalJS serves no bytes and gives the app one JS thread.** The controller answers text only —
   lib-static and any binary response are impossible — and `shared/api` queues requests so two never
   overlap.
-- **XP checks an api mount against the _page_, not the caller.** The guest's `fetch` runs in the host
-  tool's document, so `host.coreApis` is a map of urls rather than a grant; `coreApiUrl` answers
-  `undefined` where the host page mounts none.
+- **XP checks an api mount against the _page_, not the caller.** Core api urls are built by our own
+  server — `portal.apiUrl`, served as `config.serverAppUrl` — and a request to an extension keeps the
+  hosting tool's `baseUri`, so they anchor at the host page anyway. A url is not a grant: the _host
+  tool's_ descriptor still has to list the api, and a host that does not answers 403 — the section
+  cannot know beforehand.
 - **`installUrl` can never move here.** Its allowlist, checksum policy and progress events read core's
   own `AppManagementConfig`, so that call stays core's whatever else a bean absorbs.
 - **`@enonic/ui`'s shadow tax is permanent.** Every overlay has to be checked inside the shadow root

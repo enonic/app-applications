@@ -12,8 +12,9 @@ No rule here has an app-settings counterpart; it is the one thing being a provid
 - **Nothing reaches around the host.** No `window.location`, no `history`, no `document.title`, no
   style on anything outside our shadow root. Navigate through `host.navigate`, build hrefs with
   `host.url`, read the sub-path from `shared/routing`.
-- **`contract.ts` is byte-identical with app-settings' copy** until `@enonic/toolkit` publishes it.
-  Changing it means changing both, or this app compiles against a host that does not implement it.
+- **Every declaration in `contract.ts` is identical with app-settings' copy** until `@enonic/toolkit`
+  publishes it — the two differ in a doc comment and nothing else. Changing a declaration means changing
+  both, or this app compiles against a host that does not implement it.
 - **`getHost()` returning `undefined` is an answer, not a bug.** A store's callback outlives the mount
   that armed it; a revoked host's calls are no-ops. Every reader in `shared/{notifications,host}`
   degrades to a no-op — follow that, do not assert.
