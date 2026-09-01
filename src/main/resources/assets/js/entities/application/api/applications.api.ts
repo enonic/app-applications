@@ -29,9 +29,6 @@ const APPLICATION_FIELDS = `
   vendorUrl
 `;
 
-/** Mounted by the host tool's descriptor, so a miss means this page may not call it at all. */
-const SERVER_APP = 'server:app';
-
 export const APPLICATIONS_ROOT: GraphQlRoot = {
   field: 'applications',
   selection: `{${APPLICATION_FIELDS}}`,

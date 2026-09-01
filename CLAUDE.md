@@ -59,6 +59,9 @@ Each is load-bearing and each is enforced somewhere in the code:
   cannot know beforehand.
 - **`installUrl` can never move here.** Its allowlist, checksum policy and progress events read core's
   own `AppManagementConfig`, so that call stays core's whatever else a bean absorbs.
+- **Install progress is node-local.** Core publishes it `distributed(false)`, and the hub delivers only
+  to the sockets on its own node, so a clustered instance fills the bar only where the browser's socket
+  and the `installUrl` request met on one node. Neither app can widen that.
 - **`@enonic/ui`'s shadow tax is permanent.** Every overlay has to be checked inside the shadow root
   by hand; the test environment is `node` and can never catch it.
 - **`@enonic-types` understates nullability** — a field XP omits arrives absent, not null. Api mappers
