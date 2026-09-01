@@ -29,10 +29,9 @@ function extensionPath(request: Request): string {
   return request.rawPath.slice((request.contextPath ?? '').length);
 }
 
-// ! lib-static cannot serve anything from this app: it answers with a `ByteSource` body, and GraalJS
-// ! hands the serializer a host object, which reaches the browser as a JSON map of its own method
-// ! names. See `../app-settings/docs/platform-facts.md`. Text is the only thing that survives, so
-// ! nothing binary can be served from here at all.
+// ! lib-static cannot serve anything from this app: it answers with a `ByteSource` body, and GraalJS hands
+// ! the serializer a host object, which reaches the browser as a JSON map of its own method names. Text is
+// ! all that survives, so nothing binary can be served from here at all.
 function serveText(path: string): Response {
   const resource = getResource(path);
 

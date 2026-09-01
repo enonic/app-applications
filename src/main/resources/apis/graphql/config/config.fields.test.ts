@@ -33,6 +33,13 @@ describe('config', () => {
     expect(vi.mocked(apiUrl)).toHaveBeenCalledWith({ api: 'admin:events' });
   });
 
+  it("hands the section the application api's url, built in the host page's context", () => {
+    expect(configQueryFields.config.resolve?.({} as never)).toMatchObject({
+      serverAppUrl: '/_/server:app',
+    });
+    expect(vi.mocked(apiUrl)).toHaveBeenCalledWith({ api: 'server:app' });
+  });
+
   it('reports managed mode where the install configured it', () => {
     withConfig({ managedMode: 'true' });
 

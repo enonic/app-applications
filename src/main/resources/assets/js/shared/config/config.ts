@@ -7,4 +7,6 @@ export type Config = {
   appId: string;
   appVersion: string;
   eventsUrl: string;
+  managedMode: boolean;
+  serverAppUrl: string;
 };

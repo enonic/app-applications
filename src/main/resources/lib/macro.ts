@@ -1,9 +1,7 @@
 /**
- * The `lib/xp/macro` XP does not ship.
- *
- * Macro descriptors are reachable only through `MacroDescriptorService`, an OSGi service — no XP
- * JS lib exposes them, which is why this app carries Java at all. Shaped after `lib/xp/schema`'s
- * `listComponents` so replacing it with a platform lib later is one import.
+ * The `lib/xp/macro` XP does not ship. Macro descriptors are reachable only through the OSGi
+ * `MacroDescriptorService`, hence the bean; shaped after `lib/xp/schema`'s `listComponents` so replacing
+ * it with a platform lib later is one import.
  */
 
 export type MacroDescriptor = {

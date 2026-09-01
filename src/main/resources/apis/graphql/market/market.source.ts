@@ -60,9 +60,8 @@ export type MarketApplicationSource = {
   installedVersion?: string;
   updateAvailable: boolean;
   /**
-   * ? Ahead of `latest`, which is the newest release this XP can run — a release declaring a minimum
-   * ? above us never reaches the comparison — so it says "ahead of what is installable here", not
-   * ? "ahead of the market". Nothing rests on the difference: the row reads as installed either way.
+   * ? Ahead of `latest`, the newest release this XP can run — so "ahead of what is installable here", not
+   * ? "ahead of the market". Nothing rests on it: the row reads as installed either way.
    */
   installedAhead: boolean;
 };
@@ -110,10 +109,8 @@ export function listMarketApplications(): MarketApplicationSource[] {
 // *
 
 /**
- * Numeric part by part, a missing part reading as zero, and a prerelease losing to its release —
- * `1.0.0-SNAPSHOT` is older than `1.0.0`, `1.0` is the same version as `1.0.0`. A part that is not a
- * number reads as zero rather than poisoning the comparison with `NaN`, which compares false against
- * everything and would silently report two versions equal.
+ * Numeric part by part, a missing part as zero, a prerelease losing to its release. ! A non-numeric part
+ * reads as zero rather than poisoning the comparison with `NaN`, which would report two versions equal.
  */
 export function compareVersions(a: string, b: string): number {
   const [aCore, aPrerelease] = splitVersion(a);
@@ -137,14 +134,9 @@ export function compareVersions(a: string, b: string): number {
 }
 
 /**
- * Whether a market version runs on this XP, read as "its declared minimum is not newer than we are".
- *
- * ? That is the pre-rewrite rule, kept deliberately. A market version declares one minimum XP
- * ? version, never a maximum, so nothing in the data says a 7-era release stopped working — which
- * ? means an application whose 7.x line is numbered above its 8.x line can present a 7-targeted jar
- * ? as its latest. Reading the minimum's major as a requirement would rule that out, and would also
- * ? hide a still-supported release that never re-declared itself. Neither reading is free; this one
- * ? matches what this app did before the rewrite.
+ * Whether a market version runs here: its declared minimum is not newer than we are. ? A version declares
+ * a minimum and never a maximum, so nothing says a 7-era release stopped working — reading the major as a
+ * requirement would hide still-supported releases. Neither reading is free; this is the pre-rewrite rule.
  */
 export function supportsXpVersion(
   supportedVersions: string | string[] | null,
@@ -168,8 +160,8 @@ export function xpVersionPattern(xpVersion: string): string {
 // *
 
 /**
- * Wire entries to what the schema serves. Both narrowings drop the row rather than serving half of
- * one: an entry the market gives no usable key, and an application with no version this XP can run.
+ * Wire entries to what the schema serves. Both narrowings drop the row rather than half-serve it: no
+ * usable key, and no version this XP can run.
  */
 export function toMarketApplications(
   entries: readonly MarketApplicationDto[],
@@ -241,8 +233,8 @@ export function absoluteUrl(url: string | null | undefined, origin: string): str
 // *
 
 /**
- * ! Sorted here, newest first, because the market returns versions in no order at all — Data Toolbox
- * ! lists 3.0.0 between two 2.2.x entries. Nothing downstream may take position for order.
+ * ! Sorted here, newest first: the market returns versions in no order at all — Data Toolbox lists 3.0.0
+ * ! between two 2.2.x entries. Nothing downstream may take position for order.
  */
 function supportedVersionsOf(
   entry: MarketApplicationDto,
@@ -285,9 +277,8 @@ function installedVersions(): Record<string, string | undefined> {
 }
 
 /**
- * ! Throws rather than answering an empty list: a market that is unreachable is not a market with
- * ! nothing in it, and the root field is nullable so the failure stays in its own field with the
- * ! message attached.
+ * ! Throws rather than answering an empty list — an unreachable market is not an empty one. The root field
+ * ! is nullable, so the failure stays in its own field with the message attached.
  */
 function fetchMarket(pattern: string): MarketApplicationDto[] {
   const response = request({
