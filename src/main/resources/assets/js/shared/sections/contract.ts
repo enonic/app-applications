@@ -15,11 +15,14 @@ export type Readable<T> = { get(): T; subscribe(cb: (v: T) => void): () => void 
 /**
  * Canonical admin events hub topics the host registers and publishes; a section subscribes with
  * the platform-served client (`<eventsUrl>/client.js` → `connect().subscribe(topic)`). Each
- * topic's `allow` is server-side; payloads carry ids only.
+ * topic's `allow` is server-side; payloads carry ids, never data — the one exception being the
+ * download url `applicationProgress` is keyed by, which is the only handle core reports.
  */
 export const HUB_TOPICS = {
-  /** Application lifecycle, `{eventType, key, systemApplication}`; `PROGRESS` excluded. */
+  /** Application lifecycle, `{eventType, key, systemApplication}`; `PROGRESS` rides its own topic. */
   applications: 'com.enonic.xp.app.settings:applications',
+  /** A download in flight, `{url, percent}`, one message per percent. */
+  applicationProgress: 'com.enonic.xp.app.settings:application-progress',
   /** Principal changes, `{operation, changes: [{kind, key}]}`. */
   principals: 'com.enonic.xp.app.settings:principals',
 } as const;
@@ -59,4 +62,10 @@ export type MountOptions = {
 /** Idempotent, and must not throw. The host wraps it anyway. */
 export type Unmount = () => void;
 
+/**
+ * ! One module instance may serve several sections: the host imports the same URL for every section
+ * ! an application ships (unless a section opts out with `config.module`), so `mount` runs once per
+ * ! section from one instance and module-level state is shared across those mounts. Anything
+ * ! derived from `host` belongs to the mount it was handed to.
+ */
 export type SectionModule = { mount(opts: MountOptions): Unmount };

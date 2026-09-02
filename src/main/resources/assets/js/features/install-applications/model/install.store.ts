@@ -23,6 +23,10 @@ export function beginInstall(key: string, url: string): void {
 /**
  * Records progress against whichever row is installing that url. Core reports the url and nothing else,
  * so an event for a download this app did not start is dropped.
+ *
+ * ! Matched by exact string equality. Core echoes the url it was handed — `URI.create(url).toURL()
+ * ! .toString()` — which round-trips a market download url unchanged; normalizing either end with
+ * ! the browser's own `URL` would not agree with Java's and could break a match that holds.
  */
 export function receiveInstallProgress(url: string, percent: number): void {
   const installs = $marketInstalls.get();
