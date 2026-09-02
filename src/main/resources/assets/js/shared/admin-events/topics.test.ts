@@ -29,6 +29,9 @@ describe('toApplicationProgressMessage', () => {
     expect(
       toApplicationProgressMessage({ url: DOWNLOAD_URL, percent: Number.NaN }),
     ).toBeUndefined();
+    expect(
+      toApplicationProgressMessage({ url: DOWNLOAD_URL, percent: Number.POSITIVE_INFINITY }),
+    ).toBeUndefined();
     expect(toApplicationProgressMessage({ url: DOWNLOAD_URL, percent: -1 })).toBeUndefined();
     expect(toApplicationProgressMessage({ url: DOWNLOAD_URL, percent: 101 })).toBeUndefined();
   });

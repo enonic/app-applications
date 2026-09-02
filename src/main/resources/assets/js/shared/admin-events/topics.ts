@@ -51,7 +51,7 @@ export function toApplicationProgressMessage(
   }
 
   // A width comes out of this, so anything the host let through unchecked is refused here.
-  if (typeof percent !== 'number' || !Number.isFinite(percent) || percent < 0 || percent > 100) {
+  if (typeof percent !== 'number' || !(percent >= 0 && percent <= 100)) {
     return undefined;
   }
 
