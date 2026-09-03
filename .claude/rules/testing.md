@@ -18,10 +18,11 @@ line in a feature PR.
   predicates, sort and overflow maths.
 - `describe` per unit, `it` naming the observable behaviour in present tense. Assert on values and
   error results, not on a mock having been called.
-- **A test that needs the host passes a double**, not a store: `{ notify } as unknown as Host` with
-  `setHost`, released in `afterEach`. `shared/notifications/notifications.test.ts` is the shape. A test
-  that needs the section's own configuration calls `setConfig` instead and clears `$config` in
-  `afterEach` — `entities/application/api/application-lifecycle.api.test.ts`.
+- **A test that needs the host passes a double**, not a store: `fakeHost()` from `src/test/mocks/fake-host.ts`
+  into `createHostFrame`, or a `vi.fn()` where a command takes the frame's `notify`.
+  `shared/host/frame.test.ts` and `application-commands.test.ts` are the two shapes. A test that needs
+  the section's own configuration calls `setConfig` instead and clears `$config` in `afterEach` —
+  `entities/application/api/application-lifecycle.api.test.ts`.
 - XP libs and the two CJS packages that require `react` (`@enonic/ui`, `lucide-react`) resolve to
   doubles in `src/test/mocks/` through `test.alias`. A new XP lib, or a new icon reached through an
   entity barrel, needs its double added there first.

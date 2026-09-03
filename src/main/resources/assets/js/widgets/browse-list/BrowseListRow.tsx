@@ -50,18 +50,15 @@ export function BrowseListRow({
       return;
     }
 
-    // ! The root the row is in, never `document`: a shadow root reports its host element as
-    // ! `document.activeElement`, so both tests below would read a focus that is nowhere in the list and
-    // ! the roving focus would never move. `getRootNode()` answers the document where there is no shadow
-    // ! root, which is what keeps this portable.
     const active = (row.getRootNode() as Document | ShadowRoot).activeElement;
     if (active === row) {
       return;
     }
 
-    // ! Only while the focus is already in the list: the active row comes and goes as a query filters it
-    // ! in and out, and it must not yank the focus out of the search field it came back under.
-    // ! `focusVisible` keeps the ring across keyboard moves, which a plain `focus()` drops.
+    // ! Only while the focus is already in the list, as Content Studio's rows do: the active row
+    // ! comes and goes as a query filters it in and out, and it must not yank the focus out of the
+    // ! search field it came back under. focusVisible keeps the ring across keyboard moves, which
+    // ! a plain programmatic focus() drops.
     if (row.closest('[role="listbox"]')?.contains(active) === true) {
       row.focus({ focusVisible: true });
     }

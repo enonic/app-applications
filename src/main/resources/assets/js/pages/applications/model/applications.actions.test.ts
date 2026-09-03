@@ -10,7 +10,7 @@ import { $installDialogOpen, closeInstallDialog } from '../../../features/instal
 import { $uninstallTargets, closeUninstallDialog } from '../../../features/uninstall-applications';
 import { $config, type Config, setConfig } from '../../../shared/config';
 import type { ActionContext, SectionAction } from '../../../widgets/browse-toolbar/actions';
-import { APPLICATION_ACTIONS } from './applications.actions';
+import { applicationActions } from './applications.actions';
 
 vi.mock('../../../entities/application', async (importOriginal) => ({
   ...(await importOriginal<typeof import('../../../entities/application')>()),
@@ -47,8 +47,11 @@ function context(overrides: Partial<ActionContext<Application>> = {}): ActionCon
   return { selected: [], active: undefined, ...overrides };
 }
 
+const notify = vi.fn();
+const actions = applicationActions(notify);
+
 function action(id: string): SectionAction<Application> {
-  const found = APPLICATION_ACTIONS.find((candidate) => candidate.id === id);
+  const found = actions.find((candidate) => candidate.id === id);
   if (!found) {
     throw new Error(`No application action with id ${id}`);
   }
@@ -69,12 +72,7 @@ afterEach(() => {
 
 describe('application actions', () => {
   it('offers install, uninstall, start and stop in that order', () => {
-    expect(APPLICATION_ACTIONS.map(({ id }) => id)).toEqual([
-      'install',
-      'uninstall',
-      'start',
-      'stop',
-    ]);
+    expect(actions.map(({ id }) => id)).toEqual(['install', 'uninstall', 'start', 'stop']);
   });
 });
 
@@ -148,7 +146,7 @@ describe('start application', () => {
     expect(action('start').enabled(ctx)).toBe(true);
     void action('start').run(ctx);
 
-    expect(startApplications).toHaveBeenCalledWith([fathom]);
+    expect(startApplications).toHaveBeenCalledWith([fathom], notify);
   });
 });
 
@@ -176,6 +174,6 @@ describe('stop application', () => {
     expect(action('stop').enabled(ctx)).toBe(true);
     void action('stop').run(ctx);
 
-    expect(stopApplications).toHaveBeenCalledWith([booster]);
+    expect(stopApplications).toHaveBeenCalledWith([booster], notify);
   });
 });

@@ -1,71 +1,75 @@
 /**
- * The client-side contract between this shell and a section another application provides. The rules
- * these names cannot express are in `docs/extensions/docs.md` § 2.
+ * The client-side contract between a shell and a module it mounts. The rules these names cannot
+ * express are in `docs/extensions/docs.md` § 2.
  *
- * ! Duplicated verbatim in every provider until `@enonic/toolkit/section` publishes it — change
- * ! every copy, or a provider compiles against a contract the host does not implement.
+ * ! Duplicated verbatim in every provider until `@enonic/ui-types` publishes it — change every copy,
+ * ! or a provider compiles against a contract the host does not implement.
  */
 
 /**
- * ? Anything mutable the host hands over. A nanostores atom satisfies it structurally, which is why
- * ? the contract names none — and why `subscribe` may call back straight away with the current value.
+ * Anything mutable the host hands over. `get()` is the current value; `subscribe` reports changes
+ * only and never calls back on subscribe — read `get()` first. A nanostores atom satisfies the shape
+ * through `listen`, not `subscribe`.
  */
 export type Readable<T> = { get(): T; subscribe(cb: (v: T) => void): () => void };
-
-/**
- * Canonical admin events hub topics the host registers and publishes; a section subscribes with
- * the platform-served client (`<eventsUrl>/client.js` → `connect().subscribe(topic)`). Each
- * topic's `allow` is server-side; payloads carry ids, never data — the one exception being the
- * download url `applicationProgress` is keyed by, which is the only handle core reports.
- */
-export const HUB_TOPICS = {
-  /** Application lifecycle, `{eventType, key, systemApplication}`; `PROGRESS` rides its own topic. */
-  applications: 'com.enonic.xp.app.settings:applications',
-  /** A download in flight, `{url, percent}`, one message per percent. */
-  applicationProgress: 'com.enonic.xp.app.settings:application-progress',
-  /** Principal changes, `{operation, changes: [{kind, key}]}`. */
-  principals: 'com.enonic.xp.app.settings:principals',
-} as const;
 
 export type Notification = {
   level: 'info' | 'success' | 'warning' | 'error';
   /** Already localized by the guest: no i18n key crosses the boundary. */
   message: string;
+  /** `false` keeps it up until dismissed; a number overrides the host's own lifetime. */
   autoClose?: number | false;
-  action?: { label: string; onAction(): void };
 };
 
+/** What every host hands every mount, whatever the mount is: a section, a panel widget, a menu item. */
 export type Host = {
-  /** The mounted module's own extension prefix — its data plane lives under it. */
+  /**
+   * The mounted module's own extension prefix — its data plane lives under it. Its last segment is
+   * the extension key `<app>:<name>`, which is how a module serving several mounts tells them apart.
+   */
   baseUrl: string;
   /** Resolved page locale; a locale change reloads the page, so it never changes mid-mount. */
   locale: string;
   /** Resolved theme; the guest applies it inside its shadow root. */
   theme: Readable<'light' | 'dark'>;
-  /** SubPath incl. search params; back/forward arrive here. */
-  path: Readable<string>;
-  /** Programmatic navigation within the module's own segment. */
-  navigate(subPath: string, opts?: { replace?: boolean }): void;
-  /** Href builder for real anchors within the module's own segment. */
-  url(subPath: string): string;
+  /**
+   * Whether this mount is on screen. The host keeps a mount alive while another shows, and a hidden
+   * mount may pause what only a viewer needs — measuring, polling — until this turns true.
+   */
+  visible: Readable<boolean>;
   /** Toast on the host's stack; returns dismiss. */
   notify(n: Notification): () => void;
 };
 
-export type MountOptions = {
+/** What a host adds for a mount that owns a segment of its url. */
+export type Routed = {
+  /** SubPath incl. search params; back/forward arrive here. */
+  path: Readable<string>;
+  /** Programmatic navigation within the module's own segment. */
+  navigate(subPath: string, opts?: { replace?: boolean }): void;
+};
+
+/** What the `settings.section` interface hands a section. */
+export type SectionHost = Host & Routed;
+
+export type MountOptions<H extends Host = Host> = {
   /** Inside an open shadow root the host created. */
   container: HTMLElement;
   /** Valid until unmount, then revoked: a stale reference's calls become no-ops. */
-  host: Host;
+  host: H;
 };
 
 /** Idempotent, and must not throw. The host wraps it anyway. */
 export type Unmount = () => void;
 
 /**
- * ! One module instance may serve several sections: the host imports the same URL for every section
- * ! an application ships (unless a section opts out with `config.module`), so `mount` runs once per
- * ! section from one instance and module-level state is shared across those mounts. Anything
+ * ! One module instance may serve several mounts: the host imports the same URL for every extension
+ * ! an application ships (unless one opts out with `config.module`), so `mount` runs once per
+ * ! extension from one instance and module-level state is shared across those mounts. Anything
  * ! derived from `host` belongs to the mount it was handed to.
  */
-export type SectionModule = { mount(opts: MountOptions): Unmount };
+export type SectionModule<H extends Host = Host> = {
+  // ! A property, not a method: method parameters are bivariant, and a section module would then
+  // ! accept a host without the segment it needs. As a property the mismatch fails to compile.
+  mount: (opts: MountOptions<H>) => Unmount;
+};

@@ -7,6 +7,7 @@ import {
   stopApplications,
 } from '../../../entities/application';
 import { isManagedMode } from '../../../shared/config';
+import { useHostFrame } from '../../../shared/host';
 import { useI18n } from '../../../shared/i18n';
 import { isStartable, isStoppable } from '../model/application-lifecycle';
 import { applicationStateLabelKey } from '../model/applications.rows';
@@ -21,6 +22,7 @@ export type ApplicationStateMenuProps = {
  * managed mode.
  */
 export function ApplicationStateMenu({ application }: ApplicationStateMenuProps) {
+  const { notify } = useHostFrame();
   const stateLabel = useI18n(applicationStateLabelKey(application.state));
 
   const stoppable = isStoppable(application);
@@ -46,7 +48,9 @@ export function ApplicationStateMenu({ application }: ApplicationStateMenuProps)
         <Menu.Content className="min-w-24">
           <Menu.Item
             onSelect={() =>
-              void (stoppable ? stopApplications([application]) : startApplications([application]))
+              void (stoppable
+                ? stopApplications([application], notify)
+                : startApplications([application], notify))
             }
           >
             {actionLabel}

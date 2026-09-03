@@ -14,8 +14,8 @@ import { ConfirmMajorUpdateDialog } from '../../features/install-applications/ui
 import { InstallApplicationsDialog } from '../../features/install-applications/ui/InstallApplicationsDialog';
 import { UninstallApplicationsDialog } from '../../features/uninstall-applications/ui/UninstallApplicationsDialog';
 import { isManagedMode } from '../../shared/config';
+import { useHostFrame, useItemId } from '../../shared/host';
 import { i18n, useI18n } from '../../shared/i18n';
-import { closeItem, openItem, useActiveKey } from '../../shared/routing';
 import { ProgressBar } from '../../shared/ui/ProgressBar';
 import { sortByDisplayName, type SortDirection } from '../../widgets/browse-list/browse-sort';
 import { BrowseFilter } from '../../widgets/browse-list/BrowseFilter';
@@ -24,7 +24,7 @@ import { BrowseScreen } from '../../widgets/browse-screen/BrowseScreen';
 import { useBrowseSection } from '../../widgets/browse-screen/useBrowseSection';
 import { ManagedModeBanner } from '../../widgets/browse-toolbar/ManagedModeBanner';
 import { ApplicationsItemPage } from './ApplicationsItemPage';
-import { APPLICATION_ACTIONS } from './model/applications.actions';
+import { applicationActions } from './model/applications.actions';
 import {
   filterApplicationsBySystem,
   searchApplications,
@@ -48,7 +48,8 @@ export function ApplicationsPage() {
   const query = useStore(applicationsSearch.$query);
   const selectedEntries = useStore(applicationsFilter.$selected);
   const sort = useStore($applicationsSort);
-  const activeKey = useActiveKey();
+  const activeKey = useItemId();
+  const { openItem, closeItem, notify } = useHostFrame();
   const managedMode = isManagedMode();
   const { items: marketItems } = useMarketApplications();
   const uploads = useStore($applicationUploads);
@@ -60,6 +61,9 @@ export function ApplicationsPage() {
   const sortDescLabel = useI18n('applications.sort.nameDesc');
   const managedTitle = useI18n('applications.managed.title');
   const managedHelp = useI18n('applications.managed.help');
+
+  // The frame is one per mount, so the actions built over its `notify` are too.
+  const actions = useMemo(() => applicationActions(notify), [notify]);
 
   const sortOptions = useMemo(
     () => [
@@ -141,15 +145,14 @@ export function ApplicationsPage() {
   });
 
   /*
-   * ! `details` is one element rather than the host's `<Outlet />`: the shell owns the url, so the
-   * ! panel reads the active row from `shared/routing` instead of from a child route. Everything else
-   * ! is the host's screen.
+   * ! `details` is one element rather than a router's `<Outlet />`: the shell owns the url, so the
+   * ! panel reads the active row from this mount's frame instead of from a child route.
    */
   return (
     <>
       <BrowseScreen
         {...section}
-        actions={APPLICATION_ACTIONS}
+        actions={actions}
         managedMode={managedMode}
         notice={<ManagedModeBanner title={managedTitle} help={managedHelp} />}
         emptyLabel={emptyLabel}

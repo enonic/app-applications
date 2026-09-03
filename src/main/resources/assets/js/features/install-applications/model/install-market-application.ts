@@ -1,5 +1,6 @@
 import { installApplication } from '../../../entities/application';
 import { marketLoadSettled } from '../../../entities/market';
+import type { Notify } from '../../../shared/host';
 import { beginInstall, endInstall, isInstalling } from './install.store';
 import { canInstall, isMajorUpdate, type MarketRow } from './market-rows';
 
@@ -24,15 +25,18 @@ export function marketInstallIntent(row: MarketRow): MarketInstallIntent {
  * core publishes INSTALLED before it answers, so `market.service` has the reload out well before this
  * returns and asking for one here would be a second call to Enonic Market.
  */
-export async function runMarketInstall(row: MarketRow): Promise<void> {
+export async function runMarketInstall(row: MarketRow, notify: Notify): Promise<void> {
   beginInstall(row.key, row.downloadUrl);
 
-  const result = await installApplication({
-    displayName: row.displayName,
-    url: row.downloadUrl,
-    sha512: row.sha512,
-    updating: row.status === 'update',
-  });
+  const result = await installApplication(
+    {
+      displayName: row.displayName,
+      url: row.downloadUrl,
+      sha512: row.sha512,
+      updating: row.status === 'update',
+    },
+    notify,
+  );
 
   if (result.isOk()) {
     await marketLoadSettled();

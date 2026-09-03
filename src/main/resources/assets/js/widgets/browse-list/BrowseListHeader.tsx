@@ -35,9 +35,10 @@ export function BrowseListHeader({
           checked={allSelected ?? false}
           label={selectAllLabel}
           onCheckedChange={(checked) => onSelectAllChange(checked === true)}
-          // ? Checkbox exposes no hook for its label text, so the padding is aimed at the text span from
-          // ? the label class — the box itself must not move — and `pl-2.5` is the row's own, putting this
-          // ! box over the boxes in the rows. `my-0` drops the label's 3px margins, or it outgrows `h-10`.
+          // ? Checkbox exposes no hook for its label text, so the padding is aimed at the text
+          // ? span from the label class: the box itself must not move.
+          // ! my-0 drops the label's own 3px margins, or the block outgrows the h-10 buttons.
+          // ? pl-2.5 is the row's own px-2.5: it puts this box over the boxes in the rows.
           className="my-0 h-10 gap-0 pl-2.5 font-semibold [&>span:last-child]:px-4.5"
         />
       )}

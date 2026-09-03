@@ -1,4 +1,16 @@
 /**
+ * The admin events hub topics this section subscribes. The names are the host's — app-settings
+ * registers and publishes them — copied from the table in its `docs/extensions/docs.md` § Events,
+ * which is the source of truth.
+ */
+export const HUB_TOPICS = {
+  /** Application lifecycle, `{eventType, key, systemApplication}`; `PROGRESS` rides its own topic. */
+  applications: 'com.enonic.xp.app.settings:applications',
+  /** A download in flight, `{url, percent}`, one message per percent. */
+  applicationProgress: 'com.enonic.xp.app.settings:application-progress',
+} as const;
+
+/**
  * What the `applications` topic carries. The hub publishes ids and never data, and a download in
  * flight rides `applicationProgress` instead, so no message here ever describes one.
  */

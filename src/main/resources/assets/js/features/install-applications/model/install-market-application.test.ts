@@ -8,6 +8,8 @@ import { marketInstallIntent, runMarketInstall } from './install-market-applicat
 import { $marketInstalls, beginInstall } from './install.store';
 import type { MarketRow } from './market-rows';
 
+const notify = vi.fn();
+
 vi.mock('../../../entities/application', () => ({
   installApplication: vi.fn(),
 }));
@@ -77,14 +79,17 @@ describe('marketInstallIntent', () => {
 
 describe('runMarketInstall', () => {
   it('marks the row installing, installs it, and waits for the catalogue', async () => {
-    await runMarketInstall(row());
+    await runMarketInstall(row(), notify);
 
-    expect(installApplication).toHaveBeenCalledWith({
-      displayName: 'Booster',
-      url: 'https://repo.enonic.com/booster-3.0.1.jar',
-      sha512: 'abc',
-      updating: false,
-    });
+    expect(installApplication).toHaveBeenCalledWith(
+      {
+        displayName: 'Booster',
+        url: 'https://repo.enonic.com/booster-3.0.1.jar',
+        sha512: 'abc',
+        updating: false,
+      },
+      notify,
+    );
     expect(marketLoadSettled).toHaveBeenCalledOnce();
     expect($marketInstalls.get()).toEqual({});
   });
@@ -100,7 +105,7 @@ describe('runMarketInstall', () => {
       }),
     );
 
-    const install = runMarketInstall(target);
+    const install = runMarketInstall(target, notify);
     await vi.waitFor(() => expect($marketInstalls.get()[target.key]).toBeDefined());
 
     settle();
@@ -110,17 +115,20 @@ describe('runMarketInstall', () => {
   });
 
   it('tells the command it is an update when the row is one', async () => {
-    await runMarketInstall(row({ status: 'update', installedVersion: '2.1.0' }));
+    await runMarketInstall(row({ status: 'update', installedVersion: '2.1.0' }), notify);
 
-    expect(installApplication).toHaveBeenCalledWith(expect.objectContaining({ updating: true }));
+    expect(installApplication).toHaveBeenCalledWith(
+      expect.objectContaining({ updating: true }),
+      notify,
+    );
   });
 
   // Nothing changed server-side, so there is no reload to wait for; the failure has already been
-  // notified by the command.
+  // said by the command through the frame it was handed.
   it('releases the row at once after a failed install', async () => {
     vi.mocked(installApplication).mockResolvedValue(err(new AppError('Conflict')));
 
-    await runMarketInstall(row());
+    await runMarketInstall(row(), notify);
 
     expect(marketLoadSettled).not.toHaveBeenCalled();
     expect($marketInstalls.get()).toEqual({});

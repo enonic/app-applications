@@ -4,8 +4,8 @@ export type ActionContext<T> = {
 };
 
 /**
- * What a section declares. A key, not a label: the list is a module constant, and a phrase resolved there
- * would resolve before any were published.
+ * What a section declares. A key rather than a label, because the list is a module constant: a phrase
+ * resolved there would resolve before the shell has published any.
  */
 export type SectionAction<T> = {
   id: string;
@@ -14,8 +14,9 @@ export type SectionAction<T> = {
   enabled: (ctx: ActionContext<T>) => boolean;
   run: (ctx: ActionContext<T>) => void | Promise<void>;
   /**
-   * Runs when a row is activated — today, double-clicked. At most one action per section carries it, and
-   * its own `enabled` still decides: a shortcut to an action the user has, never a way past its rules.
+   * Runs when a row is activated, which today means double-clicked. At most one action per section
+   * carries it, and its own `enabled` still decides: a double click is a shortcut to an action the
+   * user already has, never a way past its rules.
    */
   activatedByRow?: boolean;
 };
@@ -24,8 +25,9 @@ export type SectionAction<T> = {
 export type LabelledAction<T> = SectionAction<T> & { label: string };
 
 /**
- * What an action applies to: the ticked rows, or the active row when nothing is ticked. The toolbar and the
- * row context menu both read it, so right-clicking a row is enough to act on it.
+ * What an action applies to: the ticked rows, or the active row when nothing is ticked.
+ * Content Studio calls the same thing its current items, and the toolbar and the row context
+ * menu both read it, so right-clicking a row is enough to act on it.
  */
 export function actionTargets<T>({ selected, active }: ActionContext<T>): readonly T[] {
   if (selected.length > 0) {

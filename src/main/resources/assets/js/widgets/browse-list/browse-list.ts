@@ -3,7 +3,7 @@ import type { ReactNode } from 'react';
 export type BrowseListStatus = 'loading' | 'ready' | 'error';
 
 export type BrowseRow = {
-  /** Stable id: selection key, and the segment the section's own sub-path names a row by. */
+  /** Stable id: selection key and `/{section}/$id` route param. */
   key: string;
   title: string;
   subtitle?: string;
@@ -13,13 +13,13 @@ export type BrowseRow = {
   /** Transient row: no navigation, no checkbox. Progress goes in `meta`. */
   disabled?: boolean;
   /**
-   * Idle rather than unavailable. Presentation only: the row opens, ticks and acts as any other, and the
-   * paint lifts wherever the row is highlighted.
+   * An item that is idle rather than unavailable. Presentation only — the row opens,
+   * ticks and acts exactly as an undimmed one, and the paint lifts wherever the row is highlighted.
    */
   dimmed?: boolean;
   /**
-   * Not the operator's to act on: the row still opens and navigates, its checkbox is greyed out. Defaults
-   * to selectable, as `@enonic/ui`'s own `TreeList` row does.
+   * An item that is not the operator's to act on: the row opens and navigates as any other, and its
+   * checkbox is greyed out. Defaults to selectable, as `@enonic/ui`'s own `TreeList` row does.
    */
   selectable?: boolean;
 };
@@ -35,7 +35,10 @@ function navigableKeys(rows: readonly BrowseRow[]): string[] {
   return rows.filter((row) => !row.disabled).map((row) => row.key);
 }
 
-/** `Select all` covers the loaded rows, not every row matching the query — nothing here knows the rest. */
+/**
+ * `Select all` covers the rows currently loaded, not every row matching the query —
+ * nothing here can know about the rest.
+ */
 export function selectAllState(
   rows: readonly BrowseRow[],
   selectedKeys: ReadonlySet<string>,
@@ -78,8 +81,9 @@ export type RowTarget = {
 };
 
 /**
- * The active row and the ticked rows are alternatives, not a pair, so a click anywhere but the checkbox
- * drops the ticks. With nothing ticked, a second click on the active row clears it.
+ * What a click on a row does, following Content Studio's tree: the active row and the ticked rows
+ * are alternatives, not a pair, so a click anywhere but the checkbox drops the ticks. With nothing
+ * ticked, a second click on the active row clears it.
  */
 export function rowClickTarget(
   key: string,
@@ -96,8 +100,8 @@ export function rowClickTarget(
 }
 
 /**
- * The same for a right-click, bar one difference: right-clicking a ticked row keeps the whole set,
- * because the menu is about to act on all of it.
+ * The same for a right-click, with one difference: right-clicking one of the ticked rows keeps the
+ * whole set, because the menu is about to act on all of it.
  */
 export function contextMenuTarget(
   key: string,
@@ -115,8 +119,9 @@ export function contextMenuTarget(
 }
 
 /**
- * What the details column shows once the selection changed: the row ticked last while anything is ticked,
- * the row already on show once nothing is. ! Tick order is the set's order — every path preserves it.
+ * The row the details column shows once the selection has changed — Content Studio's `currentItem`:
+ * the row ticked last while anything is ticked, and the row already on show once nothing is. Tick
+ * order is the order of the set, so every path that reports a selection has to preserve it.
  */
 export function shownRowKey(
   selection: ReadonlySet<string>,
@@ -130,8 +135,9 @@ export function shownRowKey(
 }
 
 /**
- * The row `Tab` reaches. The active row owns the tab stop, but a query can filter it out or it may not be
- * loaded — then the first row takes over, without which the list has no tab stop and cannot be entered.
+ * The row `Tab` reaches. The active row owns the tab stop, but it is not always in the list — a
+ * query can filter it out, and it can be gone or not loaded yet — and then the first row takes
+ * over: without the fallback the list has no tab stop at all and cannot be entered.
  */
 export function tabbableRowKey(
   rows: readonly BrowseRow[],

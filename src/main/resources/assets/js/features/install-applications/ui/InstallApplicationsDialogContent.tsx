@@ -4,6 +4,7 @@ import { Box } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'preact/hooks';
 
 import { loadMarketApplications, useMarketApplications } from '../../../entities/market';
+import { useHostFrame } from '../../../shared/host';
 import { useI18n } from '../../../shared/i18n';
 import { DropZone } from '../../../shared/ui/DropZone';
 import { marketInstallIntent, runMarketInstall } from '../model/install-market-application';
@@ -24,6 +25,7 @@ const UPLOAD_TAB = 'upload';
 export function InstallApplicationsDialogContent() {
   const { status, items } = useMarketApplications();
   const installs = useStore($marketInstalls);
+  const { notify } = useHostFrame();
 
   const title = useI18n('applications.dialog.install.title');
   const marketLabel = useI18n('applications.dialog.install.market');
@@ -53,13 +55,13 @@ export function InstallApplicationsDialogContent() {
     }
 
     if (intent === 'install') {
-      void runMarketInstall(row);
+      void runMarketInstall(row, notify);
     }
   };
 
   const handleConfirm = (row: MarketRow): void => {
     setConfirming(undefined);
-    void runMarketInstall(row);
+    void runMarketInstall(row, notify);
   };
 
   return (
@@ -118,7 +120,7 @@ export function InstallApplicationsDialogContent() {
                 multiple
                 icon={<Box size={28} strokeWidth={1.5} aria-hidden />}
                 hint={uploadHint}
-                onFiles={(files) => void runJarUpload(files)}
+                onFiles={(files) => void runJarUpload(files, notify)}
               />
             </Tab.Content>
           </Tab.Root>

@@ -1,5 +1,8 @@
-import { subscribeTopic, toApplicationProgressMessage } from '../../../shared/admin-events';
-import { HUB_TOPICS } from '../../../shared/sections/contract';
+import {
+  HUB_TOPICS,
+  subscribeTopic,
+  toApplicationProgressMessage,
+} from '../../../shared/admin-events';
 import { receiveInstallProgress } from './install.store';
 
 let unsubscribe: (() => void) | undefined;

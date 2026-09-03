@@ -1,10 +1,9 @@
 import { errAsync, okAsync } from 'neverthrow';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { AppError } from '../../../shared/api';
-import { setHost } from '../../../shared/host';
+import type { Notify } from '../../../shared/host';
 import { setPhrases } from '../../../shared/i18n';
-import type { Host, Notification } from '../../../shared/sections';
 import {
   postStartApplications,
   postStopApplications,
@@ -52,11 +51,12 @@ function application(key: string, displayName: string): Application {
 const booster = application('com.enonic.app.booster', 'Booster');
 const fathom = application('com.enonic.app.fathom', 'Fathom');
 
-// Every notification this section raises goes to the shell's toast stack, so what a command reported
-// is read off the host it was handed rather than out of a store of ours.
-const raised: Notification[] = [];
-
-let release: () => void = () => {};
+// Every message a command raises goes to the frame it was handed, so what it said is read off
+// that rather than out of a store of ours.
+const raised: { level: string; message: string }[] = [];
+const notify: Notify = (level, message) => {
+  raised.push({ level, message });
+};
 
 function notificationTexts(): string[] {
   return raised.map(({ message }) => message);
@@ -65,14 +65,6 @@ function notificationTexts(): string[] {
 // The resync only runs with the socket down, so every test asserting it says so.
 beforeEach(() => {
   raised.length = 0;
-  release();
-  release = setHost({
-    notify: (n: Notification) => {
-      raised.push(n);
-      return () => {};
-    },
-    // ! `unknown` first: a double this small overlaps the contract too little for a direct cast.
-  } as unknown as Host);
   setPhrases(
     {
       'applications.notify.startFailed': 'Could not start {0}',
@@ -99,15 +91,11 @@ beforeEach(() => {
   vi.mocked(loadApplications).mockResolvedValue(undefined);
 });
 
-afterEach(() => {
-  release();
-});
-
 describe('startApplications', () => {
   it('is silent on success and refetches the one row it changed', async () => {
     vi.mocked(postStartApplications).mockReturnValue(okAsync({ failedKeys: [] }));
 
-    await startApplications([booster]);
+    await startApplications([booster], notify);
 
     expect(postStartApplications).toHaveBeenCalledWith([booster.key]);
     expect(notificationTexts()).toEqual([]);
@@ -118,7 +106,7 @@ describe('startApplications', () => {
   it('reloads the whole list after a bulk action rather than one row at a time', async () => {
     vi.mocked(postStartApplications).mockReturnValue(okAsync({ failedKeys: [] }));
 
-    await startApplications([booster, fathom]);
+    await startApplications([booster, fathom], notify);
 
     expect(postStartApplications).toHaveBeenCalledWith([booster.key, fathom.key]);
     expect(loadApplications).toHaveBeenCalledTimes(1);
@@ -128,7 +116,7 @@ describe('startApplications', () => {
   it('names the application the server refused to start, and resyncs only the one that started', async () => {
     vi.mocked(postStartApplications).mockReturnValue(okAsync({ failedKeys: [fathom.key] }));
 
-    await startApplications([booster, fathom]);
+    await startApplications([booster, fathom], notify);
 
     expect(notificationTexts()).toEqual(['Could not start Fathom']);
     expect(loadApplication).toHaveBeenCalledWith(booster.key);
@@ -140,7 +128,7 @@ describe('startApplications', () => {
       okAsync({ failedKeys: [booster.key, fathom.key] }),
     );
 
-    await startApplications([booster, fathom]);
+    await startApplications([booster, fathom], notify);
 
     expect(loadApplication).not.toHaveBeenCalled();
     expect(loadApplications).not.toHaveBeenCalled();
@@ -149,7 +137,7 @@ describe('startApplications', () => {
   it('reports every target when the request itself fails, and refetches nothing', async () => {
     vi.mocked(postStartApplications).mockReturnValue(errAsync(new AppError('Forbidden')));
 
-    await startApplications([booster, fathom]);
+    await startApplications([booster, fathom], notify);
 
     expect(notificationTexts()).toEqual(['Could not start Booster', 'Could not start Fathom']);
     expect(loadApplication).not.toHaveBeenCalled();
@@ -157,7 +145,7 @@ describe('startApplications', () => {
   });
 
   it('asks the server nothing for an empty target list', async () => {
-    await startApplications([]);
+    await startApplications([], notify);
 
     expect(postStartApplications).not.toHaveBeenCalled();
   });
@@ -167,7 +155,7 @@ describe('stopApplications', () => {
   it('names the application the server refused to stop', async () => {
     vi.mocked(postStopApplications).mockReturnValue(okAsync({ failedKeys: [booster.key] }));
 
-    await stopApplications([booster]);
+    await stopApplications([booster], notify);
 
     expect(notificationTexts()).toEqual(['Could not stop Booster']);
   });
@@ -188,7 +176,7 @@ describe('installApplication', () => {
   it('names what was installed and refetches the row core created', async () => {
     vi.mocked(postInstallApplicationFromUrl).mockReturnValue(okAsync(installed));
 
-    const result = await installApplication(params);
+    const result = await installApplication(params, notify);
 
     expect(postInstallApplicationFromUrl).toHaveBeenCalledWith({
       url: params.url,
@@ -203,7 +191,7 @@ describe('installApplication', () => {
   it('says updated rather than installed for an update', async () => {
     vi.mocked(postInstallApplicationFromUrl).mockReturnValue(okAsync(installed));
 
-    await installApplication({ ...params, updating: true });
+    await installApplication({ ...params, updating: true }, notify);
 
     expect(notificationTexts()).toEqual(['Booster was updated']);
   });
@@ -215,7 +203,7 @@ describe('installApplication', () => {
       errAsync(new AppError('SHA512 checksum is required for installUrl')),
     );
 
-    const result = await installApplication(params);
+    const result = await installApplication(params, notify);
 
     expect(notificationTexts()).toEqual([
       'Could not install Booster: SHA512 checksum is required for installUrl',
@@ -227,7 +215,7 @@ describe('installApplication', () => {
   it('reports a failed update as an update', async () => {
     vi.mocked(postInstallApplicationFromUrl).mockReturnValue(errAsync(new AppError('Conflict')));
 
-    await installApplication({ ...params, updating: true });
+    await installApplication({ ...params, updating: true }, notify);
 
     expect(notificationTexts()).toEqual(['Could not update Booster: Conflict']);
   });
@@ -245,7 +233,7 @@ describe('uploadApplication', () => {
   it('names the application core built, not the file it came in', async () => {
     vi.mocked(postInstallApplicationFromFile).mockReturnValue(okAsync(installed));
 
-    const result = await uploadApplication(jar, queueUploads([jar.name])[0]);
+    const result = await uploadApplication(jar, queueUploads([jar.name])[0], notify);
 
     expect(notificationTexts()).toEqual(['Booster was installed']);
     expect(loadApplication).toHaveBeenCalledWith(installed.key);
@@ -260,7 +248,7 @@ describe('uploadApplication', () => {
       return okAsync(installed);
     });
 
-    await uploadApplication(jar, queueUploads([jar.name])[0]);
+    await uploadApplication(jar, queueUploads([jar.name])[0], notify);
 
     expect(Object.values(inFlight[0] ?? {})).toEqual([
       { fileName: 'booster-3.0.1.jar', percent: 40 },
@@ -274,7 +262,7 @@ describe('uploadApplication', () => {
       errAsync(new AppError('Missing file item')),
     );
 
-    const result = await uploadApplication(jar, queueUploads([jar.name])[0]);
+    const result = await uploadApplication(jar, queueUploads([jar.name])[0], notify);
 
     expect(notificationTexts()).toEqual(['Could not install booster-3.0.1.jar: Missing file item']);
     expect(loadApplication).not.toHaveBeenCalled();
@@ -284,7 +272,7 @@ describe('uploadApplication', () => {
   it('drops the upload after a failure too, so no row is left behind', async () => {
     vi.mocked(postInstallApplicationFromFile).mockReturnValue(errAsync(new AppError('Conflict')));
 
-    await uploadApplication(jar, queueUploads([jar.name])[0]);
+    await uploadApplication(jar, queueUploads([jar.name])[0], notify);
 
     expect($applicationUploads.get()).toEqual({});
   });
@@ -307,7 +295,7 @@ describe('uploadApplications', () => {
   it('shows the whole pick before the first jar has gone out', async () => {
     const seen = uploadsPerCall();
 
-    await uploadApplications(jars);
+    await uploadApplications(jars, notify);
 
     expect(seen[0]).toEqual([
       { fileName: 'booster.jar' },
@@ -319,7 +307,7 @@ describe('uploadApplications', () => {
   it('sends them one at a time, in the order they were picked, and clears the list', async () => {
     const seen = uploadsPerCall();
 
-    await uploadApplications(jars);
+    await uploadApplications(jars, notify);
 
     expect(seen.map((uploads) => uploads.length)).toEqual([3, 2, 1]);
     expect(vi.mocked(postInstallApplicationFromFile).mock.calls.map(([{ file }]) => file.name)) //
@@ -335,7 +323,7 @@ describe('uploadApplications', () => {
         okAsync({ key: file.name, version: '1.0.0', displayName: file.name }),
       );
 
-    await uploadApplications(jars);
+    await uploadApplications(jars, notify);
 
     expect(notificationTexts()).toEqual([
       'Could not install booster.jar: Missing file item',
@@ -350,7 +338,7 @@ describe('uninstallApplications', () => {
   it('names every application that went, unlike Start and Stop', async () => {
     vi.mocked(postUninstallApplications).mockReturnValue(okAsync({ failedKeys: [] }));
 
-    await uninstallApplications([booster, fathom]);
+    await uninstallApplications([booster, fathom], notify);
 
     expect(notificationTexts()).toEqual(['Booster was uninstalled', 'Fathom was uninstalled']);
   });
@@ -360,7 +348,7 @@ describe('uninstallApplications', () => {
   it('reports the refused application and the one that went', async () => {
     vi.mocked(postUninstallApplications).mockReturnValue(okAsync({ failedKeys: [fathom.key] }));
 
-    await uninstallApplications([booster, fathom]);
+    await uninstallApplications([booster, fathom], notify);
 
     expect(notificationTexts()).toEqual(['Could not uninstall Fathom', 'Booster was uninstalled']);
     expect(loadApplication).toHaveBeenCalledWith(booster.key);
@@ -369,7 +357,7 @@ describe('uninstallApplications', () => {
   it('claims nothing was uninstalled when the request itself fails', async () => {
     vi.mocked(postUninstallApplications).mockReturnValue(errAsync(new AppError('Forbidden')));
 
-    await uninstallApplications([booster]);
+    await uninstallApplications([booster], notify);
 
     expect(notificationTexts()).toEqual(['Could not uninstall Booster']);
     expect(loadApplication).not.toHaveBeenCalled();

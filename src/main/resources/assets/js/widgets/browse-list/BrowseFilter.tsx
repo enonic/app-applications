@@ -11,9 +11,12 @@ export type BrowseFilterProps = {
   selected: ReadonlySet<string>;
   onToggle: (id: string) => void;
   /**
-   * How many entries may hold at once. `multiple` is the default; `single` is for a section whose server
-   * takes one value. ! It changes what the row *is*: a radio announces "one of these" where a checkbox
-   * announces "any of these", and a user told they may tick several would find the first silently unticked.
+   * How many entries may hold at once. `multiple` is the default and the reading every client-side filter
+   * takes; `single` is for a section whose server takes one value — Users filters on one `userStoreKey`.
+   *
+   * ! It changes what the row *is*, not only how it looks: a radio announces "one of these" where a
+   * ! checkbox announces "any of these", and a user told they can tick several would find the first one
+   * ! silently unticked.
    */
   mode?: 'single' | 'multiple';
   /** Shown under the entries when some of them could not be loaded, so a short list reads as such. */
@@ -21,8 +24,9 @@ export type BrowseFilterProps = {
 };
 
 /**
- * The `Filter list` control: the entries a section supplies, each optionally counted. Section-agnostic by
- * construction — an entry is a label and maybe a number, and what it stands for is the page's business.
+ * The `Filter list` control: the entries a section supplies, each optionally with a count.
+ * Section-agnostic by construction — an entry is a label and maybe a number, and what it stands for is
+ * the page's business.
  */
 export function BrowseFilter({
   entries,
@@ -62,9 +66,11 @@ export function BrowseFilter({
                 role={mode === 'single' ? 'menuitemradio' : 'menuitemcheckbox'}
                 aria-checked={ticked}
                 /*
-                 * ! `Menu.Item` closes the menu unless the select event is cancelled, and the mode decides
-                 * ! which is right: a multi-select must survive several ticks, so it cancels; a single pick
-                 * ! is terminal, so it lets the menu close, as a radio leads a user to expect.
+                 * ! `Menu.Item` closes the menu unless the select event is cancelled, and which of those
+                 * ! is right depends on the mode. A multi-select has to survive several ticks, so it
+                 * ! cancels. A single-select pick is terminal — the role announces "one of these" — so it
+                 * ! lets the menu close, which is what the convention behind a radio leads a user to
+                 * ! expect.
                  */
                 onSelect={(event) => {
                   if (mode === 'multiple') {

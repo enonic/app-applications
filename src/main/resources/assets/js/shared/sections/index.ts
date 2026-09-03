@@ -3,6 +3,8 @@ export type {
   MountOptions,
   Notification,
   Readable,
+  Routed,
+  SectionHost,
   SectionModule,
   Unmount,
 } from './contract';

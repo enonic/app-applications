@@ -8,7 +8,8 @@ project, XP 8.1, TypeScript, Preact (React compat), Tailwind v4, nanostores, `@e
 
 Read `.claude/rules/sections.md` before touching anything under `assets/js/` — the host boundary is
 what makes this app different from an ordinary one, and `shared/sections/contract.ts` is its whole
-surface.
+surface. `shared/host/` is how this app consumes it: a `HostFrame` per mount, handed down by context,
+the same shape app-users built for its four sections.
 
 ## Scripts
 
@@ -40,7 +41,7 @@ src/main/resources/
     widgets/                    the browse framework
     features/                   user actions: install, uninstall
     entities/                   application, market
-    shared/                     host, routing, api, config, i18n, notifications, admin events, ui
+    shared/                     host (the per-mount frame), api, config, i18n, admin events, ui
 ```
 
 Imports run one way: `app → pages → widgets/features → entities → shared`. Details in
@@ -82,11 +83,13 @@ Each is load-bearing and each is enforced somewhere in the code:
 `stores.md`, `preact.md`, `enonic-ui.md`, `typescript.md`, `testing.md`, `comments.md`. Read the
 relevant rule before writing in that area.
 
-Every rule but `sections.md` mirrors one of app-settings' — **the two are edited together.** Where a
-provider's copy deliberately differs, its opening line says so. `shared/`, `widgets/` and parts of
-`shared/ui/` are duplicated with app-settings on purpose: `@enonic/toolkit` will extract the common
-ground, so keep anything written here portable — no reaching for this app's config, stores or i18n
-keys beyond what props carry.
+`widgets/`, `shared/ui/` and most of `shared/` are duplicated with app-users on purpose, byte for byte
+where the code is the same: `@enonic/ui-kit` and `@enonic/ui-utils` (the `npm-enonic-ui-toolkit`
+repository) will extract the common ground, and two identical copies extract as a move. `cmp` against
+`../app-users/assets/js` is the drift check. Keep anything written here portable — no reaching for this
+app's config, stores or i18n keys beyond what props carry. The browse screen these widgets make up is
+specified in the toolkit's `docs/browse-framework.md`; app-settings is a shell now and carries none of
+this code.
 
 `AGENTS.md` is a copy of this file for agents that read that name. Edit both, keep them identical.
 

@@ -1,7 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { type TopicHandlers } from '../../../shared/admin-events';
-import { HUB_TOPICS } from '../../../shared/sections/contract';
+import { HUB_TOPICS, type TopicHandlers } from '../../../shared/admin-events';
 import { start, stop } from './install.service';
 import { $marketInstalls, beginInstall } from './install.store';
 

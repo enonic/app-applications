@@ -5,7 +5,14 @@ import { AppError } from './errors';
 
 export type GraphQlVariables = Record<string, unknown>;
 
-/** Only the shell knows this url — it carries the tool's base path — so `mount` sets it from `host.baseUrl`. */
+/**
+ * Where this module's data plane lives. Only the shell knows it — the url carries the admin tool's
+ * base path — so the bootstrap sets it from `host.baseUrl` before anything can ask.
+ *
+ * ? Module-level, so with several sections mounted the first mount's prefix answers for all. Sound
+ * ? here because every section prefix of this app serves the same schema behind the same audience —
+ * ? a provider whose sections have different data planes must scope this per mount instead.
+ */
 let endpoint: string | undefined;
 
 export function setGraphQlEndpoint(url: string): void {
@@ -13,22 +20,32 @@ export function setGraphQlEndpoint(url: string): void {
 }
 
 /**
- * One root field and what to select under it. The caller hands over the parts rather than a document, so
- * the transport can name the operation, batch several roots, and tell whose answer is whose.
+ * One root field and what to select under it — the whole of an ordinary read.
+ *
+ * The caller hands over the parts rather than a finished document, so the transport can name the
+ * operation, put several roots in one document, and tell which field an answer belongs to without ever
+ * parsing query text.
  */
 export type GraphQlRoot = {
   /** The root field to ask for. Its answer arrives under this same name. */
   field: string;
   /**
-   * Its arguments, **referencing variables by name** — `(start: $start)`. ! Never a spliced value: values
-   * travel as JSON variables, so nothing a user typed becomes document text.
+   * Its arguments, **referencing variables by name** — `(start: $start, count: $count)`.
+   *
+   * ! Never a value spliced in. Values travel as JSON variables, so nothing a user typed is ever part of
+   * ! the document text; declare them in `options.variables` and the transport writes both the header and
+   * ! the payload from the same place.
    */
   args?: string;
   /** Its selection, braces included — `{ key displayName }`. Omitted for a scalar field. */
   selection?: string;
   /**
-   * The variables its `args` use, as name → GraphQL type. ! Declared by the root, not the caller: GraphQL
-   * rejects both an undeclared and an unused variable, so one list beside the `args` cannot drift.
+   * The variables its `args` use, as name → GraphQL type: `{ start: 'Int', sort: 'UserSort' }`.
+   *
+   * ! Declared by the root rather than by the caller, and that is what keeps the document valid. GraphQL
+   * ! rejects a document using a variable it never declared *and* one declaring a variable it never uses,
+   * ! so the two lists must agree — putting the declaration next to the `args` that reference it means
+   * ! there is only one list. A caller supplies values, not types, and cannot forget a declaration.
    */
   variables?: Record<string, string>;
 };
@@ -40,8 +57,12 @@ export type GraphQlOptions = {
 };
 
 /**
- * Several roots answered together: `data` carries every field asked for with `null` where one failed,
- * `message` what the response said. Which failure matters is the caller's call, not the transport's.
+ * Several root fields answered together, each of which may have failed on its own.
+ *
+ * `data` carries every field asked for, with `null` where that field failed; `message` is what the
+ * response said about the failures, if anything. Deciding which of them matters is the caller's — it
+ * knows what it asked for, so the check is `data.projects == null` at the one place that cares rather
+ * than a rule the transport has to guess at.
  */
 export type GraphQlRootsAnswer<T> = {
   data: T;
@@ -63,8 +84,11 @@ function readErrorMessage(error: GraphQlError | undefined): string {
 }
 
 /**
- * Every message, not just the first. ! Which error belongs to which field is unknowable — lib-graphql
- * drops the `path` graphql-java attaches — so a multi-root document can only report the lot.
+ * Every message the response carried, not just the first.
+ *
+ * ! Which error belongs to which field is unknowable: lib-graphql drops the `path` graphql-java
+ * ! attaches (`ExecutionResultMapper.serializeError`). A document asking for several roots can therefore
+ * ! only report all of its messages, and a caller reading one failed field out of it gets the lot.
  */
 function readErrorMessages(errors: readonly GraphQlError[]): string | undefined {
   return errors.length === 0
@@ -77,8 +101,9 @@ function toAppError(error: unknown): AppError {
 }
 
 /**
- * Any error fails a document asking one thing: a response can carry data *and* errors, and a partial
- * result reported as success would hide a failed field behind a half-rendered screen.
+ * The verdict for a document asking one thing: any error fails it, because a response can carry data
+ * *and* errors, and reporting a partial result as success would hide a failed field behind a
+ * half-rendered screen.
  */
 function toData<T>(body: GraphQlBody<T>): Result<T, AppError> {
   const [firstError] = body.errors ?? [];
@@ -94,9 +119,14 @@ function toData<T>(body: GraphQlBody<T>): Result<T, AppError> {
 }
 
 /**
- * A single root succeeded if its own field arrived — presence, not the absence of errors, since every
- * root on the schema is nullable. ! So `requestGraphQl` is only for a field that always resolves when it
- * succeeds; one whose `null` is a real answer belongs on `requestGraphQlDocument`.
+ * The verdict for a single root request: it succeeded if its own field arrived.
+ *
+ * ! Presence is the test, not the absence of errors, because every root field on the schema is nullable
+ * ! — `schema/query.ts` explains why at length. A field that resolved is an answer even when a sibling
+ * ! in the same document failed.
+ *
+ * ! The corollary is a constraint on `requestGraphQl`: it is for a root field that always resolves when
+ * ! it succeeds. A field whose `null` is a legitimate answer belongs on `requestGraphQlDocument`.
  */
 function rootData<T>(body: GraphQlBody<T>, field: string): Result<T, AppError> {
   const data = body.data as Record<string, unknown> | undefined;
@@ -121,9 +151,10 @@ type Call = {
   read: (body: GraphQlBody<unknown>) => Result<unknown, AppError>;
 };
 
-// ! XP gives an application one single-threaded GraalJS context, so overlapping requests into our own JS
-// ! serialize at best and throw at worst. One in flight at a time is mandatory — and it is why a screen
-// ! asks for every domain it needs in one document.
+// ! XP gives an application one single-threaded GraalJS context, so overlapping requests into this
+// ! app's JS serialize at best and throw at worst — see _GraalJS_ in `docs/platform-facts.md`. One
+// ! request in flight at a time is therefore mandatory, and it is also why a screen asks for everything
+// ! it needs in one document: several root fields cost one round trip, several requests cost several.
 let queued: Call[] = [];
 let draining = false;
 
@@ -137,9 +168,10 @@ function schedule(): void {
 }
 
 async function drain(): Promise<void> {
-  // ! Load-bearing, not defensive: a throw escaping here leaves `draining` true with calls queued, and
-  // ! `schedule` returns early while it is — so every later request waits on a dead loop, with no error
-  // ! and no notification.
+  // ! `finally`, and the `catch` in `sendOrFail`, are load-bearing rather than defensive: a throw
+  // ! escaping here would leave `draining` true with calls still queued, and since `schedule` returns
+  // ! early while it is true, every later request in the page's life would wait on a loop that already
+  // ! died — no error, no notification, every section stuck on its skeleton until a reload.
   try {
     for (let call = takeNext(); call !== undefined; call = takeNext()) {
       await sendOrFail(call);
@@ -150,8 +182,9 @@ async function drain(): Promise<void> {
 }
 
 /**
- * `read` works on a payload that only crossed the wire as a cast, so a body no server should produce
- * throws rather than answering — and the caller's promise would never settle.
+ * `read` works on a payload that only crossed the wire as an `as` cast, so a body no GraphQL server
+ * should produce throws rather than answering. The caller has to hear about it, or its promise never
+ * settles at all.
  */
 async function sendOrFail(call: Call): Promise<void> {
   try {
@@ -171,9 +204,11 @@ function takeNext(): Call | undefined {
 }
 
 /**
- * Answers the calls whose caller already gave up, without sending them. Every store aborts its previous
- * load, so holding Refresh down queues several generations — only the newest is wanted, and each of the
- * rest would cost a round trip on the app's one JS thread.
+ * Answers the calls whose caller has already given up, without sending them.
+ *
+ * Every store aborts its previous load before starting the next, so holding Refresh down leaves several
+ * generations queued; only the newest is still wanted, and the rest would each cost a round trip on the
+ * app's single JS thread for an answer that is dropped on arrival.
  */
 function dropAborted(): void {
   const aborted = queued.filter(({ signal }) => signal?.aborted === true);
@@ -222,9 +257,10 @@ function selectionLine({ field, args, selection }: GraphQlRoot): string {
 }
 
 /**
- * ! The header is derived from the roots, so it declares exactly the variables they use — a caller can
- * ! neither forget a declaration nor leave a stale one, both of which GraphQL rejects. Two roots may share
- * ! a variable while they agree on its type; disagreeing is our own bug, reported as a value.
+ * ! The header is derived from the roots, so it declares exactly the variables they use — a caller cannot
+ * ! forget a declaration or leave a stale one behind, both of which GraphQL rejects. Two roots naming the
+ * ! same variable are fine while they agree on its type; disagreeing is a mistake in our own code, and it
+ * ! is reported as a value like every other failure rather than thrown into a component effect.
  */
 function documentFor(roots: readonly GraphQlRoot[], name: string): Result<string, AppError> {
   const declared = new Map<string, string>();
@@ -239,8 +275,9 @@ function documentFor(roots: readonly GraphQlRoot[], name: string): Result<string
       declared.set(key, type);
     }
 
-    // ! Comparing the two lists is what makes the mismatch impossible to get wrong: both halves are
-    // ! GraphQL validation errors, and both would surface as a failed screen rather than as the typo.
+    // ! Co-locating the declaration with the arguments makes them easy to keep in step; only comparing
+    // ! them makes it impossible to get wrong. Both halves of the mismatch are GraphQL validation errors,
+    // ! and both would surface as a failed screen rather than as the typo they are.
     const used = new Set([...(args ?? '').matchAll(/\$(\w+)/g)].map(([, key]) => key));
     const names = new Set(Object.keys(variables ?? {}));
 
@@ -269,9 +306,11 @@ function operationName(field: string): string {
 }
 
 /**
- * Reads one root field off this section's endpoint, failing when that field did not arrive. A screen
- * spanning domains uses `requestGraphQlRoots`: one request is in flight at a time, so several calls are
- * several round trips.
+ * Reads one root field off this section's own endpoint.
+ *
+ * Fails when its field did not arrive. For a screen that needs several domains, reach for
+ * `requestGraphQlRoots` rather than calling this once per domain: one request is in flight at a time,
+ * so several calls are several round trips.
  */
 export function requestGraphQl<T>(
   root: GraphQlRoot,
@@ -291,9 +330,12 @@ export function requestGraphQl<T>(
 }
 
 /**
- * Reads several roots in one document, which is how a screen spanning domains stays one round trip. A
- * failed field is `null` in `data` beside `message`, and the caller turns that into per-domain state.
- * Fails as a whole only when there is no `data` at all.
+ * Reads several root fields in one document, and hands back whatever arrived.
+ *
+ * This is how a screen spanning domains stays one round trip. It does not decide what a failure means:
+ * a field that failed is `null` in `data`, alongside `message`, and the caller — which knows which
+ * fields it asked for and what each one feeds — turns that into per-domain state. It fails as a whole
+ * only when there is no `data` at all.
  */
 export function requestGraphQlRoots<T>(
   roots: readonly GraphQlRoot[],
@@ -321,9 +363,14 @@ export function requestGraphQlRoots<T>(
 }
 
 /**
- * A whole document as written, for what `GraphQlRoot` cannot express — arguments, aliases, a mutation.
- * Any error fails it and a `null` field passes through. ! `operationName` is not sent: lib-graphql ignores
- * it, so a document holding several named operations would silently run the wrong one.
+ * The escape hatch: a whole document, sent as written.
+ *
+ * For what `GraphQlRoot` cannot express — arguments, variables, aliases, a mutation. Any error fails the
+ * call, and a `null` field is handed through untouched, which is what makes it the right home for a field
+ * whose `null` is a legitimate answer.
+ *
+ * `operationName` is deliberately not sent: lib-graphql's ExecutionInput ignores it, so a document
+ * holding several named operations would silently run the wrong one. One operation per call.
  */
 export function requestGraphQlDocument<T>(
   query: string,

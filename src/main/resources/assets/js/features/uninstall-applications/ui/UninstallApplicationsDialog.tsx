@@ -1,6 +1,7 @@
 import { useStore } from '@nanostores/preact';
 
 import { uninstallApplications } from '../../../entities/application';
+import { useHostFrame } from '../../../shared/host';
 import { i18n, useI18n } from '../../../shared/i18n';
 import { ConfirmDialog } from '../../../shared/ui/dialogs/ConfirmDialog';
 import { ConfirmValueDialog } from '../../../shared/ui/dialogs/ConfirmValueDialog';
@@ -8,10 +9,11 @@ import { $uninstallTargets, closeUninstallDialog } from '../model/uninstall-dial
 
 /**
  * Confirms an uninstall before it happens, and closes as it starts: the outcome is a toast per
- * application from the command itself, so there is nothing for the dialog to wait for.
+ * application through this mount's frame, so there is nothing for the dialog to wait for.
  */
 export function UninstallApplicationsDialog() {
   const targets = useStore($uninstallTargets);
+  const { notify } = useHostFrame();
 
   const count = targets?.length ?? 0;
   const title = useI18n('applications.dialog.uninstall.title');
@@ -25,7 +27,7 @@ export function UninstallApplicationsDialog() {
     closeUninstallDialog();
 
     if (targets !== undefined) {
-      void uninstallApplications(targets);
+      void uninstallApplications(targets, notify);
     }
   };
 

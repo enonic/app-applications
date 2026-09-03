@@ -3,12 +3,12 @@ import {
   useApplication,
   useApplicationInfo,
 } from '../../entities/application';
-import { useActiveKey } from '../../shared/routing';
+import { useItemId } from '../../shared/host';
 import { DetailsPanel } from '../../widgets/details-panel/DetailsPanel';
 import { ApplicationDetails } from './application-details/ApplicationDetails';
 
 export function ApplicationsItemPage() {
-  const id = useActiveKey();
+  const id = useItemId();
   const { status, application } = useApplication(id);
   const info = useApplicationInfo(id, application?.state);
 

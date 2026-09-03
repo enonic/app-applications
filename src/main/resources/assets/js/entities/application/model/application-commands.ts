@@ -1,8 +1,8 @@
 import type { Result, ResultAsync } from 'neverthrow';
 
 import type { AppError } from '../../../shared/api';
+import type { Notify } from '../../../shared/host';
 import { i18n } from '../../../shared/i18n';
-import { notifyError, notifySuccess } from '../../../shared/notifications';
 import {
   type LifecycleOutcome,
   postStartApplications,
@@ -39,38 +39,52 @@ export type InstallApplicationParams = {
   updating?: boolean;
 };
 
-export function startApplications(applications: readonly Application[]): Promise<void> {
-  return runLifecycleAction(applications, postStartApplications, TEXT.startFailed);
+/**
+ * ! Every command takes the `notify` of the mount that runs it and never reaches for the host: one
+ * ! module instance may serve several mounts, and only the component tree knows which one it is in.
+ * ! The messages are localized here, where the outcome is known; the frame only shows them.
+ */
+export function startApplications(
+  applications: readonly Application[],
+  notify: Notify,
+): Promise<void> {
+  return runLifecycleAction(applications, postStartApplications, TEXT.startFailed, notify);
 }
 
-export function stopApplications(applications: readonly Application[]): Promise<void> {
-  return runLifecycleAction(applications, postStopApplications, TEXT.stopFailed);
+export function stopApplications(
+  applications: readonly Application[],
+  notify: Notify,
+): Promise<void> {
+  return runLifecycleAction(applications, postStopApplications, TEXT.stopFailed, notify);
 }
 
-export function uninstallApplications(applications: readonly Application[]): Promise<void> {
+export function uninstallApplications(
+  applications: readonly Application[],
+  notify: Notify,
+): Promise<void> {
   return runLifecycleAction(
     applications,
     postUninstallApplications,
     TEXT.uninstallFailed,
+    notify,
     TEXT.uninstalled,
   );
 }
 
-export async function installApplication({
-  displayName,
-  url,
-  sha512,
-  updating = false,
-}: InstallApplicationParams): Promise<Result<InstalledApplication, AppError>> {
+export async function installApplication(
+  { displayName, url, sha512, updating = false }: InstallApplicationParams,
+  notify: Notify,
+): Promise<Result<InstalledApplication, AppError>> {
   const result = await postInstallApplicationFromUrl({ url, sha512 });
 
   result.match(
     ({ key }) => {
-      notifySuccess(i18n(updating ? TEXT.updated : TEXT.installed, displayName));
+      notify('success', i18n(updating ? TEXT.updated : TEXT.installed, displayName));
       resyncWithoutEvents([key]);
     },
     (error) =>
-      notifyError(
+      notify(
+        'error',
         i18n(updating ? TEXT.updateFailed : TEXT.installFailed, displayName, error.message),
       ),
   );
@@ -82,11 +96,11 @@ export async function installApplication({
  * ! Queued together, sent one at a time: core reads and stores the jar on the thread serving the request,
  * ! and the app this replaces uploaded with `maxConnections: 1` for the same reason.
  */
-export async function uploadApplications(files: readonly File[]): Promise<void> {
+export async function uploadApplications(files: readonly File[], notify: Notify): Promise<void> {
   const ids = queueUploads(files.map(({ name }) => name));
 
   for (const [index, file] of files.entries()) {
-    await uploadApplication(file, ids[index]);
+    await uploadApplication(file, ids[index], notify);
   }
 }
 
@@ -94,6 +108,7 @@ export async function uploadApplications(files: readonly File[]): Promise<void> 
 export async function uploadApplication(
   file: File,
   id: string,
+  notify: Notify,
 ): Promise<Result<InstalledApplication, AppError>> {
   const result = await postInstallApplicationFromFile({
     file,
@@ -102,10 +117,10 @@ export async function uploadApplication(
 
   result.match(
     ({ key, displayName }) => {
-      notifySuccess(i18n(TEXT.installed, displayName));
+      notify('success', i18n(TEXT.installed, displayName));
       resyncWithoutEvents([key]);
     },
-    (error) => notifyError(i18n(TEXT.uploadFailed, file.name, error.message)),
+    (error) => notify('error', i18n(TEXT.uploadFailed, file.name, error.message)),
   );
 
   endUpload(id);
@@ -121,6 +136,7 @@ async function runLifecycleAction(
   applications: readonly Application[],
   request: (keys: readonly string[]) => ResultAsync<LifecycleOutcome, AppError>,
   failureKey: string,
+  notify: Notify,
   successKey?: string,
 ): Promise<void> {
   if (applications.length === 0) {
@@ -132,18 +148,20 @@ async function runLifecycleAction(
 
   result.match(
     ({ failedKeys }) => {
-      failedKeys.forEach((key) => notifyError(i18n(failureKey, nameOf(applications, key))));
+      failedKeys.forEach((key) => notify('error', i18n(failureKey, nameOf(applications, key))));
 
       const changedKeys = keys.filter((key) => !failedKeys.includes(key));
 
       if (successKey != null) {
-        changedKeys.forEach((key) => notifySuccess(i18n(successKey, nameOf(applications, key))));
+        changedKeys.forEach((key) =>
+          notify('success', i18n(successKey, nameOf(applications, key))),
+        );
       }
 
       resyncWithoutEvents(changedKeys);
     },
     () => {
-      keys.forEach((key) => notifyError(i18n(failureKey, nameOf(applications, key))));
+      keys.forEach((key) => notify('error', i18n(failureKey, nameOf(applications, key))));
     },
   );
 }

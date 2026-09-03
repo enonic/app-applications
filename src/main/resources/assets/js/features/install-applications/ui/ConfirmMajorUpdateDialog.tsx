@@ -1,6 +1,7 @@
 import { Dialog } from '@enonic/ui';
 import { useStore } from '@nanostores/preact';
 
+import { useHostFrame } from '../../../shared/host';
 import { runMarketInstall } from '../model/install-market-application';
 import { $updateConfirmTarget, closeUpdateConfirm } from '../model/update-dialog.store';
 import { ConfirmMajorUpdate } from './ConfirmMajorUpdate';
@@ -12,6 +13,7 @@ import { ConfirmMajorUpdate } from './ConfirmMajorUpdate';
  */
 export function ConfirmMajorUpdateDialog() {
   const row = useStore($updateConfirmTarget);
+  const { notify } = useHostFrame();
 
   if (row == null) {
     return null;
@@ -19,7 +21,7 @@ export function ConfirmMajorUpdateDialog() {
 
   const handleConfirm = (): void => {
     closeUpdateConfirm();
-    void runMarketInstall(row);
+    void runMarketInstall(row, notify);
   };
 
   return (
