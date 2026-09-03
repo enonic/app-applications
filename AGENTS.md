@@ -27,7 +27,8 @@ Gradle when descriptors, `build.gradle` or `src/main/java` matter.
 ## Structure
 
 ```
-src/main/java/                  script beans — only for data no XP JS lib exposes
+src/main/java/                  script beans for data no XP JS lib exposes, plus the OSGi
+                                component contributing the section's CSP source
 src/main/resources/
   admin/extensions/applications/ the descriptor, its icon, and the one controller for the prefix
   apis/graphql/                 the section's own data plane
@@ -62,6 +63,12 @@ Each is load-bearing and each is enforced somewhere in the code:
 - **Install progress is node-local.** Core publishes it `distributed(false)`, and the hub delivers only
   to the sockets on its own node, so a clustered instance fills the bar only where the browser's socket
   and the `installUrl` request met on one node. Neither app can widen that.
+- **The section contributes its own CSP source.** The page's policy belongs to the host, which seeds
+  a strict baseline; the market origin the icons come from is added here, by the
+  `AdminExtensionResponseProcessor` in `csp/` — keyed to the extension, run by the platform after the
+  host's tool controller, and only for a caller the section's `allow` admits. It **extends**
+  `img-src` and never creates it: creating that directive would block every same-origin image on the
+  page. So `marketApiUrl` has a Java reader beside the JS one, and the host names no market host.
 - **`@enonic/ui`'s shadow tax is permanent.** Every overlay has to be checked inside the shadow root
   by hand; the test environment is `node` and can never catch it.
 - **`@enonic-types` understates nullability** — a field XP omits arrives absent, not null. Api mappers
