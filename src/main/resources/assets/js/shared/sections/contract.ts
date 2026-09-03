@@ -68,4 +68,8 @@ export type Unmount = () => void;
  * ! extension from one instance and module-level state is shared across those mounts. Anything
  * ! derived from `host` belongs to the mount it was handed to.
  */
-export type SectionModule<H extends Host = Host> = { mount(opts: MountOptions<H>): Unmount };
+export type SectionModule<H extends Host = Host> = {
+  // ! A property, not a method: method parameters are bivariant, and a section module would then
+  // ! accept a host without the segment it needs. As a property the mismatch fails to compile.
+  mount: (opts: MountOptions<H>) => Unmount;
+};
