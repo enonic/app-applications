@@ -1,7 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { type TopicHandlers } from '../../../shared/admin-events';
-import { HUB_TOPICS } from '../../../shared/sections/contract';
+import { HUB_TOPICS, type TopicHandlers } from '../../../shared/admin-events';
 import { invalidateApplicationInfo } from './application-info.store';
 import { loadApplication, loadApplications } from './applications.load';
 import { start, stop, toApplicationChange } from './applications.service';

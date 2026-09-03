@@ -5,6 +5,8 @@ import { runMarketInstall } from './install-market-application';
 import { startMarketUpdate } from './update-application';
 import { $updateConfirmTarget, closeUpdateConfirm } from './update-dialog.store';
 
+const notify = vi.fn();
+
 vi.mock('./install-market-application', async (importOriginal) => ({
   ...(await importOriginal<typeof import('./install-market-application')>()),
   runMarketInstall: vi.fn(async () => undefined),
@@ -29,7 +31,7 @@ beforeEach(() => {
 
 describe('startMarketUpdate', () => {
   it('installs an update inside the same major version without asking', () => {
-    startMarketUpdate(marketApplication());
+    startMarketUpdate(marketApplication(), notify);
 
     expect(runMarketInstall).toHaveBeenCalledOnce();
     expect($updateConfirmTarget.get()).toBeUndefined();
@@ -42,6 +44,7 @@ describe('startMarketUpdate', () => {
         installedVersion: '2.0.0',
         latest: { version: '3.0.0', downloadUrl: 'https://repo.enonic.com/booster.jar' },
       }),
+      notify,
     );
 
     expect(runMarketInstall).not.toHaveBeenCalled();
@@ -49,7 +52,7 @@ describe('startMarketUpdate', () => {
   });
 
   it('does nothing for an application already on the latest version', () => {
-    startMarketUpdate(marketApplication({ updateAvailable: false }));
+    startMarketUpdate(marketApplication({ updateAvailable: false }), notify);
 
     expect(runMarketInstall).not.toHaveBeenCalled();
     expect($updateConfirmTarget.get()).toBeUndefined();

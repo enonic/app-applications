@@ -1,5 +1,4 @@
-import { subscribeTopic, toApplicationsMessage } from '../../../shared/admin-events';
-import { HUB_TOPICS } from '../../../shared/sections/contract';
+import { HUB_TOPICS, subscribeTopic, toApplicationsMessage } from '../../../shared/admin-events';
 import { invalidateApplicationInfo } from './application-info.store';
 import { loadApplication, loadApplications } from './applications.load';
 import { isApplicationsCached, removeApplication } from './applications.store';

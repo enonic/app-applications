@@ -62,14 +62,18 @@ export function BrowseList({
   const errorMessage = useI18n('browse.list.error');
   const emptyMessage = useI18n('browse.list.empty');
   const listLabel = useI18n('browse.list.label');
-  // ! Above the early returns, where a hook cannot go. The cursor is the row the user last pointed at and
-  // ! nothing else moves it: it starts where a deep link opened, and deliberately does not follow the
-  // ! details column — unticking moves that column, and the focus must stay under the hand that unticked.
+  // ! Above the early returns below, where a hook cannot go.
+  // ! The cursor is the row the user last pointed at — a click, an arrow, a tick, an untick — and
+  // ! nothing else moves it. It starts on the row a deep link opened, and it deliberately does not
+  // ! follow the details column: unticking a row moves the column to the row ticked before it, and
+  // ! the focus must stay under the hand that unticked. This is Content Studio's activeId; its
+  // ! details panel is the separate, derived currentItem.
   const [pointedKey, setPointedKey] = useState(activeKey);
 
-  // ! Only with nothing to show. A section narrowing on the server reloads on every debounced keystroke,
-  // ! and swapping rows for a skeleton each time would throw away the scroll position and any focus inside
-  // ! the list — rows on screen are the best answer until the new ones arrive.
+  // ! Only with nothing to show. A section that narrows on the server reloads on every debounced
+  // ! keystroke, and swapping the rows for a skeleton each time would throw away the scroll position and
+  // ! any focus inside the list several times a second. Rows already on screen stay until the new ones
+  // ! arrive; they are the best answer available until then.
   if (status === 'loading' && rows.length === 0) {
     return <BrowseListSkeleton />;
   }
@@ -143,9 +147,10 @@ export function BrowseList({
   };
 
   /*
-   * ! Outside the listbox, inside the scroller. A `role="listbox"` may hold only options, so a button among
-   * ! the rows is invisible to option navigation — and on the last page `hasMore` goes false, the button
-   * ! unmounts under the keyboard, and focus falls to the document body.
+   * ! Outside the listbox, though inside the scroller. A `role="listbox"` may only hold options, so a
+   * ! button among the rows is invisible to anything navigating by option — and when the last page
+   * ! arrives `hasMore` goes false, the button unmounts under the keyboard, and the focus falls to the
+   * ! document body.
    */
   const loadMore =
     hasMore && onLoadMore ? (

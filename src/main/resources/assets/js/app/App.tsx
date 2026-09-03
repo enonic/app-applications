@@ -3,29 +3,31 @@ import { useStore } from '@nanostores/preact';
 import { useEffect, useState } from 'preact/hooks';
 
 import { ApplicationsPage } from '../pages/applications/ApplicationsPage';
-import type { Host } from '../shared/sections';
+import { HostFrameProvider, type HostFrame } from '../shared/host';
 import { $stylesheets } from '../shared/styles';
 import { $bootstrap } from './bootstrap.store';
 
 export type AppProps = {
-  host: Host;
+  frame: HostFrame;
 };
 
-export function App({ host }: AppProps) {
+export function App({ frame }: AppProps) {
   const { status, error } = useStore($bootstrap);
   const stylesheets = useStore($stylesheets);
-  const [theme, setTheme] = useState(host.theme.get());
+  const [theme, setTheme] = useState(frame.host.theme.get());
 
-  useEffect(() => host.theme.subscribe(setTheme), [host]);
+  useEffect(() => frame.host.theme.subscribe(setTheme), [frame]);
 
   // ! `AppRoot` adopts the sheet, sets the theme class (`.dark` never crosses the shadow boundary)
   // ! and portals overlays inside this root. Needs `@enonic/ui` >= 1.2.0.
   return (
-    <AppRoot theme={theme} stylesheets={stylesheets} className="flex min-h-0 flex-1 flex-col">
-      {status === 'loading' && <BootstrapSkeleton />}
-      {status === 'error' && <BootstrapFailed error={error} />}
-      {status === 'ready' && <ApplicationsPage />}
-    </AppRoot>
+    <HostFrameProvider value={frame}>
+      <AppRoot theme={theme} stylesheets={stylesheets} className="flex min-h-0 flex-1 flex-col">
+        {status === 'loading' && <BootstrapSkeleton />}
+        {status === 'error' && <BootstrapFailed error={error} />}
+        {status === 'ready' && <ApplicationsPage />}
+      </AppRoot>
+    </HostFrameProvider>
   );
 }
 

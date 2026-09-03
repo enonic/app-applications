@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'preact/hooks';
+import type { ReactNode } from 'react';
 
 import { useI18n } from '../../i18n';
 import { ConfirmGate } from './ConfirmGate';
@@ -10,26 +11,24 @@ export type ConfirmValueDialogProps = {
   description: string;
   /** What has to be typed back before the dialog will confirm. */
   expected: string | number;
-  /** Defaults to the shared Confirm label. */
   confirmLabel?: string;
+  /** What the confirmation is about, shown above the gate. */
+  children?: ReactNode;
   onClose: () => void;
   onConfirm?: () => void;
 };
 
-/**
- * A confirmation that waits for the operator to type a value back. What it says is the caller's; the
- * gate, the disabled button and the focus are not.
- */
 export function ConfirmValueDialog({
   open,
   title,
   description,
   expected,
   confirmLabel,
+  children,
   onClose,
   onConfirm,
 }: ConfirmValueDialogProps) {
-  const defaultConfirmLabel = useI18n('browse.confirm.confirm');
+  const defaultConfirmLabel = useI18n('browse.dialog.confirm');
   const cancelLabel = useI18n('browse.dialog.cancel');
   const closeLabel = useI18n('browse.dialog.close');
 
@@ -37,15 +36,13 @@ export function ConfirmValueDialog({
   const inputRef = useRef<HTMLInputElement>(null);
   const primaryRef = useRef<HTMLButtonElement>(null);
 
-  // `Dialog.Content` unmounts on close, so the gate forgets what was typed on its own — this is the
-  // half of the state that outlives it.
+  // `Dialog.Content` unmounts on close, so this is the half of the state that outlives the gate.
   useEffect(() => {
     if (!open) {
       setMatched(false);
     }
   }, [open]);
 
-  // The entry is done with, so the focus follows it to the button it just enabled.
   useEffect(() => {
     if (matched) {
       primaryRef.current?.focus();
@@ -64,7 +61,6 @@ export function ConfirmValueDialog({
       intent="danger"
       cancelLabel={cancelLabel}
       closeLabel={closeLabel}
-      // The field, not the dialog box: it is what the operator has to fill in.
       onOpenAutoFocus={(event) => {
         event.preventDefault();
         inputRef.current?.focus();
@@ -72,6 +68,8 @@ export function ConfirmValueDialog({
       onClose={onClose}
       onPrimary={onConfirm}
     >
+      {children}
+
       <ConfirmGate
         expected={expected}
         onMatchChange={setMatched}

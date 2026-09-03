@@ -1,1 +1,2 @@
-export { getHost, setHost } from './host';
+export { createHostFrame, type HostFrame, type Notify } from './frame';
+export { HostFrameProvider, useHostFrame, useItemId } from './useHostFrame';

@@ -5,7 +5,7 @@ import { useI18n } from '../../shared/i18n';
 export type BrowseSearchProps = {
   value: string;
   onChange: (value: string) => void;
-  /** Searching is not wired yet — see `../app-settings/docs/browse-framework.md` § 3.6. */
+  /** Searching is not wired yet — see docs/browse-framework.md § 3.6. */
   disabled?: boolean;
 };
 

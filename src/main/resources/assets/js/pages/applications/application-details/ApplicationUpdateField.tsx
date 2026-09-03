@@ -6,6 +6,7 @@ import { useMarketApplication } from '../../../entities/market';
 import { $marketInstalls, startMarketUpdate } from '../../../features/install-applications';
 import { isManagedMode } from '../../../shared/config';
 import { formatDate } from '../../../shared/format';
+import { useHostFrame } from '../../../shared/host';
 import { i18n, useI18n } from '../../../shared/i18n';
 import { ProgressButton } from '../../../shared/ui/ProgressButton';
 import { DetailsPanel } from '../../../widgets/details-panel/DetailsPanel';
@@ -23,6 +24,7 @@ const TOOLTIP_DELAY = 300;
 export function ApplicationUpdateField({ application }: ApplicationUpdateFieldProps) {
   const { marketApplication } = useMarketApplication(application.key);
   const installs = useStore($marketInstalls);
+  const { notify } = useHostFrame();
 
   const updateLabel = useI18n('applications.action.update');
   const localLabel = useI18n('applications.details.localNoUpdate');
@@ -45,7 +47,7 @@ export function ApplicationUpdateField({ application }: ApplicationUpdateFieldPr
       className="w-40"
       progress={install == null ? undefined : (install.percent ?? 0)}
       disabled={application.local}
-      onClick={() => startMarketUpdate(marketApplication)}
+      onClick={() => startMarketUpdate(marketApplication, notify)}
     />
   );
 
