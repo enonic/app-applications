@@ -13,5 +13,6 @@ apis:
   - "admin:extension"
   - "admin:status"
   - "admin:event"
+  - "admin:events"
   - "server:app"
   - "com.enonic.xp.app.main:events"
