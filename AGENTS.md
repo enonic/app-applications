@@ -7,8 +7,7 @@ project, XP 8.1, TypeScript, Preact (React compat), Tailwind v4, nanostores, `@e
 `lib-admin-ui`; the class-based app this replaces is on `master`.
 
 Read `.claude/rules/sections.md` before touching anything under `assets/js/` — the host boundary is
-what makes this app different from an ordinary one, and `shared/sections/contract.ts` is its whole
-surface. `shared/host/` is how this app consumes it: a `HostFrame` per mount, handed down by context,
+what makes this app different from an ordinary one, and `@enonic/ui-types` is its whole surface. `shared/host/` is how this app consumes it: a `HostFrame` per mount, handed down by context,
 the same shape app-users built for its four sections.
 
 ## Scripts

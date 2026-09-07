@@ -6,7 +6,7 @@ import { startApplicationsService, stopApplicationsService } from './entities/ap
 import { startMarketService, stopMarketService } from './entities/market';
 import { startInstallService, stopInstallService } from './features/install-applications';
 import { createHostFrame } from './shared/host';
-import type { MountOptions, SectionHost, Unmount } from './shared/sections';
+import type { Mount, RoutedHost } from './shared/sections';
 
 /**
  * ! What lives for the module, not the mount: the host may serve every section of an app from one
@@ -16,7 +16,9 @@ import type { MountOptions, SectionHost, Unmount } from './shared/sections';
 let mounts = 0;
 
 /** Renders the section into the container the host owns, inside the shadow root it created. */
-export function mount({ container, host }: MountOptions<SectionHost>): Unmount {
+// ? A const carrying the contract's `Mount` rather than a function declaration: the annotation is
+// ? what makes "this module needs a routed host" a compile-time check.
+export const mount: Mount<RoutedHost> = ({ container, host }) => {
   // ! Not awaited. `mount` owes the shell its disposer synchronously, so the section paints while its
   // ! own configuration is still in flight and `$bootstrap` is what moves it on.
   void bootstrap(host);
@@ -49,4 +51,4 @@ export function mount({ container, host }: MountOptions<SectionHost>): Unmount {
       stopApplicationsService();
     }
   };
-}
+};
