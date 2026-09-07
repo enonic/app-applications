@@ -16,7 +16,7 @@ export function App({ frame }: AppProps) {
   const stylesheets = useStore($stylesheets);
   const [theme, setTheme] = useState(frame.host.theme.get());
 
-  useEffect(() => frame.host.theme.subscribe(setTheme), [frame]);
+  useEffect(() => frame.host.theme.listen(setTheme), [frame]);
 
   // ! `AppRoot` adopts the sheet, sets the theme class (`.dark` never crosses the shadow boundary)
   // ! and portals overlays inside this root. Needs `@enonic/ui` >= 1.2.0.

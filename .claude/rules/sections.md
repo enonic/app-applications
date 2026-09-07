@@ -6,15 +6,15 @@ paths:
 # The host boundary
 
 This app is a guest. The app-settings shell owns the page, the url, the socket and the toast stack,
-and hands over what it owns as the `host` object — `shared/sections/contract.ts` is the whole surface.
+and hands over what it owns as the `host` object — `@enonic/ui-types` is the whole surface, re-exported by
+`shared/sections`.
 No rule here has an app-settings counterpart; it is the one thing being a provider adds.
 
 - **Nothing reaches around the host.** No `window.location`, no `history`, no `document.title`, no
   style on anything outside our shadow root. Navigate through the frame's `openItem`/`closeItem`, read
   the selected row through `useItemId`.
-- **Every declaration in `contract.ts` is identical with app-settings' copy** until `@enonic/ui-types`
-  publishes it. Changing a declaration means changing every copy, or this app compiles against a host
-  that does not implement it. The hub topic names are not contract: `shared/admin-events/topics.ts`
+- **The contract is the published package, not a file here.** A change to it is a toolkit release the
+  host and every provider take together. The hub topic names are not contract: `shared/admin-events/topics.ts`
   carries the ones this section subscribes, copied from the table in app-settings'
   `docs/extensions/docs.md` § Events.
 - **The host lives on the frame, one per mount, never at module level.** `main.ts` builds a
@@ -26,7 +26,7 @@ No rule here has an app-settings counterpart; it is the one thing being a provid
   messages there, localized; a store's callback or a service reaches for nothing. What lives for the
   module — the services, the bootstrap, the hub connection — starts with the first mount and stops
   with the last (`mounts` in `main.ts`).
-- **A `Readable` never calls back on subscribe.** Read `get()` first, then subscribe for changes:
+- **A `Readable` never calls back on `listen`.** Read `get()` first, then listen for changes:
   `createHostFrame` does it for `path`, `App` for `theme`.
 - **`mount` returns its disposer synchronously** (`main.ts`). The bootstrap is not awaited; `App` gates
   on `$bootstrap` instead.
