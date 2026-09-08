@@ -1,3 +1,4 @@
+import type { ItemInteraction } from '@enonic/ui';
 import type { ReactNode } from 'react';
 
 export type BrowseListStatus = 'loading' | 'ready' | 'error';
@@ -27,12 +28,6 @@ export type BrowseRow = {
 /** The rows a tick or `Select all` may reach. */
 export function selectableKeys(rows: readonly BrowseRow[]): string[] {
   return rows.filter((row) => !row.disabled && row.selectable !== false).map((row) => row.key);
-}
-
-// The wider set: an unselectable row is still a row, so the arrows and the tab stop have to land on
-// it. Only a transient one is out.
-function navigableKeys(rows: readonly BrowseRow[]): string[] {
-  return rows.filter((row) => !row.disabled).map((row) => row.key);
 }
 
 /**
@@ -134,42 +129,17 @@ export function shownRowKey(
   return [...selection].pop();
 }
 
-/**
- * The row `Tab` reaches. The active row owns the tab stop, but it is not always in the list — a
- * query can filter it out, and it can be gone or not loaded yet — and then the first row takes
- * over: without the fallback the list has no tab stop at all and cannot be entered.
- */
-export function tabbableRowKey(
+/** What `TreeList` may do with each row. A lookup, built once per render: it asks per row on every key press. */
+export function rowInteractions(
   rows: readonly BrowseRow[],
-  activeKey: string | undefined,
-): string | undefined {
-  const keys = navigableKeys(rows);
-  return activeKey !== undefined && keys.includes(activeKey) ? activeKey : keys[0];
-}
+  selectable: boolean,
+): (key: string) => ItemInteraction {
+  const interactions = new Map<string, ItemInteraction>(
+    rows.map((row) => [
+      row.key,
+      row.disabled ? 'none' : selectable && row.selectable !== false ? 'full' : 'navigate-only',
+    ]),
+  );
 
-/** The row an arrow, `Home` or `End` press moves to; `undefined` for any other key. */
-export function nextRowKey(
-  rows: readonly BrowseRow[],
-  activeKey: string | undefined,
-  pressedKey: string,
-): string | undefined {
-  const keys = navigableKeys(rows);
-  if (keys.length === 0) {
-    return undefined;
-  }
-
-  const index = activeKey === undefined ? -1 : keys.indexOf(activeKey);
-
-  switch (pressedKey) {
-    case 'ArrowDown':
-      return keys[Math.min(index + 1, keys.length - 1)];
-    case 'ArrowUp':
-      return index <= 0 ? keys[0] : keys[index - 1];
-    case 'Home':
-      return keys[0];
-    case 'End':
-      return keys[keys.length - 1];
-    default:
-      return undefined;
-  }
+  return (key) => interactions.get(key) ?? 'none';
 }

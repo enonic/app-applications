@@ -3,12 +3,11 @@ import { describe, expect, it } from 'vitest';
 import {
   type BrowseRow,
   contextMenuTarget,
-  nextRowKey,
   rowClickTarget,
+  rowInteractions,
   shownRowKey,
   selectableKeys,
   selectAllState,
-  tabbableRowKey,
   toggledSelection,
 } from './browse-list';
 
@@ -164,80 +163,29 @@ describe('shownRowKey', () => {
   });
 });
 
-describe('tabbableRowKey', () => {
-  const rows = [row('a'), row('b')];
+describe('rowInteractions', () => {
+  const rows = [row('a'), row('b', true), unselectableRow('c')];
 
-  it('gives the tab stop to the active row', () => {
-    expect(tabbableRowKey(rows, 'b')).toBe('b');
+  it('lets a plain row be focused and ticked', () => {
+    expect(rowInteractions(rows, true)('a')).toBe('full');
   });
 
-  it('falls back to the first row when the active row is not in the list', () => {
-    expect(tabbableRowKey(rows, 'filtered-out')).toBe('a');
+  it('keeps work in flight out of the list entirely', () => {
+    expect(rowInteractions(rows, true)('b')).toBe('none');
   });
 
-  it('falls back to the first row when nothing is active', () => {
-    expect(tabbableRowKey(rows, undefined)).toBe('a');
+  it('lets a row that cannot be ticked still take focus', () => {
+    expect(rowInteractions(rows, true)('c')).toBe('navigate-only');
   });
 
-  it('skips a row that cannot take focus', () => {
-    expect(tabbableRowKey([row('upload-1', true), row('b')], undefined)).toBe('b');
+  it('lets every row take focus but none be ticked while the list is not selectable', () => {
+    const interactionOf = rowInteractions(rows, false);
+
+    expect(interactionOf('a')).toBe('navigate-only');
+    expect(interactionOf('b')).toBe('none');
   });
 
-  // Not selectable is not the same as not navigable: the row still opens and takes the cursor.
-  it('gives the tab stop to a row that cannot be ticked', () => {
-    expect(tabbableRowKey([unselectableRow('system'), row('b')], undefined)).toBe('system');
-  });
-
-  it('has no tab stop in an empty list', () => {
-    expect(tabbableRowKey([], 'a')).toBeUndefined();
-  });
-});
-
-describe('nextRowKey', () => {
-  const rows = [row('a'), row('b'), row('c')];
-
-  it('steps down and up one row at a time', () => {
-    expect(nextRowKey(rows, 'a', 'ArrowDown')).toBe('b');
-    expect(nextRowKey(rows, 'b', 'ArrowUp')).toBe('a');
-  });
-
-  it('stops at both ends instead of wrapping', () => {
-    expect(nextRowKey(rows, 'c', 'ArrowDown')).toBe('c');
-    expect(nextRowKey(rows, 'a', 'ArrowUp')).toBe('a');
-  });
-
-  it('enters the list at the first row when nothing is active', () => {
-    expect(nextRowKey(rows, undefined, 'ArrowDown')).toBe('a');
-    expect(nextRowKey(rows, undefined, 'ArrowUp')).toBe('a');
-  });
-
-  it('jumps to the ends on Home and End', () => {
-    expect(nextRowKey(rows, 'b', 'Home')).toBe('a');
-    expect(nextRowKey(rows, 'b', 'End')).toBe('c');
-  });
-
-  it('skips rows for work in flight', () => {
-    const withUpload = [row('a'), row('upload-1', true), row('c')];
-
-    expect(nextRowKey(withUpload, 'a', 'ArrowDown')).toBe('c');
-  });
-
-  it('steps onto a row that cannot be ticked', () => {
-    const withSystem = [row('a'), unselectableRow('system'), row('c')];
-
-    expect(nextRowKey(withSystem, 'a', 'ArrowDown')).toBe('system');
-  });
-
-  it('re-enters at the first row when the active key is gone', () => {
-    expect(nextRowKey(rows, 'gone', 'ArrowDown')).toBe('a');
-  });
-
-  it('ignores every other key', () => {
-    expect(nextRowKey(rows, 'a', 'Enter')).toBeUndefined();
-    expect(nextRowKey(rows, 'a', ' ')).toBeUndefined();
-  });
-
-  it('has nowhere to go in an empty list', () => {
-    expect(nextRowKey([], undefined, 'ArrowDown')).toBeUndefined();
+  it('knows nothing of a key without a row', () => {
+    expect(rowInteractions(rows, true)('z')).toBe('none');
   });
 });

@@ -1,5 +1,4 @@
-import { Button } from '@enonic/ui';
-import type { JSX } from 'preact';
+import { Button, TreeList } from '@enonic/ui';
 import { useState } from 'preact/hooks';
 
 import { useI18n } from '../../shared/i18n';
@@ -7,11 +6,9 @@ import {
   type BrowseListStatus,
   type BrowseRow,
   contextMenuTarget,
-  nextRowKey,
-  type RowTarget,
   rowClickTarget,
-  selectableKeys,
-  tabbableRowKey,
+  rowInteractions,
+  type RowTarget,
   toggledSelection,
 } from './browse-list';
 import { BrowseListMessage } from './BrowseListMessage';
@@ -26,7 +23,7 @@ export type BrowseListProps = {
   onSelectionChange: (keys: ReadonlySet<string>) => void;
   /** The row the user moved to, `undefined` when the active row was clicked again. */
   onActiveChange: (key: string | undefined) => void;
-  /** A row was double-clicked. Undefined where the section declared no row action. */
+  /** A row was double-clicked or `Enter` was pressed on it. Undefined where the section declared no row action. */
   onRowActivate?: (key: string) => void;
   /** Rows can be ticked. */
   selectable?: boolean;
@@ -62,13 +59,10 @@ export function BrowseList({
   const errorMessage = useI18n('browse.list.error');
   const emptyMessage = useI18n('browse.list.empty');
   const listLabel = useI18n('browse.list.label');
-  // ! Above the early returns below, where a hook cannot go.
-  // ! The cursor is the row the user last pointed at — a click, an arrow, a tick, an untick — and
-  // ! nothing else moves it. It starts on the row a deep link opened, and it deliberately does not
-  // ! follow the details column: unticking a row moves the column to the row ticked before it, and
-  // ! the focus must stay under the hand that unticked. This is Content Studio's activeId; its
-  // ! details panel is the separate, derived currentItem.
-  const [pointedKey, setPointedKey] = useState(activeKey);
+  // ! The cursor is the row the user last pointed at, and it does not follow the details column:
+  // ! unticking a row moves the column to the row ticked before it, while the focus stays under the
+  // ! hand that unticked. `TreeList` owns the focus for it.
+  const [cursorKey, setCursorKey] = useState(activeKey);
 
   // ! Only with nothing to show. A section that narrows on the server reloads on every debounced
   // ! keystroke, and swapping the rows for a skeleton each time would throw away the scroll position and
@@ -86,45 +80,20 @@ export function BrowseList({
     return <BrowseListMessage>{emptyLabel ?? emptyMessage}</BrowseListMessage>;
   }
 
-  // ! Resolved against the rows on screen, never the stored key alone: a query can filter the
-  // ! pointed row out, and then the tab stop, the focus, the arrows and Space must all agree on
-  // ! the first visible row instead of acting on a row nobody can see.
-  const cursorKey = tabbableRowKey(rows, pointedKey);
+  const interactionOf = rowInteractions(rows, selectable);
 
   const handleSelectedChange = (key: string, checked: boolean): void => {
     // Which row the details column ends up on is `shownRowKey`, applied wherever a selection
-    // change is reported — a tick, `Select all`, a right-click, `Escape` — not here.
+    // change is reported — a tick, `Select all`, a right-click, `Space` — not here.
     onSelectionChange(toggledSelection(selectedKeys, key, checked));
-    setPointedKey(key);
+    setCursorKey(key);
   };
 
-  const handleKeyDown = (event: JSX.TargetedKeyboardEvent<HTMLDivElement>): void => {
-    // ! Rows only. A click on a row checkbox leaves the focus on its hidden input, and
-    // ! Space there must tick that row, not whichever row happens to be active.
-    if (!(event.target instanceof HTMLElement) || event.target.getAttribute('role') !== 'option') {
-      return;
-    }
-
-    const nextKey = nextRowKey(rows, cursorKey, event.key);
-    if (nextKey !== undefined) {
-      event.preventDefault();
-      setPointedKey(nextKey);
-
-      // Nothing ticked: the cursor and the row on show are the same thing, so the details follow.
-      if (selectedKeys.size === 0) {
-        onActiveChange(nextKey);
-      }
-      return;
-    }
-
-    if (
-      event.key === ' ' &&
-      selectable &&
-      cursorKey !== undefined &&
-      selectableKeys(rows).includes(cursorKey)
-    ) {
-      event.preventDefault();
-      handleSelectedChange(cursorKey, !selectedKeys.has(cursorKey));
+  // The keyboard moved the cursor. With nothing ticked the details follow it; with ticks it moves alone.
+  const handleCursorChange = (key: string | undefined): void => {
+    setCursorKey(key);
+    if (key !== undefined && selectedKeys.size === 0) {
+      onActiveChange(key);
     }
   };
 
@@ -132,7 +101,7 @@ export function BrowseList({
     key: string,
     { clearSelection, activate, deactivate }: RowTarget,
   ): void => {
-    setPointedKey(key);
+    setCursorKey(key);
 
     if (clearSelection) {
       onSelectionChange(new Set());
@@ -147,9 +116,9 @@ export function BrowseList({
   };
 
   /*
-   * ! Outside the listbox, though inside the scroller. A `role="listbox"` may only hold options, so a
-   * ! button among the rows is invisible to anything navigating by option — and when the last page
-   * ! arrives `hasMore` goes false, the button unmounts under the keyboard, and the focus falls to the
+   * ! Outside the tree, though inside the scroller. A `role="tree"` may only hold items, so a button
+   * ! among the rows is invisible to anything navigating by item — and when the last page arrives
+   * ! `hasMore` goes false, the button unmounts under the keyboard, and the focus falls to the
    * ! document body.
    */
   const loadMore =
@@ -170,31 +139,34 @@ export function BrowseList({
 
   return (
     <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
-      <div
-        role="listbox"
-        aria-multiselectable={selectable}
+      {/* ! `selection` is the real ticks only; the active row without ticks is painted by `BrowseListRow`. */}
+      <TreeList
         aria-label={listLabel}
-        onKeyDown={handleKeyDown}
         className="flex flex-col gap-y-1.5"
+        selectionMode={selectable ? 'multiple' : 'none'}
+        selection={selectedKeys}
+        onSelectionChange={onSelectionChange}
+        active={cursorKey}
+        onActiveChange={handleCursorChange}
+        onActivate={onRowActivate}
+        getItemInteraction={interactionOf}
       >
         {rows.map((row) => (
           <BrowseListRow
             key={row.key}
             row={row}
             selected={selectedKeys.has(row.key)}
-            focused={row.key === cursorKey}
             highlighted={
               selectedKeys.has(row.key) || (row.key === activeKey && selectedKeys.size === 0)
             }
             onSelectedChange={selectable ? handleSelectedChange : undefined}
             onClick={(key) => applyRowTarget(key, rowClickTarget(key, selectedKeys, activeKey))}
-            onActivate={(key) => onRowActivate?.(key)}
             onContextMenu={(key) =>
               applyRowTarget(key, contextMenuTarget(key, selectedKeys, activeKey))
             }
           />
         ))}
-      </div>
+      </TreeList>
 
       {loadMore}
     </div>
