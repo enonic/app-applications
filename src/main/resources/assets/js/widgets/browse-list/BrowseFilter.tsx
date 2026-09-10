@@ -36,10 +36,16 @@ export function BrowseFilter({
   notice,
 }: BrowseFilterProps) {
   const filterLabel = useI18n('browse.filter');
+  const activeLabel = useI18n('browse.filter.active', selected.size);
 
   if (entries.length === 0 && notice === undefined) {
     return <InertHeaderControl icon={Filter} label={filterLabel} />;
   }
+
+  // The state is "you ticked something", not "rows are hidden": a section whose default already narrows
+  // would otherwise light the control on every visit and say nothing.
+  const active = selected.size > 0;
+  const triggerLabel = active ? activeLabel : filterLabel;
 
   return (
     <Menu>
@@ -47,10 +53,16 @@ export function BrowseFilter({
         <Button
           variant="text"
           startIcon={Filter}
-          title={filterLabel}
+          title={triggerLabel}
           className={HEADER_CONTROL_CLASS}
+          /*
+           * ! `data-active` is the attribute `Menu.Trigger` marks its own open state with, so the
+           * ! toggled look is the library's. Spread it only when set: `Slot` lets the child's value
+           * ! win, and one that is always present would drop the open-menu state.
+           */
+          {...(active ? { 'data-active': 'true' } : {})}
         >
-          <span className={HEADER_CONTROL_LABEL_CLASS}>{filterLabel}</span>
+          <span className={HEADER_CONTROL_LABEL_CLASS}>{triggerLabel}</span>
         </Button>
       </Menu.Trigger>
       <Menu.Portal>
