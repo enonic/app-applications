@@ -59,8 +59,8 @@ importers:
         specifier: ^9.31.5
         version: 9.31.5(@wdio/globals@9.31.3)(webdriverio@9.31.5)
       '@wdio/mocha-framework':
-        specifier: ^9.31.5
-        version: 9.31.5
+        specifier: ^9.31.6
+        version: 9.31.6
       '@wdio/spec-reporter':
         specifier: ^9.31.2
         version: 9.31.2
@@ -521,8 +521,8 @@ packages:
     resolution: {integrity: sha512-0ZAEIo6PNyMIJPlOGkIgyOJUjcd0pC8/QHlVAAe1c91/IcjZ1X+k0yidXHaboJdN7dq1XPUacmhRdtua0U5EZg==}
     engines: {node: '>=18.20.0'}
 
-  '@wdio/mocha-framework@9.31.5':
-    resolution: {integrity: sha512-UYGNF8M77T7PKvRGidN+Iu++LSPLKbKpQ+K3eJEaDnP7hWcHk+x7VYKrXWPWorPuJfS2ocT+QWAgZlkEhTo6fQ==}
+  '@wdio/mocha-framework@9.31.6':
+    resolution: {integrity: sha512-huGMzC912yUIPKPuJht/GMtrpBZLC68L9vGoPSaPwAohkB3UZZxq6QNg0c+VV1iTPE0LcU7iptYk/Lf/hwC/7w==}
     engines: {node: '>=18.20.0'}
 
   '@wdio/protocols@9.31.5':
@@ -555,12 +555,16 @@ packages:
     resolution: {integrity: sha512-wufYrRdz0Dr8Oa9OiaFsitQJsD8HWG5J4FQi/r3nZv/W3S+1h1lpBCAmDisH1Q6wN7Ed9v20E56ZU0UOaP5v3g==}
     engines: {node: '>=18.20.0'}
 
+  '@wdio/utils@9.31.6':
+    resolution: {integrity: sha512-yPEvnkCrxacYMP5x5EcscFgG5cjaedwJ4tg9aSgQFDWLR0zGUkuCHW95ufYlH1nMgiIhlxSqGvku5h6bjZvzAQ==}
+    engines: {node: '>=18.20.0'}
+
   '@wdio/xvfb@9.31.2':
     resolution: {integrity: sha512-48MqdcrvdC/Jn2YPhW6hjGLzcQqOEt1Q6KELR/TWz3vIJoZwzTngGAdT06voUnZS+PUEcd/vKSo4a6zxQ/mm7g==}
     engines: {node: '>=18.20.0'}
 
-  '@zip.js/zip.js@2.8.61':
-    resolution: {integrity: sha512-F9RnQJXgvCSdAJfMtSrH5Uh/LcLg8fZlg5ARC4u5N4w9v/DG27cN3C/ngUrY1JdJGX2LRv5DDViXeZJgbcppWA==}
+  '@zip.js/zip.js@2.11.3':
+    resolution: {integrity: sha512-c6Rqb3suFwtS+u+dW7BJTq8DW2XeX+GUwo/WXNnyxA3y3uFkU64mO5ugJN7hfn7ZRoHndzyDhaNo81VJehu/6A==}
     engines: {bun: '>=0.7.0', deno: '>=1.0.0', node: '>=18.0.0'}
 
   abort-controller@3.0.0:
@@ -667,6 +671,9 @@ packages:
 
   bare-path@3.1.1:
     resolution: {integrity: sha512-JprUlveX3QjApC1cTpsUOiscADftCGVWkzitbHsRqv84hzYwYHw2mbluddsq5TvI8mH/8Ov1f4BiMAdcB0oYnQ==}
+
+  bare-path@3.1.2:
+    resolution: {integrity: sha512-ZyKbsuuqK6Ag0K8pX6V5Txq6XeJRvY+wXucnFGRjiyVYP9YWDpIQugk/b+enRYrEYBJaqLzghRQpXPMR7341Nw==}
 
   bare-stream@2.13.4:
     resolution: {integrity: sha512-PcrQ8lVLbiJscNm1Kez+Yp4Gy4AHGcN1lzwjvf5NybWen7VvEgUfyfnXYJ2zNqWnzOfCb1Abq6lH8ti0syQszA==}
@@ -862,6 +869,10 @@ packages:
   deepmerge-ts@7.1.6:
     resolution: {integrity: sha512-gQhL1ksGBLQbHeAo47YU6cs2ahd3Pv+8PFYoWogNZbQnNwQyOh9Ad5kbeHFiWwbKdeWQJ5Z7Y7mwb9ew2hXBLw==}
     engines: {node: '>=16.0.0'}
+
+  deepmerge-ts@8.0.2:
+    resolution: {integrity: sha512-uqbvqLUMrc6p0MO+WBRtTxY55hmyh94WRwI5a++PZe54X+bfVh59FSN7uWCBCW1CCVjzjnrwzfI8zidE2obMMw==}
+    engines: {node: '>=16.9.0'}
 
   defaults@1.0.4:
     resolution: {integrity: sha512-eFuaLoy/Rxalv2kr+lqMlUnrDWV+3j4pljOIJgLIhI058IQfWJ7vXhyEIHu+HtC738klGALYxOKDO0bQP3tg8A==}
@@ -1646,8 +1657,8 @@ packages:
     resolution: {integrity: sha512-HehCEsotFqbPW9sJ8WVYB6UbmIMv7kUUORIF2Nncq4VQvBfNBLibW9YZR5dlYCSUhwcD628pRllm7n+E+YTzJw==}
     engines: {node: '>= 14'}
 
-  socks@2.8.9:
-    resolution: {integrity: sha512-LJhUYUvItdQ0LkJTmPeaEObWXAqFyfmP85x0tch/ez9cahmhlBBLbIqDFnvBnUJGagb0JbIQrkBs1wJ+yRYpEw==}
+  socks@2.8.10:
+    resolution: {integrity: sha512-e0VyvkVTwVYViNovRkZ9aodhxVlyoMn7eJhVUPxZ+eK9P/7CBkxvvsBOHqFPEH416726W8tLXXXjKwqgTErrCQ==}
     engines: {node: '>= 10.0.0', npm: '>= 3.0.0'}
 
   source-map@0.6.1:
@@ -2368,13 +2379,13 @@ snapshots:
       safe-regex2: 5.1.1
       strip-ansi: 7.2.0
 
-  '@wdio/mocha-framework@9.31.5':
+  '@wdio/mocha-framework@9.31.6':
     dependencies:
       '@types/mocha': 10.0.10
       '@types/node': 20.19.43
       '@wdio/logger': 9.29.1
       '@wdio/types': 9.31.2
-      '@wdio/utils': 9.31.5
+      '@wdio/utils': 9.31.6
       mocha: 10.8.2
     transitivePeerDependencies:
       - bare-abort-controller
@@ -2451,11 +2462,33 @@ snapshots:
       - react-native-b4a
       - supports-color
 
+  '@wdio/utils@9.31.6':
+    dependencies:
+      '@puppeteer/browsers': 2.13.2
+      '@wdio/logger': 9.29.1
+      '@wdio/types': 9.31.2
+      decamelize: 6.0.1
+      deepmerge-ts: 8.0.2
+      edgedriver: 6.3.0
+      geckodriver: 6.1.1
+      get-port: 7.2.0
+      import-meta-resolve: 4.2.0
+      locate-app: 2.5.0
+      mitt: 3.0.1
+      safaridriver: 1.0.1
+      split2: 4.2.0
+      wait-port: 1.1.0
+    transitivePeerDependencies:
+      - bare-abort-controller
+      - bare-buffer
+      - react-native-b4a
+      - supports-color
+
   '@wdio/xvfb@9.31.2':
     dependencies:
       '@wdio/logger': 9.29.1
 
-  '@zip.js/zip.js@2.8.61': {}
+  '@zip.js/zip.js@2.11.3': {}
 
   abort-controller@3.0.0:
     dependencies:
@@ -2543,6 +2576,8 @@ snapshots:
 
   bare-path@3.1.1: {}
 
+  bare-path@3.1.2: {}
+
   bare-stream@2.13.4(bare-events@2.9.2):
     dependencies:
       b4a: 1.8.1
@@ -2555,7 +2590,7 @@ snapshots:
 
   bare-url@2.5.2:
     dependencies:
-      bare-path: 3.1.1
+      bare-path: 3.1.2
 
   base64-js@1.5.1: {}
 
@@ -2742,6 +2777,8 @@ snapshots:
 
   deepmerge-ts@7.1.6: {}
 
+  deepmerge-ts@8.0.2: {}
+
   defaults@1.0.4:
     dependencies:
       clone: 1.0.4
@@ -2789,7 +2826,7 @@ snapshots:
   edgedriver@6.3.0:
     dependencies:
       '@wdio/logger': 9.29.1
-      '@zip.js/zip.js': 2.8.61
+      '@zip.js/zip.js': 2.11.3
       decamelize: 6.0.1
       edge-paths: 3.0.5
       fast-xml-parser: 5.11.1
@@ -2983,7 +3020,7 @@ snapshots:
   geckodriver@6.1.1:
     dependencies:
       '@wdio/logger': 9.29.1
-      '@zip.js/zip.js': 2.8.61
+      '@zip.js/zip.js': 2.11.3
       decamelize: 6.0.1
       http-proxy-agent: 7.0.2
       https-proxy-agent: 7.0.6
@@ -3582,11 +3619,11 @@ snapshots:
     dependencies:
       agent-base: 7.1.4
       debug: 4.4.3(supports-color@8.1.1)
-      socks: 2.8.9
+      socks: 2.8.10
     transitivePeerDependencies:
       - supports-color
 
-  socks@2.8.9:
+  socks@2.8.10:
     dependencies:
       ip-address: 10.7.0
       smart-buffer: 4.2.0
@@ -3671,7 +3708,7 @@ snapshots:
       tar-stream: 3.2.1
     optionalDependencies:
       bare-fs: 4.8.1
-      bare-path: 3.1.1
+      bare-path: 3.1.2
     transitivePeerDependencies:
       - bare-abort-controller
       - bare-buffer
