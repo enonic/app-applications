@@ -13,10 +13,7 @@ import type { ApplicationState } from './application.types';
  * entry per key and knows nothing about which is on screen, so asking again for a missing entry is what
  * reloads a panel invalidated by a lifecycle event under it.
  */
-export function useApplicationInfo(
-  key: string | undefined,
-  state?: ApplicationState,
-): ApplicationInfoEntry | undefined {
+export function useApplicationInfo(key?: string, state?: ApplicationState): ApplicationInfoEntry {
   const entries = useStore($applicationsInfo);
   const stopped = state === 'STOPPED';
   const entry = key == null || stopped ? undefined : entries[key];
@@ -28,5 +25,10 @@ export function useApplicationInfo(
     }
   }, [key, stopped, missing]);
 
-  return entry;
+  // A stopped application provides nothing: ready, with nothing in it.
+  if (key == null || stopped) {
+    return { status: 'ready' };
+  }
+
+  return entry ?? { status: 'loading' };
 }

@@ -5,6 +5,7 @@ import { useI18n } from '../../shared/i18n';
 import { ItemLabel } from '../../shared/ui/ItemLabel';
 import { withCount } from './details-panel';
 import { DetailsEmpty } from './DetailsEmpty';
+import { DetailsSkeleton } from './DetailsSkeleton';
 
 export type DetailsPanelProps = {
   children: ReactNode;
@@ -137,6 +138,7 @@ export function DetailsListItem({ title, subtitle, icon, meta }: DetailsListItem
 
 export const DetailsPanel = Object.assign(DetailsPanelRoot, {
   Empty: DetailsEmpty,
+  Skeleton: DetailsSkeleton,
   Header: DetailsHeader,
   Section: DetailsSection,
   Subsection: DetailsSubsection,

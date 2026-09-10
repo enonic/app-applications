@@ -11,28 +11,29 @@ import { ApplicationWebAppSection } from './ApplicationWebAppSection';
 
 export type ApplicationDetailsProps = {
   application: Application;
-  /** What the application provides, absent until the first render has asked for it. */
-  info?: ApplicationInfoEntry;
+  info: ApplicationInfoEntry;
 };
 
 export function ApplicationDetails({ application, info }: ApplicationDetailsProps) {
   const infoErrorMessage = useI18n('applications.details.infoError');
-  // ! One request, so one message. Every section below is fed by the same `applicationInfo`, and
-  // ! letting each report the failure itself printed it once per section.
-  const provided = info?.status === 'ready' ? info.info : undefined;
+  const { status, info: provided } = info;
 
   return (
     <DetailsPanel>
       <ApplicationDetailsHeader application={application} />
       <ApplicationSummarySection application={application} />
 
-      {info?.status === 'error' && <p className="text-error text-sm">{infoErrorMessage}</p>}
-
-      <ApplicationSchemaSection info={provided} />
-      <ApplicationTasksSection info={provided} />
-      <ApplicationExtensionsSection info={provided} />
-      <ApplicationWebAppSection info={provided} />
-      <ApplicationIdProviderSection info={provided} />
+      {status === 'loading' && <DetailsPanel.Skeleton />}
+      {status === 'error' && <p className="text-error text-sm">{infoErrorMessage}</p>}
+      {status === 'ready' && (
+        <>
+          <ApplicationSchemaSection info={provided} />
+          <ApplicationTasksSection info={provided} />
+          <ApplicationExtensionsSection info={provided} />
+          <ApplicationWebAppSection info={provided} />
+          <ApplicationIdProviderSection info={provided} />
+        </>
+      )}
     </DetailsPanel>
   );
 }
