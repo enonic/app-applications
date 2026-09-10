@@ -12,11 +12,6 @@ export function ApplicationsItemPage() {
   const { status, application } = useApplication(id);
   const info = useApplicationInfo(id, application?.state);
 
-  /*
-   * ! Three states, not two. The panel reads its application out of the list, so `loading` means the list
-   * ! has not arrived — "select an item" there reads as a deep link that did nothing. A failed list says
-   * ! so, and a key nothing answers to is an application that is gone, not an empty selection.
-   */
   if (application == null) {
     return <DetailsPanel.Empty labelKey={emptyLabelKey(status, id)} />;
   }
