@@ -17,7 +17,11 @@ import { isManagedMode } from '../../shared/config';
 import { useHostFrame, useItemId } from '../../shared/host';
 import { i18n, useI18n } from '../../shared/i18n';
 import { ProgressBar } from '../../shared/ui/ProgressBar';
-import { sortByDisplayName, type SortDirection } from '../../widgets/browse-list/browse-sort';
+import {
+  DEFAULT_SORT_DIRECTION,
+  sortByDisplayName,
+  type SortDirection,
+} from '../../widgets/browse-list/browse-sort';
 import { BrowseFilter } from '../../widgets/browse-list/BrowseFilter';
 import { BrowseSort } from '../../widgets/browse-list/BrowseSort';
 import { BrowseScreen } from '../../widgets/browse-screen/BrowseScreen';
@@ -164,7 +168,14 @@ export function ApplicationsPage() {
             onToggle={(id) => applicationsFilter.toggle(id)}
           />
         }
-        sort={<BrowseSort options={sortOptions} value={sort} onChange={setApplicationsSort} />}
+        sort={
+          <BrowseSort
+            options={sortOptions}
+            value={sort}
+            onChange={setApplicationsSort}
+            defaultValue={DEFAULT_SORT_DIRECTION}
+          />
+        }
       />
 
       {/* Mounted whether or not they are open — each is its own store's subscriber, and the details

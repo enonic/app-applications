@@ -13,6 +13,11 @@ export type BrowseSortProps<Id extends string = string> = {
   options: readonly BrowseSortOption<Id>[];
   value: Id;
   onChange: (id: Id) => void;
+  /**
+   * The order the section starts in. The control is lit while `value` is anything else, so a list the
+   * user has reordered says so with the menu closed. Omitted, it never lights.
+   */
+  defaultValue?: Id;
 };
 
 /**
@@ -24,8 +29,12 @@ export function BrowseSort<Id extends string = string>({
   options,
   value,
   onChange,
+  defaultValue,
 }: BrowseSortProps<Id>) {
   const sortLabel = useI18n('browse.sort');
+
+  // The default is this control's "nothing ticked": lighting it on every visit would say nothing.
+  const active = defaultValue !== undefined && value !== defaultValue;
 
   return (
     <Menu>
@@ -35,6 +44,8 @@ export function BrowseSort<Id extends string = string>({
           startIcon={ArrowDownUp}
           title={sortLabel}
           className={HEADER_CONTROL_CLASS}
+          // Spread only when set, for the reason `BrowseFilter` gives.
+          {...(active ? { 'data-active': 'true' } : {})}
         >
           <span className={HEADER_CONTROL_LABEL_CLASS}>{sortLabel}</span>
         </Button>
