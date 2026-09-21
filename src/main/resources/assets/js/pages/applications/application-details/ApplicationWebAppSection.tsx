@@ -21,7 +21,7 @@ export function ApplicationWebAppSection({ info }: ApplicationWebAppSectionProps
 
   return (
     <DetailsPanel.Section labelKey="applications.details.webApp">
-      <DetailsPanel.Subsection labelKey="applications.details.deployment">
+      <DetailsPanel.Subsection labelKey="applications.details.internalPath">
         <div className="flex flex-col items-start gap-1">
           {linkable ? (
             <Link href={deploymentUrl} newTab className="text-xs wrap-anywhere">
