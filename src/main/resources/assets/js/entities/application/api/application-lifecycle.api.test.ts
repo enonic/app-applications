@@ -15,6 +15,7 @@ const CONFIG = {
   eventsUrl: '/_/admin:events',
   managedMode: false,
   serverAppUrl: '/_/server:app',
+  vhostsEnabled: false,
 } satisfies Config;
 
 function respondWith(body: unknown): void {

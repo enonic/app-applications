@@ -105,7 +105,7 @@ export function listApiItems(application: string): ApiItem[] {
     .sort(byDisplayName);
 }
 
-export function deploymentUrlOf(application: string): string | null {
+export function deploymentPathOf(application: string): string | null {
   return hasWebapp({ application }) ? `/webapp/${application}` : null;
 }
 

@@ -53,7 +53,7 @@ export type ApplicationInfo = {
   adminTools: readonly AdminToolItem[];
   adminExtensions: readonly AdminExtensionItem[];
   apis: readonly ApiItem[];
-  deploymentUrl?: string;
+  deploymentPath?: string;
   /** Only an application that declares an id provider descriptor has one. */
   idProvider?: ApplicationIdProvider;
 };

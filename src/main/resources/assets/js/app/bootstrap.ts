@@ -7,7 +7,7 @@ import { startSectionEvents } from './events';
 
 const CONFIG_ROOT: GraphQlRoot = {
   field: 'config',
-  selection: '{ appId appVersion eventsUrl serverAppUrl managedMode }',
+  selection: '{ appId appVersion eventsUrl serverAppUrl managedMode vhostsEnabled }',
 };
 
 // ! A `Json` scalar, so no selection — and the locale travels as a variable rather than as text, like

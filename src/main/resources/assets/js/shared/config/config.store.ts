@@ -18,3 +18,15 @@ export function setConfig(config: Config): void {
 export function isManagedMode(): boolean {
   return $config.get()?.managedMode === true;
 }
+
+/**
+ * Whether this instance maps virtual hosts, which is what decides an internal path is not reachable
+ * from the page the section is mounted to — the admin page arrived through a mapping, and nothing
+ * says the same mapping carries anything else. ? The question the section has is about the current
+ * page, but the host boundary rules out reading it: no `window.location` here, so the installation's
+ * own setting stands in. It answers the case exactly, since XP maps nothing unless it is on.
+ * ! Read at render, like `isManagedMode`.
+ */
+export function hasVirtualHosts(): boolean {
+  return $config.get()?.vhostsEnabled === true;
+}

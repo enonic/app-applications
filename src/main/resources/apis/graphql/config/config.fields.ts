@@ -1,5 +1,6 @@
 import type { GraphQLFields } from '/lib/graphql';
 import { apiUrl } from '/lib/xp/portal';
+import { isEnabled } from '/lib/xp/vhost';
 
 import { ConfigType } from './config.types';
 
@@ -11,6 +12,7 @@ export const configQueryFields: GraphQLFields = {
       appId: app.name,
       appVersion: app.version,
       managedMode: isManagedMode(),
+      vhostsEnabled: isEnabled(),
       eventsUrl: apiUrl({ api: 'admin:events' }),
       serverAppUrl: apiUrl({ api: 'server:app' }),
     }),

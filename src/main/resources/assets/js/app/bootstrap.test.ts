@@ -17,6 +17,7 @@ const CONFIG = {
   appVersion: '8.1.0',
   eventsUrl: '/_/admin:events',
   serverAppUrl: '/_/server:app',
+  vhostsEnabled: false,
 };
 const PHRASES = { 'applications.heading': 'Applications' };
 

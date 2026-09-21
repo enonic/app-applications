@@ -67,6 +67,7 @@ export default defineConfig(({ mode }) => {
       '/lib/xp/i18n': join(import.meta.dirname, 'src/test/mocks/lib-xp-i18n.ts'),
       '/lib/xp/portal': join(import.meta.dirname, 'src/test/mocks/lib-xp-portal.ts'),
       '/lib/xp/schema': join(import.meta.dirname, 'src/test/mocks/lib-xp-schema.ts'),
+      '/lib/xp/vhost': join(import.meta.dirname, 'src/test/mocks/lib-xp-vhost.ts'),
       '/lib/admin-extension': join(import.meta.dirname, 'src/test/mocks/lib-admin-extension.ts'),
       '/lib/admin-tool': join(import.meta.dirname, 'src/test/mocks/lib-admin-tool.ts'),
       '/lib/api': join(import.meta.dirname, 'src/test/mocks/lib-api.ts'),

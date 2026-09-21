@@ -14,7 +14,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import {
   applicationInfoSource,
-  deploymentUrlOf,
+  deploymentPathOf,
   idProviderSourceOf,
   listUsedByItems,
   listAdminExtensionItems,
@@ -377,18 +377,18 @@ describe('listApiItems', () => {
   });
 });
 
-describe('deploymentUrlOf', () => {
+describe('deploymentPathOf', () => {
   it('mounts the webapp under its application key', () => {
     vi.mocked(hasWebapp).mockReturnValue(true);
 
-    expect(deploymentUrlOf('com.example.app')).toBe('/webapp/com.example.app');
+    expect(deploymentPathOf('com.example.app')).toBe('/webapp/com.example.app');
   });
 
   // Null is what tells the panel to leave the Web App section out; an empty string would render it.
   it('answers null for an application shipping no webapp', () => {
     vi.mocked(hasWebapp).mockReturnValue(false);
 
-    expect(deploymentUrlOf('com.example.app')).toBeNull();
+    expect(deploymentPathOf('com.example.app')).toBeNull();
   });
 });
 

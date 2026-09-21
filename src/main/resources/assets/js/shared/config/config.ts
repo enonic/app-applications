@@ -9,4 +9,5 @@ export type Config = {
   eventsUrl: string;
   managedMode: boolean;
   serverAppUrl: string;
+  vhostsEnabled: boolean;
 };

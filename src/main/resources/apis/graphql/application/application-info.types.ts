@@ -12,7 +12,7 @@ import {
   listAdminExtensionItems,
   listAdminToolItems,
   listApiItems,
-  deploymentUrlOf,
+  deploymentPathOf,
   idProviderSourceOf,
   listComponentItems,
   listMacroItems,
@@ -178,9 +178,11 @@ export const ApplicationInfoType: GraphQLType = generator.createObjectType({
       type: nonNull(list(nonNull(ApiItemType))),
       resolve: (env: { source: ApplicationInfoSource }) => listApiItems(env.source.key),
     },
-    deploymentUrl: {
+    deploymentPath: {
       type: GraphQLString,
-      resolve: (env: { source: ApplicationInfoSource }) => deploymentUrlOf(env.source.key),
+      description:
+        'Where XP mounts the webapp internally. Not a url: reaching it depends on the virtual host mapping the caller came in on.',
+      resolve: (env: { source: ApplicationInfoSource }) => deploymentPathOf(env.source.key),
     },
     idProvider: {
       type: ApplicationIdProviderType,

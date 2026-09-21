@@ -1,4 +1,5 @@
 import { apiUrl } from '/lib/xp/portal';
+import { isEnabled } from '/lib/xp/vhost';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { configQueryFields } from './config.fields';
@@ -10,6 +11,7 @@ function withConfig(config: Record<string, string> = {}): void {
 beforeEach(() => {
   withConfig();
   vi.mocked(apiUrl).mockImplementation(({ api }) => `/_/${api}`);
+  vi.mocked(isEnabled).mockReturnValue(false);
 });
 
 afterEach(() => {
@@ -58,5 +60,15 @@ describe('config', () => {
 
       expect(configQueryFields.config.resolve?.({} as never)).toMatchObject({ managedMode: false });
     }
+  });
+
+  it('reports virtual host mapping as the installation has it', () => {
+    vi.mocked(isEnabled).mockReturnValue(true);
+
+    expect(configQueryFields.config.resolve?.({} as never)).toMatchObject({ vhostsEnabled: true });
+  });
+
+  it('reports no virtual host mapping where the installation maps none', () => {
+    expect(configQueryFields.config.resolve?.({} as never)).toMatchObject({ vhostsEnabled: false });
   });
 });
