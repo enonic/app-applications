@@ -39,6 +39,7 @@ dependencies {
     include xplibs.app
     include xplibs.auth
     include xplibs.schema
+    include xplibs.vhost
     include 'com.enonic.lib:lib-graphql:3.0.0'
     include 'com.enonic.lib:lib-http-client:4.0.0' // the market lookup — no XP lib makes outbound calls
 }

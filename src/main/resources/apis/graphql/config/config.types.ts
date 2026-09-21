@@ -23,6 +23,11 @@ export const ConfigType: GraphQLType = generator.createObjectType({
       description:
         'Whether this instance forbids installing and uninstalling applications from the UI.',
     },
+    vhostsEnabled: {
+      type: nonNull(GraphQLBoolean),
+      description:
+        'Whether this instance maps virtual hosts, in which case an internal path is not reachable from the page the section is mounted to.',
+    },
     eventsUrl: {
       type: nonNull(GraphQLString),
       description: 'The admin events hub api; `client.js` under it is the client to import.',

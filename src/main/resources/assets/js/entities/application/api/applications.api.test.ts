@@ -25,6 +25,7 @@ const CONFIG = {
   eventsUrl: '/_/admin:events',
   managedMode: false,
   serverAppUrl: '/_/server:app',
+  vhostsEnabled: false,
 } satisfies Config;
 
 describe('fetchApplications', () => {
