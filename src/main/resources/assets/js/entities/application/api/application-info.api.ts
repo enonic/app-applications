@@ -30,7 +30,7 @@ const APPLICATION_INFO_DOCUMENT = `
       adminTools { ${ITEM_FIELDS} url }
       adminExtensions { ${ITEM_FIELDS} interfaces }
       apis { ${ITEM_FIELDS} documentationUrl }
-      deploymentUrl
+      deploymentPath
       idProvider {
         mode
         usedBy { key displayName }
@@ -67,7 +67,7 @@ type ApplicationInfoDto = {
   adminTools: AdminToolItemDto[];
   adminExtensions: AdminExtensionItemDto[];
   apis: ApiItemDto[];
-  deploymentUrl: string | null;
+  deploymentPath: string | null;
   idProvider: IdProviderDto | null;
 };
 
@@ -128,7 +128,7 @@ function toApplicationInfo(dto: ApplicationInfoDto): ApplicationInfo {
     adminTools: dto.adminTools.map(toAdminTool),
     adminExtensions: dto.adminExtensions.map(toAdminExtension),
     apis: dto.apis.map(toApi),
-    deploymentUrl: dto.deploymentUrl ?? undefined,
+    deploymentPath: dto.deploymentPath ?? undefined,
     idProvider: dto.idProvider == null ? undefined : toIdProvider(dto.idProvider),
   };
 }

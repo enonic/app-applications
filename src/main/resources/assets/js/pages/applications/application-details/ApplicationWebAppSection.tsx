@@ -9,9 +9,9 @@ export type ApplicationWebAppSectionProps = {
 };
 
 export function ApplicationWebAppSection({ info }: ApplicationWebAppSectionProps) {
-  const deploymentUrl = info?.deploymentUrl;
+  const deploymentPath = info?.deploymentPath;
 
-  if (deploymentUrl == null || deploymentUrl.length === 0) {
+  if (deploymentPath == null || deploymentPath.length === 0) {
     return null;
   }
 
@@ -24,11 +24,11 @@ export function ApplicationWebAppSection({ info }: ApplicationWebAppSectionProps
       <DetailsPanel.Subsection labelKey="applications.details.internalPath">
         <div className="flex flex-col items-start gap-1">
           {linkable ? (
-            <Link href={deploymentUrl} newTab className="text-xs wrap-anywhere">
-              {deploymentUrl}
+            <Link href={deploymentPath} newTab className="text-xs wrap-anywhere">
+              {deploymentPath}
             </Link>
           ) : (
-            <span className="text-xs wrap-anywhere">{deploymentUrl}</span>
+            <span className="text-xs wrap-anywhere">{deploymentPath}</span>
           )}
         </div>
       </DetailsPanel.Subsection>

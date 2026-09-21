@@ -15,7 +15,7 @@ vi.mock('../api/application-info.api', () => ({ fetchApplicationInfo: vi.fn() })
 const BOOSTER = 'com.enonic.app.booster';
 const FATHOM = 'com.enonic.app.fathom';
 
-function info(deploymentUrl?: string): ApplicationInfo {
+function info(deploymentPath?: string): ApplicationInfo {
   return {
     contentTypes: [],
     mixins: [],
@@ -28,7 +28,7 @@ function info(deploymentUrl?: string): ApplicationInfo {
     adminTools: [],
     adminExtensions: [],
     apis: [],
-    deploymentUrl,
+    deploymentPath,
   };
 }
 
@@ -56,7 +56,7 @@ describe('ensureApplicationInfo', () => {
     expect($applicationsInfo.get()[BOOSTER]?.status).toBe('loading');
     await settled(BOOSTER, 'ready');
 
-    expect($applicationsInfo.get()[BOOSTER]?.info?.deploymentUrl).toBe('/webapp/booster');
+    expect($applicationsInfo.get()[BOOSTER]?.info?.deploymentPath).toBe('/webapp/booster');
     expect(fetchApplicationInfo).toHaveBeenCalledTimes(1);
   });
 
@@ -127,7 +127,7 @@ describe('invalidateApplicationInfo', () => {
     await settled(BOOSTER, 'ready');
 
     expect(fetchApplicationInfo).toHaveBeenCalledTimes(2);
-    expect($applicationsInfo.get()[BOOSTER]?.info?.deploymentUrl).toBe('/webapp/after');
+    expect($applicationsInfo.get()[BOOSTER]?.info?.deploymentPath).toBe('/webapp/after');
   });
 
   it('drops an answer that is already in flight', async () => {
@@ -145,7 +145,7 @@ describe('invalidateApplicationInfo', () => {
     answerSlowly?.(info('/webapp/stale'));
     await new Promise((resolve) => setTimeout(resolve, 0));
 
-    expect($applicationsInfo.get()[BOOSTER]?.info?.deploymentUrl).not.toBe('/webapp/stale');
+    expect($applicationsInfo.get()[BOOSTER]?.info?.deploymentPath).not.toBe('/webapp/stale');
   });
 
   it('does nothing for a key it holds no entry for', () => {
@@ -167,7 +167,7 @@ describe('two applications', () => {
     ensureApplicationInfo(BOOSTER);
 
     expect(fetchApplicationInfo).toHaveBeenCalledTimes(2);
-    expect($applicationsInfo.get()[BOOSTER]?.info?.deploymentUrl).toBe(`/webapp/${BOOSTER}`);
-    expect($applicationsInfo.get()[FATHOM]?.info?.deploymentUrl).toBe(`/webapp/${FATHOM}`);
+    expect($applicationsInfo.get()[BOOSTER]?.info?.deploymentPath).toBe(`/webapp/${BOOSTER}`);
+    expect($applicationsInfo.get()[FATHOM]?.info?.deploymentPath).toBe(`/webapp/${FATHOM}`);
   });
 });

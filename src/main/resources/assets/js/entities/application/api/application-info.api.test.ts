@@ -55,7 +55,7 @@ describe('fetchApplicationInfo', () => {
           adminTools: [{ ...item('dashboard'), url: '/admin/com.enonic.app.booster/dashboard' }],
           adminExtensions: [{ ...item('panel'), interfaces: ['contentstudio.contextpanel'] }],
           apis: [{ ...item('graphql'), documentationUrl: 'https://example.com/api' }],
-          deploymentUrl: '/webapp/com.enonic.app.booster',
+          deploymentPath: '/webapp/com.enonic.app.booster',
           idProvider: { mode: 'LOCAL', usedBy: [{ key: 'system', displayName: 'System' }] },
         },
       },
@@ -76,7 +76,7 @@ describe('fetchApplicationInfo', () => {
     expect(info?.adminTools[0]?.url).toBe('/admin/com.enonic.app.booster/dashboard');
     expect(info?.adminExtensions[0]?.interfaces).toEqual(['contentstudio.contextpanel']);
     expect(info?.apis[0]?.documentationUrl).toBe('https://example.com/api');
-    expect(info?.deploymentUrl).toBe('/webapp/com.enonic.app.booster');
+    expect(info?.deploymentPath).toBe('/webapp/com.enonic.app.booster');
     expect(info?.idProvider).toEqual({
       mode: 'LOCAL',
       usedBy: [{ key: 'system', displayName: 'System' }],
@@ -85,13 +85,13 @@ describe('fetchApplicationInfo', () => {
 
   it('turns the nulls the schema allows into absent fields', async () => {
     respondWith({
-      data: { applicationInfo: { ...EMPTY_LISTS, deploymentUrl: null, idProvider: null } },
+      data: { applicationInfo: { ...EMPTY_LISTS, deploymentPath: null, idProvider: null } },
     });
 
     const result = await fetchApplicationInfo('com.enonic.app.fathom');
 
     const info = result._unsafeUnwrap();
-    expect(info?.deploymentUrl).toBeUndefined();
+    expect(info?.deploymentPath).toBeUndefined();
     expect(info?.idProvider).toBeUndefined();
     expect(info?.macros).toEqual([]);
   });
@@ -101,7 +101,7 @@ describe('fetchApplicationInfo', () => {
       data: {
         applicationInfo: {
           ...EMPTY_LISTS,
-          deploymentUrl: null,
+          deploymentPath: null,
           idProvider: { mode: null, usedBy: [] },
         },
       },
