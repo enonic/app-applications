@@ -1,8 +1,9 @@
 import type { Application, ApplicationInfoEntry } from '../../../entities/application';
 import { useI18n } from '../../../shared/i18n';
 import { DetailsPanel } from '../../../widgets/details-panel/DetailsPanel';
+import { ApplicationAdminSection } from './ApplicationAdminSection';
+import { ApplicationApisSection } from './ApplicationApisSection';
 import { ApplicationDetailsHeader } from './ApplicationDetailsHeader';
-import { ApplicationExtensionsSection } from './ApplicationExtensionsSection';
 import { ApplicationIdProviderSection } from './ApplicationIdProviderSection';
 import { ApplicationSchemaSection } from './ApplicationSchemaSection';
 import { ApplicationSummarySection } from './ApplicationSummarySection';
@@ -29,7 +30,8 @@ export function ApplicationDetails({ application, info }: ApplicationDetailsProp
         <>
           <ApplicationSchemaSection info={provided} />
           <ApplicationTasksSection info={provided} />
-          <ApplicationExtensionsSection info={provided} />
+          <ApplicationAdminSection info={provided} />
+          <ApplicationApisSection info={provided} />
           <ApplicationWebAppSection info={provided} />
           <ApplicationIdProviderSection info={provided} />
         </>

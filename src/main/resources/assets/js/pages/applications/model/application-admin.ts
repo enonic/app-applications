@@ -1,15 +1,13 @@
 import type {
   AdminExtensionItem,
   AdminToolItem,
-  ApiItem,
   ApplicationInfo,
 } from '../../../entities/application';
 import { filledSections } from '../../../widgets/details-panel/details-panel';
 
 const TEXT = {
-  adminTools: 'applications.details.adminTools',
-  widgets: 'applications.details.widgets',
-  apis: 'applications.details.apis',
+  tools: 'applications.details.tools',
+  extensions: 'applications.details.extensions',
 } as const;
 
 export type ExtensionEntry = {
@@ -33,9 +31,9 @@ function adminToolEntries(tools: readonly AdminToolItem[]): ExtensionEntry[] {
     .sort((a, b) => compare(a.label, b.label));
 }
 
-// Widgets sort by interface before display name, so the ones that surface in the same place in the
+// Extensions sort by interface before display name, so the ones that surface in the same place in the
 // admin stay together.
-function widgetEntries(extensions: readonly AdminExtensionItem[]): ExtensionEntry[] {
+function extensionEntries(extensions: readonly AdminExtensionItem[]): ExtensionEntry[] {
   return [...extensions]
     .sort(
       (a, b) =>
@@ -48,24 +46,14 @@ function widgetEntries(extensions: readonly AdminExtensionItem[]): ExtensionEntr
     }));
 }
 
-function apiEntries(apis: readonly ApiItem[]): ExtensionEntry[] {
-  return apis
-    .map(({ key, name, displayName }) => ({
-      key,
-      label: displayName.length === 0 ? name : displayName,
-    }))
-    .sort((a, b) => compare(a.label, b.label));
-}
-
 /** What an application adds to the admin, in mockup order, groups with nothing in them dropped. */
-export function extensionGroups(info: ApplicationInfo | undefined): ExtensionGroup[] {
+export function adminGroups(info: ApplicationInfo | undefined): ExtensionGroup[] {
   if (info == null) {
     return [];
   }
 
   return filledSections([
-    { labelKey: TEXT.adminTools, items: adminToolEntries(info.adminTools) },
-    { labelKey: TEXT.widgets, items: widgetEntries(info.adminExtensions) },
-    { labelKey: TEXT.apis, items: apiEntries(info.apis) },
+    { labelKey: TEXT.tools, items: adminToolEntries(info.adminTools) },
+    { labelKey: TEXT.extensions, items: extensionEntries(info.adminExtensions) },
   ]);
 }
