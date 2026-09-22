@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import type { ApplicationItem } from '../../../entities/application';
-import { byName } from './application-items';
+import { byName, compareText } from './application-items';
 
 function item(name: string, displayName = name): ApplicationItem {
   return { key: `com.enonic.app.booster:${name}`, name, displayName };
@@ -23,5 +23,15 @@ describe('byName', () => {
     byName(items);
 
     expect(items.map(({ name }) => name)).toEqual(['quote', 'embed']);
+  });
+});
+
+describe('compareText', () => {
+  it('orders ignoring case, so a lowercase name does not sort after every uppercase one', () => {
+    expect(['Zip', 'apple'].sort(compareText)).toEqual(['apple', 'Zip']);
+  });
+
+  it('is zero for two spellings that differ only in case', () => {
+    expect(compareText('APIs', 'apis')).toBe(0);
   });
 });

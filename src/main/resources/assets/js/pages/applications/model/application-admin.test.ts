@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import type { ApplicationInfo } from '../../../entities/application';
-import { extensionGroups } from './application-extensions';
+import { adminGroups } from './application-admin';
 
 const EMPTY: ApplicationInfo = {
   contentTypes: [],
@@ -21,23 +21,23 @@ function info(overrides: Partial<ApplicationInfo>): ApplicationInfo {
   return { ...EMPTY, ...overrides };
 }
 
-describe('extensionGroups', () => {
+describe('adminGroups', () => {
   it('has nothing to show without an info', () => {
-    expect(extensionGroups(undefined)).toEqual([]);
+    expect(adminGroups(undefined)).toEqual([]);
   });
 
   it('drops the groups the application does not contribute to', () => {
-    const groups = extensionGroups(
+    const groups = adminGroups(
       info({
-        apis: [{ key: 'app:content', name: 'content', displayName: 'content' }],
+        adminExtensions: [{ key: 'app:w', name: 'w', displayName: 'Extension', interfaces: [] }],
       }),
     );
 
-    expect(groups.map(({ labelKey }) => labelKey)).toEqual(['applications.details.apis']);
+    expect(groups.map(({ labelKey }) => labelKey)).toEqual(['applications.details.extensions']);
   });
 
   it('links an admin tool to its url, sorted by title', () => {
-    const groups = extensionGroups(
+    const groups = adminGroups(
       info({
         adminTools: [
           { key: 'app:users', name: 'users', displayName: 'Users', url: '/admin/tool/app/users' },
@@ -52,8 +52,8 @@ describe('extensionGroups', () => {
     ]);
   });
 
-  it('names a widget after its interfaces and groups the ones sharing an interface', () => {
-    const groups = extensionGroups(
+  it('names an extension after its interfaces and groups the ones sharing an interface', () => {
+    const groups = adminGroups(
       info({
         adminExtensions: [
           {
@@ -85,26 +85,13 @@ describe('extensionGroups', () => {
     ]);
   });
 
-  it('leaves a widget that plugs into nothing without a suffix', () => {
-    const groups = extensionGroups(
+  it('leaves an extension that plugs into nothing without a suffix', () => {
+    const groups = adminGroups(
       info({
-        adminExtensions: [{ key: 'app:w', name: 'w', displayName: 'Widget', interfaces: [] }],
+        adminExtensions: [{ key: 'app:w', name: 'w', displayName: 'Extension', interfaces: [] }],
       }),
     );
 
-    expect(groups[0]?.items[0]?.label).toBe('Widget');
-  });
-
-  it('falls back to the name where an api carries no title', () => {
-    const groups = extensionGroups(
-      info({
-        apis: [
-          { key: 'app:styles', name: 'styles', displayName: '' },
-          { key: 'app:events', name: 'events', displayName: 'Events' },
-        ],
-      }),
-    );
-
-    expect(groups[0]?.items.map(({ label }) => label)).toEqual(['Events', 'styles']);
+    expect(groups[0]?.items[0]?.label).toBe('Extension');
   });
 });
