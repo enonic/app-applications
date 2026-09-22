@@ -4,41 +4,37 @@ import type {
   ApplicationInfo,
 } from '../../../entities/application';
 import { filledSections } from '../../../widgets/details-panel/details-panel';
+import { compareText } from './application-items';
 
 const TEXT = {
   tools: 'applications.details.tools',
   extensions: 'applications.details.extensions',
 } as const;
 
-export type ExtensionEntry = {
+export type AdminEntry = {
   key: string;
   label: string;
   url?: string;
 };
 
-export type ExtensionGroup = {
+export type AdminGroup = {
   labelKey: string;
-  items: readonly ExtensionEntry[];
+  items: readonly AdminEntry[];
 };
 
-function compare(a: string, b: string): number {
-  return a.localeCompare(b, undefined, { sensitivity: 'base' });
-}
-
-function adminToolEntries(tools: readonly AdminToolItem[]): ExtensionEntry[] {
+function adminToolEntries(tools: readonly AdminToolItem[]): AdminEntry[] {
   return tools
     .map(({ key, displayName, url }) => ({ key, label: displayName, url }))
-    .sort((a, b) => compare(a.label, b.label));
+    .sort((a, b) => compareText(a.label, b.label));
 }
 
-// Extensions sort by interface before display name, so the ones that surface in the same place in the
-// admin stay together.
-function extensionEntries(extensions: readonly AdminExtensionItem[]): ExtensionEntry[] {
+// Extensions sort by interface before display name
+function extensionEntries(extensions: readonly AdminExtensionItem[]): AdminEntry[] {
   return [...extensions]
     .sort(
       (a, b) =>
-        compare(a.interfaces.join(', '), b.interfaces.join(', ')) ||
-        compare(a.displayName, b.displayName),
+        compareText(a.interfaces.join(', '), b.interfaces.join(', ')) ||
+        compareText(a.displayName, b.displayName),
     )
     .map(({ key, displayName, interfaces }) => ({
       key,
@@ -47,7 +43,7 @@ function extensionEntries(extensions: readonly AdminExtensionItem[]): ExtensionE
 }
 
 /** What an application adds to the admin, in mockup order, groups with nothing in them dropped. */
-export function adminGroups(info: ApplicationInfo | undefined): ExtensionGroup[] {
+export function adminGroups(info: ApplicationInfo | undefined): AdminGroup[] {
   if (info == null) {
     return [];
   }

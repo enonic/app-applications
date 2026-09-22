@@ -1,4 +1,5 @@
 import type { ApplicationInfo } from '../../../entities/application';
+import { compareText } from './application-items';
 
 export type ApiEntry = {
   key: string;
@@ -12,5 +13,5 @@ export function apiEntries(info: ApplicationInfo | undefined): ApiEntry[] {
       key,
       label: displayName.length === 0 ? name : displayName,
     }))
-    .sort((a, b) => a.label.localeCompare(b.label, undefined, { sensitivity: 'base' }));
+    .sort((a, b) => compareText(a.label, b.label));
 }
