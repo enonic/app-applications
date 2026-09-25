@@ -1,12 +1,17 @@
 import { Button, Menu } from '@enonic/ui';
-import { ArrowDownUp } from 'lucide-react';
+import { ArrowDownUp, ArrowDownWideNarrow, ArrowUpWideNarrow } from 'lucide-react';
 
 import { useI18n } from '../../shared/i18n';
+import type { SortDirection } from './browse-sort';
 import { HEADER_CONTROL_CLASS, HEADER_CONTROL_LABEL_CLASS } from './header-controls';
 
 export type BrowseSortOption<Id extends string = string> = {
   id: Id;
+  /** The menu item, and the trigger's tooltip while this order holds. */
   label: string;
+  /** What the order is by, shown on the trigger beside the direction's icon. */
+  field: string;
+  direction: SortDirection;
 };
 
 export type BrowseSortProps<Id extends string = string> = {
@@ -36,18 +41,26 @@ export function BrowseSort<Id extends string = string>({
   // The default is this control's "nothing ticked": lighting it on every visit would say nothing.
   const active = defaultValue !== undefined && value !== defaultValue;
 
+  const current = options.find(({ id }) => id === value);
+  const icon =
+    current === undefined
+      ? ArrowDownUp
+      : current.direction === 'desc'
+        ? ArrowUpWideNarrow
+        : ArrowDownWideNarrow;
+
   return (
     <Menu>
       <Menu.Trigger asChild>
         <Button
           variant="text"
-          startIcon={ArrowDownUp}
-          title={sortLabel}
+          endIcon={icon}
+          title={current?.label ?? sortLabel}
           className={HEADER_CONTROL_CLASS}
           // Spread only when set, for the reason `BrowseFilter` gives.
           {...(active ? { 'data-active': 'true' } : {})}
         >
-          <span className={HEADER_CONTROL_LABEL_CLASS}>{sortLabel}</span>
+          <span className={HEADER_CONTROL_LABEL_CLASS}>{current?.field ?? sortLabel}</span>
         </Button>
       </Menu.Trigger>
       <Menu.Portal>
