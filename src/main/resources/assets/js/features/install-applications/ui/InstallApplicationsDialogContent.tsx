@@ -1,7 +1,7 @@
-import { cn, Dialog, Tab } from '@enonic/ui';
+import { cn, Dialog, SearchField, Tab } from '@enonic/ui';
 import { useStore } from '@nanostores/preact';
 import { Box } from 'lucide-react';
-import { useEffect, useMemo, useState } from 'preact/hooks';
+import { useMemo, useState } from 'preact/hooks';
 
 import { loadMarketApplications, useMarketApplications } from '../../../entities/market';
 import { useHostFrame } from '../../../shared/host';
@@ -10,13 +10,11 @@ import { DropZone } from '../../../shared/ui/DropZone';
 import { marketInstallIntent, runMarketInstall } from '../model/install-market-application';
 import { $marketInstalls } from '../model/install.store';
 import { JAR_ACCEPT } from '../model/jar-files';
-import { fallbackBucket, type MarketBucket } from '../model/market-filter';
 import type { MarketRow } from '../model/market-rows';
 import { marketView } from '../model/market-view';
 import { runJarUpload } from '../model/upload-applications';
 import { ConfirmMajorUpdate } from './ConfirmMajorUpdate';
 import { MarketApplicationList } from './MarketApplicationList';
-import { MarketFilterBar } from './MarketFilterBar';
 
 const MARKET_TAB = 'market';
 const UPLOAD_TAB = 'upload';
@@ -31,20 +29,14 @@ export function InstallApplicationsDialogContent() {
   const marketLabel = useI18n('applications.dialog.install.market');
   const uploadLabel = useI18n('applications.dialog.install.upload');
   const uploadHint = useI18n('applications.dialog.install.uploadHint');
+  const searchPlaceholder = useI18n('applications.dialog.install.search');
+  const clearLabel = useI18n('applications.dialog.install.searchClear');
 
   const [tab, setTab] = useState<string>(MARKET_TAB);
   const [query, setQuery] = useState('');
-  const [bucket, setBucket] = useState<MarketBucket>('all');
   const [confirming, setConfirming] = useState<MarketRow | undefined>(undefined);
 
-  const { counts, totals, rows } = useMemo(
-    () => marketView(items, query, bucket),
-    [items, query, bucket],
-  );
-
-  useEffect(() => {
-    setBucket((current) => fallbackBucket(current, totals));
-  }, [items]);
+  const rows = useMemo(() => marketView(items, query), [items, query]);
 
   const handleInstall = (row: MarketRow): void => {
     const intent = marketInstallIntent(row);
@@ -93,20 +85,23 @@ export function InstallApplicationsDialogContent() {
             </Tab.List>
 
             <Tab.Content value={MARKET_TAB} className="mt-0 flex min-h-0 flex-1 flex-col gap-6">
-              <MarketFilterBar
-                bucket={bucket}
-                counts={counts}
-                totals={totals}
-                query={query}
-                onBucketChange={setBucket}
-                onQueryChange={setQuery}
-              />
+              <SearchField
+                value={query}
+                onChange={setQuery}
+                placeholder={searchPlaceholder}
+                clearLabel={clearLabel}
+                className="h-9 w-full"
+              >
+                <SearchField.Icon />
+                <SearchField.Input aria-label={searchPlaceholder} />
+                <SearchField.Clear />
+              </SearchField>
 
-              <Dialog.Body>
+              <Dialog.Body className="-me-5 pe-5 lg:-me-10 lg:pe-10">
                 <MarketApplicationList
                   status={status}
                   rows={rows}
-                  narrowed={query.trim().length > 0 || bucket !== 'all'}
+                  narrowed={query.trim().length > 0}
                   installs={installs}
                   onInstall={handleInstall}
                   onRetry={() => void loadMarketApplications()}
