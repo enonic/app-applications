@@ -4,9 +4,15 @@ import { schemaGroups } from '../model/application-schema';
 
 export type ApplicationSchemaSectionProps = {
   info?: ApplicationInfo;
+  'data-component'?: string;
 };
 
-export function ApplicationSchemaSection({ info }: ApplicationSchemaSectionProps) {
+const APPLICATION_SCHEMA_SECTION_NAME = 'ApplicationSchemaSection';
+
+export function ApplicationSchemaSection({
+  info,
+  'data-component': componentName = APPLICATION_SCHEMA_SECTION_NAME,
+}: ApplicationSchemaSectionProps) {
   const groups = schemaGroups(info);
 
   if (groups.length === 0) {
@@ -14,7 +20,7 @@ export function ApplicationSchemaSection({ info }: ApplicationSchemaSectionProps
   }
 
   return (
-    <DetailsPanel.Section labelKey="applications.details.schemas">
+    <DetailsPanel.Section data-component={componentName} labelKey="applications.details.schemas">
       <div className="grid grid-cols-[repeat(auto-fill,minmax(8rem,1fr))] gap-6">
         {groups.map(({ labelKey, items }) => (
           <DetailsPanel.Subsection key={labelKey} labelKey={labelKey}>
@@ -31,3 +37,5 @@ export function ApplicationSchemaSection({ info }: ApplicationSchemaSectionProps
     </DetailsPanel.Section>
   );
 }
+
+ApplicationSchemaSection.displayName = APPLICATION_SCHEMA_SECTION_NAME;

@@ -9,9 +9,15 @@ import { ApplicationUpdateField } from './ApplicationUpdateField';
 
 export type ApplicationSummarySectionProps = {
   application: Application;
+  'data-component'?: string;
 };
 
-export function ApplicationSummarySection({ application }: ApplicationSummarySectionProps) {
+const APPLICATION_SUMMARY_SECTION_NAME = 'ApplicationSummarySection';
+
+export function ApplicationSummarySection({
+  application,
+  'data-component': componentName = APPLICATION_SUMMARY_SECTION_NAME,
+}: ApplicationSummarySectionProps) {
   const { key, description, version, minSystemVersion, maxSystemVersion, vendorName, vendorUrl } =
     application;
 
@@ -19,7 +25,10 @@ export function ApplicationSummarySection({ application }: ApplicationSummarySec
   const systemVersion = systemVersionPhrase(minSystemVersion, maxSystemVersion);
 
   return (
-    <DetailsPanel.Section labelKey="applications.details.application">
+    <DetailsPanel.Section
+      data-component={componentName}
+      labelKey="applications.details.application"
+    >
       {description !== undefined && (
         <DetailsPanel.Field labelKey="applications.details.info">{description}</DetailsPanel.Field>
       )}
@@ -54,3 +63,5 @@ export function ApplicationSummarySection({ application }: ApplicationSummarySec
     </DetailsPanel.Section>
   );
 }
+
+ApplicationSummarySection.displayName = APPLICATION_SUMMARY_SECTION_NAME;

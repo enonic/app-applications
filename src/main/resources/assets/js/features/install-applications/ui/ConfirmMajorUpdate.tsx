@@ -8,7 +8,11 @@ export type ConfirmMajorUpdateProps = {
   onConfirm: () => void;
   /** Back to the list, not out of the dialog: the operator answered the question, not the dialog. */
   onCancel: () => void;
+  /** On the header: the view has no root of its own, it renders into the dialog's content. */
+  'data-component'?: string;
 };
+
+const CONFIRM_MAJOR_UPDATE_NAME = 'ConfirmMajorUpdate';
 
 /**
  * The install dialog's other view: what it asks before an update crosses a major version, which is
@@ -16,7 +20,12 @@ export type ConfirmMajorUpdateProps = {
  *
  * The header and footer belong to the dialog around it — this renders inside its `Dialog.Content`.
  */
-export function ConfirmMajorUpdate({ row, onConfirm, onCancel }: ConfirmMajorUpdateProps) {
+export function ConfirmMajorUpdate({
+  row,
+  onConfirm,
+  onCancel,
+  'data-component': componentName = CONFIRM_MAJOR_UPDATE_NAME,
+}: ConfirmMajorUpdateProps) {
   const title = useI18n('applications.dialog.update.title', row.displayName, row.availableVersion);
   const question = useI18n(
     'applications.dialog.update.question',
@@ -30,6 +39,7 @@ export function ConfirmMajorUpdate({ row, onConfirm, onCancel }: ConfirmMajorUpd
   return (
     <>
       <Dialog.DefaultHeader
+        data-component={componentName}
         title={title}
         description={
           <>
@@ -50,3 +60,5 @@ export function ConfirmMajorUpdate({ row, onConfirm, onCancel }: ConfirmMajorUpd
     </>
   );
 }
+
+ConfirmMajorUpdate.displayName = CONFIRM_MAJOR_UPDATE_NAME;

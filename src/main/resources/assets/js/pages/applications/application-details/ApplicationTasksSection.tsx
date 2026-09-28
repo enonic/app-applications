@@ -7,9 +7,15 @@ import { byName } from '../model/application-items';
 
 export type ApplicationTasksSectionProps = {
   info?: ApplicationInfo;
+  'data-component'?: string;
 };
 
-export function ApplicationTasksSection({ info }: ApplicationTasksSectionProps) {
+const APPLICATION_TASKS_SECTION_NAME = 'ApplicationTasksSection';
+
+export function ApplicationTasksSection({
+  info,
+  'data-component': componentName = APPLICATION_TASKS_SECTION_NAME,
+}: ApplicationTasksSectionProps) {
   const keyLabel = useI18n('applications.details.key');
   const descriptionLabel = useI18n('applications.details.description');
 
@@ -20,7 +26,7 @@ export function ApplicationTasksSection({ info }: ApplicationTasksSectionProps) 
   }
 
   return (
-    <DetailsPanel.Section labelKey="applications.details.tasks">
+    <DetailsPanel.Section data-component={componentName} labelKey="applications.details.tasks">
       {/* ! One grid rather than a column per field: two independent lists stop lining up as soon as
           a description wraps, and then a key sits next to another task's description. */}
       <div className="grid grid-cols-[auto_1fr] gap-x-6 gap-y-1">
@@ -37,3 +43,5 @@ export function ApplicationTasksSection({ info }: ApplicationTasksSectionProps) 
     </DetailsPanel.Section>
   );
 }
+
+ApplicationTasksSection.displayName = APPLICATION_TASKS_SECTION_NAME;

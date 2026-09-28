@@ -6,14 +6,22 @@ import type { ActionContext, LabelledAction } from './actions';
 export type BrowseToolbarProps<T> = {
   actions: readonly LabelledAction<T>[];
   context: ActionContext<T>;
+  'data-component'?: string;
 };
 
-export function BrowseToolbar<T>({ actions, context }: BrowseToolbarProps<T>) {
+const BROWSE_TOOLBAR_NAME = 'BrowseToolbar';
+
+export function BrowseToolbar<T>({
+  actions,
+  context,
+  'data-component': componentName = BROWSE_TOOLBAR_NAME,
+}: BrowseToolbarProps<T>) {
   const toolbarLabel = useI18n('browse.toolbar');
 
   return (
     <Toolbar.Root>
       <Toolbar.Container
+        data-component={componentName}
         aria-label={toolbarLabel}
         className="bg-surface-neutral border-bdr-soft flex h-15 shrink-0 items-center gap-2 border-b px-5 py-2"
       >
@@ -27,3 +35,5 @@ export function BrowseToolbar<T>({ actions, context }: BrowseToolbarProps<T>) {
     </Toolbar.Root>
   );
 }
+
+BrowseToolbar.displayName = BROWSE_TOOLBAR_NAME;

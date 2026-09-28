@@ -13,20 +13,27 @@ export type BrowseListHeaderProps = {
   /** Section-specific control. Undefined renders the button inert — see § 3.6 of the contract. */
   filter?: ReactNode;
   sort?: ReactNode;
+  'data-component'?: string;
 };
+
+const BROWSE_LIST_HEADER_NAME = 'BrowseListHeader';
 
 export function BrowseListHeader({
   allSelected,
   onSelectAllChange,
   onRefresh,
   sort,
+  'data-component': componentName = BROWSE_LIST_HEADER_NAME,
 }: BrowseListHeaderProps) {
   const selectAllLabel = useI18n('browse.selectAll');
   const refreshLabel = useI18n('browse.refresh');
   const sortLabel = useI18n('browse.sort');
 
   return (
-    <div className="@container flex shrink-0 flex-wrap items-center justify-between gap-2">
+    <div
+      data-component={componentName}
+      className="@container flex shrink-0 flex-wrap items-center justify-between gap-2"
+    >
       {onSelectAllChange !== undefined && (
         <Checkbox
           checked={allSelected ?? false}
@@ -56,3 +63,5 @@ export function BrowseListHeader({
     </div>
   );
 }
+
+BrowseListHeader.displayName = BROWSE_LIST_HEADER_NAME;

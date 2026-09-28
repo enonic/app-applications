@@ -36,7 +36,10 @@ export type BrowseListProps = {
   loadingMore?: boolean;
   /** Why the last page did not arrive. Shown beside the control, since the rows are still valid. */
   loadMoreError?: string;
+  'data-component'?: string;
 };
+
+const BROWSE_LIST_NAME = 'BrowseList';
 
 export function BrowseList({
   rows,
@@ -52,6 +55,7 @@ export function BrowseList({
   onLoadMore,
   loadingMore,
   loadMoreError,
+  'data-component': componentName = BROWSE_LIST_NAME,
 }: BrowseListProps) {
   const loadMoreLabel = useI18n(
     loadingMore === true ? 'browse.list.loadingMore' : 'browse.list.loadMore',
@@ -138,7 +142,7 @@ export function BrowseList({
     ) : undefined;
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
+    <div data-component={componentName} className="flex min-h-0 flex-1 flex-col overflow-y-auto">
       {/* ! `selection` is the real ticks only; the active row without ticks is painted by `BrowseListRow`. */}
       <TreeList
         aria-label={listLabel}
@@ -172,3 +176,5 @@ export function BrowseList({
     </div>
   );
 }
+
+BrowseList.displayName = BROWSE_LIST_NAME;

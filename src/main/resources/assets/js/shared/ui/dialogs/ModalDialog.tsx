@@ -32,7 +32,11 @@ export type ModalDialogProps = {
   children?: ReactNode;
   onClose: () => void;
   onPrimary?: () => void;
+  /** The caller's name: on `Dialog.Content`, so a test tells one dialog from another. */
+  'data-component'?: string;
 };
+
+const MODAL_DIALOG_NAME = 'ModalDialog';
 
 // `medium` follows Content Studio's confirmation: wide enough for a control, floored so it does not
 // shrink to the text around it.
@@ -60,6 +64,7 @@ export function ModalDialog({
   children,
   onClose,
   onPrimary,
+  'data-component': componentName = MODAL_DIALOG_NAME,
 }: ModalDialogProps) {
   const { blocked, nested } = useDialogLayer(open);
 
@@ -86,6 +91,7 @@ export function ModalDialog({
         />
 
         <Dialog.Content
+          data-component={componentName}
           className={cn('gap-5 p-5 md:p-7.5', SIZES[size])}
           // ! Both keep this dialog from being dismissed by a gesture meant for the one above it: the
           // ! attribute takes it out of the other dialog's outside-click test, and the prevented default
@@ -155,3 +161,5 @@ export function ModalDialog({
     </Dialog>
   );
 }
+
+ModalDialog.displayName = MODAL_DIALOG_NAME;

@@ -10,7 +10,10 @@ export type ProgressBarProps = {
   /** What a screen reader calls it — the bar has no text of its own. */
   label?: string;
   className?: string;
+  'data-component'?: string;
 };
+
+const PROGRESS_BAR_NAME = 'ProgressBar';
 
 /**
  * How far along a piece of work is. `@enonic/ui` ships no progress component.
@@ -18,11 +21,18 @@ export type ProgressBarProps = {
  * Content Studio v6's `shared/ui/primitives/ProgressBar.tsx` is the same component; keep the two
  * portable. The `label` is ours — it has no counterpart there yet.
  */
-export function ProgressBar({ progress, animated = true, label, className }: ProgressBarProps) {
+export function ProgressBar({
+  progress,
+  animated = true,
+  label,
+  className,
+  'data-component': componentName = PROGRESS_BAR_NAME,
+}: ProgressBarProps) {
   const percent = clampProgress(progress);
 
   return (
     <div
+      data-component={componentName}
       role="progressbar"
       aria-label={label}
       aria-valuenow={percent}
@@ -41,3 +51,5 @@ export function ProgressBar({ progress, animated = true, label, className }: Pro
     </div>
   );
 }
+
+ProgressBar.displayName = PROGRESS_BAR_NAME;

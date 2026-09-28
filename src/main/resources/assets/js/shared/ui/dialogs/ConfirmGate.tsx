@@ -11,7 +11,10 @@ export type ConfirmGateProps = {
   confirmLabel?: string;
   inputRef?: Ref<HTMLInputElement>;
   className?: string;
+  'data-component'?: string;
 };
+
+const CONFIRM_GATE_NAME = 'ConfirmGate';
 
 const ERROR_DELAY_MS = 500;
 
@@ -21,6 +24,7 @@ export function ConfirmGate({
   confirmLabel,
   inputRef,
   className,
+  'data-component': componentName = CONFIRM_GATE_NAME,
 }: ConfirmGateProps) {
   const defaultConfirmLabel = useI18n('browse.dialog.confirm');
   const enterLabel = useI18n('browse.confirm.enterValue');
@@ -52,7 +56,10 @@ export function ConfirmGate({
   }, [entered, matched]);
 
   return (
-    <div className={cn('bg-surface-primary flex flex-col gap-2.5 rounded-lg p-7.5', className)}>
+    <div
+      data-component={componentName}
+      className={cn('bg-surface-primary flex flex-col gap-2.5 rounded-lg p-7.5', className)}
+    >
       <p className="text-xl">
         {enterLabel} <strong>{expected}</strong> {endingLabel}
       </p>
@@ -70,3 +77,5 @@ export function ConfirmGate({
     </div>
   );
 }
+
+ConfirmGate.displayName = CONFIRM_GATE_NAME;

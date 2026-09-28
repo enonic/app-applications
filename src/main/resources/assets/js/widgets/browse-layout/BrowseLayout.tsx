@@ -22,7 +22,10 @@ export type BrowseLayoutProps = {
    * shell, not under a router of its own, so only the section — which owns its sub-path — knows.
    */
   detailsShown?: boolean;
+  'data-component'?: string;
 };
+
+const BROWSE_LAYOUT_NAME = 'BrowseLayout';
 
 // Content Studio's SplitView.Handle, thin variant: a 1px line whose grab area is wider than
 // it is, the way react-resizable-panels expands the hit target around its separator.
@@ -31,7 +34,13 @@ const HANDLE_CLASS =
   'relative z-10 w-px shrink-0 cursor-col-resize transition-colors outline-none ' +
   'focus-visible:ring-3 after:absolute after:inset-y-0 after:-inset-x-2 after:content-[""]';
 
-export function BrowseLayout({ toolbar, list, details, detailsShown }: BrowseLayoutProps) {
+export function BrowseLayout({
+  toolbar,
+  list,
+  details,
+  detailsShown,
+  'data-component': componentName = BROWSE_LAYOUT_NAME,
+}: BrowseLayoutProps) {
   const resizeLabel = useI18n('browse.details.resize');
   const columnsRef = useRef<HTMLDivElement>(null);
   const draggingRef = useRef(false);
@@ -114,7 +123,7 @@ export function BrowseLayout({ toolbar, list, details, detailsShown }: BrowseLay
     );
 
   return (
-    <div className="flex min-h-0 min-w-0 flex-1 flex-col">
+    <div data-component={componentName} className="flex min-h-0 min-w-0 flex-1 flex-col">
       {toolbar}
 
       <div ref={columnsRef} className="flex min-h-0 flex-1">
@@ -128,3 +137,5 @@ export function BrowseLayout({ toolbar, list, details, detailsShown }: BrowseLay
     </div>
   );
 }
+
+BrowseLayout.displayName = BROWSE_LAYOUT_NAME;

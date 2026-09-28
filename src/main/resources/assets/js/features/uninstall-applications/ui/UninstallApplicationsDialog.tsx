@@ -7,11 +7,19 @@ import { ConfirmDialog } from '../../../shared/ui/dialogs/ConfirmDialog';
 import { ConfirmValueDialog } from '../../../shared/ui/dialogs/ConfirmValueDialog';
 import { $uninstallTargets, closeUninstallDialog } from '../model/uninstall-dialog.store';
 
+export type UninstallApplicationsDialogProps = {
+  'data-component'?: string;
+};
+
+const UNINSTALL_APPLICATIONS_DIALOG_NAME = 'UninstallApplicationsDialog';
+
 /**
  * Confirms an uninstall before it happens, and closes as it starts: the outcome is a toast per
  * application through this mount's frame, so there is nothing for the dialog to wait for.
  */
-export function UninstallApplicationsDialog() {
+export function UninstallApplicationsDialog({
+  'data-component': componentName = UNINSTALL_APPLICATIONS_DIALOG_NAME,
+}: UninstallApplicationsDialogProps) {
   const targets = useStore($uninstallTargets);
   const { notify } = useHostFrame();
 
@@ -34,6 +42,7 @@ export function UninstallApplicationsDialog() {
   if (count > 1) {
     return (
       <ConfirmValueDialog
+        data-component={componentName}
         open
         title={title}
         description={questionMultiple}
@@ -46,6 +55,7 @@ export function UninstallApplicationsDialog() {
 
   return (
     <ConfirmDialog
+      data-component={componentName}
       open={targets !== undefined}
       question={questionSingle}
       onClose={closeUninstallDialog}
@@ -53,3 +63,5 @@ export function UninstallApplicationsDialog() {
     />
   );
 }
+
+UninstallApplicationsDialog.displayName = UNINSTALL_APPLICATIONS_DIALOG_NAME;

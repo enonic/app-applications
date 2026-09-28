@@ -9,11 +9,17 @@ import { ApplicationStateMenu } from './ApplicationStateMenu';
 
 export type ApplicationDetailsHeaderProps = {
   application: Application;
+  'data-component'?: string;
 };
+
+const APPLICATION_DETAILS_HEADER_NAME = 'ApplicationDetailsHeader';
 
 const TOOLTIP_DELAY = 300;
 
-export function ApplicationDetailsHeader({ application }: ApplicationDetailsHeaderProps) {
+export function ApplicationDetailsHeader({
+  application,
+  'data-component': componentName = APPLICATION_DETAILS_HEADER_NAME,
+}: ApplicationDetailsHeaderProps) {
   // Absent for an application the market does not carry, and while the catalogue is still loading —
   // both mean no link rather than an empty one.
   const { marketApplication } = useMarketApplication(application.key);
@@ -24,6 +30,7 @@ export function ApplicationDetailsHeader({ application }: ApplicationDetailsHead
 
   return (
     <DetailsPanel.Header
+      data-component={componentName}
       icon={
         <ApplicationIcon
           icon={application.icon}
@@ -50,3 +57,5 @@ export function ApplicationDetailsHeader({ application }: ApplicationDetailsHead
     />
   );
 }
+
+ApplicationDetailsHeader.displayName = APPLICATION_DETAILS_HEADER_NAME;

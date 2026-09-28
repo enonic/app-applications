@@ -16,7 +16,10 @@ export type DropZoneProps = {
   /** Overrides the zone's own drag state, for a drop target larger than the zone. */
   isDragging?: boolean;
   className?: string;
+  'data-component'?: string;
 };
+
+const DROP_ZONE_NAME = 'DropZone';
 
 /** A box to click or drop files onto. Content Studio v6 has the same component; keep the two portable. */
 export function DropZone({
@@ -27,6 +30,7 @@ export function DropZone({
   multiple = false,
   isDragging,
   className,
+  'data-component': componentName = DROP_ZONE_NAME,
 }: DropZoneProps) {
   const inputId = `drop-zone-${useId()}`;
   const inputRef = useRef<HTMLInputElement>(null);
@@ -56,6 +60,7 @@ export function DropZone({
 
   return (
     <div
+      data-component={componentName}
       className={cn('size-full', className)}
       onDrop={handleDrop}
       onDragOver={(event) => {
@@ -89,3 +94,5 @@ export function DropZone({
     </div>
   );
 }
+
+DropZone.displayName = DROP_ZONE_NAME;

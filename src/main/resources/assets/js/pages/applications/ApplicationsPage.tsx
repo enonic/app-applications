@@ -46,6 +46,8 @@ import { applicationsSelection } from './model/selection.store';
 import { $applicationsSort, setApplicationsSort } from './model/sort.store';
 import { useApplicationsScreen } from './model/useApplicationsScreen';
 
+const APPLICATIONS_PAGE_NAME = 'ApplicationsPage';
+
 export function ApplicationsPage() {
   useApplicationsScreen();
   const { status, items } = useStore($applications);
@@ -152,9 +154,12 @@ export function ApplicationsPage() {
   /*
    * ! `details` is one element rather than a router's `<Outlet />`: the shell owns the url, so the
    * ! panel reads the active row from this mount's frame instead of from a child route.
+   *
+   * ? A root element rather than a fragment: the host keeps every section mounted, so a test scopes
+   * ? its selectors to this one by the name on it.
    */
   return (
-    <>
+    <div data-component={APPLICATIONS_PAGE_NAME} className="flex min-h-0 min-w-0 flex-1 flex-col">
       <BrowseScreen
         {...section}
         actions={actions}
@@ -188,6 +193,8 @@ export function ApplicationsPage() {
           <ConfirmMajorUpdateDialog />
         </>
       )}
-    </>
+    </div>
   );
 }
+
+ApplicationsPage.displayName = APPLICATIONS_PAGE_NAME;

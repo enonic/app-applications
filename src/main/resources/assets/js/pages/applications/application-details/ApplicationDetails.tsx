@@ -13,14 +13,21 @@ import { ApplicationWebAppSection } from './ApplicationWebAppSection';
 export type ApplicationDetailsProps = {
   application: Application;
   info: ApplicationInfoEntry;
+  'data-component'?: string;
 };
 
-export function ApplicationDetails({ application, info }: ApplicationDetailsProps) {
+const APPLICATION_DETAILS_NAME = 'ApplicationDetails';
+
+export function ApplicationDetails({
+  application,
+  info,
+  'data-component': componentName = APPLICATION_DETAILS_NAME,
+}: ApplicationDetailsProps) {
   const infoErrorMessage = useI18n('applications.details.infoError');
   const { status, info: provided } = info;
 
   return (
-    <DetailsPanel>
+    <DetailsPanel data-component={componentName}>
       <ApplicationDetailsHeader application={application} />
       <ApplicationSummarySection application={application} />
 
@@ -39,3 +46,5 @@ export function ApplicationDetails({ application, info }: ApplicationDetailsProp
     </DetailsPanel>
   );
 }
+
+ApplicationDetails.displayName = APPLICATION_DETAILS_NAME;

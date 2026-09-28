@@ -21,7 +21,11 @@ export type BrowseFilterProps = {
   mode?: 'single' | 'multiple';
   /** Shown under the entries when some of them could not be loaded, so a short list reads as such. */
   notice?: string;
+  /** On the trigger; the open menu is `<name>.Menu`, the way the library names its parts. */
+  'data-component'?: string;
 };
+
+const BROWSE_FILTER_NAME = 'BrowseFilter';
 
 /**
  * The `Filter list` control: the entries a section supplies, each optionally with a count.
@@ -34,6 +38,7 @@ export function BrowseFilter({
   onToggle,
   mode = 'multiple',
   notice,
+  'data-component': componentName = BROWSE_FILTER_NAME,
 }: BrowseFilterProps) {
   const filterLabel = useI18n('browse.filter');
   const activeLabel = useI18n('browse.filter.active', selected.size);
@@ -51,6 +56,7 @@ export function BrowseFilter({
     <Menu>
       <Menu.Trigger asChild>
         <Button
+          data-component={componentName}
           variant="text"
           startIcon={Filter}
           title={triggerLabel}
@@ -66,7 +72,7 @@ export function BrowseFilter({
         </Button>
       </Menu.Trigger>
       <Menu.Portal>
-        <Menu.Content align="end" className="min-w-56">
+        <Menu.Content data-component={`${componentName}.Menu`} align="end" className="min-w-56">
           {entries.map(({ id, label, count }) => {
             const ticked = selected.has(id);
             const Indicator = indicatorFor(mode, ticked);
@@ -109,6 +115,8 @@ export function BrowseFilter({
     </Menu>
   );
 }
+
+BrowseFilter.displayName = BROWSE_FILTER_NAME;
 
 function indicatorFor(mode: 'single' | 'multiple', ticked: boolean) {
   if (mode === 'single') {

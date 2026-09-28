@@ -21,7 +21,11 @@ export type MarketApplicationListProps = {
   installs: Readonly<Record<string, MarketInstall>>;
   onInstall: (row: MarketRow) => void;
   onRetry: () => void;
+  /** On whichever root the state renders: the skeleton, the message, or the list. */
+  'data-component'?: string;
 };
+
+const MARKET_APPLICATION_LIST_NAME = 'MarketApplicationList';
 
 const SKELETON_ROWS = 8;
 
@@ -33,6 +37,7 @@ export function MarketApplicationList({
   installs,
   onInstall,
   onRetry,
+  'data-component': componentName = MARKET_APPLICATION_LIST_NAME,
 }: MarketApplicationListProps) {
   const errorLabel = useI18n('applications.dialog.install.error');
   const emptyLabel = useI18n('applications.dialog.install.empty');
@@ -41,7 +46,7 @@ export function MarketApplicationList({
 
   if (status === 'loading') {
     return (
-      <div aria-busy="true" className={MARKET_LIST_CLASS}>
+      <div data-component={componentName} aria-busy="true" className={MARKET_LIST_CLASS}>
         {Array.from({ length: SKELETON_ROWS }, (_, index) => (
           <Skeleton.Group key={index} className={MARKET_GRID_CLASS}>
             <div className={cn(MARKET_APP_CELL_CLASS, 'flex items-center gap-2.5')}>
@@ -65,7 +70,7 @@ export function MarketApplicationList({
   }
   if (status === 'error') {
     return (
-      <div className="flex flex-col items-center gap-4 py-10">
+      <div data-component={componentName} className="flex flex-col items-center gap-4 py-10">
         <p role="alert" className="text-error text-sm">
           {errorLabel}
         </p>
@@ -75,9 +80,11 @@ export function MarketApplicationList({
   }
   if (rows.length === 0) {
     return narrowed ? (
-      <p className="text-subtle px-2.5 py-10 text-center text-sm">{noMatchesLabel}</p>
+      <p data-component={componentName} className="text-subtle px-2.5 py-10 text-center text-sm">
+        {noMatchesLabel}
+      </p>
     ) : (
-      <div className="flex flex-col items-center gap-4 py-10">
+      <div data-component={componentName} className="flex flex-col items-center gap-4 py-10">
         <p className="text-subtle text-sm">{emptyLabel}</p>
         <Button variant="outline" label={retryLabel} onClick={onRetry} />
       </div>
@@ -85,7 +92,7 @@ export function MarketApplicationList({
   }
 
   return (
-    <ul className={MARKET_LIST_CLASS}>
+    <ul data-component={componentName} className={MARKET_LIST_CLASS}>
       {rows.map((row) => (
         <MarketApplicationRow
           key={row.key}
@@ -97,3 +104,5 @@ export function MarketApplicationList({
     </ul>
   );
 }
+
+MarketApplicationList.displayName = MARKET_APPLICATION_LIST_NAME;

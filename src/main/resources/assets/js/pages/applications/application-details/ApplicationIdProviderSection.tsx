@@ -3,9 +3,15 @@ import { DetailsPanel } from '../../../widgets/details-panel/DetailsPanel';
 
 export type ApplicationIdProviderSectionProps = {
   info?: ApplicationInfo;
+  'data-component'?: string;
 };
 
-export function ApplicationIdProviderSection({ info }: ApplicationIdProviderSectionProps) {
+const APPLICATION_ID_PROVIDER_SECTION_NAME = 'ApplicationIdProviderSection';
+
+export function ApplicationIdProviderSection({
+  info,
+  'data-component': componentName = APPLICATION_ID_PROVIDER_SECTION_NAME,
+}: ApplicationIdProviderSectionProps) {
   const idProvider = info?.idProvider;
 
   if (idProvider == null || (idProvider.mode == null && idProvider.usedBy.length === 0)) {
@@ -13,7 +19,10 @@ export function ApplicationIdProviderSection({ info }: ApplicationIdProviderSect
   }
 
   return (
-    <DetailsPanel.Section labelKey="applications.details.idProviderApplications">
+    <DetailsPanel.Section
+      data-component={componentName}
+      labelKey="applications.details.idProviderApplications"
+    >
       <div className="@container">
         <div className="grid grid-cols-1 gap-6 @lg:grid-cols-2">
           {idProvider.mode != null && (
@@ -38,3 +47,5 @@ export function ApplicationIdProviderSection({ info }: ApplicationIdProviderSect
     </DetailsPanel.Section>
   );
 }
+
+ApplicationIdProviderSection.displayName = APPLICATION_ID_PROVIDER_SECTION_NAME;
