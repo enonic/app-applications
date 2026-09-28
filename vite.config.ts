@@ -65,6 +65,7 @@ export default defineConfig(({ mode }) => {
       '/lib/xp/app': join(import.meta.dirname, 'src/test/mocks/lib-xp-app.ts'),
       '/lib/xp/auth': join(import.meta.dirname, 'src/test/mocks/lib-xp-auth.ts'),
       '/lib/xp/i18n': join(import.meta.dirname, 'src/test/mocks/lib-xp-i18n.ts'),
+      '/lib/xp/io': join(import.meta.dirname, 'src/test/mocks/lib-xp-io.ts'),
       '/lib/xp/portal': join(import.meta.dirname, 'src/test/mocks/lib-xp-portal.ts'),
       '/lib/xp/schema': join(import.meta.dirname, 'src/test/mocks/lib-xp-schema.ts'),
       '/lib/xp/vhost': join(import.meta.dirname, 'src/test/mocks/lib-xp-vhost.ts'),
@@ -80,6 +81,7 @@ export default defineConfig(({ mode }) => {
       // Real sources, not doubles: no bean behind them, so there is nothing to stand in for.
       '/lib/i18n': join(import.meta.dirname, 'src/main/resources/lib/i18n.ts'),
       '/lib/market': join(import.meta.dirname, 'src/main/resources/lib/market.ts'),
+      '/apis': join(import.meta.dirname, 'src/main/resources/apis'),
     },
   };
 
