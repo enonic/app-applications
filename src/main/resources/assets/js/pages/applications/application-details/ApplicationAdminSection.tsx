@@ -6,9 +6,15 @@ import { adminGroups } from '../model/application-admin';
 
 export type ApplicationAdminSectionProps = {
   info?: ApplicationInfo;
+  'data-component'?: string;
 };
 
-export function ApplicationAdminSection({ info }: ApplicationAdminSectionProps) {
+const APPLICATION_ADMIN_SECTION_NAME = 'ApplicationAdminSection';
+
+export function ApplicationAdminSection({
+  info,
+  'data-component': componentName = APPLICATION_ADMIN_SECTION_NAME,
+}: ApplicationAdminSectionProps) {
   const groups = adminGroups(info);
 
   if (groups.length === 0) {
@@ -16,7 +22,7 @@ export function ApplicationAdminSection({ info }: ApplicationAdminSectionProps) 
   }
 
   return (
-    <DetailsPanel.Section labelKey="applications.details.admin">
+    <DetailsPanel.Section data-component={componentName} labelKey="applications.details.admin">
       <div className="@container">
         <div className="grid grid-cols-1 gap-6 @lg:grid-cols-2">
           {groups.map(({ labelKey, items }) => (
@@ -41,3 +47,5 @@ export function ApplicationAdminSection({ info }: ApplicationAdminSectionProps) 
     </DetailsPanel.Section>
   );
 }
+
+ApplicationAdminSection.displayName = APPLICATION_ADMIN_SECTION_NAME;

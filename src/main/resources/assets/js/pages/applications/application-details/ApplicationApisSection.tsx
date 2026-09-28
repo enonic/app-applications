@@ -4,9 +4,15 @@ import { apiEntries } from '../model/application-apis';
 
 export type ApplicationApisSectionProps = {
   info?: ApplicationInfo;
+  'data-component'?: string;
 };
 
-export function ApplicationApisSection({ info }: ApplicationApisSectionProps) {
+const APPLICATION_APIS_SECTION_NAME = 'ApplicationApisSection';
+
+export function ApplicationApisSection({
+  info,
+  'data-component': componentName = APPLICATION_APIS_SECTION_NAME,
+}: ApplicationApisSectionProps) {
   const apis = apiEntries(info);
 
   if (apis.length === 0) {
@@ -14,7 +20,7 @@ export function ApplicationApisSection({ info }: ApplicationApisSectionProps) {
   }
 
   return (
-    <DetailsPanel.Section labelKey="applications.details.apis">
+    <DetailsPanel.Section data-component={componentName} labelKey="applications.details.apis">
       <div className="flex flex-col items-start gap-1">
         {apis.map(({ key, label }) => (
           <span key={key} className="text-xs wrap-anywhere">
@@ -25,3 +31,5 @@ export function ApplicationApisSection({ info }: ApplicationApisSectionProps) {
     </DetailsPanel.Section>
   );
 }
+
+ApplicationApisSection.displayName = APPLICATION_APIS_SECTION_NAME;

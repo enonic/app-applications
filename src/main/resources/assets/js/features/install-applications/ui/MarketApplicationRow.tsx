@@ -18,12 +18,20 @@ export type MarketApplicationRowProps = {
   row: MarketRow;
   install?: MarketInstall;
   onInstall: (row: MarketRow) => void;
+  'data-component'?: string;
 };
+
+const MARKET_APPLICATION_ROW_NAME = 'MarketApplicationRow';
 
 const TOOLTIP_DELAY = 300;
 
 /** One market entry: what it is, its latest version, and what can be done with it. */
-export function MarketApplicationRow({ row, install, onInstall }: MarketApplicationRowProps) {
+export function MarketApplicationRow({
+  row,
+  install,
+  onInstall,
+  'data-component': componentName = MARKET_APPLICATION_ROW_NAME,
+}: MarketApplicationRowProps) {
   const installLabel = useI18n('applications.dialog.install.install');
   const updateLabel = useI18n('applications.dialog.install.update');
   const installedLabel = useI18n('applications.dialog.install.installed');
@@ -32,7 +40,7 @@ export function MarketApplicationRow({ row, install, onInstall }: MarketApplicat
   const installing = install != null;
 
   return (
-    <li className={cn(MARKET_GRID_CLASS, MARKET_ROW_CLASS)}>
+    <li data-component={componentName} className={cn(MARKET_GRID_CLASS, MARKET_ROW_CLASS)}>
       {/* App info */}
       <div className={MARKET_APP_CELL_CLASS}>
         <ItemLabel
@@ -80,3 +88,5 @@ export function MarketApplicationRow({ row, install, onInstall }: MarketApplicat
     </li>
   );
 }
+
+MarketApplicationRow.displayName = MARKET_APPLICATION_ROW_NAME;

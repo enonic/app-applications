@@ -16,11 +16,19 @@ import { runJarUpload } from '../model/upload-applications';
 import { ConfirmMajorUpdate } from './ConfirmMajorUpdate';
 import { MarketApplicationList } from './MarketApplicationList';
 
+export type InstallApplicationsDialogContentProps = {
+  'data-component'?: string;
+};
+
+const INSTALL_APPLICATIONS_DIALOG_CONTENT_NAME = 'InstallApplicationsDialogContent';
+
 const MARKET_TAB = 'market';
 const UPLOAD_TAB = 'upload';
 
 /** Where an application comes from: Enonic Market, or a jar the operator has in front of them */
-export function InstallApplicationsDialogContent() {
+export function InstallApplicationsDialogContent({
+  'data-component': componentName = INSTALL_APPLICATIONS_DIALOG_CONTENT_NAME,
+}: InstallApplicationsDialogContentProps) {
   const { status, items } = useMarketApplications();
   const installs = useStore($marketInstalls);
   const { notify } = useHostFrame();
@@ -58,6 +66,7 @@ export function InstallApplicationsDialogContent() {
 
   return (
     <Dialog.Content
+      data-component={componentName}
       // A fixed height while browsing: the drop zone fills what it is given, and the dialog must
       // not resize as the tabs switch.
       className={cn('gap-6 max-lg:p-5', confirming ? 'max-w-160' : 'h-176 max-w-5xl')}
@@ -124,3 +133,5 @@ export function InstallApplicationsDialogContent() {
     </Dialog.Content>
   );
 }
+
+InstallApplicationsDialogContent.displayName = INSTALL_APPLICATIONS_DIALOG_CONTENT_NAME;

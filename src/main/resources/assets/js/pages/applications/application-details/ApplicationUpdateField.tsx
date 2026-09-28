@@ -13,7 +13,10 @@ import { DetailsPanel } from '../../../widgets/details-panel/DetailsPanel';
 
 export type ApplicationUpdateFieldProps = {
   application: Application;
+  'data-component'?: string;
 };
+
+const APPLICATION_UPDATE_FIELD_NAME = 'ApplicationUpdateField';
 
 const TOOLTIP_DELAY = 300;
 
@@ -21,7 +24,10 @@ const TOOLTIP_DELAY = 300;
  * What the market offers over what is installed, with the update a press away — the install dialog
  * says the same thing, but only for someone who already suspected there was something to find.
  */
-export function ApplicationUpdateField({ application }: ApplicationUpdateFieldProps) {
+export function ApplicationUpdateField({
+  application,
+  'data-component': componentName = APPLICATION_UPDATE_FIELD_NAME,
+}: ApplicationUpdateFieldProps) {
   const { marketApplication } = useMarketApplication(application.key);
   const installs = useStore($marketInstalls);
   const { notify } = useHostFrame();
@@ -52,7 +58,10 @@ export function ApplicationUpdateField({ application }: ApplicationUpdateFieldPr
   );
 
   return (
-    <DetailsPanel.Field labelKey="applications.details.updateAvailable">
+    <DetailsPanel.Field
+      data-component={componentName}
+      labelKey="applications.details.updateAvailable"
+    >
       <span className="flex flex-col items-start gap-2.5">
         <span>
           {versionDate == null
@@ -71,3 +80,5 @@ export function ApplicationUpdateField({ application }: ApplicationUpdateFieldPr
     </DetailsPanel.Field>
   );
 }
+
+ApplicationUpdateField.displayName = APPLICATION_UPDATE_FIELD_NAME;

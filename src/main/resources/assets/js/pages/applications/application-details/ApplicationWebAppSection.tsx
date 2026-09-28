@@ -6,9 +6,15 @@ import { DetailsPanel } from '../../../widgets/details-panel/DetailsPanel';
 
 export type ApplicationWebAppSectionProps = {
   info?: ApplicationInfo;
+  'data-component'?: string;
 };
 
-export function ApplicationWebAppSection({ info }: ApplicationWebAppSectionProps) {
+const APPLICATION_WEB_APP_SECTION_NAME = 'ApplicationWebAppSection';
+
+export function ApplicationWebAppSection({
+  info,
+  'data-component': componentName = APPLICATION_WEB_APP_SECTION_NAME,
+}: ApplicationWebAppSectionProps) {
   const deploymentPath = info?.deploymentPath;
 
   if (deploymentPath == null || deploymentPath.length === 0) {
@@ -20,7 +26,7 @@ export function ApplicationWebAppSection({ info }: ApplicationWebAppSectionProps
   const linkable = !hasVirtualHosts();
 
   return (
-    <DetailsPanel.Section labelKey="applications.details.webApp">
+    <DetailsPanel.Section data-component={componentName} labelKey="applications.details.webApp">
       <DetailsPanel.Subsection labelKey="applications.details.internalPath">
         <div className="flex flex-col items-start gap-1">
           {linkable ? (
@@ -35,3 +41,5 @@ export function ApplicationWebAppSection({ info }: ApplicationWebAppSectionProps
     </DetailsPanel.Section>
   );
 }
+
+ApplicationWebAppSection.displayName = APPLICATION_WEB_APP_SECTION_NAME;

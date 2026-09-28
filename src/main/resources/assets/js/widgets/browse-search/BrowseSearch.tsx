@@ -7,15 +7,24 @@ export type BrowseSearchProps = {
   onChange: (value: string) => void;
   /** Searching is not wired yet — see docs/browse-framework.md § 3.6. */
   disabled?: boolean;
+  'data-component'?: string;
 };
 
-export function BrowseSearch({ value, onChange, disabled }: BrowseSearchProps) {
+const BROWSE_SEARCH_NAME = 'BrowseSearch';
+
+export function BrowseSearch({
+  value,
+  onChange,
+  disabled,
+  'data-component': componentName = BROWSE_SEARCH_NAME,
+}: BrowseSearchProps) {
   const placeholder = useI18n('browse.search.placeholder');
   const clearLabel = useI18n('browse.search.clear');
   const inputLabel = useI18n('browse.search.label');
 
   return (
     <SearchField
+      data-component={componentName}
       value={value}
       onChange={onChange}
       disabled={disabled}
@@ -29,3 +38,5 @@ export function BrowseSearch({ value, onChange, disabled }: BrowseSearchProps) {
     </SearchField>
   );
 }
+
+BrowseSearch.displayName = BROWSE_SEARCH_NAME;

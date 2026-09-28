@@ -6,11 +6,21 @@ export type ItemLabelProps = {
   secondary?: ReactNode;
   icon?: ReactNode;
   className?: string;
+  'data-component'?: string;
 };
 
-export function ItemLabel({ primary, secondary, icon, className }: ItemLabelProps) {
+const ITEM_LABEL_NAME = 'ItemLabel';
+
+export function ItemLabel({
+  primary,
+  secondary,
+  icon,
+  className,
+  'data-component': componentName = ITEM_LABEL_NAME,
+}: ItemLabelProps) {
   return (
     <div
+      data-component={componentName}
       className={cn(
         'grid items-center gap-2.5',
         icon ? 'grid-cols-[auto_1fr]' : 'grid-cols-1',
@@ -36,3 +46,5 @@ export function ItemLabel({ primary, secondary, icon, className }: ItemLabelProp
     </div>
   );
 }
+
+ItemLabel.displayName = ITEM_LABEL_NAME;

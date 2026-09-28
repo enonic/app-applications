@@ -14,7 +14,10 @@ export type BrowseListRowProps = {
   onClick: (key: string) => void;
   /** Right-click retargets the row before the context menu around the list opens. */
   onContextMenu: (key: string) => void;
+  'data-component'?: string;
 };
+
+const BROWSE_LIST_ROW_NAME = 'BrowseListRow';
 
 // Row geometry follows Content Studio's content tree rows; the focus ring is `TreeList`'s own.
 const ROW_CLASS = 'min-h-12';
@@ -31,6 +34,7 @@ export function BrowseListRow({
   onSelectedChange,
   onClick,
   onContextMenu,
+  'data-component': componentName = BROWSE_LIST_ROW_NAME,
 }: BrowseListRowProps) {
   const { key, title, subtitle, icon, meta, disabled, dimmed, selectable } = row;
 
@@ -38,6 +42,7 @@ export function BrowseListRow({
     // ! `onClick` and `data-tone` replace `TreeList.Row`'s own: its click never drops the ticks, and it
     // ! paints only the ticked rows. The checkbox is ours too: `RowSelectionControl` labels itself in English.
     <TreeList.Row
+      data-component={componentName}
       id={key}
       disabled={disabled}
       selectable={selectable !== false}
@@ -91,3 +96,5 @@ export function BrowseListRow({
     </TreeList.Row>
   );
 }
+
+BrowseListRow.displayName = BROWSE_LIST_ROW_NAME;

@@ -7,7 +7,10 @@ export type DialogIdentityHeaderProps = {
   label: string;
   error?: string;
   onInput: (value: string) => void;
+  'data-component'?: string;
 };
+
+const DIALOG_IDENTITY_HEADER_NAME = 'DialogIdentityHeader';
 
 export function DialogIdentityHeader({
   icon,
@@ -16,9 +19,10 @@ export function DialogIdentityHeader({
   label,
   error,
   onInput,
+  'data-component': componentName = DIALOG_IDENTITY_HEADER_NAME,
 }: DialogIdentityHeaderProps) {
   return (
-    <div className="flex min-w-0 flex-col gap-1">
+    <div data-component={componentName} className="flex min-w-0 flex-col gap-1">
       <div className="flex min-w-0 items-center gap-4">
         <span className="text-main flex size-11 shrink-0 items-center justify-center">{icon}</span>
 
@@ -38,3 +42,5 @@ export function DialogIdentityHeader({
     </div>
   );
 }
+
+DialogIdentityHeader.displayName = DIALOG_IDENTITY_HEADER_NAME;

@@ -8,12 +8,17 @@ export type BrowseListContextMenuProps<T> = {
   actions: readonly LabelledAction<T>[];
   context: ActionContext<T>;
   children: ReactNode;
+  /** On the menu itself, not the trigger: the trigger is the list's wrapper. */
+  'data-component'?: string;
 };
+
+const BROWSE_LIST_CONTEXT_MENU_NAME = 'BrowseListContextMenu';
 
 export function BrowseListContextMenu<T>({
   actions,
   context,
   children,
+  'data-component': componentName = BROWSE_LIST_CONTEXT_MENU_NAME,
 }: BrowseListContextMenuProps<T>) {
   if (actions.length === 0) {
     return <>{children}</>;
@@ -23,7 +28,7 @@ export function BrowseListContextMenu<T>({
     <ContextMenu>
       <ContextMenu.Trigger className="flex min-h-0 flex-1 flex-col">{children}</ContextMenu.Trigger>
       <ContextMenu.Portal>
-        <ContextMenu.Content className="min-w-36">
+        <ContextMenu.Content data-component={componentName} className="min-w-36">
           {actions.map((action) => (
             <ContextMenu.Item
               key={action.id}
@@ -38,3 +43,5 @@ export function BrowseListContextMenu<T>({
     </ContextMenu>
   );
 }
+
+BrowseListContextMenu.displayName = BROWSE_LIST_CONTEXT_MENU_NAME;

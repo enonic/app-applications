@@ -11,7 +11,10 @@ export type ConfirmDialogProps = {
   children?: ReactNode;
   onClose: () => void;
   onConfirm?: () => void;
+  'data-component'?: string;
 };
+
+const CONFIRM_DIALOG_NAME = 'ConfirmDialog';
 
 export function ConfirmDialog({
   open,
@@ -21,6 +24,7 @@ export function ConfirmDialog({
   children,
   onClose,
   onConfirm,
+  'data-component': componentName = CONFIRM_DIALOG_NAME,
 }: ConfirmDialogProps) {
   const title = useI18n('browse.confirm.title');
   const confirmLabel = useI18n('browse.dialog.confirm');
@@ -29,6 +33,7 @@ export function ConfirmDialog({
 
   return (
     <ModalDialog
+      data-component={componentName}
       open={open}
       title={title}
       primaryLabel={confirmLabel}
@@ -47,3 +52,5 @@ export function ConfirmDialog({
     </ModalDialog>
   );
 }
+
+ConfirmDialog.displayName = CONFIRM_DIALOG_NAME;
