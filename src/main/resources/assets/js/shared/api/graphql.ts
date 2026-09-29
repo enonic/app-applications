@@ -1,7 +1,6 @@
+import { AppError } from '@enonic/ui-utils';
+import { requestJson } from '@enonic/ui-utils/request';
 import { err, errAsync, ok, type Result, ResultAsync } from 'neverthrow';
-
-import { requestJson } from './client';
-import { AppError } from './errors';
 
 export type GraphQlVariables = Record<string, unknown>;
 

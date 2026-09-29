@@ -1,6 +1,6 @@
+import type { AppError } from '@enonic/ui-utils';
 import type { Result, ResultAsync } from 'neverthrow';
 
-import type { AppError } from '../../../shared/api';
 import type { Notify } from '../../../shared/host';
 import { i18n } from '../../../shared/i18n';
 import {

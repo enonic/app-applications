@@ -1,6 +1,5 @@
+import { AppError } from '@enonic/ui-utils';
 import { ResultAsync } from 'neverthrow';
-
-import { AppError } from './errors';
 
 export type UploadOptions = {
   /** Multipart payload, sent as-is so the browser writes the boundary. */

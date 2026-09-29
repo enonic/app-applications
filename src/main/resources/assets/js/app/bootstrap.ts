@@ -1,6 +1,8 @@
+import { type Phrases } from '@enonic/ui-utils';
+
 import { requestGraphQlRoots, setGraphQlEndpoint, type GraphQlRoot } from '../shared/api';
 import { setConfig, type Config } from '../shared/config';
-import { setPhrases, type Phrases } from '../shared/i18n';
+import { setPhrases } from '../shared/i18n';
 import type { Host } from '../shared/sections';
 import { bootstrapFailed, bootstrapReady } from './bootstrap.store';
 import { startSectionEvents } from './events';
