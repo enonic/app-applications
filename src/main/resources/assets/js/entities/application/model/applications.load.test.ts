@@ -1,7 +1,7 @@
+import { AppError } from '@enonic/ui-utils';
 import { errAsync, ResultAsync } from 'neverthrow';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { AppError } from '../../../shared/api';
 import { fetchApplication, fetchApplications } from '../api/applications.api';
 import type { Application } from './application.types';
 import { ensureApplications, loadApplication, loadApplications } from './applications.load';

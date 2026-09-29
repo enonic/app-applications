@@ -1,6 +1,7 @@
+import { type AppError } from '@enonic/ui-utils';
 import type { ResultAsync } from 'neverthrow';
 
-import { type AppError, type GraphQlRoot, requestGraphQl } from '../../../shared/api';
+import { type GraphQlRoot, requestGraphQl } from '../../../shared/api';
 import type { MarketApplication, MarketApplicationVersion } from '../model/market.types';
 
 const MARKET_APPLICATIONS_SELECTION = `{

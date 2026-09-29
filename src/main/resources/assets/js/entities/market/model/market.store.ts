@@ -1,7 +1,7 @@
+import type { AppError } from '@enonic/ui-utils';
 import { map } from 'nanostores';
 import type { Result } from 'neverthrow';
 
-import type { AppError } from '../../../shared/api';
 import type { MarketApplication } from './market.types';
 
 export type MarketApplicationsState = {

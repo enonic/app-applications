@@ -1,9 +1,9 @@
+import { AppError } from '@enonic/ui-utils';
 import { err, ok } from 'neverthrow';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { installApplication } from '../../../entities/application';
 import { marketLoadSettled } from '../../../entities/market';
-import { AppError } from '../../../shared/api';
 import { marketInstallIntent, runMarketInstall } from './install-market-application';
 import { $marketInstalls, beginInstall } from './install.store';
 import type { MarketRow } from './market-rows';

@@ -1,4 +1,6 @@
-import { $phrases, localize, type PhraseValue } from './i18n.store';
+import { localize, type PhraseValue } from '@enonic/ui-utils';
+
+import { $phrases } from './i18n.store';
 
 /**
  * The phrase behind a key, with `{0}`-style placeholders filled in.

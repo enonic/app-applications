@@ -85,7 +85,8 @@ relevant rule before writing in that area.
 `widgets/`, `shared/ui/` and most of `shared/` are duplicated with app-users on purpose, byte for byte
 where the code is the same: `@enonic/ui-kit` and `@enonic/ui-utils` (the `npm-enonic-ui-toolkit`
 repository) will extract the common ground, and two identical copies extract as a move. `cmp` against
-`../app-users/assets/js` is the drift check. Keep anything written here portable — no reaching for this
+`../app-users/assets/js` is the drift check. The request transport, `AppError` and the i18n core
+(`localize`, `fromPhrases`) have already moved and are imported from `@enonic/ui-utils` directly. Keep anything written here portable — no reaching for this
 app's config, stores or i18n keys beyond what props carry. The browse screen these widgets make up is
 specified in the toolkit's `docs/browse-framework.md`; app-settings is a shell now and carries none of
 this code.

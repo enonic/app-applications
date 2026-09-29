@@ -1,7 +1,7 @@
+import { AppError } from '@enonic/ui-utils';
 import { errAsync, ResultAsync } from 'neverthrow';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { AppError } from '../../../shared/api';
 import { fetchMarketApplications } from '../api/market.api';
 import { ensureMarketApplications, loadMarketApplications, marketLoadSettled } from './market.load';
 import { $marketApplications } from './market.store';

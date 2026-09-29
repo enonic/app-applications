@@ -1,7 +1,6 @@
+import type { AppError } from '@enonic/ui-utils';
 import { atom, type ReadableAtom } from 'nanostores';
 import { err, ok, type Result, type ResultAsync } from 'neverthrow';
-
-import type { AppError } from '../api';
 
 /**
  * ! The debounce is what makes arrow-key navigation affordable. The active row moves the route, so

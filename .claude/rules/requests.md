@@ -15,7 +15,9 @@ config**, because this app has no page of its own.
 An `api/` segment is the only place that talks to the server. Two entity slices have one:
 `application`, and `market` — what Enonic Market offers, a different domain from what is installed.
 
-- Everything goes through `shared/api` and returns `ResultAsync<T, AppError>` — errors are values.
+- Everything returns `ResultAsync<T, AppError>` — errors are values. The transport is `requestJson`
+  from `@enonic/ui-utils/request` and `AppError` comes from `@enonic/ui-utils`, both imported directly;
+  `shared/api` builds the GraphQL queue and the upload on top of them.
 - **Two url sources, one of them the host's.** Our own data plane is `POST <host.baseUrl>/graphql`, set
   once by `setGraphQlEndpoint` in `app/bootstrap.ts`. XP core's apis come from our own server instead —
   `config.serverAppUrl`, joined with a path by `serverAppUrl()` in `shared/config`. It answers

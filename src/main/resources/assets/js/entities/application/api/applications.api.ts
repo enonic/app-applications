@@ -1,11 +1,11 @@
+import { AppError } from '@enonic/ui-utils';
+import { requestJson } from '@enonic/ui-utils/request';
 import { errAsync, type ResultAsync } from 'neverthrow';
 
 import {
-  AppError,
   type GraphQlRoot,
   requestGraphQl,
   requestGraphQlDocument,
-  requestJson,
   requestUploadJson,
 } from '../../../shared/api';
 import { serverAppUrl } from '../../../shared/config';

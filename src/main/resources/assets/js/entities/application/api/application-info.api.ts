@@ -1,6 +1,7 @@
+import { type AppError } from '@enonic/ui-utils';
 import type { ResultAsync } from 'neverthrow';
 
-import { type AppError, requestGraphQlDocument } from '../../../shared/api';
+import { requestGraphQlDocument } from '../../../shared/api';
 import type {
   AdminExtensionItem,
   AdminToolItem,

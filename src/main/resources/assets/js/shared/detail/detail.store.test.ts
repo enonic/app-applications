@@ -1,7 +1,7 @@
+import { AppError } from '@enonic/ui-utils';
 import { errAsync, okAsync, type ResultAsync } from 'neverthrow';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { AppError } from '../api';
 import { createDetailLoader } from './detail.store';
 
 const DEBOUNCE_MS = 250;

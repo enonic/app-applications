@@ -1,7 +1,7 @@
+import type { PhraseValue } from '@enonic/ui-utils';
 import { useMemo } from 'preact/hooks';
 
 import { i18n } from './i18n';
-import type { PhraseValue } from './i18n.store';
 
 /**
  * One resolved phrase, for a component to name at the top and render by that name.
