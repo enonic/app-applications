@@ -53,8 +53,8 @@ importers:
         specifier: ^10.0.0
         version: 10.0.0(@types/node@26.6.4)(expect-webdriverio@8.0.0-alpha.3(@wdio/types@10.0.0)(webdriverio@9.32.0))(yauzl@2.10.0)
       '@wdio/concise-reporter':
-        specifier: ^9.31.2
-        version: 9.32.0
+        specifier: ^10.0.0
+        version: 10.0.0
       '@wdio/local-runner':
         specifier: ^9.31.5
         version: 9.32.0(@wdio/globals@10.0.0(expect-webdriverio@8.0.0-alpha.3(@wdio/types@10.0.0)(webdriverio@9.32.0))(webdriverio@9.32.0))(webdriverio@9.32.0)
@@ -540,9 +540,9 @@ packages:
     engines: {node: '>=22.19.0'}
     hasBin: true
 
-  '@wdio/concise-reporter@9.32.0':
-    resolution: {integrity: sha512-ZZBWTGubo0mGruzohk1WRh1zGV7BpdoLo0IyG06wKYCdhb80EBKAdsBiRRTF3dT3Z/BxIQGu0hMkgvle/BiDDQ==}
-    engines: {node: '>=18.20.0'}
+  '@wdio/concise-reporter@10.0.0':
+    resolution: {integrity: sha512-WpE0lTG5o5uM9557Cv9TKgbA55AflfIFUX+FYUvxaX9kPmBwZVImCIzy5hRIeYg8lBA3w4a6fNQd0Rej4HFung==}
+    engines: {node: '>=22.19.0'}
 
   '@wdio/config@10.0.0':
     resolution: {integrity: sha512-g0xaQxKJM5hIhZBW05Ivs7vZi/txB+UcWeoiuzNl0/fS5rvQYvofnYlROvCBKeEdf72ooIRtfkRnW8nKQ97P+A==}
@@ -604,6 +604,10 @@ packages:
   '@wdio/repl@9.16.2':
     resolution: {integrity: sha512-FLTF0VL6+o5BSTCO7yLSXocm3kUnu31zYwzdsz4n9s5YWt83sCtzGZlZpt7TaTzb3jVUfxuHNQDTb8UMkCu0lQ==}
     engines: {node: '>=18.20.0'}
+
+  '@wdio/reporter@10.0.0':
+    resolution: {integrity: sha512-qPxe2dq0hFDd6AZj6Z3SunpMvCOv9UdXS3CINtSrJweGNGHj1VltSNVPVqWYWwzs3ywuEjGg2t91JIQVxgfgWA==}
+    engines: {node: '>=22.19.0'}
 
   '@wdio/reporter@9.32.0':
     resolution: {integrity: sha512-9z8pG7zAayRXwheN8BH6YNuzyPJ/kFIRyPl2fsD+6IvF/LFSptXPlk2XjcnKvY9Am6Lif5oAwebDFcLHp1ztAA==}
@@ -976,6 +980,10 @@ packages:
   degenerator@5.0.1:
     resolution: {integrity: sha512-TllpMR/t0M5sqCXfj85i4XaAzxmS5tVA16dqvdkMwGmzI+dXLXnw3J+3Vdv7VKw+ThlTMboK6i9rnZ6Nntj5CQ==}
     engines: {node: '>= 14'}
+
+  diff@8.0.4:
+    resolution: {integrity: sha512-DPi0FmjiSU5EvQV0++GFDOJ9ASQUVFh5kD+OzOnYdi7n3Wpm9hWWGfB/O2blfHcMVTL5WkQXSnRiK9makhrcnw==}
+    engines: {node: '>=0.3.1'}
 
   diff@9.0.0:
     resolution: {integrity: sha512-svtcdpS8CgJyqAjEQIXdb3OjhFVVYjzGAPO8WGCmRbrml64SPw/jJD4GoE98aR7r25A0XcgrK3F02yw9R/vhQw==}
@@ -2558,12 +2566,12 @@ snapshots:
       - utf-8-validate
       - yauzl
 
-  '@wdio/concise-reporter@9.32.0':
+  '@wdio/concise-reporter@10.0.0':
     dependencies:
-      '@wdio/reporter': 9.32.0
-      '@wdio/types': 9.32.0
+      '@wdio/reporter': 10.0.0
+      '@wdio/types': 10.0.0
       chalk: 5.6.2
-      pretty-ms: 9.3.0
+      pretty-ms: 9.3.1
 
   '@wdio/config@10.0.0(yauzl@2.10.0)':
     dependencies:
@@ -2683,6 +2691,13 @@ snapshots:
   '@wdio/repl@9.16.2':
     dependencies:
       '@types/node': 20.19.43
+
+  '@wdio/reporter@10.0.0':
+    dependencies:
+      '@types/node': 22.20.5
+      '@wdio/types': 10.0.0
+      diff: 8.0.4
+      object-inspect: 1.13.4
 
   '@wdio/reporter@9.32.0':
     dependencies:
@@ -3105,6 +3120,8 @@ snapshots:
       ast-types: 0.13.4
       escodegen: 2.1.0
       esprima: 4.0.1
+
+  diff@8.0.4: {}
 
   diff@9.0.0: {}
 
