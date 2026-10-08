@@ -53,8 +53,8 @@ importers:
         specifier: ^10.0.0
         version: 10.0.0(@types/node@26.6.4)(expect-webdriverio@8.0.0-alpha.3(@wdio/types@10.0.0)(webdriverio@9.32.0))(yauzl@2.10.0)
       '@wdio/concise-reporter':
-        specifier: ^9.31.2
-        version: 9.32.0
+        specifier: ^10.0.0
+        version: 10.0.0
       '@wdio/local-runner':
         specifier: ^9.31.5
         version: 9.32.0(@wdio/globals@10.0.0(expect-webdriverio@8.0.0-alpha.3(@wdio/types@10.0.0)(webdriverio@9.32.0))(webdriverio@9.32.0))(webdriverio@9.32.0)
@@ -540,9 +540,9 @@ packages:
     engines: {node: '>=22.19.0'}
     hasBin: true
 
-  '@wdio/concise-reporter@9.32.0':
-    resolution: {integrity: sha512-ZZBWTGubo0mGruzohk1WRh1zGV7BpdoLo0IyG06wKYCdhb80EBKAdsBiRRTF3dT3Z/BxIQGu0hMkgvle/BiDDQ==}
-    engines: {node: '>=18.20.0'}
+  '@wdio/concise-reporter@10.0.0':
+    resolution: {integrity: sha512-WpE0lTG5o5uM9557Cv9TKgbA55AflfIFUX+FYUvxaX9kPmBwZVImCIzy5hRIeYg8lBA3w4a6fNQd0Rej4HFung==}
+    engines: {node: '>=22.19.0'}
 
   '@wdio/config@10.0.0':
     resolution: {integrity: sha512-g0xaQxKJM5hIhZBW05Ivs7vZi/txB+UcWeoiuzNl0/fS5rvQYvofnYlROvCBKeEdf72ooIRtfkRnW8nKQ97P+A==}
@@ -2566,12 +2566,12 @@ snapshots:
       - utf-8-validate
       - yauzl
 
-  '@wdio/concise-reporter@9.32.0':
+  '@wdio/concise-reporter@10.0.0':
     dependencies:
-      '@wdio/reporter': 9.32.0
-      '@wdio/types': 9.32.0
+      '@wdio/reporter': 10.0.0
+      '@wdio/types': 10.0.0
       chalk: 5.6.2
-      pretty-ms: 9.3.0
+      pretty-ms: 9.3.1
 
   '@wdio/config@10.0.0(yauzl@2.10.0)':
     dependencies:
