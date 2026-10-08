@@ -47,8 +47,8 @@ importers:
   .:
     devDependencies:
       '@wdio/allure-reporter':
-        specifier: ^9.31.4
-        version: 9.32.0
+        specifier: ^10.0.0
+        version: 10.0.0
       '@wdio/cli':
         specifier: ^10.0.0
         version: 10.0.0(@types/node@26.6.4)(expect-webdriverio@8.0.0-alpha.3(@wdio/types@10.0.0)(webdriverio@9.32.0))(yauzl@2.10.0)
@@ -531,9 +531,9 @@ packages:
   '@vitest/utils@5.0.3':
     resolution: {integrity: sha512-77fDTZv8eu1CzlIfgPU2yrl5MXSUaUAOvgdZEeVm3X3WIxUubIX2SforqS6176lT32HCF6uBVMYVqfHxw7o6eg==}
 
-  '@wdio/allure-reporter@9.32.0':
-    resolution: {integrity: sha512-GP7H/X2A80YiGhWaK3BBoizv2tcY3czUJWeIrbSNcbydph/zKDrATn7+QTI9qcX9Cm/EecV1H5MzvmEHMfwWFg==}
-    engines: {node: '>=18.20.0'}
+  '@wdio/allure-reporter@10.0.0':
+    resolution: {integrity: sha512-03hn9dqbehHgJYFs4AP+F2uzkygw3H56rbBZG1WsXVFNqJXQrM3CVF2ZLNTRHQ3ALNYPS45xbDEQmK3k8/ll+w==}
+    engines: {node: '>=22.19.0'}
 
   '@wdio/cli@10.0.0':
     resolution: {integrity: sha512-m8ILazuQQLfdE14IEFrrJLTXkz25Nomhnypw7p5royHuxacB643+d9fYjX4VrI0h/Nufomg2ua/vxRMTm6wVBA==}
@@ -685,10 +685,10 @@ packages:
     resolution: {integrity: sha512-4HTxbXR9D2+cJV9z4MO/IUa7sfYiLLXBP3/4MWSqC63ey55wBMvXAk83yZYwJ2t+jKU1Z7QW6LgCUx0BhPy9EQ==}
     hasBin: true
 
-  allure-js-commons@3.10.2:
-    resolution: {integrity: sha512-5nAjUF1iNPSQMwKtEsadclSta8C3L705/k/pIzGb9M6P9krgfRaCyaEHt8pkLlCP9NFj5xk3grjtnAhiLeT+Kg==}
+  allure-js-commons@3.13.0:
+    resolution: {integrity: sha512-NC4qcbmfpuYTstdw+EgimzhpHD2T85wzBNWRMPpu9rukkLzRlLvSmUCo5hy6vEvwQd9BUQh2yMFplJ+shIpVrA==}
     peerDependencies:
-      allure-playwright: 3.10.2
+      allure-playwright: 3.13.0
     peerDependenciesMeta:
       allure-playwright:
         optional: true
@@ -942,8 +942,8 @@ packages:
     resolution: {integrity: sha512-u/O3vwbptzhMs3L1fQE82ZSLHQQfto5gyZzwteVIEyeaY5Fc7R4dapF/BvRoSYFeqfBk4m0V1Vafq5Pjv25wvA==}
     engines: {node: '>= 6'}
 
-  csv-stringify@6.8.3:
-    resolution: {integrity: sha512-gIeSCvq5F4VtXV3naV3VAewLhBkiZBz+PPhTOA8H3Y8h/ELa+R1ml0GZck/4/Nzo9ep2lvOluilJ6MJlbZsKMA==}
+  csv-stringify@6.9.0:
+    resolution: {integrity: sha512-6b3e29CILFfSQ2nDRuZMRROzQOpPuJ+s8zPB5H7eK5ncXBbFOyVuRLU5Sx/zAUmVri3Ly49GyC8NEme4SVSAbA==}
 
   data-uri-to-buffer@6.0.2:
     resolution: {integrity: sha512-7hvf7/GW8e86rW0ptuwS3OcBGDjIi6SZva7hCyWC0yYry2cOPmLIjXAUHI6DK2HsnwJd9ifmt57i8eV2n4YNpw==}
@@ -1660,10 +1660,6 @@ packages:
   pretty-format@30.5.1:
     resolution: {integrity: sha512-byhRAPguVKMQIj4kjJwJ5lAskVhfuiSdiYl/aLTWpgkGEmic2jYhJh1yE9ih8Ox44Xg9ccCT11/S6QrzSJuNrg==}
     engines: {node: ^18.14.0 || ^20.0.0 || ^22.0.0 || >=24.0.0}
-
-  pretty-ms@9.3.0:
-    resolution: {integrity: sha512-gjVS5hOP+M3wMm5nmNOucbIrqudzs9v/57bWRHQWLYklXqoXKrVfYW2W9+glfGsqtPgpiz5WwyEEB+ksXIx3gQ==}
-    engines: {node: '>=18'}
 
   pretty-ms@9.3.1:
     resolution: {integrity: sha512-HzMy3Geq23nVALD/M2LliU+F+M+gVNsvkQWWqeBZ8HDiCgzo6YPJ/Omrmtq24EFrIsk0a3EkQGEd7bDOo+IhGA==}
@@ -2515,13 +2511,13 @@ snapshots:
       convert-source-map: 2.0.0
       tinyrainbow: 3.2.0
 
-  '@wdio/allure-reporter@9.32.0':
+  '@wdio/allure-reporter@10.0.0':
     dependencies:
-      '@types/node': 20.19.43
-      '@wdio/reporter': 9.32.0
-      '@wdio/types': 9.32.0
-      allure-js-commons: 3.10.2
-      csv-stringify: 6.8.3
+      '@types/node': 22.20.5
+      '@wdio/reporter': 10.0.0
+      '@wdio/types': 10.0.0
+      allure-js-commons: 3.13.0
+      csv-stringify: 6.9.0
       html-entities: 2.6.0
       strip-ansi: 7.2.0
     transitivePeerDependencies:
@@ -2836,7 +2832,7 @@ snapshots:
 
   allure-commandline@2.46.1: {}
 
-  allure-js-commons@3.10.2:
+  allure-js-commons@3.13.0:
     dependencies:
       md5: 2.3.0
 
@@ -3092,7 +3088,7 @@ snapshots:
 
   css-what@6.2.2: {}
 
-  csv-stringify@6.8.3: {}
+  csv-stringify@6.9.0: {}
 
   data-uri-to-buffer@6.0.2: {}
 
@@ -3902,10 +3898,6 @@ snapshots:
       '@jest/react-is-19': react-is@19.3.0
       '@jest/schemas': 30.5.0
       ansi-styles: 5.2.0
-
-  pretty-ms@9.3.0:
-    dependencies:
-      parse-ms: 4.0.0
 
   pretty-ms@9.3.1:
     dependencies:
