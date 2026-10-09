@@ -76,27 +76,27 @@ class Page {
     }
 
     async getTextInElements(selector) {
-        let strings = [];
+        let results = [];
         let elements = await this.findElements(selector);
         if (elements.length === 0) {
             return [];
         }
-        await elements.forEach(el => {
-            strings.push(el.getText());
-        });
-        return Promise.all(strings);
+        for (const item of elements) {
+            results.push(await item.getText());
+        }
+        return results;
     }
 
     async getTextInDisplayedElements(selector) {
-        let strings = [];
+        let results = [];
         let elements = await this.getDisplayedElements(selector);
         if (elements.length === 0) {
             return [];
         }
-        elements.forEach(el => {
-            strings.push(el.getText());
-        });
-        return Promise.all(strings);
+        for (const item of elements) {
+            results.push(await item.getText());
+        }
+        return results;
     }
 
     async typeTextInInput(selector, text) {
