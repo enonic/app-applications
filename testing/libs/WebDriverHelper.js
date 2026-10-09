@@ -49,6 +49,7 @@ WebDriverHelper.prototype.setupBrowser = function setupBrowser(w, h) {
         console.log('browser width ##################### ' + width);
         let options = {
             logLevel: 'error',
+            strictSelectors: false,
             automationProtocol: 'webdriver',
             capabilities: {
                 browserName: browser_name,
