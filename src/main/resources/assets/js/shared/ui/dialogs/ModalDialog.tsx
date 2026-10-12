@@ -7,7 +7,7 @@ import { useDialogLayer } from './dialog-stack';
 export type ModalDialogProps = {
   open: boolean;
   title: string;
-  description?: string;
+  description?: ReactNode;
   /** Shown in place of the title row — an icon and the item's name, as the wizards do. */
   header?: ReactNode;
   /**

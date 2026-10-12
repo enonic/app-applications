@@ -26,6 +26,6 @@ function loadStyleSheet(): void {
     .then((css) => created.replace(css))
     .then(() => $stylesheets.set([created]))
     .catch((cause: unknown) => {
-      console.error('The Applications section could not load its stylesheet:', cause);
+      console.error('This section could not load its stylesheet:', cause);
     });
 }

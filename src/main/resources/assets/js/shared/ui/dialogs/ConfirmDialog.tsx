@@ -5,7 +5,7 @@ import { ModalDialog } from './ModalDialog';
 
 export type ConfirmDialogProps = {
   open: boolean;
-  question: string;
+  question: ReactNode;
   confirmDisabled?: boolean;
   error?: string;
   children?: ReactNode;

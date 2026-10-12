@@ -8,7 +8,7 @@ import { ModalDialog } from './ModalDialog';
 export type ConfirmValueDialogProps = {
   open: boolean;
   title: string;
-  description: string;
+  description: ReactNode;
   /** What has to be typed back before the dialog will confirm. */
   expected: string | number;
   confirmLabel?: string;

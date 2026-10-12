@@ -28,7 +28,7 @@ export function ItemLabel({
       )}
     >
       {icon && (
-        <div className="group-data-[tone=inverse]:text-alt flex size-6 shrink-0 items-center justify-center">
+        <div className="group-data-[tone=inverse]:text-alt flex min-h-6 min-w-6 shrink-0 items-center justify-center">
           {icon}
         </div>
       )}
