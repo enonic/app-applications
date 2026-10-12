@@ -1,157 +1,94 @@
-import { describe, expect, it, vi } from 'vitest';
+import type { TopicHandlers } from '@enonic/ui-utils/admin-events';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { createAdminEvents, type TopicHandlers } from './admin-events';
-
-type ConnectHandlers = {
-  onEvent: (event: { topic: string; data: unknown }) => void;
-  onLoss: (loss: { topic: string; count: number | null }) => void;
-};
-
-function harness() {
-  const subscribed: string[] = [];
-  let handlers: ConnectHandlers | undefined;
-  let resolveImport: (() => void) | undefined;
-
-  const client = {
-    connect: (h: ConnectHandlers) => {
-      handlers = h;
-      return { subscribe: (topic: string) => subscribed.push(topic) };
-    },
-  };
-
-  const events = createAdminEvents(
-    (url) =>
-      new Promise((resolve) => {
-        resolveImport = () => resolve(client);
-        void url;
-      }),
-  );
+const hub = vi.hoisted(() => {
+  const registry = new Map<string, Set<{ handlers: TopicHandlers }>>();
+  const urls: string[] = [];
 
   return {
-    events,
-    subscribed,
-    emit: (topic: string, data: unknown) => handlers?.onEvent({ topic, data }),
-    lose: (topic: string, count: number | null) => handlers?.onLoss({ topic, count }),
-    arrive: async () => {
-      resolveImport?.();
-      await Promise.resolve();
-      await Promise.resolve();
+    registry,
+    urls,
+    deliver: (topic: string, data: unknown) =>
+      registry.get(topic)?.forEach(({ handlers }) => handlers.onMessage(data)),
+    reset: () => {
+      registry.clear();
+      urls.length = 0;
     },
   };
+});
+
+vi.mock('@enonic/ui-utils/admin-events', () => ({
+  createAdminEvents: (url: string) => {
+    hub.urls.push(url);
+    return {
+      connect: () => {},
+      subscribeTopic: (topic: string, handlers: TopicHandlers) => {
+        const registration = { handlers };
+        const set = hub.registry.get(topic) ?? new Set();
+        set.add(registration);
+        hub.registry.set(topic, set);
+        return () => set.delete(registration);
+      },
+    };
+  },
+}));
+
+const TOPIC = 'applications';
+const URL = '/_/admin:events';
+
+async function load() {
+  vi.resetModules();
+  return import('./admin-events');
 }
 
-describe('createAdminEvents', () => {
-  it('delivers a message only to the handlers of its topic', async () => {
-    const { events, emit, arrive } = harness();
-    const mine = vi.fn();
-    const other = vi.fn();
-    events.subscribeTopic('app:mine', { onMessage: mine });
-    events.subscribeTopic('app:other', { onMessage: other });
-    events.connect('/hub');
-    await arrive();
+function received(): { messages: unknown[]; handlers: TopicHandlers } {
+  const messages: unknown[] = [];
+  return { messages, handlers: { onMessage: (data) => messages.push(data) } };
+}
 
-    emit('app:mine', { n: 1 });
+describe('admin events', () => {
+  beforeEach(() => hub.reset());
 
-    expect(mine).toHaveBeenCalledWith({ n: 1 });
-    expect(other).not.toHaveBeenCalled();
+  it('delivers to a subscription taken before the hub was connected', async () => {
+    const { connectAdminEvents, subscribeTopic } = await load();
+    const { messages, handlers } = received();
+
+    subscribeTopic(TOPIC, handlers);
+    connectAdminEvents(URL);
+    hub.deliver(TOPIC, 'installed');
+
+    expect(messages).toEqual(['installed']);
   });
 
-  it('subscribes topics taken before the client arrived', async () => {
-    const { events, subscribed, arrive } = harness();
-    events.subscribeTopic('app:early', { onMessage: () => {} });
-    events.connect('/hub');
-    await arrive();
+  it('drops an early subscription unsubscribed before the hub was connected', async () => {
+    const { connectAdminEvents, subscribeTopic } = await load();
+    const { messages, handlers } = received();
 
-    expect(subscribed).toEqual(['app:early']);
+    subscribeTopic(TOPIC, handlers)();
+    connectAdminEvents(URL);
+    hub.deliver(TOPIC, 'installed');
+
+    expect(messages).toEqual([]);
   });
 
-  it('subscribes a topic taken after the client arrived', async () => {
-    const { events, subscribed, arrive } = harness();
-    events.connect('/hub');
-    await arrive();
+  it('detaches an early subscription unsubscribed after the hub was connected', async () => {
+    const { connectAdminEvents, subscribeTopic } = await load();
+    const { messages, handlers } = received();
 
-    events.subscribeTopic('app:late', { onMessage: () => {} });
-
-    expect(subscribed).toEqual(['app:late']);
-  });
-
-  it('reports loss to the topic that suffered it', async () => {
-    const { events, lose, arrive } = harness();
-    const onLoss = vi.fn();
-    events.subscribeTopic('app:mine', { onMessage: () => {}, onLoss });
-    events.connect('/hub');
-    await arrive();
-
-    lose('app:mine', 3);
-    lose('app:mine', null);
-
-    expect(onLoss).toHaveBeenNthCalledWith(1, 3);
-    expect(onLoss).toHaveBeenNthCalledWith(2, null);
-  });
-
-  it('stops delivering once unsubscribed', async () => {
-    const { events, emit, arrive } = harness();
-    const onMessage = vi.fn();
-    const unsubscribe = events.subscribeTopic('app:mine', { onMessage });
-    events.connect('/hub');
-    await arrive();
-
+    const unsubscribe = subscribeTopic(TOPIC, handlers);
+    connectAdminEvents(URL);
     unsubscribe();
-    emit('app:mine', {});
+    hub.deliver(TOPIC, 'installed');
 
-    expect(onMessage).not.toHaveBeenCalled();
+    expect(messages).toEqual([]);
   });
 
-  it('connects once, whatever asks again', async () => {
-    let imports = 0;
-    const events = createAdminEvents(() => {
-      imports += 1;
-      return Promise.resolve({ connect: () => ({ subscribe: () => {} }) });
-    });
+  it('creates one hub however many times it is connected', async () => {
+    const { connectAdminEvents } = await load();
 
-    events.connect('/hub');
-    events.connect('/hub');
-    await Promise.resolve();
+    connectAdminEvents(URL);
+    connectAdminEvents(URL);
 
-    expect(imports).toBe(1);
-  });
-
-  it('logs and stays quiet when the client cannot be loaded', async () => {
-    const error = vi.spyOn(console, 'error').mockImplementation(() => {});
-    const events = createAdminEvents(() => Promise.reject(new Error('offline')));
-    const onMessage = vi.fn();
-    events.subscribeTopic('app:mine', { onMessage } satisfies TopicHandlers);
-
-    events.connect('/hub');
-    await Promise.resolve();
-    await Promise.resolve();
-
-    expect(error).toHaveBeenCalled();
-    expect(onMessage).not.toHaveBeenCalled();
-    error.mockRestore();
-  });
-
-  it('retries the load on the next connect after a failure', async () => {
-    const error = vi.spyOn(console, 'error').mockImplementation(() => {});
-    const subscribed: string[] = [];
-    let attempts = 0;
-    const events = createAdminEvents(() => {
-      attempts += 1;
-      return attempts === 1
-        ? Promise.reject(new Error('offline'))
-        : Promise.resolve({ connect: () => ({ subscribe: (t: string) => subscribed.push(t) }) });
-    });
-    events.subscribeTopic('app:mine', { onMessage: () => {} });
-
-    events.connect('/hub');
-    await Promise.resolve();
-    await Promise.resolve();
-    events.connect('/hub');
-    await Promise.resolve();
-    await Promise.resolve();
-
-    expect(attempts).toBe(2);
-    expect(subscribed).toEqual(['app:mine']);
-    error.mockRestore();
+    expect(hub.urls).toEqual([URL]);
   });
 });
