@@ -23,7 +23,7 @@ export type BrowseSortProps<Id extends string = string> = {
    * user has reordered says so with the menu closed. Omitted, it never lights.
    */
   defaultValue?: Id;
-  /** On the trigger; the open menu is `<name>.Menu`, as in `BrowseFilter`. */
+  /** On the trigger; the open menu is `<name>.Menu`, the way the library names its parts. */
   'data-component'?: string;
 };
 
@@ -63,7 +63,8 @@ export function BrowseSort<Id extends string = string>({
           endIcon={icon}
           title={current?.label ?? sortLabel}
           className={HEADER_CONTROL_CLASS}
-          // Spread only when set, for the reason `BrowseFilter` gives.
+          // ! `data-active` is the attribute `Menu.Trigger` marks its own open state with. Spread only when
+          // ! set: `Slot` lets the child's value win, and one always present would drop the open state.
           {...(active ? { 'data-active': 'true' } : {})}
         >
           <span className={HEADER_CONTROL_LABEL_CLASS}>{current?.field ?? sortLabel}</span>

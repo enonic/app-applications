@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-import { uiKitPhrases } from '@enonic/ui-kit';
+import { filterInputPhrases, uiKitPhrases } from '@enonic/ui-kit';
 import { comparePhrases, type Phrases } from '@enonic/ui-utils';
 import { describe, expect, it } from 'vitest';
 
@@ -23,9 +23,10 @@ function readBundle(): Phrases {
 
 describe('phrases.properties against the kit', () => {
   it('carries every label the kit renders on its own, placeholders and all', () => {
-    expect(comparePhrases(uiKitPhrases, readBundle())).toEqual({
-      missing: [],
-      placeholderMismatch: [],
-    });
+    const bundle = readBundle();
+
+    for (const phrases of [uiKitPhrases, filterInputPhrases]) {
+      expect(comparePhrases(phrases, bundle)).toEqual({ missing: [], placeholderMismatch: [] });
+    }
   });
 });

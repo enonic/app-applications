@@ -5,7 +5,6 @@ import {
   filterApplicationsBySystem,
   searchApplications,
   SYSTEM_ENTRY,
-  systemEntry,
 } from './applications.filter';
 
 function application(
@@ -48,6 +47,15 @@ describe('searchApplications', () => {
     expect(searchApplications(applications, 'app.fathom')).toEqual([fathom]);
   });
 
+  it('matches every word, each in any of the fields', () => {
+    expect(searchApplications(applications, 'pages booster')).toEqual([booster]);
+    expect(searchApplications(applications, 'booster fathom')).toEqual([]);
+  });
+
+  it('matches a word from its start only', () => {
+    expect(searchApplications(applications, 'oster')).toEqual([]);
+  });
+
   it('survives an application without a description', () => {
     expect(searchApplications(applications, 'fathom')).toEqual([fathom]);
   });
@@ -80,19 +88,5 @@ describe('filterApplicationsBySystem', () => {
     filterApplicationsBySystem(all, new Set());
 
     expect(all).toEqual(original);
-  });
-});
-
-describe('systemEntry', () => {
-  it('counts the system applications among the rows it was given', () => {
-    expect(systemEntry([booster, systemApp, fathom], 'System applications')).toEqual({
-      id: SYSTEM_ENTRY,
-      label: 'System applications',
-      count: 1,
-    });
-  });
-
-  it('reads zero rather than being left out, so the entry is always offered', () => {
-    expect(systemEntry(applications, 'System applications').count).toBe(0);
   });
 });
