@@ -26,10 +26,7 @@ export function UninstallApplicationsDialog({
   const count = targets?.length ?? 0;
   const title = useI18n('applications.dialog.uninstall.title');
   const confirmLabel = useI18n('applications.action.uninstall');
-  const questionSingle = useI18n(
-    'applications.dialog.uninstall.question',
-    targets?.[0]?.displayName ?? '',
-  );
+  const questionSingle = useI18n('applications.dialog.uninstall.question');
   const questionMultiple = useI18n('applications.dialog.uninstall.questionMultiple', count);
 
   const deleteTargets: DeleteTarget[] = (targets ?? []).map((application) => ({
