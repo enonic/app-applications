@@ -24,8 +24,10 @@ app  →  pages  →  widgets / features  →  entities  →  shared
 | `shared/`             | host, routing, api, config, i18n, ui, …              | importing anything above          |
 
 - **`widgets/` and `features/` never import each other**, either direction. A domain-agnostic
-  component both a page and a feature need goes in `shared/ui/`, not `widgets/` — `shared/ui/dialogs/`
+  component both a page and a feature need goes in `shared/ui/`, not `widgets/` — `ProgressButton`
   is the case.
+- **Dialogs are `@enonic/ui-kit`'s**: `ActionDialog`, `DialogPreset.Confirm`, `DeleteConfirm`. There
+  is no local dialog base to build on.
 - **This app is one section.** `pages/applications/` is the only page and nothing below `pages/` may
   assume otherwise, switch on a section id, or count them.
 - Segments are fixed and keep their suffix: `*.api.ts`, `*.store.ts`, `*.service.ts`, `*.types.ts`,
