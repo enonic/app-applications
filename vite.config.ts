@@ -53,6 +53,9 @@ export default defineConfig(({ mode }) => {
     environment: 'node' as const,
     include: ['src/**/*.{test,spec}.{ts,tsx}'],
     passWithNoTests: true,
+    // Inlined so the react → preact/compat alias and the `@enonic/ui` double reach it: externalized,
+    // it imports `react`, which is not installed.
+    server: { deps: { inline: [/@enonic\/ui-kit/] } },
     // XP supplies these at runtime; under vitest they resolve to local doubles.
     alias: {
       '/lib/graphql': join(import.meta.dirname, 'src/test/mocks/lib-graphql.ts'),
