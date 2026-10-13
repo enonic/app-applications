@@ -1,4 +1,4 @@
-import { textOf, valuesOf } from '@enonic/ui-kit';
+import { textOf } from '@enonic/ui-kit';
 import { useStore } from '@nanostores/preact';
 import { LoaderCircle } from 'lucide-react';
 import { useMemo } from 'preact/hooks';
@@ -30,9 +30,9 @@ import { ManagedModeBanner } from '../../widgets/browse-toolbar/ManagedModeBanne
 import { ApplicationsItemPage } from './ApplicationsItemPage';
 import { applicationActions } from './model/applications.actions';
 import {
-  filterApplicationsBySystem,
+  applicationFields,
+  filterApplications,
   searchApplications,
-  SYSTEM_ENTRY,
 } from './model/applications.filter';
 import {
   applicationStateLabelKey,
@@ -55,12 +55,20 @@ export function ApplicationsPage() {
   const activeKey = useItemId();
   const { openItem, closeItem, notify } = useHostFrame();
   const managedMode = isManagedMode();
-  const { items: marketItems } = useMarketApplications();
+  const { status: marketStatus, items: marketItems } = useMarketApplications();
   const uploads = useStore($applicationUploads);
 
   const emptyLabel = useI18n('applications.list.empty');
   const uploadingLabel = useI18n('applications.list.uploading');
   const filterPlaceholder = useI18n('applications.filter.placeholder');
+  const systemFieldLabel = useI18n('applications.filter.system');
+  const stateFieldLabel = useI18n('applications.filter.state');
+  const startedLabel = useI18n('applications.state.started');
+  const stoppedLabel = useI18n('applications.state.stopped');
+  const upgradeFieldLabel = useI18n('applications.filter.upgrade');
+  const yesLabel = useI18n('applications.filter.yes');
+  const noLabel = useI18n('applications.filter.no');
+  const marketFailedLabel = useI18n('applications.filter.marketFailed');
   const sortNameLabel = useI18n('applications.sort.name');
   const sortAscLabel = useI18n('applications.sort.nameAsc');
   const sortDescLabel = useI18n('applications.sort.nameDesc');
@@ -78,20 +86,55 @@ export function ApplicationsPage() {
     [],
   ) satisfies readonly BrowseSortOption<SortDirection>[];
 
-  // The whole list is loaded, so the text narrows it here rather than on the server.
+  // Empty while the market is loading or unreachable, which leaves every row on its installed
+  // version alone — the list never waits on an outbound call.
+  const available = useMemo(() => availableVersions(marketItems), [marketItems]);
+
+  // The whole list is loaded, so the text narrows it here rather than on the server. Shared with the
+  // field counts below, so the text runs once per render rather than twice.
   const searched = useMemo(() => searchApplications(items, textOf(query)), [items, query]);
 
   // Narrow first, order last: sorting only what survived is the cheaper half, and the order the rows
   // appear in has to be the final word.
   const visible = useMemo(
-    () =>
-      sortByDisplayName(filterApplicationsBySystem(searched, valuesOf(query, SYSTEM_ENTRY)), sort),
-    [searched, query, sort],
+    () => sortByDisplayName(filterApplications(searched, query, available), sort),
+    [searched, query, available, sort],
   );
 
-  // Empty while the market is loading or unreachable, which leaves every row on its installed
-  // version alone — the list never waits on an outbound call.
-  const available = useMemo(() => availableVersions(marketItems), [marketItems]);
+  const fields = useMemo(
+    () =>
+      applicationFields(
+        searched,
+        query,
+        available,
+        managedMode ? undefined : { status: marketStatus },
+        {
+          system: systemFieldLabel,
+          state: stateFieldLabel,
+          started: startedLabel,
+          stopped: stoppedLabel,
+          upgrade: upgradeFieldLabel,
+          yes: yesLabel,
+          no: noLabel,
+          marketFailed: marketFailedLabel,
+        },
+      ),
+    [
+      searched,
+      query,
+      available,
+      managedMode,
+      marketStatus,
+      systemFieldLabel,
+      stateFieldLabel,
+      startedLabel,
+      stoppedLabel,
+      upgradeFieldLabel,
+      yesLabel,
+      noLabel,
+      marketFailedLabel,
+    ],
+  );
 
   // Above the list and outside the query: a jar on its way up is not an application yet, so there is
   // nothing to search or sort it by. The spinner sits where an application's icon would, which is
@@ -161,6 +204,7 @@ export function ApplicationsPage() {
         notice={<ManagedModeBanner title={managedTitle} help={managedHelp} />}
         emptyLabel={emptyLabel}
         filterPlaceholder={filterPlaceholder}
+        fields={fields}
         details={<ApplicationsItemPage />}
         sort={
           <BrowseSort
