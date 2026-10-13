@@ -1,7 +1,8 @@
-import { Button, Dialog, Link } from '@enonic/ui';
+import { Button, Dialog } from '@enonic/ui';
 
 import { useI18n } from '../../../shared/i18n';
 import type { MarketRow } from '../model/market-rows';
+import { useMajorUpdateQuestion } from './useMajorUpdateQuestion';
 
 export type ConfirmMajorUpdateProps = {
   row: MarketRow;
@@ -26,14 +27,7 @@ export function ConfirmMajorUpdate({
   onCancel,
   'data-component': componentName = CONFIRM_MAJOR_UPDATE_NAME,
 }: ConfirmMajorUpdateProps) {
-  const title = useI18n('applications.dialog.update.title', row.displayName, row.availableVersion);
-  const question = useI18n(
-    'applications.dialog.update.question',
-    row.displayName,
-    row.installedVersion ?? '',
-  );
-  const releaseNotesLabel = useI18n('applications.dialog.update.releaseNotes', row.displayName);
-  const confirmLabel = useI18n('applications.dialog.install.update');
+  const { title, description, confirmLabel } = useMajorUpdateQuestion(row);
   const cancelLabel = useI18n('applications.dialog.install.cancel');
 
   return (
@@ -41,16 +35,7 @@ export function ConfirmMajorUpdate({
       <Dialog.DefaultHeader
         data-component={componentName}
         title={title}
-        description={
-          <>
-            {question}{' '}
-            {row.pageUrl != null && (
-              <Link href={row.pageUrl} newTab>
-                {releaseNotesLabel}
-              </Link>
-            )}
-          </>
-        }
+        description={description}
       />
 
       <Dialog.Footer>
