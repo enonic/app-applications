@@ -1,4 +1,5 @@
 import { cn, Dialog, SearchField, Tab } from '@enonic/ui';
+import { ActionDialog } from '@enonic/ui-kit';
 import { useStore } from '@nanostores/preact';
 import { Box } from 'lucide-react';
 import { useMemo, useState } from 'preact/hooks';
@@ -65,11 +66,12 @@ export function InstallApplicationsDialogContent({
   };
 
   return (
-    <Dialog.Content
+    <ActionDialog.Content
       data-component={componentName}
+      size={confirming ? 'medium' : 'default'}
       // A fixed height while browsing: the drop zone fills what it is given, and the dialog must
       // not resize as the tabs switch.
-      className={cn('gap-6 max-lg:p-5', confirming ? 'max-w-160' : 'h-176 max-w-5xl')}
+      className={cn(!confirming && 'h-176 max-w-5xl')}
       onEscapeKeyDown={(event) => {
         if (confirming) {
           event.preventDefault();
@@ -85,7 +87,7 @@ export function InstallApplicationsDialogContent({
         />
       ) : (
         <>
-          <Dialog.DefaultHeader title={title} withClose />
+          <ActionDialog.DefaultHeader title={title} withClose />
 
           <Tab.Root value={tab} onValueChange={setTab} className="min-h-0 flex-1 gap-6">
             <Tab.List>
@@ -106,7 +108,7 @@ export function InstallApplicationsDialogContent({
                 <SearchField.Clear />
               </SearchField>
 
-              <Dialog.Body className="-me-5 pe-5 lg:-me-10 lg:pe-10">
+              <Dialog.Body className="-me-5 pe-5 md:-me-7.5 md:pe-7.5">
                 <MarketApplicationList
                   status={status}
                   rows={rows}
@@ -130,7 +132,7 @@ export function InstallApplicationsDialogContent({
           </Tab.Root>
         </>
       )}
-    </Dialog.Content>
+    </ActionDialog.Content>
   );
 }
 
