@@ -14,7 +14,7 @@ export type AppProps = {
 };
 
 export function App({ frame }: AppProps) {
-  useSectionEvents();
+  useSectionEvents(frame);
   const { status, error } = useStore($bootstrap);
   const stylesheets = useStore($stylesheets);
   const [theme, setTheme] = useState(frame.host.theme.get());

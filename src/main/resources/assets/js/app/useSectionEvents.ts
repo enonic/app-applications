@@ -1,11 +1,12 @@
 import { useStore } from '@nanostores/preact';
 import { useEffect } from 'preact/hooks';
 
+import type { HostFrame } from '../shared/host';
 import { $bootstrap } from './bootstrap.store';
 import { startSectionEvents, stopSectionEvents } from './events';
 
 /** Connects the section to the hub once its bootstrap is ready; disconnects with the app. */
-export function useSectionEvents(): void {
+export function useSectionEvents(frame: HostFrame): void {
   const { status } = useStore($bootstrap, { keys: ['status'] });
 
   useEffect(() => {
@@ -13,7 +14,7 @@ export function useSectionEvents(): void {
       return;
     }
 
-    startSectionEvents();
+    startSectionEvents(frame);
     return stopSectionEvents;
-  }, [status]);
+  }, [status, frame]);
 }

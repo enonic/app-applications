@@ -1,5 +1,13 @@
-import { HUB_TOPICS, subscribeTopic, toApplicationsMessage } from '../../../shared/admin-events';
-import { invalidateApplicationInfo } from './application-info.store';
+import type { ReadableAtom } from 'nanostores';
+
+import {
+  createTopicReaction,
+  HUB_TOPICS,
+  subscribeTopic,
+  toApplicationsMessage,
+  type TopicReaction,
+} from '../../../shared/admin-events';
+import { $applicationsInfo, invalidateApplicationInfo } from './application-info.store';
 import { loadApplication, loadApplications } from './applications.load';
 import { isApplicationsCached, removeApplication } from './applications.store';
 
@@ -8,7 +16,13 @@ export type ApplicationChange = {
   key: string;
 };
 
-let unsubscribe: (() => void) | undefined;
+type ChangeKind = ApplicationChange['kind'];
+
+// Past this many applications a window is a bulk change, and one re-read beats that many requests
+// through a serial transport.
+const BATCH_LIMIT = 10;
+
+let running: TopicReaction | undefined;
 
 /**
  * Reads an application lifecycle change out of a hub message, however it was caused — this section,
@@ -36,44 +50,83 @@ export function toApplicationChange(data: unknown): ApplicationChange | undefine
   }
 }
 
-export function start(): void {
-  if (unsubscribe != null) {
+/**
+ * Follows the `applications` topic while the section is shown: a burst is applied as one batch, and
+ * what happens while it is hidden is dropped for one refresh on reveal.
+ */
+export function start($visible: ReadableAtom<boolean>): void {
+  if (running !== undefined) {
     return;
   }
 
-  unsubscribe = subscribeTopic(HUB_TOPICS.applications, {
-    onMessage: handleMessage,
-    onLoss: reloadCachedList,
+  running = createTopicReaction({
+    events: { subscribeTopic },
+    topic: HUB_TOPICS.applications,
+    parse: toApplicationChange,
+    visible: $visible,
+    apply,
+    refresh,
   });
+  running.start();
 }
 
 export function stop(): void {
-  unsubscribe?.();
-  unsubscribe = undefined;
+  running?.stop();
+  running = undefined;
 }
 
 // *
 // * Internal
 // *
-function handleMessage(data: unknown): void {
-  const change = toApplicationChange(data);
-  if (change == null) {
+
+function apply(changes: readonly ApplicationChange[]): void {
+  const settled = settle(changes);
+  const changed: string[] = [];
+  let reload = false;
+
+  settled.forEach((kind, key) => {
+    invalidateApplicationInfo(key);
+
+    switch (kind) {
+      case 'installed':
+        reload = true;
+        return;
+      case 'uninstalled':
+        removeApplication(key);
+        return;
+      case 'changed':
+        changed.push(key);
+        return;
+    }
+  });
+
+  if (reload || changed.length > BATCH_LIMIT) {
+    reloadCachedList();
     return;
   }
 
-  invalidateApplicationInfo(change.key);
+  changed.forEach((key) => void loadApplication(key));
+}
 
-  switch (change.kind) {
-    case 'installed':
-      reloadCachedList();
-      return;
-    case 'uninstalled':
-      removeApplication(change.key);
-      return;
-    case 'changed':
-      void loadApplication(change.key);
-      return;
-  }
+/**
+ * One kind per application, the batch read in order. ! An install stays an install through the changes
+ * after it: the list has no row for it yet, and only a reload makes one.
+ */
+function settle(changes: readonly ApplicationChange[]): Map<string, ChangeKind> {
+  const settled = new Map<string, ChangeKind>();
+
+  changes.forEach(({ kind, key }) => {
+    settled.set(key, kind === 'changed' && settled.get(key) === 'installed' ? 'installed' : kind);
+  });
+
+  return settled;
+}
+
+// ? What an application provides is forgotten with the list: a lost or dropped message may have moved
+// ? any of it, and an open panel asks again for what it is missing.
+function refresh(): void {
+  Object.keys($applicationsInfo.get()).forEach((key) => invalidateApplicationInfo(key));
+  reloadCachedList();
 }
 
 function reloadCachedList(): void {

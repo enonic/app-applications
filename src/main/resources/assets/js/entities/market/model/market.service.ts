@@ -1,4 +1,12 @@
-import { HUB_TOPICS, subscribeTopic, toApplicationsMessage } from '../../../shared/admin-events';
+import type { ReadableAtom } from 'nanostores';
+
+import {
+  createTopicReaction,
+  HUB_TOPICS,
+  subscribeTopic,
+  toApplicationsMessage,
+  type TopicReaction,
+} from '../../../shared/admin-events';
 import { loadMarketApplications } from './market.load';
 import { isMarketCached } from './market.store';
 
@@ -14,37 +22,38 @@ export function affectsMarket(data: unknown): boolean {
   return message != null && STALE_EVENT_TYPES.has(message.eventType);
 }
 
-let unsubscribe: (() => void) | undefined;
+let running: TopicReaction | undefined;
 
-export function start(): void {
-  if (unsubscribe != null) {
+/**
+ * Follows the `applications` topic while the section is shown: a burst reloads once, and what happens
+ * while it is hidden is dropped for one reload on reveal.
+ */
+export function start($visible: ReadableAtom<boolean>): void {
+  if (running !== undefined) {
     return;
   }
 
-  unsubscribe = subscribeTopic(HUB_TOPICS.applications, {
-    onMessage: handleMessage,
-    // A gap may have hidden an install, and only a reload can tell — but still not for a catalogue
-    // nobody has loaded, which is what keeps a lost message off Enonic Market.
-    onLoss: reloadCachedCatalogue,
+  running = createTopicReaction({
+    events: { subscribeTopic },
+    topic: HUB_TOPICS.applications,
+    // ? Only what leaves the catalogue wrong is kept, so every batch that reaches `apply` reloads.
+    parse: (data) => (affectsMarket(data) ? data : undefined),
+    visible: $visible,
+    apply: reloadCachedCatalogue,
+    // A gap may have hidden an install, and only a reload can tell.
+    refresh: reloadCachedCatalogue,
   });
+  running.start();
 }
 
 export function stop(): void {
-  unsubscribe?.();
-  unsubscribe = undefined;
+  running?.stop();
+  running = undefined;
 }
 
 // *
 // * Internal
 // *
-
-function handleMessage(data: unknown): void {
-  if (!affectsMarket(data)) {
-    return;
-  }
-
-  reloadCachedCatalogue();
-}
 
 // Nothing ever loaded the catalogue, so there is nothing to keep fresh — and this is the one read
 // that leaves the instance.
