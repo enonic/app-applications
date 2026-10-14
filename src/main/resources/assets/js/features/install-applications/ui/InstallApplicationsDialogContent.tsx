@@ -1,5 +1,5 @@
-import { cn, Dialog, SearchField, Tab } from '@enonic/ui';
-import { ActionDialog } from '@enonic/ui-kit';
+import { cn, Dialog, Tab } from '@enonic/ui';
+import { ActionDialog, EMPTY_FILTER, FilterInput, textOf, type FilterQuery } from '@enonic/ui-kit';
 import { useStore } from '@nanostores/preact';
 import { Box } from 'lucide-react';
 import { useMemo, useState } from 'preact/hooks';
@@ -11,6 +11,7 @@ import { DropZone } from '../../../shared/ui/DropZone';
 import { marketInstallIntent, runMarketInstall } from '../model/install-market-application';
 import { $marketInstalls } from '../model/install.store';
 import { JAR_ACCEPT } from '../model/jar-files';
+import { filterMarketRows, marketFields } from '../model/market-filter';
 import type { MarketRow } from '../model/market-rows';
 import { marketView } from '../model/market-view';
 import { runJarUpload } from '../model/upload-applications';
@@ -38,14 +39,30 @@ export function InstallApplicationsDialogContent({
   const marketLabel = useI18n('applications.dialog.install.market');
   const uploadLabel = useI18n('applications.dialog.install.upload');
   const uploadHint = useI18n('applications.dialog.install.uploadHint');
-  const searchPlaceholder = useI18n('applications.dialog.install.search');
-  const clearLabel = useI18n('applications.dialog.install.searchClear');
+  const filterPlaceholder = useI18n('applications.dialog.install.filter.placeholder');
+  const upgradeFieldLabel = useI18n('applications.filter.upgrade');
+  const installedFieldLabel = useI18n('applications.dialog.install.installed');
+  const yesLabel = useI18n('applications.filter.yes');
+  const noLabel = useI18n('applications.filter.no');
 
   const [tab, setTab] = useState<string>(MARKET_TAB);
-  const [query, setQuery] = useState('');
+  const [query, setQuery] = useState<FilterQuery>(EMPTY_FILTER);
   const [confirming, setConfirming] = useState<MarketRow | undefined>(undefined);
 
-  const rows = useMemo(() => marketView(items, query), [items, query]);
+  // Shared with the field counts below, so the text runs once per render rather than twice.
+  const searched = useMemo(() => marketView(items, textOf(query)), [items, query]);
+  const rows = useMemo(() => filterMarketRows(searched, query), [searched, query]);
+
+  const fields = useMemo(
+    () =>
+      marketFields(searched, query, {
+        upgrade: upgradeFieldLabel,
+        installed: installedFieldLabel,
+        yes: yesLabel,
+        no: noLabel,
+      }),
+    [searched, query, upgradeFieldLabel, installedFieldLabel, yesLabel, noLabel],
+  );
 
   const handleInstall = (row: MarketRow): void => {
     const intent = marketInstallIntent(row);
@@ -96,23 +113,18 @@ export function InstallApplicationsDialogContent({
             </Tab.List>
 
             <Tab.Content value={MARKET_TAB} className="mt-0 flex min-h-0 flex-1 flex-col gap-6">
-              <SearchField
+              <FilterInput
+                fields={fields}
                 value={query}
                 onChange={setQuery}
-                placeholder={searchPlaceholder}
-                clearLabel={clearLabel}
-                className="h-9 w-full"
-              >
-                <SearchField.Icon />
-                <SearchField.Input aria-label={searchPlaceholder} />
-                <SearchField.Clear />
-              </SearchField>
+                placeholder={filterPlaceholder}
+              />
 
               <Dialog.Body className="-me-5 pe-5 md:-me-7.5 md:pe-7.5">
                 <MarketApplicationList
                   status={status}
                   rows={rows}
-                  narrowed={query.trim().length > 0}
+                  narrowed={query.length > 0}
                   installs={installs}
                   onInstall={handleInstall}
                   onRetry={() => void loadMarketApplications()}

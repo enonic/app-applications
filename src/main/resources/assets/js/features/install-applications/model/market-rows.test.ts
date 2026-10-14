@@ -211,6 +211,11 @@ describe('searchMarketRows', () => {
     expect(searchMarketRows(rows, 'rendered')).toEqual([booster]);
   });
 
+  it('matches every word, each in any of the fields, from its start', () => {
+    expect(searchMarketRows(rows, 'pages booster')).toEqual([booster]);
+    expect(searchMarketRows(rows, 'oster')).toEqual([]);
+  });
+
   it('leaves the key out of the search', () => {
     expect(searchMarketRows(rows, 'com.enonic')).toEqual([]);
   });
