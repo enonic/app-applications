@@ -24,18 +24,19 @@ export function ConfirmMajorUpdateDialog({
   const { notify } = useHostFrame();
   const { title, description, confirmLabel } = useMajorUpdateQuestion(row);
 
+  if (row == null) {
+    return null;
+  }
+
   const handleConfirm = (): void => {
     closeUpdateConfirm();
-
-    if (row !== undefined) {
-      void runMarketInstall(row, notify);
-    }
+    void runMarketInstall(row, notify);
   };
 
   return (
     <DialogPreset.Confirm
       data-component={componentName}
-      open={row !== undefined}
+      open
       onOpenChange={(next) => {
         if (!next) {
           closeUpdateConfirm();
