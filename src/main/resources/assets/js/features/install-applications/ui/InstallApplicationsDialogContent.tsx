@@ -12,7 +12,7 @@ import { marketInstallIntent, runMarketInstall } from '../model/install-market-a
 import { $marketInstalls } from '../model/install.store';
 import { JAR_ACCEPT } from '../model/jar-files';
 import { filterMarketRows, marketFields } from '../model/market-filter';
-import type { MarketRow } from '../model/market-rows';
+import { toMarketRow, type MarketRow } from '../model/market-rows';
 import { marketView } from '../model/market-view';
 import { runJarUpload } from '../model/upload-applications';
 import { ConfirmMajorUpdate } from './ConfirmMajorUpdate';
@@ -40,6 +40,8 @@ export function InstallApplicationsDialogContent({
   const uploadLabel = useI18n('applications.dialog.install.upload');
   const uploadHint = useI18n('applications.dialog.install.uploadHint');
   const filterPlaceholder = useI18n('applications.dialog.install.filter.placeholder');
+  const licenseFieldLabel = useI18n('applications.dialog.install.filter.license');
+  const vendorFieldLabel = useI18n('applications.dialog.install.filter.vendor');
   const upgradeFieldLabel = useI18n('applications.filter.upgrade');
   const installedFieldLabel = useI18n('applications.dialog.install.installed');
   const yesLabel = useI18n('applications.filter.yes');
@@ -49,19 +51,34 @@ export function InstallApplicationsDialogContent({
   const [query, setQuery] = useState<FilterQuery>(EMPTY_FILTER);
   const [confirming, setConfirming] = useState<MarketRow | undefined>(undefined);
 
+  // What the License and Vendor fields offer, whatever the text leaves.
+  const catalogue = useMemo(() => items.map(toMarketRow), [items]);
+
   // Shared with the field counts below, so the text runs once per render rather than twice.
   const searched = useMemo(() => marketView(items, textOf(query)), [items, query]);
   const rows = useMemo(() => filterMarketRows(searched, query), [searched, query]);
 
   const fields = useMemo(
     () =>
-      marketFields(searched, query, {
+      marketFields(catalogue, searched, query, {
+        license: licenseFieldLabel,
+        vendor: vendorFieldLabel,
         upgrade: upgradeFieldLabel,
         installed: installedFieldLabel,
         yes: yesLabel,
         no: noLabel,
       }),
-    [searched, query, upgradeFieldLabel, installedFieldLabel, yesLabel, noLabel],
+    [
+      catalogue,
+      searched,
+      query,
+      licenseFieldLabel,
+      vendorFieldLabel,
+      upgradeFieldLabel,
+      installedFieldLabel,
+      yesLabel,
+      noLabel,
+    ],
   );
 
   const handleInstall = (row: MarketRow): void => {

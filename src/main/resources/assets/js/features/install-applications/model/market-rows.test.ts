@@ -17,6 +17,8 @@ function marketApplication(overrides: Partial<MarketApplication> = {}): MarketAp
     description: 'Caches rendered pages',
     iconUrl: 'https://market.enonic.com/icons/booster.svg',
     pageUrl: 'https://market.enonic.com/vendors/enonic/booster',
+    license: 'Enonic License',
+    vendor: 'Enonic',
     latest: {
       version: '3.0.1',
       downloadUrl: 'https://repo.enonic.com/booster-3.0.1.jar',
@@ -47,6 +49,8 @@ describe('toMarketRow', () => {
       description: 'Caches rendered pages',
       iconUrl: 'https://market.enonic.com/icons/booster.svg',
       pageUrl: 'https://market.enonic.com/vendors/enonic/booster',
+      license: 'Enonic License',
+      vendor: 'Enonic',
       availableVersion: '3.0.1',
       installedVersion: undefined,
       downloadUrl: 'https://repo.enonic.com/booster-3.0.1.jar',

@@ -10,6 +10,8 @@ export type MarketRow = {
   description?: string;
   iconUrl?: string;
   pageUrl?: string;
+  license?: string;
+  vendor?: string;
   availableVersion: string;
   installedVersion?: string;
   downloadUrl: string;
@@ -24,6 +26,8 @@ export function toMarketRow(application: MarketApplication): MarketRow {
     description: application.description,
     iconUrl: application.iconUrl,
     pageUrl: application.pageUrl,
+    license: application.license,
+    vendor: application.vendor,
     availableVersion: application.latest.version,
     installedVersion: application.installedVersion,
     downloadUrl: application.latest.downloadUrl,
