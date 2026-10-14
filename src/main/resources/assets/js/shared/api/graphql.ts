@@ -36,10 +36,13 @@ export type GraphQlRoot = {
    * ! the payload from the same place.
    */
   args?: string;
-  /** Its selection, braces included — `{ key displayName }`. Omitted for a scalar field. */
+  /**
+   * Its selection, braces included — `{ key displayName }`. Omitted for a scalar field. A nested field
+   * may take arguments the same way — `users(search: $search) { total }` — declared in `variables` too.
+   */
   selection?: string;
   /**
-   * The variables its `args` use, as name → GraphQL type: `{ start: 'Int', sort: 'UserSort' }`.
+   * The variables its `args` and `selection` use, as name → GraphQL type: `{ start: 'Int', sort: 'UserSort' }`.
    *
    * ! Declared by the root rather than by the caller, and that is what keeps the document valid. GraphQL
    * ! rejects a document using a variable it never declared *and* one declaring a variable it never uses,
@@ -277,7 +280,9 @@ function documentFor(roots: readonly GraphQlRoot[], name: string): Result<string
     // ! Co-locating the declaration with the arguments makes them easy to keep in step; only comparing
     // ! them makes it impossible to get wrong. Both halves of the mismatch are GraphQL validation errors,
     // ! and both would surface as a failed screen rather than as the typo they are.
-    const used = new Set([...(args ?? '').matchAll(/\$(\w+)/g)].map(([, key]) => key));
+    const used = new Set(
+      [...`${args ?? ''} ${root.selection ?? ''}`.matchAll(/\$(\w+)/g)].map(([, key]) => key),
+    );
     const names = new Set(Object.keys(variables ?? {}));
 
     for (const key of used) {
