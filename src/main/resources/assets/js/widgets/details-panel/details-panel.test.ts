@@ -3,12 +3,6 @@ import { describe, expect, it } from 'vitest';
 import { detailsEmptyLabelKey, filledSections, withCount } from './details-panel';
 
 describe('detailsEmptyLabelKey', () => {
-  // ! The distinction the panel exists to make: a debounced by-key load would otherwise read as a click
-  // ! that did nothing.
-  it('says a selection is on its way while one is loading', () => {
-    expect(detailsEmptyLabelKey('loading', 'roles.details.failed')).toBe('browse.details.loading');
-  });
-
   it("names what failed with the section's own phrase", () => {
     expect(detailsEmptyLabelKey('error', 'roles.details.failed')).toBe('roles.details.failed');
   });

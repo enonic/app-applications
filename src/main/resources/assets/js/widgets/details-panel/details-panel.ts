@@ -1,19 +1,10 @@
 import type { DetailStatus } from '../../shared/detail';
 
 /**
- * What a panel with no item to show says, which is three different things.
- *
- * ! Loading, failed and gone are not one state, and conflating any pair of them lies to the reader. A
- * ! panel fetched by key sits behind a debounce and a queue, so `loading` is what keeps a selection from
- * ! reading as a click that did nothing; `failed` says why there is nothing, and the section supplies
- * ! that phrase because only it can name what failed; and anything else — nothing selected, or a key
- * ! nothing answers to — is the same empty column the layout shows with no item route at all.
+ * What a panel with no item to show says: a failure names why, with the section's own phrase since only
+ * it can say what failed; anything else is the empty column the layout shows with no item route at all.
  */
 export function detailsEmptyLabelKey(status: DetailStatus, failedLabelKey: string): string {
-  if (status === 'loading') {
-    return 'browse.details.loading';
-  }
-
   return status === 'error' ? failedLabelKey : 'browse.details.empty';
 }
 

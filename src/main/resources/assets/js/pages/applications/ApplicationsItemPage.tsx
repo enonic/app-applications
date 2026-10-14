@@ -20,6 +20,15 @@ export function ApplicationsItemPage({
   const { status, application } = useApplication(id);
   const info = useApplicationInfo(id, application?.state);
 
+  // A selection waiting on the list: what is coming is a panel, not a message.
+  if (status === 'loading' && application == null && id != null) {
+    return (
+      <DetailsPanel data-component={componentName}>
+        <DetailsPanel.Skeleton header />
+      </DetailsPanel>
+    );
+  }
+
   if (application == null) {
     return (
       <DetailsPanel.Empty data-component={componentName} labelKey={emptyLabelKey(status, id)} />
@@ -32,9 +41,6 @@ export function ApplicationsItemPage({
 ApplicationsItemPage.displayName = APPLICATIONS_ITEM_PAGE_NAME;
 
 function emptyLabelKey(status: ApplicationLookup['status'], key: string | undefined): string {
-  if (status === 'loading') {
-    return 'browse.details.loading';
-  }
   if (status === 'error') {
     return 'applications.details.failed';
   }

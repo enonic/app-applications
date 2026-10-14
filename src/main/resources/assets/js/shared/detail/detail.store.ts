@@ -17,12 +17,9 @@ export type DetailStatus = 'idle' | 'loading' | 'ready' | 'error';
 
 export type DetailState<T> = {
   status: DetailStatus;
-  /**
-   * What the panel is showing, or the last thing it showed while the next is on its way.
-   *
-   * ! Absent once a load has failed, deliberately: keeping the previous item would leave the panel
-   * ! describing something other than the selected row, with nothing on screen to say it is stale.
-   */
+  /** The key this state answers; absent with nothing selected. */
+  key?: string;
+  /** The key's item once read, kept while the same key is re-read; never another key's. */
   item?: T;
   error?: string;
 };
@@ -58,6 +55,11 @@ export type DetailLoader<T> = {
   invalidate: () => void;
   /** One item changed elsewhere: its cached copy goes, and it is re-read in place if it is the selected one. */
   evict: (key: string) => void;
+  /**
+   * What a panel for `key` renders now. The store lags the selection by an effect and a tick, so another
+   * key's state is not it: the cache answers a key already read, anything else is loading.
+   */
+  detailFor: (key: string | undefined) => DetailState<T>;
 };
 
 /**
@@ -80,13 +82,6 @@ export function createDetailLoader<T extends { key: string }>({
   let pending: AbortController | undefined;
   let scheduled: ReturnType<typeof setTimeout> | undefined;
 
-  /**
-   * ! The selected key, which is not the key of the item on screen: during a load that one is still the
-   * ! previous item, and while an error shows there is no item at all. `invalidate` has to re-read what is
-   * ! selected, so it cannot ask the state.
-   */
-  let selected: string | undefined;
-
   function cancel(): void {
     if (scheduled !== undefined) {
       clearTimeout(scheduled);
@@ -106,10 +101,11 @@ export function createDetailLoader<T extends { key: string }>({
     cache.set(key, item);
   }
 
-  function receive(result: Result<T | undefined, AppError>): void {
+  function receive(key: string, result: Result<T | undefined, AppError>): void {
     result.match(
-      (item) => $detail.set(item === undefined ? { status: 'idle' } : { status: 'ready', item }),
-      (error) => $detail.set({ status: 'error', error: error.message }),
+      (item) =>
+        $detail.set(item === undefined ? { status: 'idle', key } : { status: 'ready', key, item }),
+      (error) => $detail.set({ status: 'error', key, error: error.message }),
     );
   }
 
@@ -126,11 +122,11 @@ export function createDetailLoader<T extends { key: string }>({
         if (item !== undefined) {
           remember(key, item);
         }
-        receive(ok(item));
+        receive(key, ok(item));
       },
       (error) => {
         if (!signal.aborted) {
-          receive(err(error));
+          receive(key, err(error));
         }
       },
     );
@@ -138,7 +134,6 @@ export function createDetailLoader<T extends { key: string }>({
 
   function show(key: string | undefined): void {
     cancel();
-    selected = key;
 
     if (key === undefined) {
       $detail.set({ status: 'idle' });
@@ -147,13 +142,13 @@ export function createDetailLoader<T extends { key: string }>({
 
     const cached = cache.get(key);
     if (cached !== undefined) {
-      receive(ok(cached));
+      receive(key, ok(cached));
       return;
     }
 
-    // ! Keeps what is on screen while the next item is fetched, so stepping through rows does not flash
-    // ! empty. The message goes, though: it belonged to the load that failed, not to this one.
-    $detail.set({ status: 'loading', item: $detail.get().item });
+    // A new key starts from nothing; the same key keeps its item while re-read.
+    const { item } = $detail.get();
+    $detail.set({ status: 'loading', key, item: item?.key === key ? item : undefined });
     scheduled = setTimeout(() => void request(key), DEBOUNCE_MS);
   }
 
@@ -164,24 +159,40 @@ export function createDetailLoader<T extends { key: string }>({
     forget(): void {
       cancel();
       cache.clear();
-      selected = undefined;
       $detail.set({ status: 'idle' });
     },
 
     invalidate(): void {
       cache.clear();
 
-      if (selected !== undefined) {
-        show(selected);
+      const { key } = $detail.get();
+      if (key !== undefined) {
+        show(key);
       }
     },
 
     evict(key: string): void {
       cache.delete(key);
 
-      if (selected === key) {
+      if ($detail.get().key === key) {
         show(key);
       }
+    },
+
+    detailFor(key: string | undefined): DetailState<T> {
+      if (key === undefined) {
+        return { status: 'idle' };
+      }
+
+      const state = $detail.get();
+      if (state.key === key) {
+        return state;
+      }
+
+      const cached = cache.get(key);
+      return cached === undefined
+        ? { status: 'loading', key }
+        : { status: 'ready', key, item: cached };
     },
   };
 }
