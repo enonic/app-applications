@@ -9,15 +9,18 @@ import {
   compareVersions,
   coreVersion,
   keyOf,
+  licenseOf,
   listMarketApplications,
   supportsXpVersion,
   toMarketApplications,
+  vendorOf,
   xpVersionPattern,
   type MarketApplicationDto,
   type MarketVersionDto,
 } from './market.source';
 
 const ORIGIN = 'https://market.enonic.com';
+const ENONIC_VENDOR = 'fc66537d-e8d4-41c7-9384-0c7a3a111ce2';
 
 function version(
   versionNumber: string,
@@ -49,6 +52,9 @@ const guillotineData: MarketData = {
   identifier: 'com.enonic.app.guillotine',
   artifactId: 'guillotine',
   groupId: 'com.enonic.app',
+  vendor: ENONIC_VENDOR,
+  licenseType: 'Apache-2.0',
+  licenseName: null,
 };
 
 const guillotine: MarketApplicationDto = {
@@ -62,7 +68,9 @@ function withData(overrides: Partial<MarketData>): MarketApplicationDto {
   return { ...guillotine, data: { ...guillotineData, ...overrides } };
 }
 
-const context = { xpVersion: '8.1.0', installed: {}, origin: ORIGIN };
+const vendors = { [ENONIC_VENDOR]: 'Enonic' };
+
+const context = { xpVersion: '8.1.0', installed: {}, vendors, origin: ORIGIN };
 
 describe('compareVersions', () => {
   it('orders numerically rather than as text', () => {
@@ -129,6 +137,48 @@ describe('keyOf', () => {
 
   it('reads nothing from an entry carrying neither', () => {
     expect(keyOf(withData({ identifier: null, groupId: null }))).toBeUndefined();
+  });
+});
+
+describe('licenseOf', () => {
+  it('takes a standard license by its identifier', () => {
+    expect(licenseOf(guillotine)).toBe('Apache-2.0');
+  });
+
+  it('takes the name of a license the market marks as other', () => {
+    expect(licenseOf(withData({ licenseType: 'other', licenseName: 'Enonic License 2.0' }))).toBe(
+      'Enonic License 2.0',
+    );
+  });
+
+  it('starts each word upper case, so two spellings of one license read as one', () => {
+    expect(licenseOf(withData({ licenseType: 'other', licenseName: 'Enonic license' }))).toBe(
+      'Enonic License',
+    );
+  });
+
+  it('leaves the rest of a word alone', () => {
+    expect(licenseOf(withData({ licenseType: 'GPL-2.0' }))).toBe('GPL-2.0');
+  });
+
+  it('reads nothing where the market names no license', () => {
+    expect(licenseOf(withData({ licenseType: null }))).toBeUndefined();
+    expect(licenseOf(withData({ licenseType: 'other', licenseName: null }))).toBeUndefined();
+    expect(licenseOf(withData({ licenseType: 'other', licenseName: '  ' }))).toBeUndefined();
+  });
+});
+
+describe('vendorOf', () => {
+  it('names the vendor the application refers to by id', () => {
+    expect(vendorOf(guillotine, vendors)).toBe('Enonic');
+  });
+
+  it('reads nothing for an id the market listed no vendor for', () => {
+    expect(vendorOf(withData({ vendor: 'unknown' }), vendors)).toBeUndefined();
+  });
+
+  it('reads nothing where the application names no vendor', () => {
+    expect(vendorOf(withData({ vendor: null }), vendors)).toBeUndefined();
   });
 });
 
@@ -199,6 +249,13 @@ describe('toMarketApplications', () => {
     expect(application?.iconUrl).toBe(
       `${ORIGIN}/_/media:attachment/market/guillotine/application.svg`,
     );
+  });
+
+  it('carries the license and the vendor by name', () => {
+    const [application] = toMarketApplications([guillotine], context);
+
+    expect(application?.license).toBe('Apache-2.0');
+    expect(application?.vendor).toBe('Enonic');
   });
 
   it('reports an update when the installed version is older than the newest supported one', () => {
@@ -351,6 +408,27 @@ describe('listMarketApplications', () => {
 
     expect(found?.installedVersion).toBe('7.3.4');
     expect(found?.updateAvailable).toBe(true);
+  });
+
+  it('names the vendors from the list the same request brings back', () => {
+    answer({
+      data: {
+        market: {
+          queryDsl: [guillotine],
+          vendors: [{ _id: ENONIC_VENDOR, displayName: 'Enonic' }],
+        },
+      },
+    });
+
+    const [found] = listMarketApplications();
+
+    expect(found?.vendor).toBe('Enonic');
+  });
+
+  it('survives a market that answered no vendors', () => {
+    answer({ data: { market: { queryDsl: [guillotine], vendors: null } } });
+
+    expect(listMarketApplications()[0]?.vendor).toBeUndefined();
   });
 
   it('reads nothing from a market that answered no applications', () => {

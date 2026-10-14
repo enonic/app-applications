@@ -35,12 +35,25 @@ const MARKET_QUERY = `
             identifier
             artifactId
             groupId
+            vendor
+            licenseType
+            licenseName
           }
         }
+      }
+      vendors: queryDsl(
+        query: {term: {field: "type", value: {string: "com.enonic.app.market:vendor"}}}
+        first: $first
+      ) {
+        _id
+        displayName
       }
     }
   }
 `;
+
+/** What `licenseType` says when the license is not a standard one; `licenseName` then names it. */
+const OTHER_LICENSE = 'other';
 
 export type MarketApplicationVersion = {
   version: string;
@@ -55,6 +68,8 @@ export type MarketApplicationSource = {
   description?: string;
   iconUrl?: string;
   pageUrl?: string;
+  license?: string;
+  vendor?: string;
   latest: MarketApplicationVersion;
   versions: MarketApplicationVersion[];
   installedVersion?: string;
@@ -84,22 +99,34 @@ export type MarketApplicationDto = {
     identifier: string | null;
     artifactId: string | null;
     groupId: string | null;
+    /** The id of a `com.enonic.app.market:vendor` content, not a name. */
+    vendor: string | null;
+    licenseType: string | null;
+    licenseName: string | null;
   } | null;
+};
+
+export type MarketVendorDto = {
+  _id: string | null;
+  displayName: string | null;
 };
 
 export type MarketContext = {
   xpVersion: string;
   installed: Record<string, string | undefined>;
+  /** Vendor names by the id an application refers to them by. */
+  vendors: Record<string, string | undefined>;
   origin: string;
 };
 
 export function listMarketApplications(): MarketApplicationSource[] {
   const xpVersion = coreVersion(getVersion());
-  const entries = fetchMarket(xpVersionPattern(xpVersion));
+  const { applications, vendors } = fetchMarket(xpVersionPattern(xpVersion));
 
-  return toMarketApplications(entries, {
+  return toMarketApplications(applications, {
     xpVersion,
     installed: installedVersions(),
+    vendors: vendorNames(vendors),
     origin: marketOrigin(),
   });
 }
@@ -165,7 +192,7 @@ export function xpVersionPattern(xpVersion: string): string {
  */
 export function toMarketApplications(
   entries: readonly MarketApplicationDto[],
-  { xpVersion, installed, origin }: MarketContext,
+  { xpVersion, installed, vendors, origin }: MarketContext,
 ): MarketApplicationSource[] {
   const applications: MarketApplicationSource[] = [];
 
@@ -193,6 +220,8 @@ export function toMarketApplications(
       description: entry.data?.shortDescription ?? undefined,
       iconUrl: absoluteUrl(entry.data?.icon?.attachmentUrl, origin),
       pageUrl: absoluteUrl(entry.pageUrl, origin),
+      license: licenseOf(entry),
+      vendor: vendorOf(entry, vendors),
       latest,
       versions,
       installedVersion,
@@ -216,6 +245,29 @@ export function keyOf(entry: MarketApplicationDto): string | undefined {
   return groupId != null && artifactId != null ? `${groupId}.${artifactId}` : undefined;
 }
 
+/**
+ * The license by name: `licenseType` where it is a standard one, `licenseName` where it is `other`. Each
+ * word starts upper case, so the spellings the market carries side by side — `Enonic license`, `Enonic
+ * License` — read as one.
+ */
+export function licenseOf(entry: MarketApplicationDto): string | undefined {
+  const { licenseType, licenseName } = entry.data ?? {};
+  const license = licenseType?.toLowerCase() === OTHER_LICENSE ? licenseName : licenseType;
+  const trimmed = license?.trim();
+
+  return trimmed == null || trimmed.length === 0 ? undefined : capitalizeWords(trimmed);
+}
+
+/** The vendor's name. ! The market stores the vendor's id on an application, never its name. */
+export function vendorOf(
+  entry: MarketApplicationDto,
+  vendors: MarketContext['vendors'],
+): string | undefined {
+  const id = entry.data?.vendor;
+
+  return id == null ? undefined : vendors[id];
+}
+
 /** Market answers `pageUrl` relative and its icons absolute, so both go through here. */
 export function absoluteUrl(url: string | null | undefined, origin: string): string | undefined {
   if (url == null || url.length === 0) {
@@ -229,7 +281,7 @@ export function absoluteUrl(url: string | null | undefined, origin: string): str
 }
 
 // *
-// * Helpers
+// * Internal
 // *
 
 /**
@@ -265,6 +317,17 @@ function supportedVersionsOf(
   return versions.sort((a, b) => compareVersions(b.version, a.version));
 }
 
+function vendorNames(vendors: readonly MarketVendorDto[]): Record<string, string | undefined> {
+  const names: Record<string, string | undefined> = {};
+  for (const { _id, displayName } of vendors) {
+    if (_id != null && displayName != null) {
+      names[_id] = displayName;
+    }
+  }
+
+  return names;
+}
+
 function installedVersions(): Record<string, string | undefined> {
   const versions: Record<string, string | undefined> = {};
   for (const application of list()) {
@@ -280,7 +343,10 @@ function installedVersions(): Record<string, string | undefined> {
  * ! Throws rather than answering an empty list — an unreachable market is not an empty one. The root field
  * ! is nullable, so the failure stays in its own field with the message attached.
  */
-function fetchMarket(pattern: string): MarketApplicationDto[] {
+function fetchMarket(pattern: string): {
+  applications: MarketApplicationDto[];
+  vendors: MarketVendorDto[];
+} {
   const response = request({
     url: marketApiUrl(),
     method: 'POST',
@@ -303,11 +369,19 @@ function fetchMarket(pattern: string): MarketApplicationDto[] {
     throw new Error(`Enonic Market reported: ${firstError.message}`);
   }
 
-  return body.data?.market?.queryDsl ?? [];
+  return {
+    applications: body.data?.market?.queryDsl ?? [],
+    vendors: body.data?.market?.vendors ?? [],
+  };
 }
 
 type MarketResponse = {
-  data?: { market?: { queryDsl?: MarketApplicationDto[] | null } | null } | null;
+  data?: {
+    market?: {
+      queryDsl?: MarketApplicationDto[] | null;
+      vendors?: MarketVendorDto[] | null;
+    } | null;
+  } | null;
   errors?: { message: string }[];
 };
 
@@ -325,6 +399,14 @@ function toArray<T>(value: T | T[] | null | undefined): T[] {
   }
 
   return Array.isArray(value) ? value : [value];
+}
+
+/** Upper-cases the first letter of each word and leaves the rest alone, so `GPL-2.0` stays as it is. */
+function capitalizeWords(text: string): string {
+  return text.replace(
+    /(^|\s)(\p{Ll})/gu,
+    (_, space: string, letter: string) => space + letter.toUpperCase(),
+  );
 }
 
 function splitVersion(version: string): [core: string, prerelease: boolean] {
