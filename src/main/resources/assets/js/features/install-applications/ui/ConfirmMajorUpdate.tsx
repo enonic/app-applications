@@ -1,7 +1,7 @@
-import { Button, Dialog, Link } from '@enonic/ui';
+import { ActionDialog } from '@enonic/ui-kit';
 
-import { useI18n } from '../../../shared/i18n';
 import type { MarketRow } from '../model/market-rows';
+import { useMajorUpdateQuestion } from './useMajorUpdateQuestion';
 
 export type ConfirmMajorUpdateProps = {
   row: MarketRow;
@@ -18,7 +18,8 @@ const CONFIRM_MAJOR_UPDATE_NAME = 'ConfirmMajorUpdate';
  * The install dialog's other view: what it asks before an update crosses a major version, which is
  * where an application may change behaviour.
  *
- * The header and footer belong to the dialog around it — this renders inside its `Dialog.Content`.
+ * The header and footer belong to the dialog around it — this renders inside its
+ * `ActionDialog.Content`.
  */
 export function ConfirmMajorUpdate({
   row,
@@ -26,37 +27,24 @@ export function ConfirmMajorUpdate({
   onCancel,
   'data-component': componentName = CONFIRM_MAJOR_UPDATE_NAME,
 }: ConfirmMajorUpdateProps) {
-  const title = useI18n('applications.dialog.update.title', row.displayName, row.availableVersion);
-  const question = useI18n(
-    'applications.dialog.update.question',
-    row.displayName,
-    row.installedVersion ?? '',
-  );
-  const releaseNotesLabel = useI18n('applications.dialog.update.releaseNotes', row.displayName);
-  const confirmLabel = useI18n('applications.dialog.install.update');
-  const cancelLabel = useI18n('applications.dialog.install.cancel');
+  const { title, description, confirmLabel } = useMajorUpdateQuestion(row);
 
   return (
     <>
-      <Dialog.DefaultHeader
+      <ActionDialog.DefaultHeader
         data-component={componentName}
         title={title}
-        description={
-          <>
-            {question}{' '}
-            {row.pageUrl != null && (
-              <Link href={row.pageUrl} newTab>
-                {releaseNotesLabel}
-              </Link>
-            )}
-          </>
-        }
+        description={description}
       />
 
-      <Dialog.Footer>
-        <Button variant="outline" label={cancelLabel} onClick={onCancel} />
-        <Button variant="solid" label={confirmLabel} onClick={onConfirm} />
-      </Dialog.Footer>
+      <ActionDialog.Footer
+        cancelVariant="outline"
+        confirmLabel={confirmLabel}
+        closeOnConfirm={false}
+        closeOnCancel={false}
+        onConfirm={onConfirm}
+        onCancel={onCancel}
+      />
     </>
   );
 }

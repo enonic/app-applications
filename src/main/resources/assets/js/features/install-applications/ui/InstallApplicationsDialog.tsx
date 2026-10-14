@@ -1,11 +1,13 @@
-import { Dialog } from '@enonic/ui';
+import { ActionDialog } from '@enonic/ui-kit';
 import { useStore } from '@nanostores/preact';
 
 import { $installDialogOpen, closeInstallDialog } from '../model/install-dialog.store';
 import { InstallApplicationsDialogContent } from './InstallApplicationsDialogContent';
 
 export type InstallApplicationsDialogProps = {
-  /** Carried down to `Dialog.Content`, so the dialog reads as this one and not as its content. */
+  /**
+   * Carried down to `ActionDialog.Content`, so the dialog reads as this one and not as its content.
+   */
   'data-component'?: string;
 };
 
@@ -22,7 +24,7 @@ export function InstallApplicationsDialog({
   }
 
   return (
-    <Dialog
+    <ActionDialog.Root
       open
       onOpenChange={(next) => {
         if (!next) {
@@ -30,11 +32,11 @@ export function InstallApplicationsDialog({
         }
       }}
     >
-      <Dialog.Portal>
-        <Dialog.Overlay />
+      <ActionDialog.Portal>
+        <ActionDialog.Overlay />
         <InstallApplicationsDialogContent data-component={componentName} />
-      </Dialog.Portal>
-    </Dialog>
+      </ActionDialog.Portal>
+    </ActionDialog.Root>
   );
 }
 
