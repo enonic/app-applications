@@ -1,4 +1,5 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { atom } from 'nanostores';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { HUB_TOPICS, type TopicHandlers } from '../../../shared/admin-events';
 import { loadMarketApplications } from './market.load';
@@ -24,8 +25,16 @@ function message(eventType: string, key = 'com.enonic.app.booster'): unknown {
   return { eventType, key };
 }
 
-function emit(data: unknown): void {
-  subscribed.handlers.forEach((handlers) => (handlers as TopicHandlers).onMessage(data));
+// The reaction gathers a window of messages before it applies them.
+const WINDOW_MS = 300;
+
+const $visible = atom(true);
+
+function emit(...data: unknown[]): void {
+  data.forEach((entry) =>
+    subscribed.handlers.forEach((handlers) => (handlers as TopicHandlers).onMessage(entry)),
+  );
+  vi.advanceTimersByTime(WINDOW_MS);
 }
 
 function emitLoss(count: number | null): void {
@@ -37,12 +46,18 @@ function cacheCatalogue(): void {
 }
 
 beforeEach(() => {
+  vi.useFakeTimers();
   stop();
+  $visible.set(true);
   subscribed.handlers = [];
   subscribed.topics = [];
   $marketApplications.set({ status: 'loading', items: [] });
   vi.mocked(loadMarketApplications).mockReset();
   vi.mocked(loadMarketApplications).mockResolvedValue(undefined);
+});
+
+afterEach(() => {
+  vi.useRealTimers();
 });
 
 describe('affectsMarket', () => {
@@ -67,7 +82,7 @@ describe('affectsMarket', () => {
 describe('start', () => {
   it('reloads the catalogue when an application is uninstalled', () => {
     cacheCatalogue();
-    start();
+    start($visible);
 
     emit(message('UNINSTALLED'));
 
@@ -76,7 +91,7 @@ describe('start', () => {
 
   it('reloads it when an installed version changes under it', () => {
     cacheCatalogue();
-    start();
+    start($visible);
 
     emit(message('UPDATED'));
 
@@ -87,7 +102,7 @@ describe('start', () => {
   // another operator, a jar in the deploy folder — and this is the only thing that answers for it.
   it('reloads it on an install, whatever started it', () => {
     cacheCatalogue();
-    start();
+    start($visible);
 
     emit(message('INSTALLED'));
 
@@ -97,7 +112,7 @@ describe('start', () => {
   // A gap may have hidden an install, and the hub replays nothing.
   it('reloads it on a loss', () => {
     cacheCatalogue();
-    start();
+    start($visible);
 
     emitLoss(2);
 
@@ -107,7 +122,7 @@ describe('start', () => {
   // The one read that leaves the instance: an event nobody is looking at must not cost a call to
   // Enonic Market.
   it('asks for nothing while no catalogue has been loaded, on a message or a loss', () => {
-    start();
+    start($visible);
 
     emit(message('UNINSTALLED'));
     emitLoss(null);
@@ -115,10 +130,42 @@ describe('start', () => {
     expect(loadMarketApplications).not.toHaveBeenCalled();
   });
 
+  it('reloads once for a burst', () => {
+    cacheCatalogue();
+    start($visible);
+
+    emit(message('INSTALLED'), message('STARTED'), message('UPDATED', 'com.enonic.app.fathom'));
+
+    expect(loadMarketApplications).toHaveBeenCalledTimes(1);
+  });
+
+  it('ignores a batch of run state alone', () => {
+    cacheCatalogue();
+    start($visible);
+
+    emit(message('STARTED'), message('STOPPED'));
+
+    expect(loadMarketApplications).not.toHaveBeenCalled();
+  });
+
+  it('drops what arrives while hidden and reloads once on reveal', () => {
+    cacheCatalogue();
+    start($visible);
+
+    $visible.set(false);
+    emit(message('INSTALLED'), message('UNINSTALLED'));
+
+    expect(loadMarketApplications).not.toHaveBeenCalled();
+
+    $visible.set(true);
+
+    expect(loadMarketApplications).toHaveBeenCalledTimes(1);
+  });
+
   it('subscribes the hub-owned applications topic once however often it is started', () => {
     cacheCatalogue();
-    start();
-    start();
+    start($visible);
+    start($visible);
 
     emit(message('UNINSTALLED'));
 
@@ -130,7 +177,7 @@ describe('start', () => {
 describe('stop', () => {
   it('stops reloading once it has been stopped', () => {
     cacheCatalogue();
-    start();
+    start($visible);
     stop();
 
     emit(message('UNINSTALLED'));

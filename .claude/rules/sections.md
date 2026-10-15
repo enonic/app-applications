@@ -23,9 +23,10 @@ No rule here has an app-settings counterpart; it is the one thing being a provid
   singleton would be the first mount's host for all of them. This app ships one section, which makes
   that a latent bug rather than a visible one — the shape is the multi-section one regardless.
 - **A command never touches the host.** It takes the frame's `notify` as an argument and sends its
-  messages there, localized; a store's callback or a service reaches for nothing. What lives for the
-  module — the services, the bootstrap, the hub connection — starts with the first mount and stops
-  with the last (`mounts` in `main.ts`).
+  messages there, localized; a store's callback or a service reaches for nothing. The bootstrap and the
+  hub connection are the module's, shared by every mount; the services start from `App` once
+  `$bootstrap` is ready, the hub connected first and the topics subscribed after, and stop with the
+  mount (`useSectionEvents`), as in app-users.
 - **A `Readable` never calls back on `listen`.** Read `get()` first, then listen for changes:
   `createHostFrame` does it for `path`, `App` for `theme`.
 - **`mount` returns its disposer synchronously** (`main.ts`). The bootstrap is not awaited; `App` gates

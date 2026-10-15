@@ -5,7 +5,6 @@ import { setConfig, type Config } from '../shared/config';
 import { setPhrases } from '../shared/i18n';
 import type { Host } from '../shared/sections';
 import { bootstrapFailed, bootstrapReady } from './bootstrap.store';
-import { startSectionEvents } from './events';
 
 const CONFIG_ROOT: GraphQlRoot = {
   field: 'config',
@@ -27,11 +26,9 @@ type BootstrapData = {
 };
 
 /**
- * What a standalone tool would have had before its first render, in one document. The event feed opens
- * here too: a standalone tool would connect at startup, and this is the only thing whose life is the
- * module's, which is the subscription's life as well. ! Memoized for the life of the module, not the
- * mount: a provider shipping several sections points every descriptor here, so `mount` runs per section
- * while this must not — every mount would ask the same question.
+ * What a standalone tool would have had before its first render, in one document. ! Memoized for the life
+ * of the module, not the mount: a provider shipping several sections points every descriptor here, so
+ * `mount` runs per section while this must not — every mount would ask the same question.
  */
 let started: Promise<void> | undefined;
 
@@ -60,7 +57,6 @@ function load({ baseUrl, locale }: Host): Promise<void> {
 
       setConfig(data.config);
       setPhrases(phrases, locale);
-      startSectionEvents(data.config.eventsUrl);
       bootstrapReady();
     }, fail)
     .catch(fail);

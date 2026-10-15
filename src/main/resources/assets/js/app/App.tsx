@@ -7,12 +7,14 @@ import { HostFrameProvider, type HostFrame } from '../shared/host';
 import { translate } from '../shared/i18n';
 import { $stylesheets } from '../shared/styles';
 import { $bootstrap } from './bootstrap.store';
+import { useSectionEvents } from './useSectionEvents';
 
 export type AppProps = {
   frame: HostFrame;
 };
 
 export function App({ frame }: AppProps) {
+  useSectionEvents(frame);
   const { status, error } = useStore($bootstrap);
   const stylesheets = useStore($stylesheets);
   const [theme, setTheme] = useState(frame.host.theme.get());

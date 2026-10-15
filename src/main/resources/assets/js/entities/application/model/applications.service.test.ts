@@ -1,7 +1,8 @@
+import { atom } from 'nanostores';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { HUB_TOPICS, type TopicHandlers } from '../../../shared/admin-events';
-import { invalidateApplicationInfo } from './application-info.store';
+import { $applicationsInfo, invalidateApplicationInfo } from './application-info.store';
 import { loadApplication, loadApplications } from './applications.load';
 import { start, stop, toApplicationChange } from './applications.service';
 import { $applications, removeApplication } from './applications.store';
@@ -19,7 +20,10 @@ vi.mock('../../../shared/admin-events', async (importOriginal) => ({
   }),
 }));
 
-vi.mock('./application-info.store', () => ({ invalidateApplicationInfo: vi.fn() }));
+vi.mock('./application-info.store', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('./application-info.store')>()),
+  invalidateApplicationInfo: vi.fn(),
+}));
 
 vi.mock('./applications.load', () => ({
   loadApplication: vi.fn(),
@@ -36,8 +40,16 @@ function message(eventType: string, key?: string): unknown {
   return { eventType, key };
 }
 
-function emit(data: unknown): void {
-  subscribed.handlers.forEach((handlers) => (handlers as TopicHandlers).onMessage(data));
+// The reaction gathers a window of messages before it applies them.
+const WINDOW_MS = 300;
+
+const $visible = atom(true);
+
+function emit(...data: unknown[]): void {
+  data.forEach((entry) =>
+    subscribed.handlers.forEach((handlers) => (handlers as TopicHandlers).onMessage(entry)),
+  );
+  vi.advanceTimersByTime(WINDOW_MS);
 }
 
 function emitLoss(count: number | null): void {
@@ -75,6 +87,7 @@ describe('toApplicationChange', () => {
 
 describe('the applications service', () => {
   beforeEach(() => {
+    vi.useFakeTimers();
     subscribed.handlers = [];
     subscribed.topics = [];
     vi.mocked(loadApplication).mockReset();
@@ -82,15 +95,18 @@ describe('the applications service', () => {
     vi.mocked(removeApplication).mockReset();
     vi.mocked(invalidateApplicationInfo).mockReset();
     $applications.set({ status: 'ready', items: [] });
-    start();
+    $applicationsInfo.set({});
+    $visible.set(true);
+    start($visible);
   });
 
   afterEach(() => {
     stop();
+    vi.useRealTimers();
   });
 
   it('subscribes the hub-owned applications topic once, however often it is started', () => {
-    start();
+    start($visible);
 
     expect(subscribed.handlers).toHaveLength(1);
     expect(subscribed.topics).toEqual([HUB_TOPICS.applications]);
@@ -99,7 +115,7 @@ describe('the applications service', () => {
   it('refetches the one application a state change names', () => {
     emit(message('STOPPED', 'com.enonic.app.booster'));
 
-    expect(loadApplication).toHaveBeenCalledWith('com.enonic.app.booster');
+    expect(loadApplication).toHaveBeenCalledExactlyOnceWith('com.enonic.app.booster');
     expect(loadApplications).not.toHaveBeenCalled();
   });
 
@@ -130,12 +146,60 @@ describe('the applications service', () => {
     expect(loadApplication).not.toHaveBeenCalled();
   });
 
-  // The hub never replays what a subscriber missed, so the gap itself is the only signal there is.
-  it('reloads the list on a loss, countable or not', () => {
-    emitLoss(3);
-    emitLoss(null);
+  it('applies a burst as one batch, an application refetched once', () => {
+    emit(
+      message('STOPPED', 'com.enonic.app.booster'),
+      message('STARTED', 'com.enonic.app.booster'),
+      message('UPDATED', 'com.enonic.app.booster'),
+    );
 
-    expect(loadApplications).toHaveBeenCalledTimes(2);
+    expect(loadApplication).toHaveBeenCalledExactlyOnceWith('com.enonic.app.booster');
+  });
+
+  // An install is followed by its start: the start must not refetch a row the list does not have yet.
+  it('keeps an install an install through the changes after it', () => {
+    emit(
+      message('INSTALLED', 'com.enonic.app.fathom'),
+      message('STARTED', 'com.enonic.app.fathom'),
+    );
+
+    expect(loadApplications).toHaveBeenCalledTimes(1);
+    expect(loadApplication).not.toHaveBeenCalled();
+  });
+
+  it('reloads the list once for a batch too large to refetch by key', () => {
+    emit(
+      ...Array.from({ length: 11 }, (_, index) => message('STARTED', `com.enonic.app.${index}`)),
+    );
+
+    expect(loadApplications).toHaveBeenCalledTimes(1);
+    expect(loadApplication).not.toHaveBeenCalled();
+  });
+
+  // The hub never replays what a subscriber missed, so the gap itself is the only signal there is.
+  it('reloads the list and forgets every application on a loss', () => {
+    $applicationsInfo.set({ 'com.enonic.app.booster': { status: 'ready' } });
+
+    emitLoss(3);
+
+    expect(loadApplications).toHaveBeenCalledTimes(1);
+    expect(invalidateApplicationInfo).toHaveBeenCalledWith('com.enonic.app.booster');
+  });
+
+  it('drops what arrives while hidden and refreshes once on reveal', () => {
+    $visible.set(false);
+    emit(
+      message('STOPPED', 'com.enonic.app.booster'),
+      message('INSTALLED', 'com.enonic.app.fathom'),
+    );
+
+    expect(loadApplication).not.toHaveBeenCalled();
+    expect(loadApplications).not.toHaveBeenCalled();
+
+    $visible.set(true);
+
+    expect(loadApplications).toHaveBeenCalledTimes(1);
+    expect(loadApplication).not.toHaveBeenCalled();
   });
 
   it('leaves a list it never loaded alone, on a loss and on an install alike', () => {

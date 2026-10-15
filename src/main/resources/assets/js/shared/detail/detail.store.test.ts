@@ -14,10 +14,7 @@ function thing(key: string): Thing {
   return { key, name: key };
 }
 
-/**
- * A loader over a `load` that answers whatever the test tells it to, so the machinery is what is under
- * test: the domain's own read is stubbed out entirely.
- */
+/** A loader over a stubbed `load`, so the machinery alone is under test. */
 function loaderOver(load: (key: string, signal: AbortSignal) => Answer) {
   const calls: string[] = [];
   const loader = createDetailLoader<Thing>({
@@ -32,6 +29,10 @@ function loaderOver(load: (key: string, signal: AbortSignal) => Answer) {
 
 function answering(): ReturnType<typeof loaderOver> {
   return loaderOver((key) => okAsync(thing(key)));
+}
+
+function failingWhen(fail: () => boolean): ReturnType<typeof loaderOver> {
+  return loaderOver((key) => (fail() ? errAsync(new AppError('Gone')) : okAsync(thing(key))));
 }
 
 beforeEach(() => {
@@ -54,7 +55,7 @@ describe('createDetailLoader', () => {
     await vi.advanceTimersByTimeAsync(DEBOUNCE_MS);
 
     expect(calls).toEqual(['a']);
-    expect(loader.$detail.get()).toEqual({ status: 'ready', item: thing('a') });
+    expect(loader.$detail.get()).toEqual({ status: 'ready', key: 'a', item: thing('a') });
   });
 
   it('sends nothing before the debounce has elapsed', () => {
@@ -67,8 +68,7 @@ describe('createDetailLoader', () => {
     expect(loader.$detail.get().status).toBe('loading');
   });
 
-  // ! What the debounce exists for: holding an arrow key down walks the route through every row, and each
-  // ! would otherwise be a request through a transport that sends one at a time.
+  // ! Holding an arrow key down walks the route through every row; each would otherwise be a request.
   it('asks only for the key the stepping stopped on', async () => {
     const { loader, calls } = answering();
 
@@ -93,18 +93,28 @@ describe('createDetailLoader', () => {
     loader.show('a');
 
     // Immediately, with no timer to wait for and no third read.
-    expect(loader.$detail.get()).toEqual({ status: 'ready', item: thing('a') });
+    expect(loader.$detail.get()).toEqual({ status: 'ready', key: 'a', item: thing('a') });
     expect(calls).toEqual(['a', 'b']);
   });
 
-  it('keeps what it has on screen while the next item loads, so stepping does not flash empty', async () => {
+  it('shows nothing while a new key loads', async () => {
     const { loader } = answering();
 
     loader.show('a');
     await vi.advanceTimersByTimeAsync(DEBOUNCE_MS);
     loader.show('b');
 
-    expect(loader.$detail.get()).toEqual({ status: 'loading', item: thing('a') });
+    expect(loader.$detail.get()).toEqual({ status: 'loading', key: 'b' });
+  });
+
+  it('keeps the item on screen while the same key is re-read', async () => {
+    const { loader } = answering();
+
+    loader.show('a');
+    await vi.advanceTimersByTimeAsync(DEBOUNCE_MS);
+    loader.invalidate();
+
+    expect(loader.$detail.get()).toEqual({ status: 'loading', key: 'a', item: thing('a') });
   });
 
   it('empties the panel when nothing is selected', async () => {
@@ -117,40 +127,35 @@ describe('createDetailLoader', () => {
     expect(loader.$detail.get()).toEqual({ status: 'idle' });
   });
 
-  // ! Null is an answer, not a failure: the key names nothing, so there is nothing to show. It must not
-  // ! be remembered either, or a deleted item would keep answering from the cache.
+  // ! Null is an answer, not a failure, and is not cached: a deleted item must not keep answering.
   it('empties the panel for a key nothing answers to, without calling it a failure', async () => {
     const { loader, calls } = loaderOver(() => okAsync(undefined));
 
     loader.show('gone');
     await vi.advanceTimersByTimeAsync(DEBOUNCE_MS);
-    expect(loader.$detail.get()).toEqual({ status: 'idle' });
+    expect(loader.$detail.get()).toEqual({ status: 'idle', key: 'gone' });
 
     loader.show('gone');
     await vi.advanceTimersByTimeAsync(DEBOUNCE_MS);
     expect(calls).toEqual(['gone', 'gone']);
   });
 
-  // ! A failure drops the item rather than keeping the previous one: the panel would otherwise describe
-  // ! something other than the selected row with nothing on screen to say so.
-  it('drops what it was showing when a load fails', async () => {
+  // ! A stale item beside an error would say nothing about being stale.
+  it('drops the item on screen when its re-read fails', async () => {
     let fail = false;
-    const { loader } = loaderOver((key) =>
-      fail ? errAsync(new AppError('Gone')) : okAsync(thing(key)),
-    );
+    const { loader } = failingWhen(() => fail);
 
     loader.show('a');
     await vi.advanceTimersByTimeAsync(DEBOUNCE_MS);
 
     fail = true;
-    loader.show('b');
+    loader.invalidate();
     await vi.advanceTimersByTimeAsync(DEBOUNCE_MS);
 
-    expect(loader.$detail.get()).toEqual({ status: 'error', error: 'Gone' });
+    expect(loader.$detail.get()).toEqual({ status: 'error', key: 'a', error: 'Gone' });
   });
 
-  // ! The answer to an overtaken key must not land after a newer one, or the panel shows an item the list
-  // ! is no longer pointing at.
+  // ! An overtaken answer must not land after a newer one.
   it('drops the answer to a request it cancelled', async () => {
     const signals: AbortSignal[] = [];
     const { loader } = loaderOver((key, signal) => {
@@ -180,8 +185,7 @@ describe('createDetailLoader', () => {
     expect(calls).toEqual(['a', 'a']);
   });
 
-  // ! What `Refresh` needs: the cached item describes a row that is about to be replaced, so the open one
-  // ! is re-read rather than left stale beside a fresh row.
+  // ! What `Refresh` needs: the open item is re-read rather than left stale beside a fresh row.
   it('re-reads the open item on invalidate', async () => {
     const { loader, calls } = answering();
 
@@ -192,13 +196,10 @@ describe('createDetailLoader', () => {
     await vi.advanceTimersByTimeAsync(DEBOUNCE_MS);
 
     expect(calls).toEqual(['a', 'a']);
-    expect(loader.$detail.get()).toEqual({ status: 'ready', item: thing('a') });
+    expect(loader.$detail.get()).toEqual({ status: 'ready', key: 'a', item: thing('a') });
   });
 
-  // ! Invalidating mid-load must re-read what is selected, not what is on screen: the item shown during a
-  // ! load is still the previous one, so asking the state would load the row the user has just left and
-  // ! leave the panel describing it while the route points at another.
-  it('re-reads the selected item on invalidate, not the one still on screen', async () => {
+  it('re-reads the selected key on invalidate, not the one last shown', async () => {
     const { loader, calls } = answering();
 
     loader.show('a');
@@ -209,26 +210,24 @@ describe('createDetailLoader', () => {
     await vi.advanceTimersByTimeAsync(DEBOUNCE_MS);
 
     expect(calls).toEqual(['a', 'b']);
-    expect(loader.$detail.get()).toEqual({ status: 'ready', item: thing('b') });
+    expect(loader.$detail.get()).toEqual({ status: 'ready', key: 'b', item: thing('b') });
   });
 
   // The selection stands after a failure, so `Refresh` is what retries it.
   it('re-reads the selected item on invalidate after a failed load', async () => {
     let fail = true;
-    const { loader, calls } = loaderOver((key) =>
-      fail ? errAsync(new AppError('Gone')) : okAsync(thing(key)),
-    );
+    const { loader, calls } = failingWhen(() => fail);
 
     loader.show('a');
     await vi.advanceTimersByTimeAsync(DEBOUNCE_MS);
-    expect(loader.$detail.get()).toEqual({ status: 'error', error: 'Gone' });
+    expect(loader.$detail.get()).toEqual({ status: 'error', key: 'a', error: 'Gone' });
 
     fail = false;
     loader.invalidate();
     await vi.advanceTimersByTimeAsync(DEBOUNCE_MS);
 
     expect(calls).toEqual(['a', 'a']);
-    expect(loader.$detail.get()).toEqual({ status: 'ready', item: thing('a') });
+    expect(loader.$detail.get()).toEqual({ status: 'ready', key: 'a', item: thing('a') });
   });
 
   it('asks for nothing on invalidate when the panel is empty', async () => {
@@ -253,5 +252,53 @@ describe('createDetailLoader', () => {
 
     expect(calls).toEqual(['a']);
     expect(loader.$detail.get()).toEqual({ status: 'idle' });
+  });
+
+  it('re-reads an evicted key only while it is the one shown', async () => {
+    const { loader, calls } = answering();
+
+    loader.show('a');
+    await vi.advanceTimersByTimeAsync(DEBOUNCE_MS);
+
+    loader.evict('b');
+    expect(loader.$detail.get()).toEqual({ status: 'ready', key: 'a', item: thing('a') });
+
+    loader.evict('a');
+    expect(loader.$detail.get()).toEqual({ status: 'loading', key: 'a', item: thing('a') });
+    await vi.advanceTimersByTimeAsync(DEBOUNCE_MS);
+
+    expect(calls).toEqual(['a', 'a']);
+  });
+});
+
+describe('detailFor', () => {
+  it('is idle with nothing selected', () => {
+    expect(answering().loader.detailFor(undefined)).toEqual({ status: 'idle' });
+  });
+
+  it('answers with the store state about the key', async () => {
+    const { loader } = answering();
+
+    loader.show('a');
+    await vi.advanceTimersByTimeAsync(DEBOUNCE_MS);
+
+    expect(loader.detailFor('a')).toBe(loader.$detail.get());
+  });
+
+  // The store lags the selection by an effect and a tick; a key already read must not paint the skeleton.
+  it('answers a cached key as ready before it is shown again', async () => {
+    const { loader, calls } = answering();
+
+    loader.show('a');
+    await vi.advanceTimersByTimeAsync(DEBOUNCE_MS);
+    loader.show('b');
+    await vi.advanceTimersByTimeAsync(DEBOUNCE_MS);
+
+    expect(loader.detailFor('a')).toEqual({ status: 'ready', key: 'a', item: thing('a') });
+    expect(calls).toEqual(['a', 'b']);
+  });
+
+  it('reads a key it has not seen as loading', () => {
+    expect(answering().loader.detailFor('c')).toEqual({ status: 'loading', key: 'c' });
   });
 });

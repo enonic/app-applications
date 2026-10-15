@@ -2,7 +2,9 @@ import { ListItem, Separator } from '@enonic/ui';
 import type { ReactNode } from 'react';
 
 import { useI18n } from '../../shared/i18n';
+import { useLoadMore } from '../../shared/load-more';
 import { ItemLabel } from '../../shared/ui/ItemLabel';
+import { MoreButton } from '../../shared/ui/MoreButton';
 import { withCount } from './details-panel';
 import { DetailsEmpty } from './DetailsEmpty';
 import { DetailsSkeleton } from './DetailsSkeleton';
@@ -59,8 +61,15 @@ export type DetailsFieldProps = {
   'data-component'?: string;
 };
 
-export type DetailsListProps = {
-  children: ReactNode;
+export type DetailsListProps<T> = {
+  items: readonly T[];
+  /** The size of the whole set when `items` is only the page of it that was loaded. */
+  total?: number;
+  /** The caller pages: every row in `items` is shown, and `+N more` asks for the next page. */
+  onLoadMore?: () => void;
+  /** A page is on its way: the control says so. */
+  loadingMore?: boolean;
+  children: (item: T) => ReactNode;
 };
 
 export type DetailsListItemProps = {
@@ -167,11 +176,33 @@ export function DetailsField({
 
 DetailsField.displayName = DETAILS_FIELD_NAME;
 
-export function DetailsList({ children }: DetailsListProps) {
+export function DetailsList<T>({
+  items,
+  total,
+  onLoadMore,
+  loadingMore,
+  children,
+}: DetailsListProps<T>) {
+  const { visible, hiddenCount, nextCount, loadMore } = useLoadMore(items, { total, onLoadMore });
+
+  const moreLabel = useI18n('browse.details.more', nextCount);
+  const loadingMoreLabel = useI18n('browse.list.loadingMore');
+
+  // ? A sibling of the list rather than a row in it: `role="list"` takes list items and nothing else.
   return (
-    <div role="list" className="flex flex-col">
-      {children}
-    </div>
+    <>
+      <div role="list" className="flex flex-col">
+        {visible.map(children)}
+      </div>
+
+      {hiddenCount > 0 && (
+        <MoreButton
+          label={loadingMore === true ? loadingMoreLabel : moreLabel}
+          busy={loadingMore}
+          onClick={loadMore}
+        />
+      )}
+    </>
   );
 }
 
