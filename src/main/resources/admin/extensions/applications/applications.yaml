@@ -1,0 +1,14 @@
+kind: 'AdminExtension'
+title:
+  text: 'Applications'
+  i18n: 'section.applications.title'
+description:
+  text: 'Install, update and manage applications'
+  i18n: 'section.applications.description'
+allow:
+  - 'role:system.admin'
+interfaces:
+  - 'settings.section'
+config:
+  order: 10
+  path: 'applications'

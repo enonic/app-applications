@@ -1,17 +1,3 @@
 plugins {
     id 'com.enonic.xp.settings' version '4.2.0'
 }
-
-include 'testing'
-
-if ( hasProperty( 'env' ) ) {
-    addBuild('../lib-admin-ui')
-}
-
-def addBuild( name )
-{
-    def dir = new File( (File) settingsDir, name )
-    if (dir.directory) {
-        includeBuild name
-    }
-}

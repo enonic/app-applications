@@ -10,25 +10,25 @@
 *~
 
 # AI
-.claude/
+.claude/settings.local.json
 .cursor/
 
 # Build files
-dist/
 build/
-buildSrc/
-target/
+
+# Eclipse / VS Code Java language server — shadow-compiles src/main/java and mirrors the
+# resources tree along with it.
+bin/
+.classpath
+.project
+.settings/
 
 # Development files
-.storybook/
-storybook-static/
 docs/
-*storybook.log
 *.local
-.xp/
 
 # Coverage
-**/spec/coverage
+coverage/
 
 # Build tools
 node_modules/
@@ -40,7 +40,7 @@ node_modules/
 Thumbs.db
 
 # Enonic
-.enonic/
+.enonic
 
 # Logs
 logs/
@@ -54,8 +54,6 @@ pnpm-debug.log*
 .cache/
 .temp/
 .tmp/
-generated-java/
-.tsbuildinfo
-.eslintcache
+*.tsbuildinfo
 
 .gh-actions/

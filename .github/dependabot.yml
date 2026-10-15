@@ -24,15 +24,16 @@ updates:
       # Unpin once lib-admin-ui moves to jQuery 4.
       - dependency-name: "jquery"
         update-types: ["version-update:semver-major"]
-  - package-ecosystem: "npm"
-    directory: "/testing"
-    schedule:
-      interval: "weekly"
-    open-pull-requests-limit: 10
-    assignees:
-      - "alansemenov"
-    reviewers:
-      - "alansemenov"
+  # Disabled: /testing went with the old admin tool; Dependabot errors on a missing directory.
+  # - package-ecosystem: "npm"
+  #   directory: "/testing"
+  #   schedule:
+  #     interval: "weekly"
+  #   open-pull-requests-limit: 10
+  #   assignees:
+  #     - "alansemenov"
+  #   reviewers:
+  #     - "alansemenov"
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:

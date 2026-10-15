@@ -1,109 +1,54 @@
-import {Application} from '@enonic/lib-admin-ui/app/Application';
-import {ApplicationAppPanel} from './app/ApplicationAppPanel';
-import {InstallAppDialog} from './app/installation/InstallAppDialog';
-import {InstallAppPromptEvent} from './app/installation/InstallAppPromptEvent';
-import {Body} from '@enonic/lib-admin-ui/dom/Body';
-import {Path} from '@enonic/lib-admin-ui/rest/Path';
-import {ConnectionDetector} from '@enonic/lib-admin-ui/system/ConnectionDetector';
-import {AppBar} from '@enonic/lib-admin-ui/app/bar/AppBar';
-import {AppHelper} from '@enonic/lib-admin-ui/util/AppHelper';
-import {ServerEventsListener} from '@enonic/lib-admin-ui/event/ServerEventsListener';
-import {i18nInit} from '@enonic/lib-admin-ui/util/MessagesInitializer';
-import {i18n} from '@enonic/lib-admin-ui/util/Messages';
-import {AppInstalledEvent} from './app/installation/AppInstalledEvent';
-import {CONFIG, ConfigObject} from '@enonic/lib-admin-ui/util/Config';
-import {AppUninstalledEvent} from './app/installation/AppUninstalledEvent';
-import {CustomElement} from '@enonic/lib-admin-ui/dom/CustomElement';
+import { h, render } from 'preact';
 
-const body = Body.get();
+import { App } from './app/App';
+import { bootstrap } from './app/bootstrap';
+import { startApplicationsService, stopApplicationsService } from './entities/application';
+import { startMarketService, stopMarketService } from './entities/market';
+import { startInstallService, stopInstallService } from './features/install-applications';
+import { createHostFrame } from './shared/host';
+import type { Mount, RoutedHost } from './shared/sections';
 
-function getApplication(): Application {
-    const assetsUri: string = CONFIG.getString('assetsUri');
-    const application = new Application(
-        CONFIG.getString('appId'),
-        i18n('admin.tool.displayName'),
-        i18n('app.abbr'),
-        `${assetsUri}/icons/icon-white.svg`
-    );
-    application.setPath(Path.fromString('/'));
-    application.setWindow(window);
+/**
+ * ! What lives for the module, not the mount: the host may serve every section of an app from one
+ * ! module instance, so the services start with the first mount and stop with the last. This app ships
+ * ! one section, so the two coincide — the count is what keeps that a coincidence rather than a rule.
+ */
+let mounts = 0;
 
-    return application;
-}
+/** Renders the section into the container the host owns, inside the shadow root it created. */
+// ? A const carrying the contract's `Mount` rather than a function declaration: the annotation is
+// ? what makes "this module needs a routed host" a compile-time check.
+export const mount: Mount<RoutedHost> = ({ container, host }) => {
+  // ! Not awaited. `mount` owes the shell its disposer synchronously, so the section paints while its
+  // ! own configuration is still in flight and `$bootstrap` is what moves it on.
+  void bootstrap(host);
 
-function startLostConnectionDetector() {
-    ConnectionDetector.get(CONFIG.getString('statusApiUrl'))
-        .setAuthenticated(true)
-        .setSessionExpireRedirectUrl(CONFIG.getString('toolUri'))
-        .setNotificationMessage(i18n('notify.connection.loss'))
-        .startPolling(true);
-}
+  // Everything derived from the host lives on the frame — one per mount, never at module level.
+  const frame = createHostFrame(host);
 
-function startApplication() {
+  render(h(App, { frame }), container);
 
-    const application: Application = getApplication();
-    const appBar = new AppBar(application);
-    const appPanel = new ApplicationAppPanel(application.getPath());
+  // ! Counted only once the mount has succeeded: a throw above returns no disposer, so a count taken
+  // ! earlier could never come back down and the services would outlive every section.
+  if (mounts === 0) {
+    // ! Subscribed before the hub connection the bootstrap opens, which is deliberate: the client keeps
+    // ! a handler taken this early and subscribes its topic the moment it connects.
+    startApplicationsService();
+    startMarketService();
+    startInstallService();
+  }
+  mounts += 1;
 
-    body.appendChild(appBar);
-    body.appendChild(appPanel);
+  return () => {
+    // The components go first: their cleanups may still speak to the frame.
+    render(null, container);
+    frame.dispose();
 
-    AppHelper.preventDragRedirect();
-
-    application.setLoaded(true);
-
-    const serverEventsListener = new ServerEventsListener([application], CONFIG.getString('eventApiUrl'));
-    serverEventsListener.start();
-
-    startLostConnectionDetector();
-
-    const installAppDialog = new InstallAppDialog();
-
-    InstallAppPromptEvent.on((event) => {
-        installAppDialog.setInstalledApplications(event.getInstalledApplications());
-        installAppDialog.open();
-    });
-
-    AppInstalledEvent.on((event) => {
-        installAppDialog.updateAppInstalled(event.getApplication());
-    });
-
-    AppUninstalledEvent.on((event) => {
-       installAppDialog.updateAppUninstalled(event.getApplication());
-    });
-
-    appendMenuPanel();
-}
-
-function appendMenuPanel(): void {
-    const menuUrl = CONFIG.getString('menuUrl');
-    if (!menuUrl) {
-        throw new Error('Menu URL is not defined');
+    mounts -= 1;
+    if (mounts === 0) {
+      stopInstallService();
+      stopMarketService();
+      stopApplicationsService();
     }
-    const menuElement = CustomElement.create('xp-menu');
-    document.body.appendChild(menuElement);
-    fetch(menuUrl)
-        .then(response => response.text())
-        .then((html: string) => menuElement.setHtml(html))
-        .catch((e: Error) => {
-            throw new Error(`Failed to fetch the Menu extension panel at ${menuUrl}: ${e.toString()}`);
-        });
-}
-
-(async () => {
-    if (!document.currentScript) {
-        throw Error('Legacy browsers are not supported');
-    }
-
-    const configScriptId = document.currentScript.getAttribute('data-config-script-id');
-    if (!configScriptId) {
-        throw Error('Missing \'data-config-script-id\' attribute');
-    }
-
-    const configScriptEl: HTMLElement = document.getElementById(configScriptId);
-    CONFIG.setConfig(JSON.parse(configScriptEl.innerText) as ConfigObject);
-
-    await i18nInit(CONFIG.getString('apis.i18nUrl'));
-    startApplication();
-})();
-
+  };
+};
