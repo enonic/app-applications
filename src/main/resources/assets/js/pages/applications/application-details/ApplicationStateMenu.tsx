@@ -14,7 +14,7 @@ import { applicationStateLabelKey } from '../model/applications.rows';
 
 export type ApplicationStateMenuProps = {
   application: Application;
-  /** On the trigger, or on the plain label; the open menu is `<name>.Menu`, as in `BrowseFilter`. */
+  /** On the trigger, or on the plain label; the open menu is `<name>.Menu`, as in `BrowseSort`. */
   'data-component'?: string;
 };
 

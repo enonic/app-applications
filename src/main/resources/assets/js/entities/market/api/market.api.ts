@@ -10,6 +10,8 @@ const MARKET_APPLICATIONS_SELECTION = `{
   description
   iconUrl
   pageUrl
+  license
+  vendor
   latest {
     version
     downloadUrl
@@ -39,6 +41,8 @@ type MarketApplicationDto = {
   description: string | null;
   iconUrl: string | null;
   pageUrl: string | null;
+  license: string | null;
+  vendor: string | null;
   latest: MarketApplicationVersionDto;
   installedVersion: string | null;
   updateAvailable: boolean;
@@ -71,6 +75,8 @@ function toMarketApplication(dto: MarketApplicationDto): MarketApplication {
     description: dto.description ?? undefined,
     iconUrl: dto.iconUrl ?? undefined,
     pageUrl: dto.pageUrl ?? undefined,
+    license: dto.license ?? undefined,
+    vendor: dto.vendor ?? undefined,
     latest: toVersion(dto.latest),
     installedVersion: dto.installedVersion ?? undefined,
     updateAvailable: dto.updateAvailable,

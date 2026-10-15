@@ -1,3 +1,4 @@
+import { FilterInput, type FilterField, type FilterQuery } from '@enonic/ui-kit';
 import type { ReactNode } from 'react';
 
 import { useI18n, useLabelled } from '../../shared/i18n';
@@ -11,7 +12,6 @@ import {
 import { BrowseList } from '../browse-list/BrowseList';
 import { BrowseListContextMenu } from '../browse-list/BrowseListContextMenu';
 import { BrowseListHeader } from '../browse-list/BrowseListHeader';
-import { BrowseSearch } from '../browse-search/BrowseSearch';
 import {
   rowActivationAction,
   type ActionContext,
@@ -27,7 +27,11 @@ export type BrowseScreenProps<T> = {
   status: BrowseListStatus;
   activeKey?: string;
   selectedKeys: ReadonlySet<string>;
-  query: string;
+  query: FilterQuery;
+  /** The fields the filter offers. None leaves it a free-text search. */
+  fields?: readonly FilterField[];
+  /** The filter's empty-input prompt, named for the section: `Search users`. */
+  filterPlaceholder?: string;
   /** Shown when the section itself is empty; a query with no match says so on its own. */
   emptyLabel: string;
   /** The details column, rendered once `activeKey` names a row. */
@@ -36,11 +40,10 @@ export type BrowseScreenProps<T> = {
   managedMode?: boolean;
   /** What stands in the action row's place, normally `ManagedModeBanner` with the section's copy. */
   notice?: ReactNode;
-  onQueryChange: (query: string) => void;
+  onQueryChange: (query: FilterQuery) => void;
   onSelectionChange: (keys: ReadonlySet<string>) => void;
   onActiveChange: (key: string | undefined) => void;
   onRefresh: () => void;
-  filter?: ReactNode;
   sort?: ReactNode;
   hasMore?: boolean;
   onLoadMore?: () => void;
@@ -52,9 +55,11 @@ export type BrowseScreenProps<T> = {
 
 const BROWSE_SCREEN_NAME = 'BrowseScreen';
 
+const NO_FIELDS: readonly FilterField[] = [];
+
 /**
  * The whole browse screen, so a section states its data and actions and nothing else. Every section
- * renders the same toolbar, search, header, list and details column, and the wiring lives here rather
+ * renders the same toolbar, filter, header, list and details column, and the wiring lives here rather
  * than being copied per section.
  */
 export function BrowseScreen<T>({
@@ -66,6 +71,8 @@ export function BrowseScreen<T>({
   activeKey,
   selectedKeys,
   query,
+  fields = NO_FIELDS,
+  filterPlaceholder,
   emptyLabel,
   details,
   managedMode,
@@ -74,7 +81,6 @@ export function BrowseScreen<T>({
   onSelectionChange,
   onActiveChange,
   onRefresh,
-  filter,
   sort,
   hasMore,
   onLoadMore,
@@ -119,13 +125,17 @@ export function BrowseScreen<T>({
       detailsShown={activeKey !== undefined}
       list={
         <>
-          <BrowseSearch value={query} onChange={onQueryChange} />
+          <FilterInput
+            fields={fields}
+            value={query}
+            onChange={onQueryChange}
+            placeholder={filterPlaceholder}
+          />
 
           <BrowseListHeader
             allSelected={managedMode ? undefined : selectAllState(rows, selectedKeys)}
             onSelectAllChange={managedMode ? undefined : handleSelectAllChange}
             onRefresh={onRefresh}
-            filter={filter}
             sort={sort}
           />
 
@@ -140,7 +150,7 @@ export function BrowseScreen<T>({
               onRowActivate={handleRowActivate}
               selectable={managedMode !== true}
               status={status}
-              emptyLabel={query.trim() ? noMatchesLabel : emptyLabel}
+              emptyLabel={query.length > 0 ? noMatchesLabel : emptyLabel}
               hasMore={hasMore}
               onLoadMore={onLoadMore}
               loadingMore={loadingMore}

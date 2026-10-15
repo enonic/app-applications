@@ -1,3 +1,4 @@
+import { textOf } from '@enonic/ui-kit';
 import { useStore } from '@nanostores/preact';
 import { LoaderCircle } from 'lucide-react';
 import { useMemo } from 'preact/hooks';
@@ -22,7 +23,6 @@ import {
   sortByDisplayName,
   type SortDirection,
 } from '../../widgets/browse-list/browse-sort';
-import { BrowseFilter } from '../../widgets/browse-list/BrowseFilter';
 import { BrowseSort, type BrowseSortOption } from '../../widgets/browse-list/BrowseSort';
 import { BrowseScreen } from '../../widgets/browse-screen/BrowseScreen';
 import { useBrowseSection } from '../../widgets/browse-screen/useBrowseSection';
@@ -30,9 +30,9 @@ import { ManagedModeBanner } from '../../widgets/browse-toolbar/ManagedModeBanne
 import { ApplicationsItemPage } from './ApplicationsItemPage';
 import { applicationActions } from './model/applications.actions';
 import {
-  filterApplicationsBySystem,
+  applicationFields,
+  filterApplications,
   searchApplications,
-  systemEntry,
 } from './model/applications.filter';
 import {
   applicationStateLabelKey,
@@ -41,7 +41,6 @@ import {
   toUploadRow,
 } from './model/applications.rows';
 import { applicationsFilter } from './model/filter.store';
-import { applicationsSearch } from './model/search.store';
 import { applicationsSelection } from './model/selection.store';
 import { $applicationsSort, setApplicationsSort } from './model/sort.store';
 import { useApplicationsScreen } from './model/useApplicationsScreen';
@@ -51,18 +50,25 @@ const APPLICATIONS_PAGE_NAME = 'ApplicationsPage';
 export function ApplicationsPage() {
   useApplicationsScreen();
   const { status, items } = useStore($applications);
-  const query = useStore(applicationsSearch.$query);
-  const selectedEntries = useStore(applicationsFilter.$selected);
+  const query = useStore(applicationsFilter.$query);
   const sort = useStore($applicationsSort);
   const activeKey = useItemId();
   const { openItem, closeItem, notify } = useHostFrame();
   const managedMode = isManagedMode();
-  const { items: marketItems } = useMarketApplications();
+  const { status: marketStatus, items: marketItems } = useMarketApplications();
   const uploads = useStore($applicationUploads);
 
   const emptyLabel = useI18n('applications.list.empty');
   const uploadingLabel = useI18n('applications.list.uploading');
-  const systemLabel = useI18n('applications.filter.system');
+  const filterPlaceholder = useI18n('applications.filter.placeholder');
+  const systemFieldLabel = useI18n('applications.filter.system');
+  const stateFieldLabel = useI18n('applications.filter.state');
+  const startedLabel = useI18n('applications.state.started');
+  const stoppedLabel = useI18n('applications.state.stopped');
+  const upgradeFieldLabel = useI18n('applications.filter.upgrade');
+  const yesLabel = useI18n('applications.filter.yes');
+  const noLabel = useI18n('applications.filter.no');
+  const marketFailedLabel = useI18n('applications.filter.marketFailed');
   const sortNameLabel = useI18n('applications.sort.name');
   const sortAscLabel = useI18n('applications.sort.nameAsc');
   const sortDescLabel = useI18n('applications.sort.nameDesc');
@@ -80,23 +86,55 @@ export function ApplicationsPage() {
     [],
   ) satisfies readonly BrowseSortOption<SortDirection>[];
 
-  // The whole list is loaded, so the search narrows it here rather than on the server. Shared with
-  // the entry's count below, so the query runs once per render rather than twice.
-  const searched = useMemo(() => searchApplications(items, query), [items, query]);
+  // Empty while the market is loading or unreachable, which leaves every row on its installed
+  // version alone — the list never waits on an outbound call.
+  const available = useMemo(() => availableVersions(marketItems), [marketItems]);
+
+  // The whole list is loaded, so the text narrows it here rather than on the server. Shared with the
+  // field counts below, so the text runs once per render rather than twice.
+  const searched = useMemo(() => searchApplications(items, textOf(query)), [items, query]);
 
   // Narrow first, order last: sorting only what survived is the cheaper half, and the order the rows
   // appear in has to be the final word.
   const visible = useMemo(
-    () => sortByDisplayName(filterApplicationsBySystem(searched, selectedEntries), sort),
-    [searched, selectedEntries, sort],
+    () => sortByDisplayName(filterApplications(searched, query, available), sort),
+    [searched, query, available, sort],
   );
 
-  // The count follows the query but not the tick, so it answers "how many would this reveal".
-  const entries = useMemo(() => [systemEntry(searched, systemLabel)], [searched]);
-
-  // Empty while the market is loading or unreachable, which leaves every row on its installed
-  // version alone — the list never waits on an outbound call.
-  const available = useMemo(() => availableVersions(marketItems), [marketItems]);
+  const fields = useMemo(
+    () =>
+      applicationFields(
+        searched,
+        query,
+        available,
+        managedMode ? undefined : { status: marketStatus },
+        {
+          system: systemFieldLabel,
+          state: stateFieldLabel,
+          started: startedLabel,
+          stopped: stoppedLabel,
+          upgrade: upgradeFieldLabel,
+          yes: yesLabel,
+          no: noLabel,
+          marketFailed: marketFailedLabel,
+        },
+      ),
+    [
+      searched,
+      query,
+      available,
+      managedMode,
+      marketStatus,
+      systemFieldLabel,
+      stateFieldLabel,
+      startedLabel,
+      stoppedLabel,
+      upgradeFieldLabel,
+      yesLabel,
+      noLabel,
+      marketFailedLabel,
+    ],
+  );
 
   // Above the list and outside the query: a jar on its way up is not an application yet, so there is
   // nothing to search or sort it by. The spinner sits where an application's icon would, which is
@@ -121,8 +159,7 @@ export function ApplicationsPage() {
     items,
     status,
     selection: applicationsSelection,
-    search: applicationsSearch,
-    resetOnLeave: [applicationsFilter],
+    filter: applicationsFilter,
     visible,
     // A fresh icon element per row: Preact writes into a vnode as it renders it.
     toRow: (application) =>
@@ -166,14 +203,9 @@ export function ApplicationsPage() {
         managedMode={managedMode}
         notice={<ManagedModeBanner title={managedTitle} help={managedHelp} />}
         emptyLabel={emptyLabel}
+        filterPlaceholder={filterPlaceholder}
+        fields={fields}
         details={<ApplicationsItemPage />}
-        filter={
-          <BrowseFilter
-            entries={entries}
-            selected={selectedEntries}
-            onToggle={(id) => applicationsFilter.toggle(id)}
-          />
-        }
         sort={
           <BrowseSort
             options={sortOptions}

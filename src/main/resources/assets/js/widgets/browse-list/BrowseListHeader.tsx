@@ -10,8 +10,7 @@ export type BrowseListHeaderProps = {
   /** Absent leaves the header without a select-all. */
   onSelectAllChange?: (checked: boolean) => void;
   onRefresh: () => void;
-  /** Section-specific control. Undefined renders the button inert — see § 3.6 of the contract. */
-  filter?: ReactNode;
+  /** Section-specific control. Undefined renders the button inert. */
   sort?: ReactNode;
   'data-component'?: string;
 };
@@ -48,8 +47,6 @@ export function BrowseListHeader({
       )}
 
       <div className="ml-auto flex flex-wrap items-center gap-2.5">
-        {/* TODO: remove it and its functionality when filter component lands */}
-        {/* {filter ?? <InertHeaderControl icon={Filter} label={filterLabel} />} */}
         {sort ?? <InertHeaderControl icon={ArrowDownUp} label={sortLabel} />}
         <Button
           variant="text"

@@ -1,7 +1,8 @@
+import type { FilterQuery } from '@enonic/ui-kit';
 import { useStore } from '@nanostores/preact';
 import { useEffect } from 'preact/hooks';
 
-import type { SearchStore } from '../../shared/search';
+import type { FilterStore } from '../../shared/filter';
 import type { SelectionStore } from '../../shared/selection';
 import { type BrowseListStatus, type BrowseRow, shownRowKey } from '../browse-list/browse-list';
 import type { ActionContext } from '../browse-toolbar/actions';
@@ -22,7 +23,7 @@ export type BrowseSectionOptions<T extends { key: string }> = {
   status: BrowseListStatus;
   /** The section's own stores, from `pages/<section>/model/`. */
   selection: SelectionStore;
-  search: SearchStore;
+  filter: FilterStore;
   /** Per-section narrowing cleared on leaving, beside the selection and query — a bucket filter. */
   resetOnLeave?: readonly { clear: () => void }[];
   /**
@@ -50,9 +51,9 @@ export type BrowseSection<T> = {
   status: BrowseListStatus;
   activeKey: string | undefined;
   selectedKeys: ReadonlySet<string>;
-  query: string;
+  query: FilterQuery;
   context: ActionContext<T>;
-  onQueryChange: (query: string) => void;
+  onQueryChange: (query: FilterQuery) => void;
   onSelectionChange: (keys: ReadonlySet<string>) => void;
   onActiveChange: (key: string | undefined) => void;
   onRefresh: () => void;
@@ -69,7 +70,7 @@ export function useBrowseSection<T extends { key: string }>({
   items,
   status,
   selection,
-  search,
+  filter,
   resetOnLeave,
   visible,
   toRow,
@@ -77,12 +78,12 @@ export function useBrowseSection<T extends { key: string }>({
   reload,
 }: BrowseSectionOptions<T>): BrowseSection<T> {
   const selectedKeys = useStore(selection.$selected);
-  const query = useStore(search.$query);
+  const query = useStore(filter.$query);
 
   useEffect(() => {
     return () => {
       selection.clear();
-      search.clear();
+      filter.clear();
       resetOnLeave?.forEach((store) => store.clear());
     };
     // ? The stores outlive the page, so the cleanup only has to run when it unmounts.
@@ -102,7 +103,7 @@ export function useBrowseSection<T extends { key: string }>({
       selected: visible.filter(({ key }) => selectedKeys.has(key)),
       active: items.find(({ key }) => key === activeKey),
     },
-    onQueryChange: search.set,
+    onQueryChange: filter.set,
     onSelectionChange: (keys) => {
       selection.replace([...keys]);
 

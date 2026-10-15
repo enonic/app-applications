@@ -12,6 +12,8 @@ export type MarketApplication = {
   description?: string;
   iconUrl?: string;
   pageUrl?: string;
+  license?: string;
+  vendor?: string;
   latest: MarketApplicationVersion;
   installedVersion?: string;
   updateAvailable: boolean;

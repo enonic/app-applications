@@ -38,6 +38,12 @@ export const MarketApplicationType: GraphQLType = generator.createObjectType({
     pageUrl: {
       type: GraphQLString,
     },
+    license: {
+      type: GraphQLString,
+    },
+    vendor: {
+      type: GraphQLString,
+    },
     latest: {
       type: nonNull(MarketApplicationVersionType),
     },

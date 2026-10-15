@@ -13,6 +13,8 @@ const guillotine = {
   description: 'Augmentable GraphQL Content API for Enonic XP',
   iconUrl: 'https://market.enonic.com/_/media:attachment/market/guillotine/application.svg',
   pageUrl: 'https://market.enonic.com/vendors/enonic/guillotine',
+  license: 'Apache-2.0',
+  vendor: 'Enonic',
   latest: {
     version: '8.0.0',
     downloadUrl: 'https://repo.enonic.com/public/guillotine-8.0.0.jar',
@@ -50,6 +52,8 @@ describe('fetchMarketApplications', () => {
         description: 'Augmentable GraphQL Content API for Enonic XP',
         iconUrl: 'https://market.enonic.com/_/media:attachment/market/guillotine/application.svg',
         pageUrl: 'https://market.enonic.com/vendors/enonic/guillotine',
+        license: 'Apache-2.0',
+        vendor: 'Enonic',
         latest: {
           version: '8.0.0',
           downloadUrl: 'https://repo.enonic.com/public/guillotine-8.0.0.jar',
@@ -74,6 +78,17 @@ describe('fetchMarketApplications', () => {
 
     expect(application?.installedVersion).toBeUndefined();
     expect(application?.updateAvailable).toBe(false);
+  });
+
+  it('reads a license or a vendor the market did not name as absent', async () => {
+    respondWith({
+      data: { marketApplications: [{ ...guillotine, license: null, vendor: null }] },
+    });
+
+    const [application] = (await fetchMarketApplications())._unsafeUnwrap();
+
+    expect(application?.license).toBeUndefined();
+    expect(application?.vendor).toBeUndefined();
   });
 
   it('asks for the field with no arguments, so the transport names the operation', () => {

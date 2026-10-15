@@ -1,4 +1,5 @@
 import type { MarketApplication } from '../../../entities/market';
+import { matchesEveryWord } from '../../../shared/filter';
 
 /** What this instance can do with a market entry: install it, update it, or nothing. */
 export type MarketRowStatus = 'install' | 'update' | 'installed' | 'ahead';
@@ -9,6 +10,8 @@ export type MarketRow = {
   description?: string;
   iconUrl?: string;
   pageUrl?: string;
+  license?: string;
+  vendor?: string;
   availableVersion: string;
   installedVersion?: string;
   downloadUrl: string;
@@ -23,6 +26,8 @@ export function toMarketRow(application: MarketApplication): MarketRow {
     description: application.description,
     iconUrl: application.iconUrl,
     pageUrl: application.pageUrl,
+    license: application.license,
+    vendor: application.vendor,
     availableVersion: application.latest.version,
     installedVersion: application.installedVersion,
     downloadUrl: application.latest.downloadUrl,
@@ -62,17 +67,12 @@ export function sortMarketRows(rows: readonly MarketRow[]): MarketRow[] {
 }
 
 /**
- * Display name and description, case-insensitive, over the loaded catalogue. ? The key is left out, unlike
+ * Display name and description, word by word, over the loaded catalogue. ? The key is left out, unlike
  * the section's own search: an application is picked off the market by its advertised name.
  */
 export function searchMarketRows(rows: readonly MarketRow[], query: string): MarketRow[] {
-  const needle = query.trim().toLowerCase();
-  if (needle.length === 0) {
-    return [...rows];
-  }
-
   return rows.filter(({ displayName, description }) =>
-    [displayName, description].some((field) => field?.toLowerCase().includes(needle) ?? false),
+    matchesEveryWord(query, [displayName, description]),
   );
 }
 
