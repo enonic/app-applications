@@ -51,6 +51,7 @@ export function BrowseListRow({
       onContextMenu={() => onContextMenu(key)}
       className={cn(
         ROW_CLASS,
+        !disabled && 'cursor-pointer',
         highlighted && 'bg-surface-selected text-alt hover:bg-surface-selected-hover',
         dimmed && !highlighted && 'opacity-50',
       )}
