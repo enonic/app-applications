@@ -9,6 +9,8 @@ export const SYSTEM_FIELD = 'system';
 export const STATE_FIELD = 'state';
 export const UPGRADE_FIELD = 'upgrade';
 
+export const SHOWN = 'shown';
+export const HIDDEN = 'hidden';
 export const YES = 'yes';
 export const NO = 'no';
 
@@ -24,6 +26,8 @@ export type ApplicationFieldLabels = {
   started: string;
   stopped: string;
   upgrade: string;
+  shown: string;
+  hidden: string;
   yes: string;
   no: string;
   marketFailed: string;
@@ -85,9 +89,10 @@ export function applicationFields(
       id: SYSTEM_FIELD,
       label: labels.system,
       icon: Settings,
-      // ? Yes reveals rather than narrows, so Yes and No together would mean Yes; one pick says it.
+      // ? Shown reveals rather than narrows, so Shown and Hidden together would mean Shown; one pick
+      // ? says it.
       multiple: false,
-      values: yesNo(facet(SYSTEM_FIELD), ({ system }) => system, labels),
+      values: systemValues(facet(SYSTEM_FIELD), labels),
     },
     {
       id: STATE_FIELD,
@@ -117,8 +122,8 @@ export function applicationFields(
 
 /**
  * ! System is inverted against every other field, where no term narrows nothing: the applications XP
- * ! ships are noise, so they start hidden and Yes reveals them beside the rest — as the app this replaces
- * ! did, off by default. No is the default said out loud.
+ * ! ships are noise, so they start hidden and Shown reveals them beside the rest — as the app this
+ * ! replaces did, off by default. Hidden is the default said out loud.
  */
 function passes(
   field: ApplicationFieldId,
@@ -128,12 +133,27 @@ function passes(
 ): boolean {
   switch (field) {
     case SYSTEM_FIELD:
-      return values.has(YES) || !application.system;
+      return values.has(SHOWN) || !application.system;
     case STATE_FIELD:
       return values.size === 0 || values.has(application.state);
     case UPGRADE_FIELD:
       return values.size === 0 || values.has(upgradable.has(application.key) ? YES : NO);
   }
+}
+
+/** Each value counted as the rows it would leave: Shown keeps every application, Hidden the non-system ones. */
+function systemValues(
+  applications: readonly Application[],
+  labels: Pick<ApplicationFieldLabels, 'shown' | 'hidden'>,
+): FilterValue[] {
+  return [
+    { id: SHOWN, label: labels.shown, count: applications.length },
+    {
+      id: HIDDEN,
+      label: labels.hidden,
+      count: applications.filter(({ system }) => !system).length,
+    },
+  ];
 }
 
 function yesNo(

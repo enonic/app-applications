@@ -66,6 +66,8 @@ export function ApplicationsPage() {
   const startedLabel = useI18n('applications.state.started');
   const stoppedLabel = useI18n('applications.state.stopped');
   const upgradeFieldLabel = useI18n('applications.filter.upgrade');
+  const shownLabel = useI18n('applications.filter.shown');
+  const hiddenLabel = useI18n('applications.filter.hidden');
   const yesLabel = useI18n('applications.filter.yes');
   const noLabel = useI18n('applications.filter.no');
   const marketFailedLabel = useI18n('applications.filter.marketFailed');
@@ -114,6 +116,8 @@ export function ApplicationsPage() {
           started: startedLabel,
           stopped: stoppedLabel,
           upgrade: upgradeFieldLabel,
+          shown: shownLabel,
+          hidden: hiddenLabel,
           yes: yesLabel,
           no: noLabel,
           marketFailed: marketFailedLabel,
@@ -130,6 +134,8 @@ export function ApplicationsPage() {
       startedLabel,
       stoppedLabel,
       upgradeFieldLabel,
+      shownLabel,
+      hiddenLabel,
       yesLabel,
       noLabel,
       marketFailedLabel,
