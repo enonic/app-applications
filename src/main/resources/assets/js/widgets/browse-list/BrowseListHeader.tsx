@@ -1,4 +1,4 @@
-import { Button, Checkbox } from '@enonic/ui';
+import { Button, Checkbox, Tooltip } from '@enonic/ui';
 import { ArrowDownUp, RefreshCw } from 'lucide-react';
 import type { ReactNode } from 'react';
 
@@ -16,6 +16,7 @@ export type BrowseListHeaderProps = {
 };
 
 const BROWSE_LIST_HEADER_NAME = 'BrowseListHeader';
+const TOOLTIP_DELAY = 300;
 
 export function BrowseListHeader({
   allSelected,
@@ -48,14 +49,15 @@ export function BrowseListHeader({
 
       <div className="ml-auto flex flex-wrap items-center gap-2.5">
         {sort ?? <InertHeaderControl icon={ArrowDownUp} label={sortLabel} />}
-        <Button
-          variant="text"
-          startIcon={RefreshCw}
-          title={refreshLabel}
-          aria-label={refreshLabel}
-          onClick={onRefresh}
-          className="px-2.5"
-        />
+        <Tooltip value={refreshLabel} side="top" delay={TOOLTIP_DELAY} asChild>
+          <Button
+            variant="text"
+            startIcon={RefreshCw}
+            aria-label={refreshLabel}
+            onClick={onRefresh}
+            className="px-2.5"
+          />
+        </Tooltip>
       </div>
     </div>
   );

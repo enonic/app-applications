@@ -33,6 +33,7 @@ import {
   applicationFields,
   filterApplications,
   searchApplications,
+  withoutSystem,
 } from './model/applications.filter';
 import {
   applicationStateLabelKey,
@@ -43,7 +44,9 @@ import {
 import { applicationsFilter } from './model/filter.store';
 import { applicationsSelection } from './model/selection.store';
 import { $applicationsSort, setApplicationsSort } from './model/sort.store';
+import { $systemShown, setSystemShown } from './model/system.store';
 import { useApplicationsScreen } from './model/useApplicationsScreen';
+import { SystemApplicationsToggle } from './SystemApplicationsToggle';
 
 const APPLICATIONS_PAGE_NAME = 'ApplicationsPage';
 
@@ -52,6 +55,7 @@ export function ApplicationsPage() {
   const { status, items } = useStore($applications);
   const query = useStore(applicationsFilter.$query);
   const sort = useStore($applicationsSort);
+  const systemShown = useStore($systemShown);
   const activeKey = useItemId();
   const { openItem, closeItem, notify } = useHostFrame();
   const managedMode = isManagedMode();
@@ -61,7 +65,6 @@ export function ApplicationsPage() {
   const emptyLabel = useI18n('applications.list.empty');
   const uploadingLabel = useI18n('applications.list.uploading');
   const filterPlaceholder = useI18n('applications.filter.placeholder');
-  const systemFieldLabel = useI18n('applications.filter.system');
   const stateFieldLabel = useI18n('applications.filter.state');
   const startedLabel = useI18n('applications.state.started');
   const stoppedLabel = useI18n('applications.state.stopped');
@@ -91,8 +94,12 @@ export function ApplicationsPage() {
   const available = useMemo(() => availableVersions(marketItems), [marketItems]);
 
   // The whole list is loaded, so the text narrows it here rather than on the server. Shared with the
-  // field counts below, so the text runs once per render rather than twice.
-  const searched = useMemo(() => searchApplications(items, textOf(query)), [items, query]);
+  // field counts below, so the text runs once per render rather than twice. The system applications
+  // go first, so no count includes a row the list leaves out.
+  const searched = useMemo(
+    () => searchApplications(systemShown ? items : withoutSystem(items), textOf(query)),
+    [items, systemShown, query],
+  );
 
   // Narrow first, order last: sorting only what survived is the cheaper half, and the order the rows
   // appear in has to be the final word.
@@ -109,7 +116,6 @@ export function ApplicationsPage() {
         available,
         managedMode ? undefined : { status: marketStatus },
         {
-          system: systemFieldLabel,
           state: stateFieldLabel,
           started: startedLabel,
           stopped: stoppedLabel,
@@ -125,7 +131,6 @@ export function ApplicationsPage() {
       available,
       managedMode,
       marketStatus,
-      systemFieldLabel,
       stateFieldLabel,
       startedLabel,
       stoppedLabel,
@@ -206,13 +211,19 @@ export function ApplicationsPage() {
         filterPlaceholder={filterPlaceholder}
         fields={fields}
         details={<ApplicationsItemPage />}
+        // ? The toggle rides in the sort's slot, which is the header's only one and sits right where
+        // ? it belongs, before Refresh: a slot of its own would be a widget change app-users does
+        // ? not need.
         sort={
-          <BrowseSort
-            options={sortOptions}
-            value={sort}
-            onChange={setApplicationsSort}
-            defaultValue={DEFAULT_SORT_DIRECTION}
-          />
+          <>
+            <BrowseSort
+              options={sortOptions}
+              value={sort}
+              onChange={setApplicationsSort}
+              defaultValue={DEFAULT_SORT_DIRECTION}
+            />
+            <SystemApplicationsToggle shown={systemShown} onShownChange={setSystemShown} />
+          </>
         }
       />
 
