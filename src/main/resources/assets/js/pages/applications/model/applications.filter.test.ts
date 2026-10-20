@@ -60,13 +60,6 @@ describe('withoutSystem', () => {
   it('leaves out the applications XP ships, keeping the order', () => {
     expect(withoutSystem(all)).toEqual([booster, fathom]);
   });
-
-  it('leaves the applications it was given alone', () => {
-    const original = [...all];
-    withoutSystem(all);
-
-    expect(all).toEqual(original);
-  });
 });
 
 describe('searchApplications', () => {

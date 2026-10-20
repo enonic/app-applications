@@ -13,10 +13,13 @@ const TOOLTIP_DELAY = 300;
 
 /** The list header's switch for the applications XP ships, beside the sort and as quiet as Refresh. */
 export function SystemApplicationsToggle({ shown, onShownChange }: SystemApplicationsToggleProps) {
-  const label = useI18n(shown ? 'applications.list.hideSystem' : 'applications.list.showSystem');
+  const tooltip = useI18n(shown ? 'applications.list.hideSystem' : 'applications.list.showSystem');
+  // ! The name stays put: `Toggle` says the state through `aria-pressed`, and a name that flipped
+  // ! with it would read "Hide system applications, pressed".
+  const label = useI18n('applications.list.showSystem');
 
   return (
-    <Tooltip value={label} side="top" delay={TOOLTIP_DELAY} asChild>
+    <Tooltip value={tooltip} side="top" delay={TOOLTIP_DELAY} asChild>
       <Toggle
         data-component={SYSTEM_APPLICATIONS_TOGGLE_NAME}
         variant="text"
