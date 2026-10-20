@@ -1,30 +1,31 @@
-const TEXT = {
-  systemVersionRange: 'applications.details.systemVersionRange',
-  systemVersionFrom: 'applications.details.systemVersionFrom',
-  systemVersionUpTo: 'applications.details.systemVersionUpTo',
-} as const;
+const LOWER_SIGN = { '[': '≥', '(': '>' } as const;
+const UPPER_SIGN = { ']': '≤', ')': '<' } as const;
 
-export type SystemVersionPhrase = {
-  labelKey: string;
-  args: readonly string[];
-};
+const RANGE = /^([[(])\s*([^,\s]+)\s*,\s*([^\s\])]+)\s*([\])])$/;
 
 /**
- * The phrase and arguments for the platform versions an application accepts. `undefined` where the
- * descriptor names neither bound, so the field is left out rather than rendered empty.
+ * The platform versions an application accepts, one comparison sign per bound: `[8.1.0,9.0.0)`
+ * reads `≥ 8.1.0, < 9.0.0`, and a bare `8.1.0` — how XP writes a range with no upper bound — reads
+ * `≥ 8.1.0`. `undefined` where the descriptor names no range, so the field is left out rather than
+ * rendered empty. A range the regex does not recognise is shown as XP reported it rather than hidden.
  */
-export function systemVersionPhrase(min?: string, max?: string): SystemVersionPhrase | undefined {
-  if (min != null && max != null) {
-    return { labelKey: TEXT.systemVersionRange, args: [min, max] };
+export function systemVersionRequirement(range?: string): string | undefined {
+  if (range == null || range.length === 0) {
+    return undefined;
   }
 
-  if (min != null) {
-    return { labelKey: TEXT.systemVersionFrom, args: [min] };
+  if (!range.includes(',')) {
+    return `${LOWER_SIGN['[']} ${range}`;
   }
 
-  if (max != null) {
-    return { labelKey: TEXT.systemVersionUpTo, args: [max] };
+  const match = RANGE.exec(range);
+  if (match == null) {
+    return range;
   }
 
-  return undefined;
+  const [, open, lower, upper, close] = match;
+  const lowerSign = LOWER_SIGN[open as keyof typeof LOWER_SIGN];
+  const upperSign = UPPER_SIGN[close as keyof typeof UPPER_SIGN];
+
+  return `${lowerSign} ${lower}, ${upperSign} ${upper}`;
 }

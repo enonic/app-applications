@@ -11,7 +11,7 @@ import {
 import { serverAppUrl } from '../../../shared/config';
 import type { Application, ApplicationState } from '../model/application.types';
 
-// The last five are the details panel's, not a row's: they are scalars off the application and
+// The last four are the details panel's, not a row's: they are scalars off the application and
 // descriptor this query already loads, while `applicationInfo` costs a jar walk per field.
 const APPLICATION_FIELDS = `
   key
@@ -23,8 +23,7 @@ const APPLICATION_FIELDS = `
   local
   icon
   modifiedTime
-  minSystemVersion
-  maxSystemVersion
+  systemVersion
   vendorName
   vendorUrl
 `;
@@ -53,8 +52,7 @@ type ApplicationRowDto = {
   local: boolean;
   icon: string | null;
   modifiedTime: string | null;
-  minSystemVersion: string | null;
-  maxSystemVersion: string | null;
+  systemVersion: string | null;
   vendorName: string | null;
   vendorUrl: string | null;
 };
@@ -178,8 +176,7 @@ function toApplication(dto: ApplicationRowDto): Application {
     local: dto.local,
     icon: dto.icon ?? undefined,
     modifiedTime: dto.modifiedTime ?? undefined,
-    minSystemVersion: dto.minSystemVersion ?? undefined,
-    maxSystemVersion: dto.maxSystemVersion ?? undefined,
+    systemVersion: dto.systemVersion ?? undefined,
     vendorName: dto.vendorName ?? undefined,
     vendorUrl: dto.vendorUrl ?? undefined,
   };

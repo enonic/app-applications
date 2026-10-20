@@ -53,11 +53,10 @@ export const ApplicationType: GraphQLType = generator.createObjectType({
       type: GraphQLString,
       resolve: (env: { source: ApplicationSource }) => iconDataUriOf(env.source),
     },
-    minSystemVersion: {
+    systemVersion: {
       type: GraphQLString,
-    },
-    maxSystemVersion: {
-      type: GraphQLString,
+      description:
+        'The platform versions the application accepts, as the OSGi range XP reports it: `[8.1.0,9.0.0)`, or a bare `8.1.0` when the descriptor names no upper bound.',
     },
     vendorName: {
       type: GraphQLString,
