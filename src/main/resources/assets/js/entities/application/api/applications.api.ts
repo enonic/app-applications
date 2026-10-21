@@ -21,6 +21,7 @@ const APPLICATION_FIELDS = `
   state
   system
   local
+  schema
   icon
   modifiedTime
   minSystemVersion
@@ -51,6 +52,7 @@ type ApplicationRowDto = {
   state: ApplicationState;
   system: boolean;
   local: boolean;
+  schema: boolean;
   icon: string | null;
   modifiedTime: string | null;
   minSystemVersion: string | null;
@@ -176,6 +178,7 @@ function toApplication(dto: ApplicationRowDto): Application {
     state: dto.state,
     system: dto.system,
     local: dto.local,
+    schema: dto.schema,
     icon: dto.icon ?? undefined,
     modifiedTime: dto.modifiedTime ?? undefined,
     minSystemVersion: dto.minSystemVersion ?? undefined,
