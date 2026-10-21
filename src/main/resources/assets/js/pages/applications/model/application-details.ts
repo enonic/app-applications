@@ -1,6 +1,7 @@
 const LOWER_SIGN = { '[': '≥', '(': '>' } as const;
 const UPPER_SIGN = { ']': '≤', ')': '<' } as const;
 
+const BARE = /^[^\s,[\]()]+$/;
 const RANGE = /^([[(])\s*([^,\s]+)\s*,\s*([^\s\])]+)\s*([\])])$/;
 
 /**
@@ -14,7 +15,7 @@ export function systemVersionRequirement(range?: string): string | undefined {
     return undefined;
   }
 
-  if (!range.includes(',')) {
+  if (BARE.test(range)) {
     return `${LOWER_SIGN['[']} ${range}`;
   }
 
