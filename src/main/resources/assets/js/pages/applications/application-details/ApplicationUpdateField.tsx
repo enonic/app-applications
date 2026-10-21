@@ -4,7 +4,6 @@ import { useStore } from '@nanostores/preact';
 import type { Application } from '../../../entities/application';
 import { useMarketApplication } from '../../../entities/market';
 import { $marketInstalls, startMarketUpdate } from '../../../features/install-applications';
-import { isManagedMode } from '../../../shared/config';
 import { formatDate } from '../../../shared/format';
 import { useHostFrame } from '../../../shared/host';
 import { i18n, useI18n } from '../../../shared/i18n';
@@ -35,8 +34,7 @@ export function ApplicationUpdateField({
   const updateLabel = useI18n('applications.action.update');
   const localLabel = useI18n('applications.details.localNoUpdate');
 
-  // Managed mode reads no catalogue.
-  if (isManagedMode() || marketApplication?.updateAvailable !== true) {
+  if (marketApplication?.updateAvailable !== true) {
     return null;
   }
 

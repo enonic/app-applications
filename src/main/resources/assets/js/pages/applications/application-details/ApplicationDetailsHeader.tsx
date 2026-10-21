@@ -2,7 +2,6 @@ import { Link, Tooltip } from '@enonic/ui';
 
 import { type Application, ApplicationIcon } from '../../../entities/application';
 import { useMarketApplication } from '../../../entities/market';
-import { isManagedMode } from '../../../shared/config';
 import { useI18n } from '../../../shared/i18n';
 import { DetailsPanel } from '../../../widgets/details-panel/DetailsPanel';
 import { ApplicationStateMenu } from './ApplicationStateMenu';
@@ -24,9 +23,7 @@ export function ApplicationDetailsHeader({
   // both mean no link rather than an empty one.
   const { marketApplication } = useMarketApplication(application.key);
   const marketLinkLabel = useI18n('applications.details.marketLink');
-
-  // Managed mode shows no links out, and never reads the catalogue this one comes from.
-  const pageUrl = isManagedMode() ? undefined : marketApplication?.pageUrl;
+  const pageUrl = marketApplication?.pageUrl;
 
   return (
     <DetailsPanel.Header

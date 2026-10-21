@@ -72,41 +72,33 @@ export function filterApplications(
 /**
  * The fields this section filters by, each counted over the rows the text and the *other* fields leave,
  * so a count says what picking that value would leave.
- *
- * ! `market` is absent in managed mode, which never loads it: no Upgrade field rather than one that
- * ! says no to every application.
  */
 export function applicationFields(
   searched: readonly Application[],
   query: FilterQuery,
   upgradable: Pick<ReadonlySet<string>, 'has'>,
-  market: Pick<MarketApplicationsState, 'status'> | undefined,
+  market: Pick<MarketApplicationsState, 'status'>,
   labels: ApplicationFieldLabels,
 ): FilterField[] {
   const facet = (field: ApplicationFieldId): Application[] =>
     filterApplications(searched, query, upgradable, field);
 
-  const fields: FilterField[] = [
+  return [
     {
       id: STATE_FIELD,
       label: labels.state,
       icon: Power,
       values: stateValues(facet(STATE_FIELD), labels),
     },
-  ];
-
-  if (market !== undefined) {
-    fields.push({
+    {
       id: UPGRADE_FIELD,
       label: labels.upgrade,
       icon: BellDot,
       values: yesNo(facet(UPGRADE_FIELD), ({ key }) => upgradable.has(key), labels),
       loading: market.status === 'loading',
       notice: market.status === 'error' ? labels.marketFailed : undefined,
-    });
-  }
-
-  return fields;
+    },
+  ];
 }
 
 // *

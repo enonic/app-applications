@@ -25,7 +25,6 @@ const config = {
   appVersion: '1.0.0',
   eventsUrl: '/_/admin:events',
   serverAppUrl: '/_/server:app',
-  managedMode: false,
   vhostsEnabled: false,
 } satisfies Config;
 

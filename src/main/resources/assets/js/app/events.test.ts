@@ -37,7 +37,6 @@ const CONFIG = {
   appId: 'com.enonic.xp.app.applications',
   appVersion: '8.1.0',
   eventsUrl: EVENTS_URL,
-  managedMode: false,
   serverAppUrl: '/_/server:app',
   vhostsEnabled: false,
 };

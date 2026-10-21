@@ -14,7 +14,6 @@ import { loadMarketApplications, useMarketApplications } from '../../entities/ma
 import { ConfirmMajorUpdateDialog } from '../../features/install-applications/ui/ConfirmMajorUpdateDialog';
 import { InstallApplicationsDialog } from '../../features/install-applications/ui/InstallApplicationsDialog';
 import { UninstallApplicationsDialog } from '../../features/uninstall-applications/ui/UninstallApplicationsDialog';
-import { isManagedMode } from '../../shared/config';
 import { useHostFrame, useItemId } from '../../shared/host';
 import { i18n, useI18n } from '../../shared/i18n';
 import { ProgressBar } from '../../shared/ui/ProgressBar';
@@ -26,7 +25,6 @@ import {
 import { BrowseSort, type BrowseSortOption } from '../../widgets/browse-list/BrowseSort';
 import { BrowseScreen } from '../../widgets/browse-screen/BrowseScreen';
 import { useBrowseSection } from '../../widgets/browse-screen/useBrowseSection';
-import { ManagedModeBanner } from '../../widgets/browse-toolbar/ManagedModeBanner';
 import { ApplicationsItemPage } from './ApplicationsItemPage';
 import { applicationActions } from './model/applications.actions';
 import {
@@ -58,7 +56,6 @@ export function ApplicationsPage() {
   const systemShown = useStore($systemShown);
   const activeKey = useItemId();
   const { openItem, closeItem, notify } = useHostFrame();
-  const managedMode = isManagedMode();
   const { status: marketStatus, items: marketItems } = useMarketApplications();
   const uploads = useStore($applicationUploads);
 
@@ -75,8 +72,6 @@ export function ApplicationsPage() {
   const sortNameLabel = useI18n('applications.sort.name');
   const sortAscLabel = useI18n('applications.sort.nameAsc');
   const sortDescLabel = useI18n('applications.sort.nameDesc');
-  const managedTitle = useI18n('applications.managed.title');
-  const managedHelp = useI18n('applications.managed.help');
 
   // The frame is one per mount, so the actions built over its `notify` are too.
   const actions = useMemo(() => applicationActions(notify), [notify]);
@@ -114,7 +109,7 @@ export function ApplicationsPage() {
         searched,
         query,
         available,
-        managedMode ? undefined : { status: marketStatus },
+        { status: marketStatus },
         {
           state: stateFieldLabel,
           started: startedLabel,
@@ -129,7 +124,6 @@ export function ApplicationsPage() {
       searched,
       query,
       available,
-      managedMode,
       marketStatus,
       stateFieldLabel,
       startedLabel,
@@ -186,10 +180,7 @@ export function ApplicationsPage() {
     leadingRows: uploadRows,
     reload: () => {
       void loadApplications();
-
-      if (!managedMode) {
-        void loadMarketApplications();
-      }
+      void loadMarketApplications();
     },
   });
 
@@ -205,8 +196,6 @@ export function ApplicationsPage() {
       <BrowseScreen
         {...section}
         actions={actions}
-        managedMode={managedMode}
-        notice={<ManagedModeBanner title={managedTitle} help={managedHelp} />}
         emptyLabel={emptyLabel}
         filterPlaceholder={filterPlaceholder}
         fields={fields}
@@ -228,14 +217,10 @@ export function ApplicationsPage() {
       />
 
       {/* Mounted whether or not they are open — each is its own store's subscriber, and the details
-          panel reads install progress through the install dialog. Managed mode mounts none of them. */}
-      {!managedMode && (
-        <>
-          <InstallApplicationsDialog />
-          <UninstallApplicationsDialog />
-          <ConfirmMajorUpdateDialog />
-        </>
-      )}
+          panel reads install progress through the install dialog. */}
+      <InstallApplicationsDialog />
+      <UninstallApplicationsDialog />
+      <ConfirmMajorUpdateDialog />
     </div>
   );
 }

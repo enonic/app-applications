@@ -6,7 +6,6 @@ import {
   startApplications,
   stopApplications,
 } from '../../../entities/application';
-import { isManagedMode } from '../../../shared/config';
 import { useHostFrame } from '../../../shared/host';
 import { useI18n } from '../../../shared/i18n';
 import { isStartable, isStoppable } from '../model/application-lifecycle';
@@ -22,8 +21,7 @@ const APPLICATION_STATE_MENU_NAME = 'ApplicationStateMenu';
 
 /**
  * The application's state as a dropdown offering the opposite state. An application this section must
- * not stop — a platform one, or its own — gets a plain label instead, as does every application in
- * managed mode.
+ * not stop — a platform one, or its own — gets a plain label instead.
  */
 export function ApplicationStateMenu({
   application,
@@ -35,8 +33,7 @@ export function ApplicationStateMenu({
   const stoppable = isStoppable(application);
   const actionLabel = useI18n(stoppable ? 'applications.action.stop' : 'applications.action.start');
 
-  // Managed mode offers nothing that changes what is installed.
-  if (isManagedMode() || (!stoppable && !isStartable(application))) {
+  if (!stoppable && !isStartable(application)) {
     return (
       <span data-component={componentName} className="text-subtle text-sm whitespace-nowrap">
         {stateLabel}
