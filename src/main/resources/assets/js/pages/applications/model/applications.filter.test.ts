@@ -168,12 +168,6 @@ describe('applicationFields', () => {
     });
   });
 
-  it('leaves Upgrade out without a market, as in managed mode', () => {
-    const fields = applicationFields(all, EMPTY_FILTER, new Set(), undefined, LABELS);
-
-    expect(fields.map(({ id }) => id)).toEqual([STATE_FIELD]);
-  });
-
   it('says why Upgrade may be short while the market loads or fails', () => {
     const upgradeOf = (status: 'loading' | 'error') =>
       applicationFields(all, EMPTY_FILTER, new Set(), { status }, LABELS).find(

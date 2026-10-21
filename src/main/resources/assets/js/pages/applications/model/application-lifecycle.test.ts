@@ -10,7 +10,6 @@ const config = {
   appId: OWN_APP,
   appVersion: '1.0.0',
   eventsUrl: '/_/admin:events',
-  managedMode: false,
   serverAppUrl: '/_/server:app',
   vhostsEnabled: false,
 } satisfies Config;

@@ -18,11 +18,6 @@ export const ConfigType: GraphQLType = generator.createObjectType({
     appVersion: {
       type: nonNull(GraphQLString),
     },
-    managedMode: {
-      type: nonNull(GraphQLBoolean),
-      description:
-        'Whether this instance forbids installing and uninstalling applications from the UI.',
-    },
     vhostsEnabled: {
       type: nonNull(GraphQLBoolean),
       description:

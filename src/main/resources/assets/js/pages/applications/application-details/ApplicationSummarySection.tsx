@@ -1,7 +1,6 @@
 import { Link } from '@enonic/ui';
 
 import type { Application } from '../../../entities/application';
-import { isManagedMode } from '../../../shared/config';
 import { i18n, useI18n } from '../../../shared/i18n';
 import { DetailsPanel } from '../../../widgets/details-panel/DetailsPanel';
 import { systemVersionPhrase } from '../model/application-details';
@@ -43,8 +42,7 @@ export function ApplicationSummarySection({
 
       {vendorName !== undefined && (
         <DetailsPanel.Field labelKey="applications.details.vendor">
-          {/* Managed mode shows no links out. */}
-          {vendorUrl === undefined || isManagedMode() ? (
+          {vendorUrl === undefined ? (
             vendorName
           ) : (
             <span className="inline-flex items-center gap-1">

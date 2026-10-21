@@ -23,7 +23,6 @@ const CONFIG = {
   appId: 'com.enonic.xp.app.applications',
   appVersion: '1.0.0',
   eventsUrl: '/_/admin:events',
-  managedMode: false,
   serverAppUrl: '/_/server:app',
   vhostsEnabled: false,
 } satisfies Config;
