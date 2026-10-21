@@ -1,25 +1,23 @@
 import { valuesOf, type FilterField, type FilterQuery, type FilterValue } from '@enonic/ui-kit';
-import { BellDot, Power, Settings } from 'lucide-react';
+import { BellDot, Power } from 'lucide-react';
 
 import type { Application, ApplicationState } from '../../../entities/application';
 import type { MarketApplicationsState } from '../../../entities/market';
 import { matchesEveryWord } from '../../../shared/filter';
 
-export const SYSTEM_FIELD = 'system';
 export const STATE_FIELD = 'state';
 export const UPGRADE_FIELD = 'upgrade';
 
 export const YES = 'yes';
 export const NO = 'no';
 
-type ApplicationFieldId = typeof SYSTEM_FIELD | typeof STATE_FIELD | typeof UPGRADE_FIELD;
+type ApplicationFieldId = typeof STATE_FIELD | typeof UPGRADE_FIELD;
 
-const FIELD_IDS: readonly ApplicationFieldId[] = [SYSTEM_FIELD, STATE_FIELD, UPGRADE_FIELD];
+const FIELD_IDS: readonly ApplicationFieldId[] = [STATE_FIELD, UPGRADE_FIELD];
 
 const STATES: readonly ApplicationState[] = ['STARTED', 'STOPPED'];
 
 export type ApplicationFieldLabels = {
-  system: string;
   state: string;
   started: string;
   stopped: string;
@@ -28,6 +26,14 @@ export type ApplicationFieldLabels = {
   no: string;
   marketFailed: string;
 };
+
+/**
+ * ? The applications XP ships are noise, so the list leaves them out unless the header's toggle asks
+ * ? for them — as the app this replaces did, off by default.
+ */
+export function withoutSystem(applications: readonly Application[]): Application[] {
+  return applications.filter(({ system }) => !system);
+}
 
 /**
  * Display name, description and key, word by word, over the loaded applications. ? The key is searched
@@ -82,14 +88,6 @@ export function applicationFields(
 
   const fields: FilterField[] = [
     {
-      id: SYSTEM_FIELD,
-      label: labels.system,
-      icon: Settings,
-      // ? Yes reveals rather than narrows, so Yes and No together would mean Yes; one pick says it.
-      multiple: false,
-      values: yesNo(facet(SYSTEM_FIELD), ({ system }) => system, labels),
-    },
-    {
       id: STATE_FIELD,
       label: labels.state,
       icon: Power,
@@ -115,11 +113,6 @@ export function applicationFields(
 // * Internal
 // *
 
-/**
- * ! System is inverted against every other field, where no term narrows nothing: the applications XP
- * ! ships are noise, so they start hidden and Yes reveals them beside the rest — as the app this replaces
- * ! did, off by default. No is the default said out loud.
- */
 function passes(
   field: ApplicationFieldId,
   application: Application,
@@ -127,8 +120,6 @@ function passes(
   upgradable: Pick<ReadonlySet<string>, 'has'>,
 ): boolean {
   switch (field) {
-    case SYSTEM_FIELD:
-      return values.has(YES) || !application.system;
     case STATE_FIELD:
       return values.size === 0 || values.has(application.state);
     case UPGRADE_FIELD:

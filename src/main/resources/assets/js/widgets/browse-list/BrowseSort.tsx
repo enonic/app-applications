@@ -1,4 +1,4 @@
-import { Button, Menu } from '@enonic/ui';
+import { Button, Menu, Tooltip } from '@enonic/ui';
 import { ArrowDownUp, ArrowDownWideNarrow, ArrowUpWideNarrow } from 'lucide-react';
 
 import { useI18n } from '../../shared/i18n';
@@ -28,6 +28,7 @@ export type BrowseSortProps<Id extends string = string> = {
 };
 
 const BROWSE_SORT_NAME = 'BrowseSort';
+const TOOLTIP_DELAY = 300;
 
 /**
  * The `Sort by` control: one order out of the few a section offers. Section-agnostic — an option
@@ -56,20 +57,23 @@ export function BrowseSort<Id extends string = string>({
 
   return (
     <Menu>
-      <Menu.Trigger asChild>
-        <Button
-          data-component={componentName}
-          variant="text"
-          endIcon={icon}
-          title={current?.label ?? sortLabel}
-          className={HEADER_CONTROL_CLASS}
-          // ! `data-active` is the attribute `Menu.Trigger` marks its own open state with. Spread only when
-          // ! set: `Slot` lets the child's value win, and one always present would drop the open state.
-          {...(active ? { 'data-active': 'true' } : {})}
-        >
-          <span className={HEADER_CONTROL_LABEL_CLASS}>{current?.field ?? sortLabel}</span>
-        </Button>
-      </Menu.Trigger>
+      {/* ! The tooltip wraps the trigger, not the button: inside, the trigger's own props would land on
+          ! `Tooltip`, which passes on only its own. */}
+      <Tooltip value={current?.label ?? sortLabel} side="top" delay={TOOLTIP_DELAY} asChild>
+        <Menu.Trigger asChild>
+          <Button
+            data-component={componentName}
+            variant="text"
+            endIcon={icon}
+            className={HEADER_CONTROL_CLASS}
+            // ! `data-active` is the attribute `Menu.Trigger` marks its own open state with. Spread only when
+            // ! set: `Slot` lets the child's value win, and one always present would drop the open state.
+            {...(active ? { 'data-active': 'true' } : {})}
+          >
+            <span className={HEADER_CONTROL_LABEL_CLASS}>{current?.field ?? sortLabel}</span>
+          </Button>
+        </Menu.Trigger>
+      </Tooltip>
       <Menu.Portal>
         <Menu.Content data-component={`${componentName}.Menu`} align="end" className="min-w-56">
           {/* Picking an order is terminal, so the menu closes — unlike the multi-select filter. */}

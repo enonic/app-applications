@@ -8,8 +8,8 @@ import {
   NO,
   searchApplications,
   STATE_FIELD,
-  SYSTEM_FIELD,
   UPGRADE_FIELD,
+  withoutSystem,
   YES,
 } from './applications.filter';
 
@@ -38,7 +38,6 @@ const applications = [booster, fathom];
 const all = [booster, systemApp, fathom];
 
 const LABELS = {
-  system: 'System applications',
   state: 'State',
   started: 'Started',
   stopped: 'Stopped',
@@ -56,6 +55,12 @@ function counts(query: FilterQuery, upgradable: ReadonlySet<string> = new Set())
     ]),
   );
 }
+
+describe('withoutSystem', () => {
+  it('leaves out the applications XP ships, keeping the order', () => {
+    expect(withoutSystem(all)).toEqual([booster, fathom]);
+  });
+});
 
 describe('searchApplications', () => {
   it('returns every application for an empty or blank query', () => {
@@ -97,16 +102,8 @@ describe('searchApplications', () => {
 });
 
 describe('filterApplications', () => {
-  it('hides the system applications with no term, and with No', () => {
-    expect(filterApplications(all, EMPTY_FILTER, new Set())).toEqual([booster, fathom]);
-    expect(filterApplications(all, [fieldTerm(SYSTEM_FIELD, NO)], new Set())).toEqual([
-      booster,
-      fathom,
-    ]);
-  });
-
-  it('reveals them beside the rest with Yes, in the order it was given them', () => {
-    expect(filterApplications(all, [fieldTerm(SYSTEM_FIELD, YES)], new Set())).toEqual(all);
+  it('narrows nothing with no term, system applications included', () => {
+    expect(filterApplications(all, EMPTY_FILTER, new Set())).toEqual(all);
   });
 
   it('narrows by state, the states ORed', () => {
@@ -119,54 +116,53 @@ describe('filterApplications', () => {
         [fieldTerm(STATE_FIELD, 'STOPPED'), fieldTerm(STATE_FIELD, 'STARTED')],
         new Set(),
       ),
-    ).toEqual([booster, fathom]);
+    ).toEqual(all);
   });
 
   it('narrows by whether the market has a newer version', () => {
     const upgradable = new Set([booster.key]);
 
     expect(filterApplications(all, [fieldTerm(UPGRADE_FIELD, YES)], upgradable)).toEqual([booster]);
-    expect(filterApplications(all, [fieldTerm(UPGRADE_FIELD, NO)], upgradable)).toEqual([fathom]);
+    expect(filterApplications(all, [fieldTerm(UPGRADE_FIELD, NO)], upgradable)).toEqual([
+      systemApp,
+      fathom,
+    ]);
   });
 
   it('ANDs the fields', () => {
-    const query = [fieldTerm(SYSTEM_FIELD, YES), fieldTerm(STATE_FIELD, 'STARTED')];
+    const query = [fieldTerm(UPGRADE_FIELD, NO), fieldTerm(STATE_FIELD, 'STARTED')];
 
-    expect(filterApplications(all, query, new Set())).toEqual([booster, systemApp]);
+    expect(filterApplications(all, query, new Set([booster.key]))).toEqual([systemApp]);
   });
 
   it('leaves out the field it is told to', () => {
     const query = [fieldTerm(STATE_FIELD, 'STOPPED')];
 
-    expect(filterApplications(all, query, new Set(), STATE_FIELD)).toEqual([booster, fathom]);
-    expect(filterApplications(all, EMPTY_FILTER, new Set(), SYSTEM_FIELD)).toEqual(all);
+    expect(filterApplications(all, query, new Set(), STATE_FIELD)).toEqual(all);
   });
 });
 
 describe('applicationFields', () => {
-  it('offers System as a single pick, and State and Upgrade as several', () => {
+  it('offers State and Upgrade, each as several picks', () => {
     const fields = applicationFields(all, EMPTY_FILTER, new Set(), { status: 'ready' }, LABELS);
 
     expect(fields.map(({ id, multiple }) => [id, multiple])).toEqual([
-      [SYSTEM_FIELD, false],
       [STATE_FIELD, undefined],
       [UPGRADE_FIELD, undefined],
     ]);
   });
 
-  it('counts System over every application, State and Upgrade over the visible ones', () => {
+  it('counts every field over the applications it is given', () => {
     expect(counts(EMPTY_FILTER, new Set([booster.key]))).toEqual({
-      [SYSTEM_FIELD]: { [YES]: 1, [NO]: 2 },
-      [STATE_FIELD]: { STARTED: 1, STOPPED: 1 },
-      [UPGRADE_FIELD]: { [YES]: 1, [NO]: 1 },
+      [STATE_FIELD]: { STARTED: 2, STOPPED: 1 },
+      [UPGRADE_FIELD]: { [YES]: 1, [NO]: 2 },
     });
   });
 
   it('counts each field over what the other fields leave, never over its own terms', () => {
-    const query = [fieldTerm(SYSTEM_FIELD, YES), fieldTerm(STATE_FIELD, 'STOPPED')];
+    const query = [fieldTerm(UPGRADE_FIELD, NO), fieldTerm(STATE_FIELD, 'STOPPED')];
 
     expect(counts(query)).toEqual({
-      [SYSTEM_FIELD]: { [YES]: 0, [NO]: 1 },
       [STATE_FIELD]: { STARTED: 2, STOPPED: 1 },
       [UPGRADE_FIELD]: { [YES]: 0, [NO]: 1 },
     });
@@ -175,7 +171,7 @@ describe('applicationFields', () => {
   it('leaves Upgrade out without a market, as in managed mode', () => {
     const fields = applicationFields(all, EMPTY_FILTER, new Set(), undefined, LABELS);
 
-    expect(fields.map(({ id }) => id)).toEqual([SYSTEM_FIELD, STATE_FIELD]);
+    expect(fields.map(({ id }) => id)).toEqual([STATE_FIELD]);
   });
 
   it('says why Upgrade may be short while the market loads or fails', () => {
