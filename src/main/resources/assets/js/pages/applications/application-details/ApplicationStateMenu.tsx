@@ -21,7 +21,7 @@ const APPLICATION_STATE_MENU_NAME = 'ApplicationStateMenu';
 
 /**
  * The application's state as a dropdown offering the opposite state. An application this section must
- * not stop — a platform one, or its own — gets a plain label instead.
+ * not stop — a platform one, a schema one, or its own — gets a plain label instead.
  */
 export function ApplicationStateMenu({
   application,

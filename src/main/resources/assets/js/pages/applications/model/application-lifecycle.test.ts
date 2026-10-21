@@ -19,9 +19,12 @@ function application(
   state: ApplicationState,
   system = false,
   local = false,
+  schema = false,
 ): Application {
-  return { key, displayName: key, version: '1.0.0', state, system, local };
+  return { key, displayName: key, version: '1.0.0', state, system, local, schema };
 }
+
+const schemaApp = application('com.enonic.app.schema', 'STARTED', false, false, true);
 
 beforeEach(() => {
   setConfig(config);
@@ -40,6 +43,13 @@ describe('isStartable', () => {
   it('refuses one that is already started', () => {
     expect(isStartable(application('com.enonic.app.booster', 'STARTED'))).toBe(false);
   });
+
+  // XP refuses to start one, so an enabled button could only ever fail. It never reports as
+  // stopped, but the schema flag is what gates it rather than the state.
+  it('refuses a schema application whatever state it reports', () => {
+    expect(isStartable(schemaApp)).toBe(false);
+    expect(isStartable({ ...schemaApp, state: 'STOPPED' })).toBe(false);
+  });
 });
 
 describe('isStoppable', () => {
@@ -57,6 +67,10 @@ describe('isStoppable', () => {
 
   it('refuses the application this section is served from', () => {
     expect(isStoppable(application(OWN_APP, 'STARTED'))).toBe(false);
+  });
+
+  it('refuses a schema application, which XP keeps started', () => {
+    expect(isStoppable(schemaApp)).toBe(false);
   });
 });
 
@@ -81,5 +95,10 @@ describe('isUninstallable', () => {
   // Refused by key, not only because this app happens to ship as a system app.
   it('refuses the application this section is served from', () => {
     expect(isUninstallable(application(OWN_APP, 'STARTED'))).toBe(false);
+  });
+
+  // The one lifecycle action XP allows on a schema application.
+  it('accepts a schema application', () => {
+    expect(isUninstallable(schemaApp)).toBe(true);
   });
 });

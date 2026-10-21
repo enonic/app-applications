@@ -34,6 +34,7 @@ export function ApplicationDetailsHeader({
           size="lg"
           system={application.system}
           local={application.local}
+          schema={application.schema}
         />
       }
       title={application.displayName}

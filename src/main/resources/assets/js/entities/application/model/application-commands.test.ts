@@ -45,7 +45,7 @@ vi.mock('./applications.load', () => ({
 }));
 
 function application(key: string, displayName: string): Application {
-  return { key, displayName, state: 'STOPPED', system: false, local: false };
+  return { key, displayName, state: 'STOPPED', system: false, local: false, schema: false };
 }
 
 const booster = application('com.enonic.app.booster', 'Booster');

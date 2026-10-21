@@ -168,6 +168,7 @@ export function ApplicationsPage() {
           icon={application.icon}
           system={application.system}
           local={application.local}
+          schema={application.schema}
         />,
         i18n(applicationStateLabelKey(application.state)),
         application.version == null ? undefined : (
