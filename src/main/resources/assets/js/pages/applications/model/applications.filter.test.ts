@@ -28,6 +28,7 @@ function application(
     state,
     system,
     local: false,
+    schema: false,
   };
 }
 

@@ -46,8 +46,11 @@ export function toApplicationRow(
   stateLabel?: string,
   version?: ReactNode,
 ): BrowseRow {
-  // An application XP ships cannot be stopped, so its state is a constant.
-  const meta = [version, application.system ? '' : stateLabel].filter((cell) => cell !== undefined);
+  // An application XP ships cannot be stopped, and a schema application is always started, so the
+  // state of either is a constant.
+  const meta = [version, application.system || application.schema ? '' : stateLabel].filter(
+    (cell) => cell !== undefined,
+  );
 
   return {
     key: application.key,
