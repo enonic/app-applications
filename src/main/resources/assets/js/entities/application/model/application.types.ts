@@ -10,8 +10,7 @@ export type Application = {
   local: boolean;
   icon?: string;
   modifiedTime?: string;
-  minSystemVersion?: string;
-  maxSystemVersion?: string;
+  systemVersion?: string;
   vendorName?: string;
   vendorUrl?: string;
 };

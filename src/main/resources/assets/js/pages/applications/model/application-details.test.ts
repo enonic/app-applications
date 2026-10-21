@@ -1,30 +1,36 @@
 import { describe, expect, it } from 'vitest';
 
-import { systemVersionPhrase } from './application-details';
+import { systemVersionRequirement } from './application-details';
 
-describe('systemVersionPhrase', () => {
-  it('reads a lower bound alone as an open range', () => {
-    expect(systemVersionPhrase('7.15.0')).toEqual({
-      labelKey: 'applications.details.systemVersionFrom',
-      args: ['7.15.0'],
-    });
+describe('systemVersionRequirement', () => {
+  it('reads an inclusive lower and exclusive upper bound', () => {
+    expect(systemVersionRequirement('[8.1.0,9.0.0)')).toBe('≥ 8.1.0, < 9.0.0');
   });
 
-  it('reads an upper bound alone', () => {
-    expect(systemVersionPhrase(undefined, '8.0.0')).toEqual({
-      labelKey: 'applications.details.systemVersionUpTo',
-      args: ['8.0.0'],
-    });
+  it('reads two inclusive bounds', () => {
+    expect(systemVersionRequirement('[8.1.0,9.0.0]')).toBe('≥ 8.1.0, ≤ 9.0.0');
   });
 
-  it('reads both bounds as a range', () => {
-    expect(systemVersionPhrase('7.15.0', '8.0.0')).toEqual({
-      labelKey: 'applications.details.systemVersionRange',
-      args: ['7.15.0', '8.0.0'],
-    });
+  it('reads two exclusive bounds', () => {
+    expect(systemVersionRequirement('(8.1.0,9.0.0)')).toBe('> 8.1.0, < 9.0.0');
   });
 
-  it('has nothing to say about a descriptor that names no bound', () => {
-    expect(systemVersionPhrase()).toBeUndefined();
+  it('reads an exclusive lower and inclusive upper bound', () => {
+    expect(systemVersionRequirement('(8.1.0,9.0.0]')).toBe('> 8.1.0, ≤ 9.0.0');
+  });
+
+  it('reads a bare version as an inclusive lower bound', () => {
+    expect(systemVersionRequirement('8.1.0')).toBe('≥ 8.1.0');
+  });
+
+  it('shows a range it does not recognise as reported', () => {
+    expect(systemVersionRequirement('[8.1.0,')).toBe('[8.1.0,');
+    expect(systemVersionRequirement('[8.1.0')).toBe('[8.1.0');
+    expect(systemVersionRequirement('8.1.0)')).toBe('8.1.0)');
+  });
+
+  it('has nothing to say about a descriptor that names no range', () => {
+    expect(systemVersionRequirement()).toBeUndefined();
+    expect(systemVersionRequirement('')).toBeUndefined();
   });
 });

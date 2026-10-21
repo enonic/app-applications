@@ -1,9 +1,9 @@
 import { Link } from '@enonic/ui';
 
 import type { Application } from '../../../entities/application';
-import { i18n, useI18n } from '../../../shared/i18n';
+import { useI18n } from '../../../shared/i18n';
 import { DetailsPanel } from '../../../widgets/details-panel/DetailsPanel';
-import { systemVersionPhrase } from '../model/application-details';
+import { systemVersionRequirement } from '../model/application-details';
 import { ApplicationUpdateField } from './ApplicationUpdateField';
 
 export type ApplicationSummarySectionProps = {
@@ -17,11 +17,10 @@ export function ApplicationSummarySection({
   application,
   'data-component': componentName = APPLICATION_SUMMARY_SECTION_NAME,
 }: ApplicationSummarySectionProps) {
-  const { key, description, version, minSystemVersion, maxSystemVersion, vendorName, vendorUrl } =
-    application;
+  const { key, description, version, systemVersion, vendorName, vendorUrl } = application;
 
   const vendorLinkLabel = useI18n('applications.details.vendorLink');
-  const systemVersion = systemVersionPhrase(minSystemVersion, maxSystemVersion);
+  const systemRequired = systemVersionRequirement(systemVersion);
 
   return (
     <DetailsPanel.Section
@@ -53,9 +52,9 @@ export function ApplicationSummarySection({
         </DetailsPanel.Field>
       )}
 
-      {systemVersion !== undefined && (
+      {systemRequired !== undefined && (
         <DetailsPanel.Field labelKey="applications.details.systemRequired">
-          {i18n(systemVersion.labelKey, ...systemVersion.args)}
+          {systemRequired}
         </DetailsPanel.Field>
       )}
     </DetailsPanel.Section>
