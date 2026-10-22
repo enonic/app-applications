@@ -44,8 +44,8 @@ importers:
         version: 4.18.16(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
     devDependencies:
       '@enonic-types/core':
-        specifier: ^8.0.4
-        version: 8.0.4
+        specifier: ^8.1.0
+        version: 8.1.0
       '@enonic-types/global':
         specifier: ^8.0.4
         version: 8.0.4
@@ -126,6 +126,9 @@ packages:
 
   '@enonic-types/core@8.0.4':
     resolution: {integrity: sha512-8ZNsk4Yb0MZwq2DW9T6XUxKWCIedt0CUR2bCOriUge3LrY0diwJX2QwaZYrQQ7A4bF8g3dTczO3DDnDRQuPhFg==}
+
+  '@enonic-types/core@8.1.0':
+    resolution: {integrity: sha512-XLcdaYU2z7H9rMqwjR6FQyWKETLmdTwEhWUiwAGSiqrCHr/8LG0lVkf9HHsMBn/sWg2MmxioColYrpN+0NRxvQ==}
 
   '@enonic-types/global@8.0.4':
     resolution: {integrity: sha512-K32di6aJFFyGQMBwCPC+1Vo/zRFlhwC4iCBKOlQL8FGeFwrc8E+88ZfNhyPO7NVVI0E6TcCpovBmhfQMw7rj8A==}
@@ -1632,6 +1635,8 @@ snapshots:
   '@blazediff/core@1.10.0': {}
 
   '@enonic-types/core@8.0.4': {}
+
+  '@enonic-types/core@8.1.0': {}
 
   '@enonic-types/global@8.0.4':
     dependencies:
