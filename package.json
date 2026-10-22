@@ -41,7 +41,7 @@
     "@enonic-types/lib-portal": "^8.0.4",
     "@enonic-types/lib-schema": "^8.0.4",
     "@enonic-types/lib-vhost": "^8.0.4",
-    "@enonic/ui-types": "0.5.0",
+    "@enonic/ui-types": "0.5.2",
     "@tailwindcss/vite": "^4.3.3",
     "@types/node": "^26.6.5",
     "@types/react": "^19.3.0",
