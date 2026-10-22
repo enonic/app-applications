@@ -28,7 +28,7 @@
     "nanostores": "^1.5.5",
     "neverthrow": "^8.2.0",
     "preact": "^10.29.8",
-    "react-virtuoso": "^4.18.16"
+    "react-virtuoso": "^4.18.19"
   },
   "devDependencies": {
     "@enonic-types/core": "^8.1.0",
