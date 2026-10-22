@@ -1,8 +1,8 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-import { filterInputPhrases, uiKitPhrases } from '@enonic/ui-kit';
-import { comparePhrases, mergePhrases, type Phrases } from '@enonic/ui-utils';
+import { themeSwitcherPhrases, uiKitPhrases } from '@enonic/ui-kit';
+import { comparePhrases, type Phrases } from '@enonic/ui-utils';
 import { describe, expect, it } from 'vitest';
 
 const BUNDLE = join(__dirname, '../../../../i18n/phrases.properties');
@@ -21,11 +21,14 @@ function readBundle(): Phrases {
   return phrases;
 }
 
-describe('phrases.properties against the kit', () => {
-  it('carries every label the kit renders on its own, placeholders and all', () => {
-    const catalog = mergePhrases([uiKitPhrases, filterInputPhrases]);
+// The app renders no theme switcher: the host owns the theme.
+const rendered: Phrases = Object.fromEntries(
+  Object.entries(uiKitPhrases).filter(([key]) => !(key in themeSwitcherPhrases)),
+);
 
-    expect(comparePhrases(catalog, readBundle())).toEqual({
+describe('phrases.properties against the kit', () => {
+  it('carries every label the kit renders here, placeholders and all', () => {
+    expect(comparePhrases(rendered, readBundle())).toEqual({
       missing: [],
       placeholderMismatch: [],
     });
