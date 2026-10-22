@@ -74,8 +74,8 @@ importers:
         specifier: ^8.0.4
         version: 8.0.4
       '@enonic/ui-types':
-        specifier: 0.5.0
-        version: 0.5.0
+        specifier: 0.5.2
+        version: 0.5.2
       '@tailwindcss/vite':
         specifier: ^4.3.3
         version: 4.3.3(@voidzero-dev/vite-plus-core@1.1.0(@types/node@26.6.5)(jiti@2.7.0)(typescript@7.0.2))
@@ -173,8 +173,8 @@ packages:
       react-dom:
         optional: true
 
-  '@enonic/ui-types@0.5.0':
-    resolution: {integrity: sha512-eNGRKrwto3m5B7sPe9q0mGgqZLo/kYyTSEy1XEvA3gk9j4KyFg8pMmdDHsNoaDiJemWy9XS2tDJ+Syrugl72SA==}
+  '@enonic/ui-types@0.5.2':
+    resolution: {integrity: sha512-0q/QA7q8Cd//CjzlHDQmKKRwClZdeUFp0Nt/JgEjXruehUP9jv2kHNzmWufdM3KJDEmF7H3AaXY2brl/64FZrQ==}
     engines: {node: '>=22.12.0'}
 
   '@enonic/ui-utils@0.5.0':
@@ -1685,11 +1685,11 @@ snapshots:
       - '@types/react'
       - neverthrow
 
-  '@enonic/ui-types@0.5.0': {}
+  '@enonic/ui-types@0.5.2': {}
 
   '@enonic/ui-utils@0.5.0(neverthrow@8.2.0)':
     dependencies:
-      '@enonic/ui-types': 0.5.0
+      '@enonic/ui-types': 0.5.2
     optionalDependencies:
       neverthrow: 8.2.0
 
