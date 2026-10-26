@@ -1,14 +1,14 @@
 const LOWER_SIGN = { '[': '≥', '(': '>' } as const;
-const UPPER_SIGN = { ']': '≤', ')': '<' } as const;
 
 const BARE = /^[^\s,[\]()]+$/;
-const RANGE = /^([[(])\s*([^,\s]+)\s*,\s*([^\s\])]+)\s*([\])])$/;
+const RANGE = /^([[(])\s*([^,\s]+)\s*,\s*[^\s\])]+\s*[\])]$/;
 
 /**
- * The platform versions an application accepts, one comparison sign per bound: `[8.1.0,9.0.0)`
- * reads `≥ 8.1.0, < 9.0.0`, and a bare `8.1.0` — how XP writes a range with no upper bound — reads
- * `≥ 8.1.0`. `undefined` where the descriptor names no range, so the field is left out rather than
- * rendered empty. A range the regex does not recognise is shown as XP reported it rather than hidden.
+ * The lowest platform version an application accepts: `[8.1.0,9.0.0)` and a bare `8.1.0` both read
+ * `≥ 8.1.0`, `(8.1.0,9.0.0)` reads `> 8.1.0`. The upper bound is dropped on purpose — by convention
+ * it is the next major and tells the user nothing. `undefined` where the descriptor names no range, so
+ * the field is left out; a range the regex does not recognise is shown as XP reported it rather than
+ * hidden.
  */
 export function systemVersionRequirement(range?: string): string | undefined {
   if (range == null || range.length === 0) {
@@ -24,9 +24,8 @@ export function systemVersionRequirement(range?: string): string | undefined {
     return range;
   }
 
-  const [, open, lower, upper, close] = match;
+  const [, open, lower] = match;
   const lowerSign = LOWER_SIGN[open as keyof typeof LOWER_SIGN];
-  const upperSign = UPPER_SIGN[close as keyof typeof UPPER_SIGN];
 
-  return `${lowerSign} ${lower}, ${upperSign} ${upper}`;
+  return `${lowerSign} ${lower}`;
 }
