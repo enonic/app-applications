@@ -53,8 +53,8 @@ importers:
         specifier: ^8.0.4
         version: 8.0.4
       '@enonic-types/lib-app':
-        specifier: ^8.0.4
-        version: 8.0.4
+        specifier: ^8.1.1
+        version: 8.1.1
       '@enonic-types/lib-auth':
         specifier: ^8.1.0
         version: 8.1.0
@@ -139,8 +139,8 @@ packages:
   '@enonic-types/lib-admin@8.0.4':
     resolution: {integrity: sha512-Af+/5xxHssKvPCJrLdWj0GtIVyUNasNJdf7Kd2K0CILoof7LsFhaDIYM5xHZcCd1QK7W1YdgHbVfjTeCIpzLMg==}
 
-  '@enonic-types/lib-app@8.0.4':
-    resolution: {integrity: sha512-41dYX1AfEJBfyV7IBOY2AeRINJ8XDGAgXu1g0G+lx12tmIyA5murNEc0T4D5hF8WQitRekM+MoOooJysYhEjAQ==}
+  '@enonic-types/lib-app@8.1.1':
+    resolution: {integrity: sha512-huucmd14xIV83IzTB1AqE8h4O9NSGnFpcljL+s5RYsxyo09ZOpSlAKSbpYoO3F5b+5uZCye2qtTVesG7Hvo7QA==}
 
   '@enonic-types/lib-auth@8.1.0':
     resolution: {integrity: sha512-7pnzohMabayUpQjW4VgwcSJni5rJJ+/RE2r9aQp0FfswNerN+CTcVhGz9wzUZglaRuvw5Ibrl1yL4A+Wsex0uQ==}
@@ -1567,9 +1567,9 @@ snapshots:
     dependencies:
       '@enonic-types/core': 8.0.4
 
-  '@enonic-types/lib-app@8.0.4':
+  '@enonic-types/lib-app@8.1.1':
     dependencies:
-      '@enonic-types/core': 8.0.4
+      '@enonic-types/core': 8.1.1
 
   '@enonic-types/lib-auth@8.1.0':
     dependencies:

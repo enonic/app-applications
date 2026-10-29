@@ -34,7 +34,7 @@
     "@enonic-types/core": "^8.1.1",
     "@enonic-types/global": "^8.1.0",
     "@enonic-types/lib-admin": "^8.0.4",
-    "@enonic-types/lib-app": "^8.0.4",
+    "@enonic-types/lib-app": "^8.1.1",
     "@enonic-types/lib-auth": "^8.1.0",
     "@enonic-types/lib-i18n": "^8.1.0",
     "@enonic-types/lib-io": "^8.1.0",
