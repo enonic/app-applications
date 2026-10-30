@@ -8,6 +8,8 @@ export type Application = {
   state: ApplicationState;
   system: boolean;
   local: boolean;
+  /** Its schema is persisted on this instance: always started, and XP refuses to start or stop it. */
+  schema: boolean;
   icon?: string;
   modifiedTime?: string;
   systemVersion?: string;

@@ -1,4 +1,4 @@
-import { Box, Laptop, Settings } from 'lucide-react';
+import { Box, Braces, Laptop, Settings } from 'lucide-react';
 import { useState } from 'preact/hooks';
 
 import { i18n } from '../../../shared/i18n';
@@ -10,18 +10,25 @@ export type ApplicationIconProps = {
   /** `sm` for a list row, `lg` for the details header. */
   size?: 'sm' | 'lg';
   /**
-   * The application's own flags: at most one corner badge, system before local. Absent for an icon standing
-   * for no installed application — a market entry, or a form placeholder.
+   * The application's own flags: at most one corner badge, system before schema before local. Absent
+   * for an icon standing for no installed application — a market entry, or a form placeholder.
    */
   system?: boolean;
   local?: boolean;
+  schema?: boolean;
 };
 
 const CLASSES = { sm: 'size-6', lg: 'size-12' } as const;
 const PIXELS = { sm: 24, lg: 48 } as const;
 
 /** An application's own icon where it has one, a generic package glyph where it does not. */
-export function ApplicationIcon({ icon, size = 'sm', system, local }: ApplicationIconProps) {
+export function ApplicationIcon({
+  icon,
+  size = 'sm',
+  system,
+  local,
+  schema,
+}: ApplicationIconProps) {
   // ! The failing url rather than a flag: a `data:` uri cannot fail, but a market icon is fetched
   // ! from another host and may 404, and the same element is reused as rows are filtered in and out.
   const [failedIcon, setFailedIcon] = useState<string>();
@@ -38,13 +45,15 @@ export function ApplicationIcon({ icon, size = 'sm', system, local }: Applicatio
       />
     );
 
-  if (!system && !local) {
+  if (!system && !schema && !local) {
     return glyph;
   }
 
   const badge = system
     ? { icon: Settings, color: 'var(--color-main)', label: i18n('applications.badge.system') }
-    : { icon: Laptop, color: 'var(--color-info)', label: i18n('applications.badge.local') };
+    : schema
+      ? { icon: Braces, color: 'var(--color-info)', label: i18n('applications.badge.schema') }
+      : { icon: Laptop, color: 'var(--color-info)', label: i18n('applications.badge.local') };
 
   return (
     <span className="relative inline-flex shrink-0">
