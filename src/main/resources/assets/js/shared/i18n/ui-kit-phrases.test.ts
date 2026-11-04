@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-import { themeSwitcherPhrases, uiKitPhrases } from '@enonic/ui-kit';
+import { notificationListPhrases, themeSwitcherPhrases, uiKitPhrases } from '@enonic/ui-kit';
 import { comparePhrases, type Phrases } from '@enonic/ui-utils';
 import { describe, expect, it } from 'vitest';
 
@@ -21,9 +21,11 @@ function readBundle(): Phrases {
   return phrases;
 }
 
-// The app renders no theme switcher: the host owns the theme.
+// The app renders no theme switcher and no toast stack: the host owns both.
 const rendered: Phrases = Object.fromEntries(
-  Object.entries(uiKitPhrases).filter(([key]) => !(key in themeSwitcherPhrases)),
+  Object.entries(uiKitPhrases).filter(
+    ([key]) => !(key in themeSwitcherPhrases) && !(key in notificationListPhrases),
+  ),
 );
 
 describe('phrases.properties against the kit', () => {
