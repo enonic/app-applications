@@ -45,6 +45,7 @@ describe('applications.details.panel.spec - the details panel of an application:
     await applicationsPage.waitForRowActive(SIMPLE_SITE.key);
     await applicationDetails.waitForLoaded();
     await applicationDetails.waitForTitle(SIMPLE_SITE.displayName);
+    await settingsUtils.saveScreenshot('app_details_panel_1');
     // 2. The empty message is gone.
     assert.equal(await applicationDetails.getEmptyMessage(), undefined);
     // 3. The header: a local application (deployed from home/deploy) with its badge, the state as a
@@ -86,6 +87,7 @@ describe('applications.details.panel.spec - the details panel of an application:
     await applicationDetails.waitForTitle(SIMPLE_SITE.displayName);
     // 1. The Schemas section is shown once the application's info is loaded.
     await applicationDetails.waitForSectionDisplayed(ApplicationDetails.SECTION.SCHEMAS);
+    await settingsUtils.saveScreenshot('app_details_panel_2');
     // 2. One subsection per kind the application has, none for a kind it has not (no parts, no macros).
     assert.deepEqual(await applicationDetails.getSchemaKinds(), [
       ApplicationDetails.SUBSECTION.CONTENT_TYPES,
@@ -162,6 +164,7 @@ describe('applications.details.panel.spec - the details panel of an application:
     await applicationDetails.waitForTitle(SIMPLE_SITE.displayName);
     // 1. Stop it from the header: the details and the row follow, the toolbar offers Start.
     await applicationDetails.stopApplication();
+    await settingsUtils.saveScreenshot('app_details_panel_3');
     await applicationsPage.waitForApplicationState(SIMPLE_SITE.key, appConst.APP_STATE.STOPPED);
     await applicationsPage.waitForStartButtonEnabled();
     await applicationsPage.waitForStopButtonDisabled();

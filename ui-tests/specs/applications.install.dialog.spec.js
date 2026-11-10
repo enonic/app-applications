@@ -54,6 +54,7 @@ describe("applications.install.dialog.spec - the 'Install applications' dialog: 
       appConst.INSTALL_DIALOG.FILTER_FIELD.UPGRADE,
       appConst.INSTALL_DIALOG.FILTER_FIELD.INSTALLED,
     ]);
+    await settingsUtils.saveScreenshot('install_app_dialog_1');
     await installAppDialog.closeFilterPopup();
     // 5. Close the dialog with its cross.
     await installAppDialog.clickOnCloseButton();
@@ -76,6 +77,7 @@ describe("applications.install.dialog.spec - the 'Install applications' dialog: 
     assert.equal(await installAppDialog.getFilterValueCount(APP.vendor), 1);
     // 3. Pick 'Enonic': the term shows as a tag beside the text, the list is the one application.
     await installAppDialog.clickOnFilterValue(APP.vendor);
+    await settingsUtils.saveScreenshot('install_app_dialog_vendor_filtered');
     await installAppDialog.waitForFilterTerm(
       appConst.INSTALL_DIALOG.FILTER_FIELD.VENDOR,
       APP.vendor,
@@ -143,6 +145,7 @@ describe("applications.install.dialog.spec - the 'Install applications' dialog: 
       appConst.INSTALL_DIALOG.ACTION.INSTALLED,
       appConst.TIMEOUT.INSTALL,
     );
+    await settingsUtils.saveScreenshot('install_app_dialog_installed');
     assert.ok(
       !(await installAppDialog.isInstallButtonDisplayed(APP.displayName)),
       'An installed application on the latest version has no button',
@@ -208,6 +211,7 @@ describe("applications.install.dialog.spec - the 'Install applications' dialog: 
     // 3. Pick 'Yes': the term shows as a tag and the application stays the one row.
     await installAppDialog.clickOnFilterValue('Yes');
     await installAppDialog.waitForFilterTerm(appConst.INSTALL_DIALOG.FILTER_FIELD.INSTALLED, 'Yes');
+    await settingsUtils.saveScreenshot('install_app_dialog_installed_filtered');
     await installAppDialog.waitForMarketAppDisplayNames([APP.displayName]);
     // 4. Take the text out: every installed application of the catalogue is listed, this one among
     //    them, and every row reads 'Installed' or 'Update'.

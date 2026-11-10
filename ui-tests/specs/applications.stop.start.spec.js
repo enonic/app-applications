@@ -113,6 +113,7 @@ describe('applications.stop.start.spec - stopping an application from the toolba
     await applicationsPage.clickOnFilterField(appConst.FILTER_FIELD.STATE);
     assert.equal(await applicationsPage.getFilterValueCount(appConst.APP_STATE.STOPPED), 0);
     assert.equal(await applicationsPage.getFilterValueCount(appConst.APP_STATE.STARTED), listed);
+    await settingsUtils.saveScreenshot('app_details_panel_state_filter');
     // 8. Pick 'Started': every listed application passes, the tag says so.
     await applicationsPage.clickOnFilterValue(appConst.APP_STATE.STARTED);
     await applicationsPage.waitForFilterTerm(
