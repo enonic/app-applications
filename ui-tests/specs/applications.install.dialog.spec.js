@@ -19,9 +19,6 @@ describe("applications.install.dialog.spec - the 'Install applications' dialog: 
   // Installed from Enonic Market in this spec, and uninstalled again at the end so the XP is left as
   // it was found. Not a test application: the market has to carry it.
   const APP = appConst.MARKET_APPS.CHUCK_NORRIS;
-  // Set once this run has installed the application: the teardown uninstalls only then, so an
-  // application that was on the XP before the run is left alone.
-  let installedByThisRun = false;
 
   it("WHEN 'Install' in the toolbar has been clicked THEN the 'Install applications' dialog should be opened on the 'Enonic Market' tab AND the market list should be loaded", async () => {
     await settingsUtils.navigateToApplicationsSection();
@@ -128,7 +125,6 @@ describe("applications.install.dialog.spec - the 'Install applications' dialog: 
     let applicationsPage = new ApplicationsPage();
     let applicationDetails = new ApplicationDetails();
     let installAppDialog = new InstallAppDialog();
-    const listed = (await applicationsPage.getApplicationDisplayNames()).length;
     // 1. Open the dialog and narrow the list to the one application.
     await applicationsPage.clickOnInstallButton();
     await installAppDialog.waitForDialogOpened();
@@ -148,7 +144,6 @@ describe("applications.install.dialog.spec - the 'Install applications' dialog: 
       appConst.INSTALL_DIALOG.ACTION.INSTALLED,
       appConst.TIMEOUT.INSTALL,
     );
-    installedByThisRun = true;
     await settingsUtils.saveScreenshot('install_app_dialog_installed');
     assert.ok(
       !(await installAppDialog.isInstallButtonDisplayed(APP.displayName)),
@@ -172,11 +167,6 @@ describe("applications.install.dialog.spec - the 'Install applications' dialog: 
       APP.description,
     );
     assert.equal(await applicationsPage.getApplicationBadge(APP.key), undefined);
-    assert.equal(
-      (await applicationsPage.getApplicationDisplayNames()).length,
-      listed + 1,
-      'One application more should be listed',
-    );
     // 6. Its details: the header reads the application, 'Started', with a link to the market.
     await applicationsPage.clickOnRowByKey(APP.key);
     await applicationDetails.waitForTitle(APP.displayName);
@@ -235,12 +225,10 @@ describe("applications.install.dialog.spec - the 'Install applications' dialog: 
     await installAppDialog.waitForDialogClosed();
   });
 
-  // Leaves the XP as it was found: an application this run installed is uninstalled through the
-  // section itself, so the spec can run again; one that was installed before the run stays.
+  // Leaves the XP as it was found: the application is uninstalled through the section itself
+  // whenever its row is there, so the spec can run again. The first test asserts that it was not
+  // installed before the run, so nothing that was on the XP already is taken away here.
   after(async () => {
-    if (!installedByThisRun) {
-      return;
-    }
     let applicationsPage = new ApplicationsPage();
     let uninstallAppDialog = new UninstallAppDialog();
     await settingsUtils.navigateToSettingsApp();

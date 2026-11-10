@@ -331,6 +331,14 @@ class BrowsePage extends SectionPage {
     return this.isElementDisplayed(this.css.filterPopup);
   }
 
+  // Closes the open dropdown without picking: Escape in the input closes the popup.
+  async closeFilterPopup() {
+    if (await this.isFilterPopupDisplayed()) {
+      await this.pressEscKey();
+      await this.waitForFilterPopupClosed();
+    }
+  }
+
   // Labels of the fields the open dropdown offers (appConst.FILTER_FIELD.*), in display order.
   async getFilterFields() {
     await this.waitForElementDisplayed(this.css.filterPopup);

@@ -61,21 +61,27 @@ describe('applications.stop.start.spec - stopping an application from the toolba
     await settingsUtils.navigateToApplicationsSection();
     let applicationsPage = new ApplicationsPage();
     let applicationDetails = new ApplicationDetails();
-    const listed = (await applicationsPage.getApplicationDisplayNames()).length;
+    // The State filter counts the data, so the total comes from it: the list is virtualized and
+    // renders only the rows that fit the viewport.
+    await applicationsPage.clickOnFilterButton();
+    await applicationsPage.clickOnFilterField(appConst.FILTER_FIELD.STATE);
+    const started = await applicationsPage.getFilterValueCount(appConst.APP_STATE.STARTED);
+    assert.equal(await applicationsPage.getFilterValueCount(appConst.APP_STATE.STOPPED), 0);
+    await applicationsPage.closeFilterPopup();
     // 1. Click on the row and stop the application from the toolbar.
     await applicationsPage.clickOnRowByKey(APP.key);
     await applicationDetails.waitForTitle(APP.displayName);
     await applicationsPage.clickOnStopButton();
     await applicationDetails.waitForState(appConst.APP_STATE.STOPPED, appConst.TIMEOUT.LONG);
     await applicationsPage.waitForApplicationState(APP.key, appConst.APP_STATE.STOPPED);
-    // 2. The State filter counts the stopped application: 'Stopped (1)', the rest 'Started'.
+    // 2. The State filter counts the stopped application: 'Stopped (1)', one 'Started' less.
     await applicationsPage.clickOnFilterButton();
     await applicationsPage.clickOnFilterField(appConst.FILTER_FIELD.STATE);
     assert.equal(await applicationsPage.getFilterValueCount(appConst.APP_STATE.STOPPED), 1);
     assert.equal(
       await applicationsPage.getFilterValueCount(appConst.APP_STATE.STARTED),
-      listed - 1,
-      'Every other listed application should count as started',
+      started - 1,
+      'Every other application should still count as started',
     );
     // 3. Pick 'Stopped': the term shows as a tag and the list narrows to the one application.
     await applicationsPage.clickOnFilterValue(appConst.APP_STATE.STOPPED);
@@ -94,10 +100,10 @@ describe('applications.stop.start.spec - stopping an application from the toolba
     assert.deepEqual(await applicationsPage.getFilterTerms(), [], 'No term should be left');
     await applicationsPage
       .getBrowser()
-      .waitUntil(
-        async () => (await applicationsPage.getApplicationDisplayNames()).length === listed,
-        { timeout: appConst.TIMEOUT.MEDIUM, timeoutMsg: 'The whole list should be back' },
-      );
+      .waitUntil(async () => (await applicationsPage.getApplicationDisplayNames()).length > 1, {
+        timeout: appConst.TIMEOUT.MEDIUM,
+        timeoutMsg: 'More than the one filtered application should be listed again',
+      });
     // 5. Once the state button reads 'Stopped', pick 'Start' in its menu.
     await applicationDetails.clickOnStateMenuButton();
     assert.deepEqual(await applicationDetails.getStateMenuItems(), [appConst.TOOLBAR.START]);
@@ -108,19 +114,19 @@ describe('applications.stop.start.spec - stopping an application from the toolba
     await applicationsPage.waitForStopButtonEnabled();
     await applicationsPage.waitForStartButtonDisabled();
     await applicationDetails.waitForSectionDisplayed(ApplicationDetails.SECTION.SCHEMAS);
-    // 7. The State filter follows: nothing is stopped any more, everything listed is started.
+    // 7. The State filter follows: nothing is stopped any more, the 'Started' count is back.
     await applicationsPage.clickOnFilterButton();
     await applicationsPage.clickOnFilterField(appConst.FILTER_FIELD.STATE);
     assert.equal(await applicationsPage.getFilterValueCount(appConst.APP_STATE.STOPPED), 0);
-    assert.equal(await applicationsPage.getFilterValueCount(appConst.APP_STATE.STARTED), listed);
+    assert.equal(await applicationsPage.getFilterValueCount(appConst.APP_STATE.STARTED), started);
     await settingsUtils.saveScreenshot('app_details_panel_state_filter');
-    // 8. Pick 'Started': every listed application passes, the tag says so.
+    // 8. Pick 'Started': the application passes, the tag says so.
     await applicationsPage.clickOnFilterValue(appConst.APP_STATE.STARTED);
     await applicationsPage.waitForFilterTerm(
       appConst.FILTER_FIELD.STATE,
       appConst.APP_STATE.STARTED,
     );
-    assert.equal((await applicationsPage.getApplicationDisplayNames()).length, listed);
+    await applicationsPage.waitForRowDisplayed(APP.key);
     await applicationsPage.removeFilterTerm(
       appConst.FILTER_FIELD.STATE,
       appConst.APP_STATE.STARTED,
