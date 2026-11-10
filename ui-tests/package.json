@@ -1,0 +1,25 @@
+{
+  "name": "test_app_applications",
+  "version": "1.0.0",
+  "license": "ISC",
+  "author": "Hauruseu Siarhei",
+  "scripts": {
+    "test_applications:wdio_chrome": "wdio ./wdio.chrome.conf.js",
+    "allure-report": "allure generate ./build/reports/allure --output ./build/reports/allure-report --clean --single-file"
+  },
+  "devDependencies": {
+    "@wdio/allure-reporter": "^10.0.1",
+    "@wdio/cli": "^10.0.2",
+    "@wdio/concise-reporter": "^10.0.1",
+    "@wdio/local-runner": "^10.0.2",
+    "@wdio/mocha-framework": "^10.0.1",
+    "allure-commandline": "^2.46.1",
+    "properties-reader": "^3.0.1",
+    "webdriverio": "^10.0.2"
+  },
+  "engines": {
+    "node": ">= 24.15.0",
+    "pnpm": ">= 10.33.4"
+  },
+  "packageManager": "pnpm@10.33.4"
+}

@@ -1,0 +1,5 @@
+# Makes this folder its own pnpm root. Without it pnpm walks up to the repository's
+# pnpm-workspace.yaml, installs the app's dependencies instead of these and writes into the root
+# lockfile - both from a `pnpm install` run here and from Gradle's :ui-tests:pnpmInstall.
+packages:
+  - '.'
