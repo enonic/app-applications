@@ -331,10 +331,12 @@ class BrowsePage extends SectionPage {
     return this.isElementDisplayed(this.css.filterPopup);
   }
 
-  // Closes the open dropdown without picking: Escape in the input closes the popup.
+  // Dismisses the dropdown with a click on the toolbar - outside the dropdown, on the empty space
+  // right of its buttons. Not Escape: with a field entered, the FilterInput takes Escape to step
+  // out of the field and the dropdown stays open on the fields.
   async closeFilterPopup() {
     if (await this.isFilterPopupDisplayed()) {
-      await this.pressEscKey();
+      await this.clickOnElement(this.css.toolbar);
       await this.waitForFilterPopupClosed();
     }
   }
