@@ -10,6 +10,7 @@ const LoginPage = require('../page_objects/login.page');
 const appConst = require('./app_const');
 const webDriverHelper = require('./WebDriverHelper');
 const MenuSectionsRail = require('../page_objects/menu.sections.rail');
+const ApplicationsPage = require('../page_objects/applications.page');
 const fs = require('fs');
 const path = require('path');
 
@@ -190,6 +191,27 @@ module.exports = {
   // Precondition: the Settings app is open (navigateToSettingsApp).
   navigateToApplicationsSection() {
     return this.navigateToExtension(appConst.EXTENSIONS.APPLICATIONS);
+  },
+  // Returns an application the specs stop to 'Started' when a failed test left it stopped, so the
+  // next test finds the state it expects. Starts from the home page: a failed test may have left a
+  // filter, a menu or a dialog behind, and a fresh mount of the section is what the row is read from.
+  async ensureApplicationStarted(key) {
+    await this.doCloseAllWindowTabsAndNavigateToHome();
+    await this.navigateToSettingsApp();
+    await this.navigateToApplicationsSection();
+    let applicationsPage = new ApplicationsPage();
+    await applicationsPage.waitForApplicationsListLoaded();
+    await applicationsPage.waitForRowDisplayed(key);
+    if ((await applicationsPage.getApplicationState(key)) === appConst.APP_STATE.STARTED) {
+      return;
+    }
+    await applicationsPage.clickOnRowByKey(key);
+    await applicationsPage.clickOnStartButton();
+    await applicationsPage.waitForApplicationState(
+      key,
+      appConst.APP_STATE.STARTED,
+      appConst.TIMEOUT.LONG,
+    );
   },
   // The section's screen renders inside a shadow root, where Chrome cannot evaluate XPath
   // ("#document-fragment is not a valid context node type"), so it is located with CSS through

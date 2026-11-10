@@ -204,13 +204,21 @@ describe('applications.stop.start.spec - stopping an application from the toolba
   beforeEach(async () => {
     await settingsUtils.navigateToSettingsApp();
   });
-  afterEach(() => settingsUtils.doCloseAllWindowTabsAndNavigateToHome());
+  // The application is left 'Started' whatever the test did: a failure between Stop and Start
+  // must not reach the next test, which expects it started.
+  afterEach(async () => {
+    await settingsUtils.ensureApplicationStarted(APP.key);
+    return await settingsUtils.doCloseAllWindowTabsAndNavigateToHome();
+  });
   before(async () => {
     if (typeof browser !== 'undefined') {
       await settingsUtils
         .getBrowser()
         .setWindowSize(appConst.BROWSER_WIDTH, appConst.BROWSER_HEIGHT);
     }
+    // A run that was cut off may have left the application stopped: start it before the first test.
+    await settingsUtils.ensureApplicationStarted(APP.key);
+    await settingsUtils.doCloseAllWindowTabsAndNavigateToHome();
     return console.log('specification starting: ' + this.title);
   });
 });

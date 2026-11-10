@@ -19,6 +19,9 @@ describe("applications.install.dialog.spec - the 'Install applications' dialog: 
   // Installed from Enonic Market in this spec, and uninstalled again at the end so the XP is left as
   // it was found. Not a test application: the market has to carry it.
   const APP = appConst.MARKET_APPS.CHUCK_NORRIS;
+  // Set once this run has installed the application: the teardown uninstalls only then, so an
+  // application that was on the XP before the run is left alone.
+  let installedByThisRun = false;
 
   it("WHEN 'Install' in the toolbar has been clicked THEN the 'Install applications' dialog should be opened on the 'Enonic Market' tab AND the market list should be loaded", async () => {
     await settingsUtils.navigateToApplicationsSection();
@@ -145,6 +148,7 @@ describe("applications.install.dialog.spec - the 'Install applications' dialog: 
       appConst.INSTALL_DIALOG.ACTION.INSTALLED,
       appConst.TIMEOUT.INSTALL,
     );
+    installedByThisRun = true;
     await settingsUtils.saveScreenshot('install_app_dialog_installed');
     assert.ok(
       !(await installAppDialog.isInstallButtonDisplayed(APP.displayName)),
@@ -231,9 +235,12 @@ describe("applications.install.dialog.spec - the 'Install applications' dialog: 
     await installAppDialog.waitForDialogClosed();
   });
 
-  // Leaves the XP as it was found: the application installed above is uninstalled through the
-  // section itself, so the spec can run again.
+  // Leaves the XP as it was found: an application this run installed is uninstalled through the
+  // section itself, so the spec can run again; one that was installed before the run stays.
   after(async () => {
+    if (!installedByThisRun) {
+      return;
+    }
     let applicationsPage = new ApplicationsPage();
     let uninstallAppDialog = new UninstallAppDialog();
     await settingsUtils.navigateToSettingsApp();

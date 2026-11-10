@@ -126,6 +126,10 @@ tasks.register( 'startServer' ) {
     dependsOn( tasks.named( 'unpackDistro' ) )
     // The config and the app under test are read at startup: both must be in place before it.
     mustRunAfter tasks.named( 'copyConfig' ), tasks.named( 'deployApp' )
+    // ! A finalizer runs only when its task ran: one on the test task alone leaves the server up when
+    // ! downloadApps or waitForServer fails and the test task never runs. stopServer is ordered after
+    // ! the rest, so on a green run it is still the last task.
+    finalizedBy 'stopServer'
     doLast {
         sleep( 5000 )
         logger.lifecycle( 'Starting XP Server at: {}', xpHome )
@@ -190,6 +194,7 @@ tasks.register( 'waitForServer') {
 tasks.register( 'stopServer' ) {
     description = 'Stops the XP server'
     group = 'Test Execution'
+    mustRunAfter 'downloadApps', 'waitForServer', 'testApplicationsApp', 'generateReportAndStopServer'
     doLast {
         if ( process == null ) {
             logger.warn( 'Server process not found - it might already be stopped' )

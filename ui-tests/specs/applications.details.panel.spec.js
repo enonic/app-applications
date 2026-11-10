@@ -184,13 +184,21 @@ describe('applications.details.panel.spec - the details panel of an application:
   beforeEach(async () => {
     await settingsUtils.navigateToSettingsApp();
   });
-  afterEach(() => settingsUtils.doCloseAllWindowTabsAndNavigateToHome());
+  // The application is left 'Started' whatever the test did: a failure between Stop and Start
+  // must not reach the next test, which expects it started.
+  afterEach(async () => {
+    await settingsUtils.ensureApplicationStarted(SIMPLE_SITE.key);
+    return await settingsUtils.doCloseAllWindowTabsAndNavigateToHome();
+  });
   before(async () => {
     if (typeof browser !== 'undefined') {
       await settingsUtils
         .getBrowser()
         .setWindowSize(appConst.BROWSER_WIDTH, appConst.BROWSER_HEIGHT);
     }
+    // A run that was cut off may have left the application stopped: start it before the first test.
+    await settingsUtils.ensureApplicationStarted(SIMPLE_SITE.key);
+    await settingsUtils.doCloseAllWindowTabsAndNavigateToHome();
     return console.log('specification starting: ' + this.title);
   });
 });
