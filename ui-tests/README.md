@@ -12,6 +12,12 @@ Mocha against a real XP with the app deployed, Chrome driven over WebDriver Clas
   start the application, with the row and the toolbar following.
 - `specs/applications.stop.start.spec.js` — stopping an application from the toolbar, the state menu
   and the row's context menu, and starting it again, with the State filter counting it on each side.
+- `specs/applications.grid.filter.spec.js` — narrowing the grid: by a key typed in the filter (one
+  row, counted by the State field), by a description three test applications share (three rows,
+  counted by 'Upgrade available: No' and kept once it is picked), and with 'Show system
+  applications' on — the applications XP ships listed with their checkboxes greyed, left out by
+  'Select all', and one of them opened: Install alone enabled in the toolbar and the context menu, the
+  state a plain label in the details and absent from the row.
 - `specs/applications.install.dialog.spec.js` — the 'Install applications' dialog: its tabs and
   filter fields, the market list narrowed by text and by Vendor, an application (Chuck Norris)
   installed from the market — the row reading 'Installed', the toast, the grid and the details once

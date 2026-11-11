@@ -12,17 +12,20 @@ the same shape app-users built for its four sections.
 
 ## Scripts
 
-| Intent                         | Command                         |
-| ------------------------------ | ------------------------------- |
-| Verify changes                 | `pnpm check`                    |
-| Verify, fixing format and lint | `pnpm check:fix`                |
-| Tests                          | `pnpm test` / `pnpm test:watch` |
-| Frontend watch build           | `pnpm dev`                      |
-| Server-side TS → CommonJS      | `pnpm pack:server`              |
-| Build + deploy to local XP     | `./gradlew deploy -Penv=dev`    |
+| Intent                         | Command                                   |
+| ------------------------------ | ----------------------------------------- |
+| Verify changes                 | `pnpm check`                              |
+| Verify, fixing format and lint | `pnpm check:fix`                          |
+| Tests                          | `pnpm test` / `pnpm test:watch`           |
+| Frontend watch build           | `pnpm dev`                                |
+| Server-side TS → CommonJS      | `pnpm pack:server`                        |
+| Build + deploy to local XP     | `./gradlew deploy -Penv=dev`              |
+| Browser tests on a fresh XP    | `./gradlew :ui-tests:testApplicationsApp` |
 
 `pnpm check` is what CI runs: format, lint, client typecheck, server typecheck, tests. Reach for
-Gradle when descriptors, `build.gradle` or `src/main/java` matter.
+Gradle when descriptors, `build.gradle` or `src/main/java` matter. The browser suite is a Gradle
+subproject: `:ui-tests:testApplicationsApp` unpacks an XP distro, deploys the build and runs the
+WebdriverIO specs against it, as CI does after `build`; `ui-tests/README.md` has the details.
 
 ## Structure
 
@@ -41,6 +44,8 @@ src/main/resources/
     features/                   user actions: install, uninstall
     entities/                   application, market
     shared/                     host (the per-mount frame), api, config, i18n, admin events, ui
+ui-tests/                       browser tests of the section: WebdriverIO specs, page objects, and
+                                the Gradle setup that runs them on a fresh XP
 ```
 
 Imports run one way: `app → pages → widgets/features → entities → shared`. Details in
