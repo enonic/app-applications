@@ -1,3 +1,4 @@
+import type { Application } from '../../../entities/application';
 import type { MarketApplication } from '../../../entities/market';
 import { matchesEveryWord } from '../../../shared/filter';
 
@@ -42,6 +43,16 @@ export function toMarketRow(application: MarketApplication): MarketRow {
  */
 export function canInstall({ status }: MarketRow): boolean {
   return status === 'install' || status === 'update';
+}
+
+/**
+ * The keys deployed locally. ! Core refuses a global install over a local application, so a row under one
+ * of these has an update it can show but not apply.
+ */
+export function localKeysOf(
+  applications: readonly Pick<Application, 'key' | 'local'>[],
+): ReadonlySet<string> {
+  return new Set(applications.filter(({ local }) => local).map(({ key }) => key));
 }
 
 /** Whether an update crosses a major version — the one case worth asking about, since behaviour may change. */
