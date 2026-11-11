@@ -18,7 +18,13 @@ describe("applications.install.dialog.spec - the 'Install applications' dialog: 
 
   // Installed from Enonic Market in this spec, and uninstalled again at the end so the XP is left as
   // it was found. Not a test application: the market has to carry it.
+  //
+  // ! The tests run in order and share that install: the ones after 'Install' in the row expect the
+  // ! application on the XP, so a failed install fails each of them too - read the first failure.
   const APP = appConst.MARKET_APPS.CHUCK_NORRIS;
+  // Set by `before` when the application was on the XP already: Mocha runs `after` even when
+  // `before` throws, and `after` must not uninstall what this run did not install.
+  let foundInstalled = false;
 
   it("WHEN 'Install' in the toolbar has been clicked THEN the 'Install applications' dialog should be opened on the 'Enonic Market' tab AND the market list should be loaded", async () => {
     await settingsUtils.navigateToApplicationsSection();
@@ -371,9 +377,12 @@ describe("applications.install.dialog.spec - the 'Install applications' dialog: 
   });
 
   // Leaves the XP as it was found: the application is uninstalled through the section itself
-  // whenever a failure left its row there, so the spec can run again. `before` has made sure the
-  // row can only be this run's, so nothing that was on the XP already is taken away here.
+  // whenever a failure left its row there, so the spec can run again. An application `before` found
+  // installed is not this run's and is left alone.
   after(async () => {
+    if (foundInstalled) {
+      return;
+    }
     let applicationsPage = new ApplicationsPage();
     let uninstallAppDialog = new UninstallAppDialog();
     await settingsUtils.navigateToSettingsApp();
@@ -409,6 +418,7 @@ describe("applications.install.dialog.spec - the 'Install applications' dialog: 
     let applicationsPage = new ApplicationsPage();
     await applicationsPage.waitForApplicationsListLoaded();
     if (await applicationsPage.isRowDisplayed(APP.key)) {
+      foundInstalled = true;
       throw new Error(
         `'${APP.displayName}' is installed on this XP already: uninstall it before running the suite`,
       );
