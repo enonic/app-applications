@@ -1,5 +1,7 @@
-# Makes this folder its own pnpm root. Without it pnpm walks up to the repository's
-# pnpm-workspace.yaml, installs the app's dependencies instead of these and writes into the root
-# lockfile - both from a `pnpm install` run here and from Gradle's :ui-tests:pnpmInstall.
-packages:
-  - '.'
+# Marks ui-tests as a pnpm project of its own, outside the root workspace: the suite's wdio
+# toolchain is not a dependency of the app, and `:ui-tests:pnpmInstall` resolves against the
+# lockfile here.
+ignoredBuiltDependencies:
+  - edgedriver
+  - esbuild
+  - geckodriver
