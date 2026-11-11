@@ -85,6 +85,11 @@ module.exports = Object.freeze({
     STATE: 'State',
     UPGRADE: 'Upgrade available',
   },
+  // The values of the 'Upgrade available' field (phrases: applications.filter.yes / no).
+  FILTER_VALUE: {
+    YES: 'Yes',
+    NO: 'No',
+  },
   INSTALL_DIALOG: {
     TITLE: 'Install applications',
     TAB: {
@@ -117,6 +122,24 @@ module.exports = Object.freeze({
     LABEL: 'Show system applications',
     SHOW: 'Show system applications',
     HIDE: 'Hide system applications',
+  },
+  // The applications XP ships, listed only while 'Show system applications' is on: a row that
+  // cannot be ticked, stopped or uninstalled and shows no state.
+  SYSTEM_APPS: {
+    MAIN: {
+      key: 'com.enonic.xp.app.main',
+      displayName: 'com.enonic.xp.app.main',
+    },
+    // Every key the distro of xpVersion ships (its system/ directory), sorted by key: the list
+    // orders them by display name, which not every one of them has.
+    KEYS: [
+      'com.enonic.xp.app.applications',
+      'com.enonic.xp.app.main',
+      'com.enonic.xp.app.settings',
+      'com.enonic.xp.app.standardidprovider',
+      'com.enonic.xp.app.system',
+      'com.enonic.xp.app.users',
+    ],
   },
   TEST_APPS: {
     SIMPLE_SITE: {

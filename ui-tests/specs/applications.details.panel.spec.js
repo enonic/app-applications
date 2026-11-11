@@ -108,8 +108,6 @@ describe('applications.details.panel.spec - the details panel of an application:
       ApplicationDetails.SECTION.SCHEMAS.toUpperCase(),
     ]);
   });
-  // Verifies https://github.com/enonic/app-applications/issues/2453
-  // Application details omit pages and parts without a yaml descriptor #2453
   it("GIVEN 'Simple Site App' is selected WHEN 'My First App' row has been clicked THEN the details should switch to it AND the Vendor should be shown with a link to the vendor site", async () => {
     await settingsUtils.navigateToApplicationsSection();
     let applicationsPage = new ApplicationsPage();
@@ -127,12 +125,23 @@ describe('applications.details.panel.spec - the details panel of an application:
     // 2. The Details section is the new application's.
     assert.equal(await applicationDetails.getKey(), MY_FIRST_APP.key);
     assert.equal(await applicationDetails.getInfo(), MY_FIRST_APP.description);
-    // 3. Its schemas: content types, pages and parts.
+    // 3. Its schemas: content types and parts. The pages are the skipped test below.
     await applicationDetails.waitForSectionDisplayed(ApplicationDetails.SECTION.SCHEMAS);
     assert.deepEqual(await applicationDetails.getContentTypes(), MY_FIRST_APP.contentTypes);
-    // TODO: uncomment it after the bug is fixed:
-    //assert.deepEqual(await applicationDetails.getPages(), MY_FIRST_APP.pages);
     assert.deepEqual(await applicationDetails.getParts(), MY_FIRST_APP.parts);
+  });
+
+  // TODO: enable once https://github.com/enonic/app-applications/issues/2453 is fixed - the
+  // details omit the pages and parts that have no yaml descriptor, and 'My First App' lists none
+  // of its pages until then.
+  it.skip("GIVEN 'My First App' row has been clicked THEN the Schemas section should list its pages (#2453)", async () => {
+    await settingsUtils.navigateToApplicationsSection();
+    let applicationsPage = new ApplicationsPage();
+    let applicationDetails = new ApplicationDetails();
+    await applicationsPage.clickOnRowByKey(MY_FIRST_APP.key);
+    await applicationDetails.waitForTitle(MY_FIRST_APP.displayName);
+    await applicationDetails.waitForSectionDisplayed(ApplicationDetails.SECTION.SCHEMAS);
+    assert.deepEqual(await applicationDetails.getPages(), MY_FIRST_APP.pages);
   });
 
   it("GIVEN 'Simple Site App' is selected WHEN the state button has been clicked THEN the menu should offer 'Stop' only AND WHEN Escape has been pressed THEN the menu should close AND the state should stay 'Started'", async () => {

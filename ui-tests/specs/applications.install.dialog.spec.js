@@ -19,9 +19,6 @@ describe("applications.install.dialog.spec - the 'Install applications' dialog: 
   // Installed from Enonic Market in this spec, and uninstalled again at the end so the XP is left as
   // it was found. Not a test application: the market has to carry it.
   const APP = appConst.MARKET_APPS.CHUCK_NORRIS;
-  // Set once this suite has installed the application. Both uninstall paths - the last test and the
-  // teardown - run only then, so an application that was on the XP before the run is left alone.
-  let installedByThisRun = false;
 
   it("WHEN 'Install' in the toolbar has been clicked THEN the 'Install applications' dialog should be opened on the 'Enonic Market' tab AND the market list should be loaded", async () => {
     await settingsUtils.navigateToApplicationsSection();
@@ -176,7 +173,6 @@ describe("applications.install.dialog.spec - the 'Install applications' dialog: 
       appConst.INSTALL_DIALOG.ACTION.INSTALLED,
       appConst.TIMEOUT.INSTALL,
     );
-    installedByThisRun = true;
     await settingsUtils.saveScreenshot('install_app_dialog_installed');
     assert.ok(
       !(await installAppDialog.isInstallButtonDisplayed(APP.displayName)),
@@ -317,7 +313,6 @@ describe("applications.install.dialog.spec - the 'Install applications' dialog: 
   // The row menu is the toolbar over the row that was right-clicked: Install, Uninstall, Start and
   // Stop, each enabled the way its toolbar button is for that row.
   it("GIVEN 'Chuck Norris' has been stopped from the toolbar WHEN its context menu has been opened THEN Install, Uninstall and Start should be enabled AND 'Uninstall' picked and confirmed should take the application out of the grid", async () => {
-    assert.ok(installedByThisRun, `'${APP.displayName}' was not installed by this run`);
     await settingsUtils.navigateToApplicationsSection();
     let applicationsPage = new ApplicationsPage();
     let applicationDetails = new ApplicationDetails();
@@ -375,12 +370,10 @@ describe("applications.install.dialog.spec - the 'Install applications' dialog: 
     await applicationDetails.waitForTitle(first);
   });
 
-  // Leaves the XP as it was found: an application this suite installed is uninstalled through the
-  // section itself when a failure left it there, so the spec can run again.
+  // Leaves the XP as it was found: the application is uninstalled through the section itself
+  // whenever a failure left its row there, so the spec can run again. `before` has made sure the
+  // row can only be this run's, so nothing that was on the XP already is taken away here.
   after(async () => {
-    if (!installedByThisRun) {
-      return;
-    }
     let applicationsPage = new ApplicationsPage();
     let uninstallAppDialog = new UninstallAppDialog();
     await settingsUtils.navigateToSettingsApp();
