@@ -522,6 +522,23 @@ class InstallAppDialog extends SectionPage {
     return links.length === 0 ? undefined : await links[0].getAttribute('href');
   }
 
+  // Clicks the version link ('Open on the Enonic Market'): the market page opens in a new tab.
+  async clickOnMarketAppPageLink(displayName) {
+    try {
+      const row = await this.waitForRowDisplayed(displayName);
+      const link = await row.$(this.css.rowMarketLink);
+      await link.waitForDisplayed({ timeout: appConst.TIMEOUT.MEDIUM });
+      await link.click();
+      return await this.pause(300);
+    } catch (err) {
+      await this.handleError(
+        `${this.dialogName} - error after clicking on the market link of '${displayName}'`,
+        'err_install_market_link',
+        err,
+      );
+    }
+  }
+
   // What the action cell of the row reads: 'Install', 'Update', 'Installed'
   // (appConst.INSTALL_DIALOG.ACTION.*) - or '' for an application ahead of the market.
   async getMarketAppAction(displayName) {

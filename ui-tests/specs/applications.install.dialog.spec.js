@@ -120,6 +120,40 @@ describe("applications.install.dialog.spec - the 'Install applications' dialog: 
     await installAppDialog.waitForDialogClosed();
   });
 
+  // The version of a market row links to the application's page on Enonic Market, in a new tab.
+  it("GIVEN 'Install applications' dialog is narrowed to 'Chuck Norris' WHEN the version link has been clicked THEN the application's page on the Enonic Market should be loaded in a new tab", async () => {
+    await settingsUtils.navigateToApplicationsSection();
+    let applicationsPage = new ApplicationsPage();
+    let installAppDialog = new InstallAppDialog();
+    await applicationsPage.clickOnInstallButton();
+    await installAppDialog.waitForDialogOpened();
+    await installAppDialog.waitForMarketListLoaded(appConst.TIMEOUT.LONG);
+    // 1. Narrow the list to the one application; its version is a link to the market.
+    await installAppDialog.typeTextInSearchInput(APP.searchText);
+    await installAppDialog.waitForRowDisplayed(APP.displayName);
+    const pageUrl = await installAppDialog.getMarketAppPageUrl(APP.displayName);
+    assert.ok(
+      pageUrl !== undefined && pageUrl.startsWith('https://market.enonic.com/'),
+      `The version should link to the Enonic Market, not '${pageUrl}'`,
+    );
+    // 2. Click the link: a new tab opens on that page, the dialog stays where it was.
+    const handlesBefore = await settingsUtils.getBrowser().getWindowHandles();
+    await installAppDialog.clickOnMarketAppPageLink(APP.displayName);
+    await settingsUtils.switchToNewTab(handlesBefore);
+    await settingsUtils.waitForPageLoaded();
+    assert.equal(await settingsUtils.getBrowser().getUrl(), pageUrl);
+    assert.ok(
+      (await settingsUtils.getTitle()).includes(APP.displayName),
+      'The market page should be titled after the application',
+    );
+    // 3. Back in the admin tab the dialog is still open on the narrowed list.
+    await settingsUtils.getBrowser().switchToWindow(handlesBefore[handlesBefore.length - 1]);
+    assert.ok(await installAppDialog.isDialogDisplayed(), 'The dialog should still be open');
+    assert.deepEqual(await installAppDialog.getMarketAppDisplayNames(), [APP.displayName]);
+    await installAppDialog.clickOnCloseButton();
+    await installAppDialog.waitForDialogClosed();
+  });
+
   it("GIVEN 'Chuck Norris' is the one row left in the dialog WHEN 'Install' in the row has been clicked THEN the row should read 'Installed' AND the application should be listed in the grid, 'Started', once the dialog is closed", async () => {
     await settingsUtils.navigateToApplicationsSection();
     let applicationsPage = new ApplicationsPage();
@@ -166,6 +200,7 @@ describe("applications.install.dialog.spec - the 'Install applications' dialog: 
       await applicationsPage.getApplicationDescriptionByDisplayName(APP.displayName),
       APP.description,
     );
+    // Check that the application is not a system or a local application, so no badge is shown on its row.
     assert.equal(await applicationsPage.getApplicationBadge(APP.key), undefined);
     // 6. Its details: the header reads the application, 'Started', with a link to the market.
     await applicationsPage.clickOnRowByKey(APP.key);
@@ -223,6 +258,121 @@ describe("applications.install.dialog.spec - the 'Install applications' dialog: 
     }
     await installAppDialog.clickOnCloseButton();
     await installAppDialog.waitForDialogClosed();
+  });
+
+  it("GIVEN the list is narrowed to 'Chuck Norris' AND 'Select all' has been ticked WHEN the filter has been cleared THEN 'Select all' should be indeterminate AND only 'Chuck Norris' should stay checked", async () => {
+    await settingsUtils.navigateToApplicationsSection();
+    let applicationsPage = new ApplicationsPage();
+    await applicationsPage.waitForApplicationsListLoaded();
+    const listed = (await applicationsPage.getApplicationDisplayNames()).length;
+    // 1. Narrow the list by text: the one application is listed.
+    await applicationsPage.typeTextInSearchInput(APP.searchText);
+    await applicationsPage.pressEnterKey();
+    await applicationsPage.waitForFilterTerm(undefined, APP.searchText);
+    await settingsUtils.clickOnElement(
+      `//header//h2[text()='${appConst.EXTENSIONS.APPLICATIONS}']`,
+    );
+    await applicationsPage.waitForFilterPopupClosed();
+    await applicationsPage.waitForRowDisplayed(APP.key);
+    assert.deepEqual(await applicationsPage.getApplicationDisplayNames(), [APP.displayName]);
+    // 2. Tick 'Select all': the one listed row is checked, and 'Select all' with it.
+    await applicationsPage.clickOnSelectAllCheckbox();
+    assert.ok(await applicationsPage.isRowChecked(APP.key), 'The listed row should be checked');
+    assert.ok(
+      await applicationsPage.isSelectAllCheckboxSelected(),
+      "'Select all' should be checked while every listed row is",
+    );
+    await applicationsPage.waitForUninstallButtonEnabled();
+    // 3. Clear the filter: every application is listed again.
+    await applicationsPage.clickOnClearFilterButton();
+    assert.deepEqual(await applicationsPage.getFilterTerms(), [], 'No term should be left');
+    await applicationsPage
+      .getBrowser()
+      .waitUntil(
+        async () => (await applicationsPage.getApplicationDisplayNames()).length === listed,
+        { timeout: appConst.TIMEOUT.MEDIUM, timeoutMsg: 'The whole list should be back' },
+      );
+    // 4. The selection survived the filter but no longer covers the list: 'Select all' is
+    //    indeterminate, neither checked nor clear.
+    assert.equal(
+      await applicationsPage.getAttribute(applicationsPage.selectAllCheckbox, 'aria-checked'),
+      'mixed',
+      "'Select all' should be indeterminate while only some rows are checked",
+    );
+    // 5. The one row checked is still the one that was selected.
+    const checked = [];
+    for (const name of await applicationsPage.getApplicationDisplayNames()) {
+      const key = await applicationsPage.getApplicationKeyByDisplayName(name);
+      if (await applicationsPage.isRowChecked(key)) {
+        checked.push(key);
+      }
+    }
+    assert.deepEqual(
+      checked,
+      [APP.key],
+      'Only the application selected under the filter is checked',
+    );
+    await applicationsPage.waitForUninstallButtonEnabled();
+  });
+
+  // The row menu is the toolbar over the row that was right-clicked: Install, Uninstall, Start and
+  // Stop, each enabled the way its toolbar button is for that row.
+  it("GIVEN 'Chuck Norris' has been stopped from the toolbar WHEN its context menu has been opened THEN Install, Uninstall and Start should be enabled AND 'Uninstall' picked and confirmed should take the application out of the grid", async () => {
+    await settingsUtils.navigateToApplicationsSection();
+    let applicationsPage = new ApplicationsPage();
+    let applicationDetails = new ApplicationDetails();
+    let uninstallAppDialog = new UninstallAppDialog();
+    // 1. Click on the row: the details open, the application is started.
+    await applicationsPage.clickOnRowByKey(APP.key);
+    await applicationDetails.waitForTitle(APP.displayName);
+    await applicationDetails.waitForState(appConst.APP_STATE.STARTED);
+    // 2. Click on 'Stop' in the toolbar: the details and the row read 'Stopped'.
+    await applicationsPage.clickOnStopButton();
+    await applicationDetails.waitForState(appConst.APP_STATE.STOPPED, appConst.TIMEOUT.LONG);
+    await applicationsPage.waitForApplicationState(APP.key, appConst.APP_STATE.STOPPED);
+    // 3. Right-click on the row: Install, Uninstall and Start are enabled, Stop is not.
+    await applicationsPage.openContextMenuOnRow(APP.key);
+    assert.deepEqual(await applicationsPage.getContextMenuItems(), [
+      appConst.TOOLBAR.INSTALL,
+      appConst.TOOLBAR.UNINSTALL,
+      appConst.TOOLBAR.START,
+      appConst.TOOLBAR.STOP,
+    ]);
+    for (const item of [
+      appConst.TOOLBAR.INSTALL,
+      appConst.TOOLBAR.UNINSTALL,
+      appConst.TOOLBAR.START,
+    ]) {
+      assert.ok(
+        await applicationsPage.isContextMenuItemEnabled(item),
+        `'${item}' should be enabled for a stopped application`,
+      );
+    }
+    assert.ok(
+      !(await applicationsPage.isContextMenuItemEnabled(appConst.TOOLBAR.STOP)),
+      "'Stop' should be disabled for a stopped application",
+    );
+    // 4. Pick 'Uninstall': the confirmation names the application; confirm it.
+    await applicationsPage.clickOnContextMenuItem(appConst.TOOLBAR.UNINSTALL);
+    await uninstallAppDialog.waitForDialogOpened();
+    assert.equal(await uninstallAppDialog.getTitle(), appConst.UNINSTALL_DIALOG.TITLE);
+    assert.equal(await uninstallAppDialog.getQuestion(), appConst.UNINSTALL_DIALOG.QUESTION);
+    assert.deepEqual(await uninstallAppDialog.getTargetDisplayNames(), [APP.displayName]);
+    assert.ok(
+      !(await uninstallAppDialog.isConfirmInputDisplayed()),
+      'One application is a click away: no count to type back',
+    );
+    await uninstallAppDialog.clickOnUninstallButton();
+    await uninstallAppDialog.waitForDialogClosed();
+    // 5. The toast says so, the row is gone, and the details move on to the first application
+    //    listed in place of the one that is no longer there.
+    await applicationsPage.waitForExpectedNotificationMessage(
+      appConst.applicationUninstalledMessage(APP.displayName),
+    );
+    await applicationsPage.waitForRowNotDisplayed(APP.key, appConst.TIMEOUT.LONG);
+    const [first] = await applicationsPage.getApplicationDisplayNames();
+    assert.notEqual(first, APP.displayName, 'The uninstalled application should not be listed');
+    await applicationDetails.waitForTitle(first);
   });
 
   // Leaves the XP as it was found: the application is uninstalled through the section itself

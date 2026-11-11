@@ -95,6 +95,28 @@ module.exports = {
     let homePage = new HomePage();
     await homePage.waitForSettingsLinkDisplayed();
   },
+  // Waits for a tab to open on top of `handlesBefore` (getWindowHandles() taken before the click)
+  // and switches to it; returns its handle.
+  async switchToNewTab(handlesBefore, ms = appConst.TIMEOUT.LONG) {
+    let handle;
+    await this.getBrowser().waitUntil(
+      async () => {
+        const handles = await this.getBrowser().getWindowHandles();
+        handle = handles.find((candidate) => !handlesBefore.includes(candidate));
+        return handle !== undefined;
+      },
+      { timeout: ms, timeoutMsg: 'No new browser tab was opened' },
+    );
+    await this.getBrowser().switchToWindow(handle);
+    return handle;
+  },
+  // Waits until the current tab's document has finished loading.
+  async waitForPageLoaded(ms = appConst.TIMEOUT.LONG) {
+    await this.getBrowser().waitUntil(
+      async () => (await this.getBrowser().execute(() => document.readyState)) === 'complete',
+      { timeout: ms, timeoutMsg: 'The page is still loading' },
+    );
+  },
   async switchToTab(title) {
     let handles = await this.getBrowser().getWindowHandles();
     for (const handle of handles) {
