@@ -4,6 +4,7 @@ import { useStore } from '@nanostores/preact';
 import { Box } from 'lucide-react';
 import { useMemo, useState } from 'preact/hooks';
 
+import { $applications } from '../../../entities/application';
 import { loadMarketApplications, useMarketApplications } from '../../../entities/market';
 import { useHostFrame } from '../../../shared/host';
 import { useI18n } from '../../../shared/i18n';
@@ -12,7 +13,7 @@ import { marketInstallIntent, runMarketInstall } from '../model/install-market-a
 import { $marketInstalls } from '../model/install.store';
 import { JAR_ACCEPT } from '../model/jar-files';
 import { filterMarketRows, marketFields } from '../model/market-filter';
-import { toMarketRow, type MarketRow } from '../model/market-rows';
+import { localKeysOf, toMarketRow, type MarketRow } from '../model/market-rows';
 import { marketView } from '../model/market-view';
 import { runJarUpload } from '../model/upload-applications';
 import { ConfirmMajorUpdate } from './ConfirmMajorUpdate';
@@ -32,6 +33,7 @@ export function InstallApplicationsDialogContent({
   'data-component': componentName = INSTALL_APPLICATIONS_DIALOG_CONTENT_NAME,
 }: InstallApplicationsDialogContentProps) {
   const { status, items } = useMarketApplications();
+  const { items: applications } = useStore($applications, { keys: ['items'] });
   const installs = useStore($marketInstalls);
   const { notify } = useHostFrame();
 
@@ -57,6 +59,8 @@ export function InstallApplicationsDialogContent({
   // Shared with the field counts below, so the text runs once per render rather than twice.
   const searched = useMemo(() => marketView(items, textOf(query)), [items, query]);
   const rows = useMemo(() => filterMarketRows(searched, query), [searched, query]);
+
+  const localKeys = useMemo(() => localKeysOf(applications), [applications]);
 
   const fields = useMemo(
     () =>
@@ -143,6 +147,7 @@ export function InstallApplicationsDialogContent({
                   rows={rows}
                   narrowed={query.length > 0}
                   installs={installs}
+                  localKeys={localKeys}
                   onInstall={handleInstall}
                   onRetry={() => void loadMarketApplications()}
                 />

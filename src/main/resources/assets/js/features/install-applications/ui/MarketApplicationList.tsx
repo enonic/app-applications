@@ -19,6 +19,8 @@ export type MarketApplicationListProps = {
   /** Whether the search narrowed the list — an empty result then means no match, not an empty catalogue. */
   narrowed: boolean;
   installs: Readonly<Record<string, MarketInstall>>;
+  /** The applications deployed locally, whose rows show an update they cannot apply. */
+  localKeys: ReadonlySet<string>;
   onInstall: (row: MarketRow) => void;
   onRetry: () => void;
   /** On whichever root the state renders: the skeleton, the message, or the list. */
@@ -35,6 +37,7 @@ export function MarketApplicationList({
   rows,
   narrowed,
   installs,
+  localKeys,
   onInstall,
   onRetry,
   'data-component': componentName = MARKET_APPLICATION_LIST_NAME,
@@ -98,6 +101,7 @@ export function MarketApplicationList({
           key={row.key}
           row={row}
           install={installs[row.key]}
+          local={localKeys.has(row.key)}
           onInstall={onInstall}
         />
       ))}

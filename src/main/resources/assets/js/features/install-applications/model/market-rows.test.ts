@@ -4,6 +4,7 @@ import type { MarketApplication } from '../../../entities/market';
 import {
   canInstall,
   isMajorUpdate,
+  localKeysOf,
   type MarketRow,
   searchMarketRows,
   sortMarketRows,
@@ -106,6 +107,22 @@ describe('canInstall', () => {
 
   it('answers no for a dev build, which the market could only downgrade', () => {
     expect(canInstall(row({ status: 'ahead' }))).toBe(false);
+  });
+});
+
+describe('localKeysOf', () => {
+  it('keeps the keys of the applications deployed locally', () => {
+    const keys = localKeysOf([
+      { key: 'com.enonic.app.booster', local: true },
+      { key: 'com.enonic.app.fathom', local: false },
+    ]);
+
+    expect([...keys]).toEqual(['com.enonic.app.booster']);
+  });
+
+  it('answers an empty set where nothing is local', () => {
+    expect(localKeysOf([{ key: 'com.enonic.app.fathom', local: false }]).size).toBe(0);
+    expect(localKeysOf([]).size).toBe(0);
   });
 });
 

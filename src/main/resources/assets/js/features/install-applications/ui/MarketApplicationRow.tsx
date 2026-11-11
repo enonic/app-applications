@@ -17,6 +17,8 @@ import {
 export type MarketApplicationRowProps = {
   row: MarketRow;
   install?: MarketInstall;
+  /** Deployed locally: core refuses the update, so the button is there but disabled, and says why. */
+  local?: boolean;
   onInstall: (row: MarketRow) => void;
   'data-component'?: string;
 };
@@ -29,6 +31,7 @@ const TOOLTIP_DELAY = 300;
 export function MarketApplicationRow({
   row,
   install,
+  local = false,
   onInstall,
   'data-component': componentName = MARKET_APPLICATION_ROW_NAME,
 }: MarketApplicationRowProps) {
@@ -36,8 +39,21 @@ export function MarketApplicationRow({
   const updateLabel = useI18n('applications.dialog.install.update');
   const installedLabel = useI18n('applications.dialog.install.installed');
   const marketLinkLabel = useI18n('applications.details.marketLink');
+  const localLabel = useI18n('applications.details.localNoUpdate');
 
   const installing = install != null;
+
+  const button = (
+    <ProgressButton
+      variant="outline"
+      size="sm"
+      label={row.status === 'update' ? updateLabel : installLabel}
+      progress={installing ? (install.percent ?? 0) : undefined}
+      disabled={local}
+      onClick={() => onInstall(row)}
+      className="w-full max-lg:h-8 max-lg:px-2.5 max-lg:text-xs"
+    />
+  );
 
   return (
     <li data-component={componentName} className={cn(MARKET_GRID_CLASS, MARKET_ROW_CLASS)}>
@@ -74,16 +90,14 @@ export function MarketApplicationRow({
         {row.status === 'installed' && !installing && (
           <span className="text-sm opacity-30 max-lg:text-xs">{installedLabel}</span>
         )}
-        {(canInstall(row) || installing) && (
-          <ProgressButton
-            variant="outline"
-            size="sm"
-            label={row.status === 'update' ? updateLabel : installLabel}
-            progress={installing ? (install.percent ?? 0) : undefined}
-            onClick={() => onInstall(row)}
-            className="w-full max-lg:h-8 max-lg:px-2.5 max-lg:text-xs"
-          />
-        )}
+        {(canInstall(row) || installing) &&
+          (local ? (
+            <Tooltip value={localLabel} side="top" delay={TOOLTIP_DELAY} asChild>
+              <span className="inline-flex w-full">{button}</span>
+            </Tooltip>
+          ) : (
+            button
+          ))}
       </div>
     </li>
   );
