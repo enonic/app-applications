@@ -19,22 +19,20 @@ describe("applications.install.dialog.spec - the 'Install applications' dialog: 
   // Installed from Enonic Market in this spec, and uninstalled again at the end so the XP is left as
   // it was found. Not a test application: the market has to carry it.
   const APP = appConst.MARKET_APPS.CHUCK_NORRIS;
+  // Set once this suite has installed the application. Both uninstall paths - the last test and the
+  // teardown - run only then, so an application that was on the XP before the run is left alone.
+  let installedByThisRun = false;
 
   it("WHEN 'Install' in the toolbar has been clicked THEN the 'Install applications' dialog should be opened on the 'Enonic Market' tab AND the market list should be loaded", async () => {
     await settingsUtils.navigateToApplicationsSection();
     let applicationsPage = new ApplicationsPage();
     let installAppDialog = new InstallAppDialog();
-    // 1. The application is not installed yet: no row in the grid.
     await applicationsPage.waitForApplicationsListLoaded();
-    assert.ok(
-      !(await applicationsPage.isRowDisplayed(APP.key)),
-      `'${APP.displayName}' should not be installed before the test`,
-    );
-    // 2. Click on 'Install' in the toolbar: the dialog opens.
+    // 1. Click on 'Install' in the toolbar: the dialog opens.
     await applicationsPage.clickOnInstallButton();
     await installAppDialog.waitForDialogOpened();
     assert.equal(await installAppDialog.getTitle(), appConst.INSTALL_DIALOG.TITLE);
-    // 3. Two tabs, 'Enonic Market' the active one; the catalogue is loaded into the list.
+    // 2. Two tabs, 'Enonic Market' the active one; the catalogue is loaded into the list.
     assert.deepEqual(await installAppDialog.getTabs(), [
       appConst.INSTALL_DIALOG.TAB.MARKET,
       appConst.INSTALL_DIALOG.TAB.UPLOAD,
@@ -46,7 +44,7 @@ describe("applications.install.dialog.spec - the 'Install applications' dialog: 
       'The market list should hold more than one application before it is narrowed',
     );
     assert.equal(await installAppDialog.getListError(), undefined, 'The market should be reached');
-    // 4. The filter offers License, Vendor, Upgrade available and Installed.
+    // 3. The filter offers License, Vendor, Upgrade available and Installed.
     await installAppDialog.clickOnFilterButton();
     assert.deepEqual(await installAppDialog.getFilterFields(), [
       appConst.INSTALL_DIALOG.FILTER_FIELD.LICENSE,
@@ -56,7 +54,7 @@ describe("applications.install.dialog.spec - the 'Install applications' dialog: 
     ]);
     await settingsUtils.saveScreenshot('install_app_dialog_1');
     await installAppDialog.closeFilterPopup();
-    // 5. Close the dialog with its cross.
+    // 4. Close the dialog with its cross.
     await installAppDialog.clickOnCloseButton();
     await installAppDialog.waitForDialogClosed();
   });
@@ -178,6 +176,7 @@ describe("applications.install.dialog.spec - the 'Install applications' dialog: 
       appConst.INSTALL_DIALOG.ACTION.INSTALLED,
       appConst.TIMEOUT.INSTALL,
     );
+    installedByThisRun = true;
     await settingsUtils.saveScreenshot('install_app_dialog_installed');
     assert.ok(
       !(await installAppDialog.isInstallButtonDisplayed(APP.displayName)),
@@ -318,6 +317,7 @@ describe("applications.install.dialog.spec - the 'Install applications' dialog: 
   // The row menu is the toolbar over the row that was right-clicked: Install, Uninstall, Start and
   // Stop, each enabled the way its toolbar button is for that row.
   it("GIVEN 'Chuck Norris' has been stopped from the toolbar WHEN its context menu has been opened THEN Install, Uninstall and Start should be enabled AND 'Uninstall' picked and confirmed should take the application out of the grid", async () => {
+    assert.ok(installedByThisRun, `'${APP.displayName}' was not installed by this run`);
     await settingsUtils.navigateToApplicationsSection();
     let applicationsPage = new ApplicationsPage();
     let applicationDetails = new ApplicationDetails();
@@ -375,10 +375,12 @@ describe("applications.install.dialog.spec - the 'Install applications' dialog: 
     await applicationDetails.waitForTitle(first);
   });
 
-  // Leaves the XP as it was found: the application is uninstalled through the section itself
-  // whenever its row is there, so the spec can run again. The first test asserts that it was not
-  // installed before the run, so nothing that was on the XP already is taken away here.
+  // Leaves the XP as it was found: an application this suite installed is uninstalled through the
+  // section itself when a failure left it there, so the spec can run again.
   after(async () => {
+    if (!installedByThisRun) {
+      return;
+    }
     let applicationsPage = new ApplicationsPage();
     let uninstallAppDialog = new UninstallAppDialog();
     await settingsUtils.navigateToSettingsApp();
@@ -407,6 +409,18 @@ describe("applications.install.dialog.spec - the 'Install applications' dialog: 
         .getBrowser()
         .setWindowSize(appConst.BROWSER_WIDTH, appConst.BROWSER_HEIGHT);
     }
+    // The application must not be on the XP before the run: a failed `before` skips every test,
+    // the two that would uninstall it included, where a failed test would not.
+    await settingsUtils.navigateToSettingsApp();
+    await settingsUtils.navigateToApplicationsSection();
+    let applicationsPage = new ApplicationsPage();
+    await applicationsPage.waitForApplicationsListLoaded();
+    if (await applicationsPage.isRowDisplayed(APP.key)) {
+      throw new Error(
+        `'${APP.displayName}' is installed on this XP already: uninstall it before running the suite`,
+      );
+    }
+    await settingsUtils.doCloseAllWindowTabsAndNavigateToHome();
     return console.log('specification starting: ' + this.title);
   });
 });
