@@ -14,6 +14,8 @@ exports.config = {
 
     maxInstances: 1,
 
+    autoXvfb: false,
+
     capabilities: [{
         browserName: 'chrome',
         browserVersion: browser_version,
