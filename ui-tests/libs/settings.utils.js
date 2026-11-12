@@ -23,7 +23,7 @@ const propertiesReader =
 const properties = propertiesReader({ sourceFile: path.join(__dirname, '../browser.properties') });
 const BASE_URL = String(properties.get('base.url')).replace(/[/]+$/, '') + '/';
 const LOGIN_FORM = "input[id^='username-input']";
-const HOME_PAGE = "div[class*='home-main-container visible']";
+const XP_MENU = 'xp-menu';
 
 module.exports = {
   getBrowser() {
@@ -147,7 +147,8 @@ module.exports = {
     await this.getBrowser().url(this.getBaseUrl());
     await this.getBrowser().waitUntil(
       async () =>
-        (await this.isElementDisplayed(LOGIN_FORM)) || (await this.isElementDisplayed(HOME_PAGE)),
+        (await this.isElementDisplayed(LOGIN_FORM)) ||
+        (await this.getBrowser().$(XP_MENU).isExisting()),
       {
         timeout: appConst.TIMEOUT.LONG,
         timeoutMsg: 'Neither the login form nor the home page was shown',
