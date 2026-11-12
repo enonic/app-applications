@@ -405,7 +405,7 @@ class BrowsePage extends SectionPage {
         const text = await option.getText();
         if (text.replace(/\(\d+\)\s*$/, '').trim() === label) {
           await option.click();
-          await this.waitForFilterPopupClosed();
+          return await this.waitForFilterPopupClosed();
         }
       }
       throw new Error(`value '${label}' was not found in the filter dropdown`);
@@ -625,7 +625,7 @@ class BrowsePage extends SectionPage {
       for (const item of items) {
         if ((await item.getText()).trim() === itemName) {
           await item.click();
-          await this.waitForSortMenuClosed();
+          return await this.waitForSortMenuClosed();
         }
       }
       throw new Error(`item '${itemName}' was not found in the Sort menu`);

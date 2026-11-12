@@ -300,7 +300,7 @@ class InstallAppDialog extends SectionPage {
         const text = await option.getText();
         if (text.replace(/\(\d+\)\s*$/, '').trim() === label) {
           await option.click();
-          await this.waitForFilterPopupClosed();
+          return await this.waitForFilterPopupClosed();
         }
       }
       throw new Error(`value '${label}' was not found in the filter dropdown`);
