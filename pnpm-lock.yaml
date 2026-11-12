@@ -47,8 +47,8 @@ importers:
         specifier: ^8.1.2
         version: 8.1.2
       '@enonic-types/global':
-        specifier: ^8.1.1
-        version: 8.1.1
+        specifier: ^8.1.2
+        version: 8.1.2
       '@enonic-types/lib-admin':
         specifier: ^8.0.4
         version: 8.0.4
@@ -133,8 +133,8 @@ packages:
   '@enonic-types/core@8.1.2':
     resolution: {integrity: sha512-iQ4y9u0ol3iu5Oby6SP5JSpTx5062Do4rtzDDKDVPi3pZgQTpb2fyjmrjaeMUcOKS5pYxuszL/QjRZZPmujjtA==}
 
-  '@enonic-types/global@8.1.1':
-    resolution: {integrity: sha512-Q8jNovJW9ylnPhyNcNbOOg9Z9LHj7tPLYzWYjNa6oZp3A7H8SyCvmmJrIoBAxr/yhjrjzIU07pv4kRKL/jCwuw==}
+  '@enonic-types/global@8.1.2':
+    resolution: {integrity: sha512-ek5F757g4GkibjJvEOdcPngoEUrGPbCNcRfcPi53NYgnXJO3yHvoMdecmF07lLszKS+BM97xCRjNd2KJnoE68A==}
 
   '@enonic-types/lib-admin@8.0.4':
     resolution: {integrity: sha512-Af+/5xxHssKvPCJrLdWj0GtIVyUNasNJdf7Kd2K0CILoof7LsFhaDIYM5xHZcCd1QK7W1YdgHbVfjTeCIpzLMg==}
@@ -1477,9 +1477,9 @@ snapshots:
 
   '@enonic-types/core@8.1.2': {}
 
-  '@enonic-types/global@8.1.1':
+  '@enonic-types/global@8.1.2':
     dependencies:
-      '@enonic-types/core': 8.1.1
+      '@enonic-types/core': 8.1.2
 
   '@enonic-types/lib-admin@8.0.4':
     dependencies:
