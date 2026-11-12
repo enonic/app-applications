@@ -1,0 +1,241 @@
+// UI tests for the Applications section: unpack an XP distro, deploy the app under test plus the test
+// applications, start the server and run the wdio suites against it. Mirrors app-users/ui-tests/build.gradle.
+//
+// Plugin versions come from the root build (plugins DSL puts them on the whole build's classpath),
+// so none are repeated here.
+plugins {
+    id 'java'
+    id 'com.enonic.defaults'
+    id 'com.enonic.xp.base'
+    id 'com.github.node-gradle.node'
+}
+group = 'com.enonic.xp.app.applications.js_testing'
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+    xp.enonicRepo( 'dev' )
+}
+
+// Same Node + pnpm as the root build; share its download dirs so a checkout fetches Node once.
+node {
+    download = true
+    version = '24.18.0'
+    pnpmVersion = '10.33.4'
+    workDir = rootProject.file( '.gradle/nodejs' )
+    pnpmWorkDir = rootProject.file( '.gradle/pnpm' )
+}
+
+configurations {
+    distro
+    apps {
+        transitive false
+    }
+}
+
+def unpackDir = layout.buildDirectory.dir( 'install' ).get()
+// The distro and the app it bundles are of xpVersion, not of this build's version.
+def distroDir = unpackDir.dir( "enonic-xp-generic-$xpVersion" )
+def xpHome = distroDir.dir('home')
+def testConfDir = "$projectDir/test-config"
+def deployDir = distroDir.dir( 'home/deploy' )
+def configDir = "$xpHome/config"
+
+
+dependencies {
+    distro "com.enonic.xp:enonic-xp-generic:$xpVersion@tgz"
+    apps 'com.enonic.uitest:auth0-idprovider:2.0.0-SNAPSHOT'
+    apps 'com.enonic.uitest:adfs-idprovider:2.0.0-SNAPSHOT'
+    apps 'com.enonic.uitest:simple-page:2.0.0-SNAPSHOT'
+    apps 'com.enonic.uitest:test-application:2.0.0-SNAPSHOT'
+    apps 'com.enonic.uitest:myfirstapp:2.0.0-SNAPSHOT'
+}
+
+tasks.register( 'unpackDistro', Copy ) {
+    description = 'Unpacks the XP distribution for testing'
+    group = 'Test Setup'
+    from {
+        configurations.distro.collect { tarTree( it ) }
+    }
+    into unpackDir
+}
+
+tasks.register( 'copyConfig', Copy ) {
+    description = 'Copies configuration files to the test environment'
+    group = 'Test Setup'
+    doLast {
+        logger.info( 'Configuration files copied from: {}', "$testConfDir${File.separator}common-config" )
+    }
+    from "$testConfDir${File.separator}common-config"
+    include '**.*.cfg'
+    include '*.properties'
+    into configDir
+    mustRunAfter tasks.named( 'unpackDistro' )
+}
+
+tasks.register( 'downloadApps', Copy ) {
+    description = 'Downloads required apps for testing'
+    group = 'Test Setup'
+
+    from {
+        configurations.apps
+    }
+    into deployDir
+    mustRunAfter tasks.named( 'startServer' )
+    doLast {
+        println 'Task downloadApps completed successfully.'
+        println 'Downloaded artifacts:'
+        configurations.apps.files.each { file -> println "- ${file.name}" }
+    }
+}
+
+tasks.register( 'deployApp', DefaultTask ) {
+    description = 'Deploy the main application'
+    group = 'Test Setup'
+
+    def appName = rootProject.tasks.named("jar", Jar).get().archiveBaseName.get()
+    def appFile = distroDir.file("system/40/${appName}-${xpVersion}.jar").asFile
+
+    outputs.files( appFile )
+    outputs.upToDateWhen { false }
+    doLast {
+        // The default is the jar the root build makes. Built as a File, not a string: on Windows
+        // $rootDir carries backslashes and 'file:///C:...' is not a URI Gradle can turn into a file.
+        def defaultJar = rootProject.layout.buildDirectory.file( "libs/${appName}.jar" ).get().asFile
+        def appUrl = findProperty( 'appUrl' ) != null ? uri( findProperty( 'appUrl' ) as String ) : defaultJar.toURI()
+
+        if ( findProperty( 'appUrl' ) == null && !defaultJar.exists() )
+        {
+            throw new GradleException( "${defaultJar} does not exist - build the app first (gradlew build) or pass -PappUrl=<url>" )
+        }
+
+        println "Deleting ${appFile}. Exists ${appFile.exists()}"
+        appFile.delete()
+
+        println "Copying from ${appUrl} to ${appFile}"
+        appUrl.toURL().withInputStream { i -> appFile.withOutputStream { it << i } }
+    }
+    mustRunAfter tasks.named( 'unpackDistro' )
+}
+
+
+def process
+tasks.register( 'startServer' ) {
+    description = 'Starts the XP server for testing'
+    group = 'Test Execution'
+    dependsOn( tasks.named( 'unpackDistro' ) )
+    // The config and the app under test are read at startup: both must be in place before it.
+    mustRunAfter tasks.named( 'copyConfig' ), tasks.named( 'deployApp' )
+    // ! A finalizer runs only when its task ran: one on the test task alone leaves the server up when
+    // ! downloadApps or waitForServer fails and the test task never runs. stopServer is ordered after
+    // ! the rest, so on a green run it is still the last task.
+    finalizedBy 'stopServer'
+    doLast {
+        sleep( 5000 )
+        logger.lifecycle( 'Starting XP Server at: {}', xpHome )
+        logger.lifecycle( 'Server logs will be written to: build/reports/logs/xp.log' )
+        def pb
+        if ( System.getProperty( 'os.name' ).toLowerCase().contains( 'windows' ) ) {
+            pb = new ProcessBuilder( 'cmd', '/c', new File( "${distroDir}/bin/server.bat" ).path )
+        }
+        else {
+            pb = new ProcessBuilder( "${distroDir}/bin/server.sh" )
+        }
+        Map<String, String> env = pb.environment()
+        env.put( 'XP_HOME', "${xpHome}".toString() )
+
+        def logsPath = layout.buildDirectory.dir( 'reports/logs' ).get()
+        mkdir logsPath.asFile
+        pb.redirectOutput( logsPath.file( 'xp.log' ).asFile )
+        pb.redirectErrorStream( true )
+        process = pb.start()
+        sleep( 10000 )
+    }
+}
+tasks.register( 'waitForServer') {
+    description = 'Waits for the XP server'
+    group = 'Test Setup'
+    mustRunAfter tasks.named( 'startServer' ), tasks.named( 'downloadApps' )
+
+    doLast {
+        long maxWaitMs = 60000
+        long deadline = System.nanoTime() + maxWaitMs * 1_000_000L
+
+        boolean ready = false
+        while (!ready && System.nanoTime() < deadline) {
+            logger.lifecycle("Waiting for server server...")
+
+            try {
+                HttpURLConnection conn = (HttpURLConnection) uri("http://localhost:2609/ready").toURL().openConnection()
+                conn.setConnectTimeout(1000)
+                conn.setReadTimeout(1000)
+                conn.connect()
+                int code = conn.getResponseCode()
+                if (code == 200) {
+                    ready = true
+                    break
+                }
+            } catch (IOException ignored) {
+                // Not up yet; retry
+            }
+            sleep(1000)
+
+        }
+        if (ready) {
+            logger.lifecycle('Server is ready.')
+        } else {
+            throw new GradleException("Server not ready after ${maxWaitMs} ms.")
+        }
+
+        sleep(1000)
+    }
+}
+
+tasks.register( 'stopServer' ) {
+    description = 'Stops the XP server'
+    group = 'Test Execution'
+    mustRunAfter 'downloadApps', 'waitForServer', 'testApplicationsApp', 'generateReportAndStopServer'
+    doLast {
+        if ( process == null ) {
+            logger.warn( 'Server process not found - it might already be stopped' )
+            return
+        }
+
+        // server.bat / server.sh spawn the JVM as a child, so kill the whole tree.
+        logger.lifecycle( "Stopping server process (PID: ${process.pid()})..." )
+        process.descendants().forEach { it.destroyForcibly() }
+        process.destroyForcibly()
+        process = null
+    }
+}
+
+tasks.register( 'cleanup', Delete ) {
+    description = 'Cleans up test reports'
+    group = 'Test Cleanup'
+    delete './build/reports/allure'
+}
+
+// Test execution tasks
+tasks.register( 'testApplicationsApp', PnpmTask ) {
+    description = 'Runs the Applications section UI tests in Chrome'
+    group = 'verification'
+
+    dependsOn tasks.named( 'pnpmInstall' )
+    dependsOn tasks.named( 'unpackDistro' )
+    dependsOn tasks.named( 'copyConfig' )
+    dependsOn tasks.named( 'downloadApps' )
+    dependsOn tasks.named( 'deployApp' )
+    dependsOn tasks.named( 'startServer' )
+    dependsOn tasks.named( 'waitForServer' )
+    mustRunAfter tasks.named( 'waitForServer' )
+    args = ['--color', 'run', 'test_applications:wdio_chrome']
+    finalizedBy tasks.named( 'generateReportAndStopServer' )
+    finalizedBy tasks.named( 'stopServer' )
+}
+tasks.register( 'generateReportAndStopServer', PnpmTask ) {
+    description = 'Generates test report and stops server'
+    group = 'Test Reporting'
+    args = ['--color', 'run', 'allure-report']
+    finalizedBy tasks.named( 'cleanup' )
+    finalizedBy tasks.named( 'stopServer' )
+}

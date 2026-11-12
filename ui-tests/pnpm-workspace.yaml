@@ -1,0 +1,7 @@
+# Marks ui-tests as a pnpm project of its own, outside the root workspace: the suite's wdio
+# toolchain is not a dependency of the app, and `:ui-tests:pnpmInstall` resolves against the
+# lockfile here.
+ignoredBuiltDependencies:
+  - edgedriver
+  - esbuild
+  - geckodriver
