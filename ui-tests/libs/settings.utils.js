@@ -150,7 +150,7 @@ module.exports = {
         (await this.isElementDisplayed(LOGIN_FORM)) ||
         (await this.getBrowser().$(XP_MENU).isExisting()),
       {
-        timeout: appConst.TIMEOUT.LONG,
+        timeout: appConst.TIMEOUT.MEDIUM,
         timeoutMsg: 'Neither the login form nor the home page was shown',
       },
     );
