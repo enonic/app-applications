@@ -50,8 +50,8 @@ importers:
         specifier: ^8.1.2
         version: 8.1.2
       '@enonic-types/lib-admin':
-        specifier: ^8.0.4
-        version: 8.0.4
+        specifier: ^8.1.2
+        version: 8.1.2
       '@enonic-types/lib-app':
         specifier: ^8.1.2
         version: 8.1.2
@@ -124,20 +124,14 @@ packages:
   '@blazediff/core@1.10.0':
     resolution: {integrity: sha512-AOQff0zgR7cGsZL+4E7hVkmujoPUpm0J9xzWGWZj5wCjd3gmxESXAPfKyuzs93VdpQNFhHlBhfOjrcZ+XTERtQ==}
 
-  '@enonic-types/core@8.0.4':
-    resolution: {integrity: sha512-8ZNsk4Yb0MZwq2DW9T6XUxKWCIedt0CUR2bCOriUge3LrY0diwJX2QwaZYrQQ7A4bF8g3dTczO3DDnDRQuPhFg==}
-
-  '@enonic-types/core@8.1.1':
-    resolution: {integrity: sha512-doqfZ7GSm5Q0IIZYED+J/b6KalGAYIcCkTjE6wCzFIVJivlUiJIQMg6hw18G280Vx7ovtVj5oOZgPjPou8SCNw==}
-
   '@enonic-types/core@8.1.2':
     resolution: {integrity: sha512-iQ4y9u0ol3iu5Oby6SP5JSpTx5062Do4rtzDDKDVPi3pZgQTpb2fyjmrjaeMUcOKS5pYxuszL/QjRZZPmujjtA==}
 
   '@enonic-types/global@8.1.2':
     resolution: {integrity: sha512-ek5F757g4GkibjJvEOdcPngoEUrGPbCNcRfcPi53NYgnXJO3yHvoMdecmF07lLszKS+BM97xCRjNd2KJnoE68A==}
 
-  '@enonic-types/lib-admin@8.0.4':
-    resolution: {integrity: sha512-Af+/5xxHssKvPCJrLdWj0GtIVyUNasNJdf7Kd2K0CILoof7LsFhaDIYM5xHZcCd1QK7W1YdgHbVfjTeCIpzLMg==}
+  '@enonic-types/lib-admin@8.1.2':
+    resolution: {integrity: sha512-egw3fLZw9eKzqNUlu4AUIZRbB2DwSDI2Cq53OVdpyiQ5SLVs1k6k0ateSYT6+mb8M8yvZxHOJ5d+Og2BG/UpfQ==}
 
   '@enonic-types/lib-app@8.1.2':
     resolution: {integrity: sha512-PDoSGuvhgwzZ3CVtJ1PxXcSODARIElhZRsdqJ1Ter4zsiqQggforzWlJHDw36ixd5VZ9XJEVHKRfuOPfFD5vyw==}
@@ -1471,19 +1465,15 @@ snapshots:
 
   '@blazediff/core@1.10.0': {}
 
-  '@enonic-types/core@8.0.4': {}
-
-  '@enonic-types/core@8.1.1': {}
-
   '@enonic-types/core@8.1.2': {}
 
   '@enonic-types/global@8.1.2':
     dependencies:
       '@enonic-types/core': 8.1.2
 
-  '@enonic-types/lib-admin@8.0.4':
+  '@enonic-types/lib-admin@8.1.2':
     dependencies:
-      '@enonic-types/core': 8.0.4
+      '@enonic-types/core': 8.1.2
 
   '@enonic-types/lib-app@8.1.2':
     dependencies:
