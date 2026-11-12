@@ -129,8 +129,9 @@ class ApplicationsPage extends BrowsePage {
   async clickOnSystemApplicationsToggle() {
     try {
       await this.waitForElementDisplayed(this.systemToggle);
+      const before = await this.getAttribute(this.systemToggle, 'aria-pressed');
       await this.clickOnElement(this.systemToggle);
-      return await this.pause(300);
+      return await this.waitForAttributeChanged(this.systemToggle, 'aria-pressed', before);
     } catch (err) {
       await this.handleError(
         `${this.pageName} - error after clicking on the 'Show system applications' toggle`,
@@ -170,6 +171,10 @@ class ApplicationsPage extends BrowsePage {
   // Display names of the applications listed, in display order.
   getApplicationDisplayNames() {
     return this.getRowDisplayNames();
+  }
+
+  waitForApplicationDisplayNames(expected, ms = appConst.TIMEOUT.MEDIUM) {
+    return this.waitForRowDisplayNames(expected, ms);
   }
 
   // Descriptions (the line under the display name) of the applications listed, in display order.

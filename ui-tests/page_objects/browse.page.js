@@ -72,6 +72,7 @@ function buildCss(pageComponent) {
     rowName: "[data-component='ItemLabel'] small",
     rowMeta: "[data-component='TreeList.RowRight'] > span",
     rowCheckboxLabelInRow: "[data-component='Checkbox'] label",
+    rowCheckboxInRow: "[data-component='Checkbox'] input",
   };
 }
 
@@ -155,7 +156,6 @@ class BrowsePage extends SectionPage {
     try {
       await this.waitForElementEnabled(selector);
       await this.clickOnElement(selector);
-      return await this.pause(300);
     } catch (err) {
       await this.handleError(
         `${this.pageName} - error after clicking on ${label} button`,
@@ -255,7 +255,6 @@ class BrowsePage extends SectionPage {
     try {
       await this.waitForElementDisplayed(this.css.searchInput);
       await this.typeTextInInput(this.css.searchInput, text);
-      return await this.pause(300);
     } catch (err) {
       await this.handleError(
         `${this.pageName} - error after typing in the search input`,
@@ -293,7 +292,6 @@ class BrowsePage extends SectionPage {
       await this.waitForElementEnabled(this.css.filterButton);
       await this.clickOnElement(this.css.filterButton);
       await this.waitForElementDisplayed(this.css.filterPopup);
-      return await this.pause(300);
     } catch (err) {
       await this.handleError(
         `${this.pageName} - error after clicking on the Filter button`,
@@ -355,7 +353,7 @@ class BrowsePage extends SectionPage {
       for (const option of options) {
         if ((await option.getText()).trim() === label) {
           await option.click();
-          return await this.pause(300);
+          return await this.waitUntilDisplayed(this.css.filterValueOptions);
         }
       }
       throw new Error(`field '${label}' was not found in the filter dropdown`);
@@ -407,8 +405,7 @@ class BrowsePage extends SectionPage {
         const text = await option.getText();
         if (text.replace(/\(\d+\)\s*$/, '').trim() === label) {
           await option.click();
-          await this.waitForFilterPopupClosed();
-          return await this.pause(300);
+          return await this.waitForFilterPopupClosed();
         }
       }
       throw new Error(`value '${label}' was not found in the filter dropdown`);
@@ -471,7 +468,13 @@ class BrowsePage extends SectionPage {
         const tagValue = await tag.$(this.css.filterTagLabel).getText();
         if (tagField === field && tagValue === value) {
           await tag.$(this.css.filterTagRemove).click();
-          return await this.pause(300);
+          return await this.getBrowser().waitUntil(
+            async () =>
+              !(await this.getFilterTerms()).some(
+                (term) => term.field === field && term.value === value,
+              ),
+            { timeout: appConst.TIMEOUT.MEDIUM, timeoutMsg: 'the tag is still in the filter' },
+          );
         }
       }
       throw new Error(`no '${field}: ${value}' tag in the filter`);
@@ -495,7 +498,6 @@ class BrowsePage extends SectionPage {
       await this.waitForElementDisplayed(this.css.filterClearButton);
       await this.clickOnElement(this.css.filterClearButton);
       await this.waitForElementNotDisplayed(this.css.filterClearButton);
-      return await this.pause(300);
     } catch (err) {
       await this.handleError(
         `${this.pageName} - error after clicking on the 'Clear the filter' button`,
@@ -512,7 +514,6 @@ class BrowsePage extends SectionPage {
       await this.waitForElementEnabled(this.sortButton);
       await this.clickOnElement(this.sortButton);
       await this.waitForElementDisplayed(this.css.sortMenu);
-      return await this.pause(300);
     } catch (err) {
       await this.handleError(
         `${this.pageName} - error after clicking on Sort by button`,
@@ -624,8 +625,7 @@ class BrowsePage extends SectionPage {
       for (const item of items) {
         if ((await item.getText()).trim() === itemName) {
           await item.click();
-          await this.waitForSortMenuClosed();
-          return await this.pause(300);
+          return await this.waitForSortMenuClosed();
         }
       }
       throw new Error(`item '${itemName}' was not found in the Sort menu`);
@@ -655,8 +655,9 @@ class BrowsePage extends SectionPage {
   async clickOnSelectAllCheckbox() {
     try {
       await this.waitForElementDisplayed(this.css.selectAllCheckboxLabel);
+      const before = await this.getAttribute(this.css.selectAllCheckbox, 'aria-checked');
       await this.clickOnElement(this.css.selectAllCheckboxLabel);
-      return await this.pause(300);
+      return await this.waitForAttributeChanged(this.css.selectAllCheckbox, 'aria-checked', before);
     } catch (err) {
       await this.handleError(
         `${this.pageName} - Select all checkbox`,
@@ -701,6 +702,42 @@ class BrowsePage extends SectionPage {
     return names;
   }
 
+  // Waits until the list holds exactly these rows, in this order: a read right after a filter or a
+  // refresh would see the list before it re-renders.
+  async waitForRowDisplayNames(expected, ms = appConst.TIMEOUT.MEDIUM) {
+    let names;
+    try {
+      await this.getBrowser().waitUntil(
+        async () => {
+          names = await this.getRowDisplayNames();
+          return names.length === expected.length && names.every((name, i) => name === expected[i]);
+        },
+        { timeout: ms, timeoutMsg: `the list should be [${expected.join(', ')}]` },
+      );
+    } catch (err) {
+      await this.handleError(
+        `${this.pageName} - the list should hold exactly [${expected.join(', ')}], not [${names}]`,
+        'err_browse_rows',
+        err,
+      );
+    }
+  }
+
+  async waitForRowCountGreaterThan(count, ms = appConst.TIMEOUT.MEDIUM) {
+    try {
+      await this.getBrowser().waitUntil(
+        async () => (await this.getRowDisplayNames()).length > count,
+        { timeout: ms, timeoutMsg: `the list should hold more than ${count} rows` },
+      );
+    } catch (err) {
+      await this.handleError(
+        `${this.pageName} - the list should hold more than ${count} rows`,
+        'err_browse_rows',
+        err,
+      );
+    }
+  }
+
   // Names (the line under the display name) of the rows, in display order.
   async getRowNames() {
     const rows = await this.getDisplayedElements(this.css.rows);
@@ -728,6 +765,13 @@ class BrowsePage extends SectionPage {
   }
 
   // Rows by key: the row's id ends with '-item-<key>'.
+
+  async waitForAttributeChanged(selector, attrName, before, ms = appConst.TIMEOUT.MEDIUM) {
+    await this.getBrowser().waitUntil(
+      async () => (await this.getAttribute(selector, attrName)) !== before,
+      { timeout: ms, timeoutMsg: `'${attrName}' of ${selector} is still '${before}'` },
+    );
+  }
 
   async getRowMeta(key) {
     await this.waitForRowDisplayed(key);
@@ -772,7 +816,7 @@ class BrowsePage extends SectionPage {
     try {
       await this.waitForRowDisplayed(key);
       await this.clickOnElement(this.css.rowByKey(key));
-      return await this.pause(300);
+      return await this.waitForAttributeValue(this.css.rowByKey(key), 'data-active', 'true');
     } catch (err) {
       await this.handleError(
         `${this.pageName} - error after clicking on the row '${key}'`,
@@ -786,8 +830,9 @@ class BrowsePage extends SectionPage {
   async clickOnCheckboxByKey(key) {
     try {
       await this.waitForElementDisplayed(this.css.rowCheckboxLabel(key));
+      const before = await this.getAttribute(this.css.rowCheckbox(key), 'aria-checked');
       await this.clickOnElement(this.css.rowCheckboxLabel(key));
-      return await this.pause(300);
+      return await this.waitForAttributeChanged(this.css.rowCheckbox(key), 'aria-checked', before);
     } catch (err) {
       await this.handleError(
         `${this.pageName} - checkbox of the row '${key}'`,
@@ -847,7 +892,6 @@ class BrowsePage extends SectionPage {
       const row = await this.findElement(this.css.rowByKey(key));
       await this.doRightClickOnElement(row);
       await this.waitForElementDisplayed(this.css.contextMenu);
-      return await this.pause(300);
     } catch (err) {
       await this.handleError(
         `${this.pageName} - error after right-clicking on the row '${key}'`,
@@ -921,7 +965,6 @@ class BrowsePage extends SectionPage {
       }
       await item.click();
       await this.waitForContextMenuClosed();
-      return await this.pause(300);
     } catch (err) {
       await this.handleError(
         `${this.pageName} - error after clicking on the context menu item '${label}'`,
@@ -1003,7 +1046,10 @@ class BrowsePage extends SectionPage {
     try {
       const row = await this.waitForRowByDisplayNameDisplayed(displayName);
       await row.click();
-      return await this.pause(300);
+      return await row.waitUntil(async () => (await row.getAttribute('data-active')) === 'true', {
+        timeout: appConst.TIMEOUT.MEDIUM,
+        timeoutMsg: `the row '${displayName}' should be active`,
+      });
     } catch (err) {
       await this.handleError(
         `${this.pageName} - error after clicking on the row '${displayName}'`,
@@ -1017,8 +1063,13 @@ class BrowsePage extends SectionPage {
   async clickOnCheckboxByDisplayName(displayName) {
     try {
       const row = await this.waitForRowByDisplayNameDisplayed(displayName);
+      const checkbox = await row.$(this.css.rowCheckboxInRow);
+      const before = await checkbox.getAttribute('aria-checked');
       await row.$(this.css.rowCheckboxLabelInRow).click();
-      return await this.pause(300);
+      return await checkbox.waitUntil(
+        async () => (await checkbox.getAttribute('aria-checked')) !== before,
+        { timeout: appConst.TIMEOUT.MEDIUM, timeoutMsg: `the row '${displayName}' was not ticked` },
+      );
     } catch (err) {
       await this.handleError(
         `${this.pageName} - checkbox of the row '${displayName}'`,

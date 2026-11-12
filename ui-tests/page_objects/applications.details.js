@@ -129,6 +129,19 @@ class ApplicationDetails extends DetailsPanel {
     return this.isElementDisplayed(this.css.marketLink);
   }
 
+  // The link waits for the market catalogue: it is absent while the catalogue loads.
+  async waitForMarketLinkDisplayed(ms = appConst.TIMEOUT.LONG) {
+    try {
+      await this.waitUntilDisplayed(this.css.marketLink, ms);
+    } catch (err) {
+      await this.handleError(
+        `${this.panelName} - the link to the Enonic Market should be displayed`,
+        'err_details_market_link',
+        err,
+      );
+    }
+  }
+
   // The href of the link out to the Enonic Market - or undefined when the market does not carry
   // the application.
   async getMarketLinkUrl() {
@@ -171,7 +184,6 @@ class ApplicationDetails extends DetailsPanel {
       await this.waitForElementEnabled(this.css.stateButton);
       await this.clickOnElement(this.css.stateButton);
       await this.waitForElementDisplayed(this.css.stateMenu);
-      return await this.pause(300);
     } catch (err) {
       await this.handleError(
         `${this.panelName} - error after clicking on the state button`,
@@ -222,8 +234,7 @@ class ApplicationDetails extends DetailsPanel {
       for (const item of items) {
         if ((await item.getText()).trim() === itemName) {
           await item.click();
-          await this.waitForStateMenuClosed();
-          return await this.pause(300);
+          return await this.waitForStateMenuClosed();
         }
       }
       throw new Error(`item '${itemName}' was not found in the state menu`);
@@ -324,8 +335,7 @@ class ApplicationDetails extends DetailsPanel {
       }
       const button = await field.$(IN_FIELD.updateButton);
       await button.waitForClickable({ timeout: appConst.TIMEOUT.MEDIUM });
-      await button.click();
-      return await this.pause(300);
+      return await button.click();
     } catch (err) {
       await this.handleError(
         `${this.panelName} - error after clicking on the Update button`,

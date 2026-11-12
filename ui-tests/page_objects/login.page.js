@@ -20,7 +20,6 @@ class LoginPage extends Page {
 
   async clickOnLoginButton() {
     await this.clickOnElement(this.loginButton);
-    return await this.pause(200);
   }
 
   async waitForPageLoaded() {

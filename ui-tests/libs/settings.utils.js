@@ -22,6 +22,8 @@ const propertiesReader =
   propertiesReaderModule;
 const properties = propertiesReader({ sourceFile: path.join(__dirname, '../browser.properties') });
 const BASE_URL = String(properties.get('base.url')).replace(/[/]+$/, '') + '/';
+const LOGIN_FORM = "input[id^='username-input']";
+const XP_MENU = 'xp-menu';
 
 module.exports = {
   getBrowser() {
@@ -37,12 +39,12 @@ module.exports = {
   },
   async clickOnElement(selector) {
     let el = await this.getBrowser().$(selector);
-    await el.waitForDisplayed({ timeout: 2000 });
+    await el.waitForDisplayed({ timeout: appConst.TIMEOUT.MEDIUM });
     return await el.click();
   },
   async getText(selector) {
     let el = await this.getBrowser().$(selector);
-    await el.waitForDisplayed({ timeout: 2000 });
+    await el.waitForDisplayed({ timeout: appConst.TIMEOUT.MEDIUM });
     return await el.getText();
   },
 
@@ -140,9 +142,18 @@ module.exports = {
   getBaseUrl() {
     return BASE_URL;
   },
+  // doLogin reads whether the login form is shown, so the page has to settle on one of the two.
   async navigateToHomePage() {
     await this.getBrowser().url(this.getBaseUrl());
-    await this.getBrowser().pause(500);
+    await this.getBrowser().waitUntil(
+      async () =>
+        (await this.isElementDisplayed(LOGIN_FORM)) ||
+        (await this.getBrowser().$(XP_MENU).isExisting()),
+      {
+        timeout: appConst.TIMEOUT.MEDIUM,
+        timeoutMsg: 'Neither the login form nor the home page was shown',
+      },
+    );
   },
   async doCloseAllWindowTabs(keepTitle1 = 'Enonic XP Admin', keepTitle2 = 'Settings') {
     const handles = await this.getBrowser().getWindowHandles();
