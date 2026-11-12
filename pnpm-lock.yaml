@@ -59,8 +59,8 @@ importers:
         specifier: ^8.1.2
         version: 8.1.2
       '@enonic-types/lib-i18n':
-        specifier: ^8.1.0
-        version: 8.1.0
+        specifier: ^8.1.2
+        version: 8.1.2
       '@enonic-types/lib-io':
         specifier: ^8.1.2
         version: 8.1.2
@@ -127,9 +127,6 @@ packages:
   '@enonic-types/core@8.0.4':
     resolution: {integrity: sha512-8ZNsk4Yb0MZwq2DW9T6XUxKWCIedt0CUR2bCOriUge3LrY0diwJX2QwaZYrQQ7A4bF8g3dTczO3DDnDRQuPhFg==}
 
-  '@enonic-types/core@8.1.0':
-    resolution: {integrity: sha512-XLcdaYU2z7H9rMqwjR6FQyWKETLmdTwEhWUiwAGSiqrCHr/8LG0lVkf9HHsMBn/sWg2MmxioColYrpN+0NRxvQ==}
-
   '@enonic-types/core@8.1.1':
     resolution: {integrity: sha512-doqfZ7GSm5Q0IIZYED+J/b6KalGAYIcCkTjE6wCzFIVJivlUiJIQMg6hw18G280Vx7ovtVj5oOZgPjPou8SCNw==}
 
@@ -148,8 +145,8 @@ packages:
   '@enonic-types/lib-auth@8.1.2':
     resolution: {integrity: sha512-CbhDaO3fS+ogv1/LrYVZmijWiNXBAHkoq0syONHydYpiAhHVqaHXjWy0DgRj4m28pkIapGleemBca5W+/b+Vuw==}
 
-  '@enonic-types/lib-i18n@8.1.0':
-    resolution: {integrity: sha512-PYe2YTwSiMNXbPJ+qSmQ4M284o4QOMQAfQFD94lema1FiqQo5iZDn6TYpR4NnVNFWAN2UsyHJUkA3j68j/4m/w==}
+  '@enonic-types/lib-i18n@8.1.2':
+    resolution: {integrity: sha512-EEsBZ99mdSp5JBfgER1SqGebwc9+tdRg/RbZnaaD6+5iqMBO29FriDg0pA9wB5Nwj3NTOgvDI/lCh9FSdutjDg==}
 
   '@enonic-types/lib-io@8.1.2':
     resolution: {integrity: sha512-WZZwd+hfqw6NHCBqOcPT03nWDhCHwwRo3WCajkkbzQxMmb78tKzNBe6qSds28+uWVz0benWqGV99Md9FmuqykA==}
@@ -1336,9 +1333,6 @@ packages:
   tailwind-merge@3.7.0:
     resolution: {integrity: sha512-XPPUyAc+cvspz3lHTcR/QgPfW2A0lv/xQNIjX3HGhLR+Nq2lHaLq5MtTesHn8GUr3W3DguT2KT5x3NVgRtYwmA==}
 
-  tailwindcss@4.3.3:
-    resolution: {integrity: sha512-gOhV3P7ufE62QDGg1zVaTgCR+EtPv92k2nIhVcVKcLmxT1sUBsQGhnZj175j+MqRt4zLF7ic+sCYjfhxMxj7YQ==}
-
   tailwindcss@4.3.5:
     resolution: {integrity: sha512-FcQk9BuffmEHJP2G0XmB2SplU1aLTI7j07Kunk+U74Ny+XiWOtzXz9aujFZ/avntw1e2cOv/3PkgzflQ7gX2vQ==}
 
@@ -1479,8 +1473,6 @@ snapshots:
 
   '@enonic-types/core@8.0.4': {}
 
-  '@enonic-types/core@8.1.0': {}
-
   '@enonic-types/core@8.1.1': {}
 
   '@enonic-types/core@8.1.2': {}
@@ -1501,9 +1493,9 @@ snapshots:
     dependencies:
       '@enonic-types/core': 8.1.2
 
-  '@enonic-types/lib-i18n@8.1.0':
+  '@enonic-types/lib-i18n@8.1.2':
     dependencies:
-      '@enonic-types/core': 8.1.0
+      '@enonic-types/core': 8.1.2
 
   '@enonic-types/lib-io@8.1.2':
     dependencies:
@@ -2313,8 +2305,6 @@ snapshots:
   tabbable@6.5.1: {}
 
   tailwind-merge@3.7.0: {}
-
-  tailwindcss@4.3.3: {}
 
   tailwindcss@4.3.5: {}
 
