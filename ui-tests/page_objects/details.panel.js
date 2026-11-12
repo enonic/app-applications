@@ -427,16 +427,24 @@ class DetailsPanel extends SectionPage {
     return buttons.length === 0 ? undefined : await buttons[0].getText();
   }
 
+  async countListItems(sectionLabel) {
+    const section = await this.getSection(sectionLabel);
+    return (await section.$$(IN_SECTION.listItems)).length;
+  }
+
   async clickOnMoreButton(sectionLabel) {
     try {
       const section = await this.getSection(sectionLabel);
       const button = await section.$(IN_SECTION.moreButton);
       await button.waitForClickable({ timeout: appConst.TIMEOUT.MEDIUM });
-      const before = await button.getText();
+      const before = await this.countListItems(sectionLabel);
       await button.click();
       return await this.getBrowser().waitUntil(
-        async () => (await this.getMoreButtonLabel(sectionLabel)) !== before,
-        { timeout: appConst.TIMEOUT.MEDIUM, timeoutMsg: `'${before}' did not load more` },
+        async () => (await this.countListItems(sectionLabel)) > before,
+        {
+          timeout: appConst.TIMEOUT.MEDIUM,
+          timeoutMsg: `'${sectionLabel}' still shows ${before} rows after '+N more'`,
+        },
       );
     } catch (err) {
       await this.handleError(
