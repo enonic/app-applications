@@ -109,7 +109,6 @@ class UninstallAppDialog extends SectionPage {
     try {
       await this.waitForElementDisplayed(this.css.confirmInput);
       await this.typeTextInInput(this.css.confirmInput, String(value));
-      return await this.pause(300);
     } catch (err) {
       await this.handleError(`${this.dialogName} - the gate input`, 'err_uninstall_input', err);
     }
@@ -121,7 +120,6 @@ class UninstallAppDialog extends SectionPage {
     try {
       await this.waitForElementEnabled(this.css.uninstallButton);
       await this.clickOnElement(this.css.uninstallButton);
-      return await this.pause(300);
     } catch (err) {
       await this.handleError(`${this.dialogName} - Uninstall button`, 'err_uninstall_btn', err);
     }
@@ -143,7 +141,6 @@ class UninstallAppDialog extends SectionPage {
     try {
       await this.waitForElementDisplayed(this.css.cancelButton);
       await this.clickOnElement(this.css.cancelButton);
-      return await this.pause(300);
     } catch (err) {
       await this.handleError(`${this.dialogName} - Cancel button`, 'err_uninstall_cancel', err);
     }
@@ -153,7 +150,6 @@ class UninstallAppDialog extends SectionPage {
     try {
       await this.waitForElementDisplayed(this.css.closeButton);
       await this.clickOnElement(this.css.closeButton);
-      return await this.pause(300);
     } catch (err) {
       await this.handleError(`${this.dialogName} - Close button`, 'err_uninstall_close', err);
     }

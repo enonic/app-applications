@@ -189,7 +189,7 @@ describe("applications.install.dialog.spec - the 'Install applications' dialog: 
       appConst.applicationInstalledMessage(APP.displayName),
     );
     // 4. The filter still holds: the one row stays.
-    assert.deepEqual(await installAppDialog.getMarketAppDisplayNames(), [APP.displayName]);
+    await installAppDialog.waitForMarketAppDisplayNames([APP.displayName]);
     // 5. Close the dialog: the grid lists the application, started, on the version the market
     //    offered, with no badge - neither a system nor a local application.
     await installAppDialog.clickOnCloseButton();
@@ -209,10 +209,7 @@ describe("applications.install.dialog.spec - the 'Install applications' dialog: 
     assert.equal(await applicationDetails.getState(), appConst.APP_STATE.STARTED);
     assert.equal(await applicationDetails.getKey(), APP.key);
     assert.equal(await applicationDetails.getVersionInstalled(), version);
-    assert.ok(
-      await applicationDetails.isMarketLinkDisplayed(),
-      'An application from the market links to its market page',
-    );
+    await applicationDetails.waitForMarketLinkDisplayed();
   });
 
   it("GIVEN 'Chuck Norris' has been installed WHEN the dialog has been opened again THEN its row should read 'Installed' AND the 'Installed' filter should count it", async () => {
@@ -270,12 +267,8 @@ describe("applications.install.dialog.spec - the 'Install applications' dialog: 
     await applicationsPage.typeTextInSearchInput(APP.searchText);
     await applicationsPage.pressEnterKey();
     await applicationsPage.waitForFilterTerm(undefined, APP.searchText);
-    await settingsUtils.clickOnElement(
-      `//header//h2[text()='${appConst.EXTENSIONS.APPLICATIONS}']`,
-    );
-    await applicationsPage.waitForFilterPopupClosed();
-    await applicationsPage.waitForRowDisplayed(APP.key);
-    assert.deepEqual(await applicationsPage.getApplicationDisplayNames(), [APP.displayName]);
+    await applicationsPage.closeFilterPopup();
+    await applicationsPage.waitForApplicationDisplayNames([APP.displayName]);
     // 2. Tick 'Select all': the one listed row is checked, and 'Select all' with it.
     await applicationsPage.clickOnSelectAllCheckbox();
     assert.ok(await applicationsPage.isRowChecked(APP.key), 'The listed row should be checked');

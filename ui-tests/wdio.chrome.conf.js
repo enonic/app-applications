@@ -41,7 +41,7 @@ exports.config = {
   baseUrl: baseURL,
   //
   // Default timeout for all waitForXXX commands.
-  waitforTimeout: 3000,
+  waitforTimeout: 10000,
   //
   // Default timeout in milliseconds for request
   // if Selenium Grid doesn't send response

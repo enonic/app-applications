@@ -24,12 +24,14 @@ module.exports = Object.freeze({
   BROWSER_XP_TITLES: {
     XP_HOME: 'Enonic XP Home',
   },
+  // Waits end as soon as their condition holds, so a long one costs a green run nothing; a short one
+  // turns a slow CI runner into a red build. Start and stop of an application go to the server.
   TIMEOUT: {
-    MEDIUM: 3000,
-    LONG: 5000,
-    SHORT: 2000,
+    SHORT: 5000,
+    MEDIUM: 10000,
+    LONG: 20000,
     // An install from Enonic Market: the download, the deploy and the catalogue reload after it.
-    INSTALL: 30000,
+    INSTALL: 60000,
   },
 
   BROWSER_WIDTH: 1950,

@@ -110,7 +110,6 @@ class InstallAppDialog extends SectionPage {
     try {
       await this.waitForElementDisplayed(this.css.closeButton);
       await this.clickOnElement(this.css.closeButton);
-      return await this.pause(300);
     } catch (err) {
       await this.handleError(`${this.dialogName} - Close button`, 'err_install_close_btn', err);
     }
@@ -136,7 +135,13 @@ class InstallAppDialog extends SectionPage {
       for (const tab of tabs) {
         if ((await tab.getText()).trim() === label) {
           await tab.click();
-          return await this.pause(300);
+          return await tab.waitUntil(
+            async () => (await tab.getAttribute('aria-selected')) === 'true',
+            {
+              timeout: appConst.TIMEOUT.MEDIUM,
+              timeoutMsg: `the '${label}' tab should be active`,
+            },
+          );
         }
       }
       throw new Error(`tab '${label}' was not found`);
@@ -165,7 +170,6 @@ class InstallAppDialog extends SectionPage {
       await this.pressEnterKey();
       await this.waitForFilterTerm(undefined, text);
       await this.closeFilterPopup();
-      return await this.pause(300);
     } catch (err) {
       await this.handleError(
         `${this.dialogName} - error after typing in the search input`,
@@ -201,7 +205,6 @@ class InstallAppDialog extends SectionPage {
         await this.clickOnElement(this.css.filterButton);
       }
       await this.waitForElementDisplayed(this.css.filterPopup);
-      return await this.pause(300);
     } catch (err) {
       await this.handleError(
         `${this.dialogName} - error after clicking on the Filter button`,
@@ -250,7 +253,7 @@ class InstallAppDialog extends SectionPage {
       for (const option of options) {
         if ((await option.getText()).trim() === label) {
           await option.click();
-          return await this.pause(300);
+          return await this.waitUntilDisplayed(this.css.filterValueOptions);
         }
       }
       throw new Error(`field '${label}' was not found in the filter dropdown`);
@@ -298,7 +301,6 @@ class InstallAppDialog extends SectionPage {
         if (text.replace(/\(\d+\)\s*$/, '').trim() === label) {
           await option.click();
           await this.waitForFilterPopupClosed();
-          return await this.pause(300);
         }
       }
       throw new Error(`value '${label}' was not found in the filter dropdown`);
@@ -361,7 +363,13 @@ class InstallAppDialog extends SectionPage {
         const tagValue = await tag.$(this.css.filterTagLabel).getText();
         if (tagField === field && tagValue === value) {
           await tag.$(this.css.filterTagRemove).click();
-          return await this.pause(300);
+          return await this.getBrowser().waitUntil(
+            async () =>
+              !(await this.getFilterTerms()).some(
+                (term) => term.field === field && term.value === value,
+              ),
+            { timeout: appConst.TIMEOUT.MEDIUM, timeoutMsg: 'the tag is still in the filter' },
+          );
         }
       }
       throw new Error(`no '${field}: ${value}' tag in the filter`);
@@ -383,7 +391,6 @@ class InstallAppDialog extends SectionPage {
       await this.waitForElementDisplayed(this.css.filterClearButton);
       await this.clickOnElement(this.css.filterClearButton);
       await this.waitForElementNotDisplayed(this.css.filterClearButton);
-      return await this.pause(300);
     } catch (err) {
       await this.handleError(
         `${this.dialogName} - error after clicking on the 'Clear the filter' button`,
@@ -529,7 +536,6 @@ class InstallAppDialog extends SectionPage {
       const link = await row.$(this.css.rowMarketLink);
       await link.waitForDisplayed({ timeout: appConst.TIMEOUT.MEDIUM });
       await link.click();
-      return await this.pause(300);
     } catch (err) {
       await this.handleError(
         `${this.dialogName} - error after clicking on the market link of '${displayName}'`,
@@ -583,7 +589,6 @@ class InstallAppDialog extends SectionPage {
       const button = await row.$(this.css.rowActionButton);
       await button.waitForEnabled({ timeout: appConst.TIMEOUT.MEDIUM });
       await button.click();
-      return await this.pause(300);
     } catch (err) {
       await this.handleError(
         `${this.dialogName} - error after clicking on 'Install' in the row '${displayName}'`,

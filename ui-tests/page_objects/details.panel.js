@@ -432,8 +432,12 @@ class DetailsPanel extends SectionPage {
       const section = await this.getSection(sectionLabel);
       const button = await section.$(IN_SECTION.moreButton);
       await button.waitForClickable({ timeout: appConst.TIMEOUT.MEDIUM });
+      const before = await button.getText();
       await button.click();
-      return await this.pause(500);
+      return await this.getBrowser().waitUntil(
+        async () => (await this.getMoreButtonLabel(sectionLabel)) !== before,
+        { timeout: appConst.TIMEOUT.MEDIUM, timeoutMsg: `'${before}' did not load more` },
+      );
     } catch (err) {
       await this.handleError(
         `${this.panelName} - the '+N more' button of '${sectionLabel}'`,
@@ -450,8 +454,7 @@ class DetailsPanel extends SectionPage {
       const section = await this.getSection(sectionLabel);
       const button = await section.$(IN_SECTION.button(label));
       await button.waitForClickable({ timeout: appConst.TIMEOUT.MEDIUM });
-      await button.click();
-      return await this.pause(300);
+      return await button.click();
     } catch (err) {
       await this.handleError(
         `${this.panelName} - the '${label}' button of '${sectionLabel}'`,
@@ -480,8 +483,16 @@ class DetailsPanel extends SectionPage {
   async clickOnCheckbox(sectionLabel) {
     try {
       const section = await this.getSection(sectionLabel);
+      const checkbox = await section.$(IN_SECTION.checkbox);
+      const before = await checkbox.getAttribute('aria-checked');
       await section.$(IN_SECTION.checkboxLabel).click();
-      return await this.pause(300);
+      return await checkbox.waitUntil(
+        async () => (await checkbox.getAttribute('aria-checked')) !== before,
+        {
+          timeout: appConst.TIMEOUT.MEDIUM,
+          timeoutMsg: `the checkbox of '${sectionLabel}' was not ticked`,
+        },
+      );
     } catch (err) {
       await this.handleError(
         `${this.panelName} - the checkbox of '${sectionLabel}'`,

@@ -45,6 +45,12 @@ describe('applications.details.panel.spec - the details panel of an application:
     await applicationsPage.waitForRowActive(SIMPLE_SITE.key);
     await applicationDetails.waitForLoaded();
     await applicationDetails.waitForTitle(SIMPLE_SITE.displayName);
+    // The title comes before the Details section: the checks for what is absent wait for the section.
+    await applicationDetails.waitForFieldValue(
+      ApplicationDetails.SECTION.DETAILS,
+      ApplicationDetails.FIELD.KEY,
+      SIMPLE_SITE.key,
+    );
     await settingsUtils.saveScreenshot('app_details_panel_1');
     // 2. The empty message is gone.
     assert.equal(await applicationDetails.getEmptyMessage(), undefined);

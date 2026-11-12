@@ -61,8 +61,7 @@ describe('applications.stop.start.spec - stopping an application from the toolba
     await settingsUtils.navigateToApplicationsSection();
     let applicationsPage = new ApplicationsPage();
     let applicationDetails = new ApplicationDetails();
-    // The State filter counts the data, so the total comes from it: the list is virtualized and
-    // renders only the rows that fit the viewport.
+    // The State filter counts the data, so the totals come from it rather than from the rows.
     await applicationsPage.clickOnFilterButton();
     await applicationsPage.clickOnFilterField(appConst.FILTER_FIELD.STATE);
     const started = await applicationsPage.getFilterValueCount(appConst.APP_STATE.STARTED);
@@ -89,8 +88,7 @@ describe('applications.stop.start.spec - stopping an application from the toolba
       appConst.FILTER_FIELD.STATE,
       appConst.APP_STATE.STOPPED,
     );
-    await applicationsPage.waitForRowDisplayed(APP.key);
-    assert.deepEqual(await applicationsPage.getApplicationDisplayNames(), [APP.displayName]);
+    await applicationsPage.waitForApplicationDisplayNames([APP.displayName]);
     assert.ok(
       await applicationsPage.isClearFilterButtonDisplayed(),
       "'Clear the filter' should be shown while a term is in force",
@@ -98,12 +96,7 @@ describe('applications.stop.start.spec - stopping an application from the toolba
     // 4. Clear the filter: every application is listed again.
     await applicationsPage.clickOnClearFilterButton();
     assert.deepEqual(await applicationsPage.getFilterTerms(), [], 'No term should be left');
-    await applicationsPage
-      .getBrowser()
-      .waitUntil(async () => (await applicationsPage.getApplicationDisplayNames()).length > 1, {
-        timeout: appConst.TIMEOUT.MEDIUM,
-        timeoutMsg: 'More than the one filtered application should be listed again',
-      });
+    await applicationsPage.waitForRowCountGreaterThan(1);
     // 5. Once the state button reads 'Stopped', pick 'Start' in its menu.
     await applicationDetails.clickOnStateMenuButton();
     assert.deepEqual(await applicationDetails.getStateMenuItems(), [appConst.TOOLBAR.START]);
@@ -173,7 +166,7 @@ describe('applications.stop.start.spec - stopping an application from the toolba
       appConst.FILTER_FIELD.STATE,
       appConst.APP_STATE.STOPPED,
     );
-    assert.deepEqual(await applicationsPage.getApplicationDisplayNames(), [APP.displayName]);
+    await applicationsPage.waitForApplicationDisplayNames([APP.displayName]);
     // 5. Right-click on the filtered row: now the menu offers Start, not Stop. Pick 'Start'.
     await applicationsPage.openContextMenuOnRow(APP.key);
     assert.ok(
@@ -191,8 +184,7 @@ describe('applications.stop.start.spec - stopping an application from the toolba
     await applicationsPage.waitForStartButtonDisabled();
     // 7. The filter is still 'State: Stopped' and nothing is stopped any more: the list is empty and
     //    says so, while the details stay on the application.
-    await applicationsPage.waitForRowNotDisplayed(APP.key);
-    assert.deepEqual(await applicationsPage.getApplicationDisplayNames(), []);
+    await applicationsPage.waitForApplicationDisplayNames([]);
     assert.equal(
       await applicationsPage.getListMessage(),
       appConst.LIST_MESSAGE.NOTHING_MATCHES,
