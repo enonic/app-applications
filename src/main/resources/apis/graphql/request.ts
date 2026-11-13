@@ -1,4 +1,5 @@
 import { execute, type ExecutionResult } from '/lib/graphql';
+import { countAliases } from '/lib/graphql-aliases';
 
 import { schema } from './schema';
 
@@ -15,6 +16,9 @@ type GraphQlOperation = {
   variables?: Record<string, unknown>;
 };
 
+export const MAX_BODY_LENGTH = 8192;
+export const MAX_ALIASES = 0;
+
 /**
  * The data plane, served from this app's own extension prefix: a `kind: API` descriptor would need the
  * *host tool* to list it, i.e. a host release per provider. ! No role check — four gates ran before this
@@ -23,6 +27,9 @@ type GraphQlOperation = {
 export function handleGraphQlRequest(request: GraphQlRequest): GraphQlResponse {
   if (!request.body) {
     return badRequest('Request body is missing');
+  }
+  if (request.body.length > MAX_BODY_LENGTH) {
+    return refused(413, 'Request body is too large');
   }
 
   let operation: unknown;
@@ -34,6 +41,10 @@ export function handleGraphQlRequest(request: GraphQlRequest): GraphQlResponse {
 
   if (!isGraphQlOperation(operation)) {
     return badRequest('Request body carries no `query` string');
+  }
+
+  if (countAliases(operation.query) > MAX_ALIASES) {
+    return badRequest('Query uses more aliases than this endpoint allows');
   }
 
   // ! GraphQL answers 200 even when `errors` is populated — the client reads that array, not the
@@ -59,5 +70,9 @@ function isGraphQlOperation(value: unknown): value is GraphQlOperation {
 }
 
 function badRequest(message: string): GraphQlResponse {
-  return { status: 400, contentType: 'application/json', body: { message } };
+  return refused(400, message);
+}
+
+function refused(status: number, message: string): GraphQlResponse {
+  return { status, contentType: 'application/json', body: { message } };
 }
