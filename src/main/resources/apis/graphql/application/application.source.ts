@@ -1,4 +1,3 @@
-import { encodeApplicationIcon } from '/lib/icon';
 import {
   get,
   getDescriptor,
@@ -14,16 +13,6 @@ export type ApplicationSource = Application & {
 export function displayNameOf(source: ApplicationSource): string {
   const title = source.descriptor?.title;
   return title != null && title.length > 0 ? title : source.key;
-}
-
-export function iconDataUriOf(source: ApplicationSource): string | undefined {
-  const mimeType = source.descriptor?.icon?.mimeType;
-  if (mimeType == null) {
-    return undefined;
-  }
-
-  const encoded = encodeApplicationIcon({ application: source.key });
-  return encoded == null ? undefined : `data:${mimeType};base64,${encoded}`;
 }
 
 export function getApplication(key: string): ApplicationSource | null {
