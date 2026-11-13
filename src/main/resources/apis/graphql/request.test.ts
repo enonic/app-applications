@@ -1,7 +1,14 @@
 import { execute } from '/lib/graphql';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { handleGraphQlRequest } from './request';
+import { handleGraphQlRequest, MAX_BODY_LENGTH } from './request';
+
+/** A valid operation padded inside its query, so only the length differs between two of them. */
+function bodyOfLength(length: number): string {
+  const open = '{"query":"{ probe }';
+  const close = '"}';
+  return `${open}${' '.repeat(length - open.length - close.length)}${close}`;
+}
 
 describe('handleGraphQlRequest', () => {
   beforeEach(() => {
@@ -48,6 +55,21 @@ describe('handleGraphQlRequest', () => {
       body: { message: 'Request body is missing' },
     });
     expect(vi.mocked(execute)).not.toHaveBeenCalled();
+  });
+
+  it('rejects a body over the size limit without parsing it or reaching the schema', () => {
+    const response = handleGraphQlRequest({ body: bodyOfLength(MAX_BODY_LENGTH + 1) });
+
+    expect(response).toEqual({
+      status: 413,
+      contentType: 'application/json',
+      body: { message: 'Request body is too large' },
+    });
+    expect(vi.mocked(execute)).not.toHaveBeenCalled();
+  });
+
+  it('answers a body exactly at the size limit', () => {
+    expect(handleGraphQlRequest({ body: bodyOfLength(MAX_BODY_LENGTH) }).status).toBe(200);
   });
 
   it('rejects a body that is not valid JSON', () => {

@@ -15,6 +15,8 @@ type GraphQlOperation = {
   variables?: Record<string, unknown>;
 };
 
+export const MAX_BODY_LENGTH = 8192;
+
 /**
  * The data plane, served from this app's own extension prefix: a `kind: API` descriptor would need the
  * *host tool* to list it, i.e. a host release per provider. ! No role check — four gates ran before this
@@ -23,6 +25,9 @@ type GraphQlOperation = {
 export function handleGraphQlRequest(request: GraphQlRequest): GraphQlResponse {
   if (!request.body) {
     return badRequest('Request body is missing');
+  }
+  if (request.body.length > MAX_BODY_LENGTH) {
+    return refused(413, 'Request body is too large');
   }
 
   let operation: unknown;
@@ -59,5 +64,9 @@ function isGraphQlOperation(value: unknown): value is GraphQlOperation {
 }
 
 function badRequest(message: string): GraphQlResponse {
-  return { status: 400, contentType: 'application/json', body: { message } };
+  return refused(400, message);
+}
+
+function refused(status: number, message: string): GraphQlResponse {
+  return { status, contentType: 'application/json', body: { message } };
 }
