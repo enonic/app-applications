@@ -1,6 +1,6 @@
 import { AppError } from '@enonic/ui-utils';
 import { requestJson } from '@enonic/ui-utils/request';
-import { errAsync, type ResultAsync } from 'neverthrow';
+import { errAsync, okAsync, ResultAsync } from 'neverthrow';
 
 import {
   type GraphQlRoot,
@@ -21,7 +21,6 @@ const APPLICATION_FIELDS = `
   state
   system
   local
-  icon
   modifiedTime
   systemVersion
   vendorName
@@ -50,7 +49,6 @@ type ApplicationRowDto = {
   state: ApplicationState;
   system: boolean;
   local: boolean;
-  icon: string | null;
   modifiedTime: string | null;
   systemVersion: string | null;
   vendorName: string | null;
@@ -60,6 +58,12 @@ type ApplicationRowDto = {
 type ApplicationsResult = { applications: ApplicationRowDto[] };
 
 type ApplicationResult = { application: ApplicationRowDto | null };
+
+// The one field read off core's own list (`GET server:app/`, ApplicationInfoJson): the rest of a row still
+// comes from the section's schema. ! Absent rather than null for an application that ships no icon.
+type IconHashesDto = { applications: { key: string; iconHash?: string }[] };
+
+type IconUrls = ReadonlyMap<string, string>;
 
 // The wire shape both of XP core's install endpoints answer with (ApplicationInfoJson): the
 // application as it now stands installed. Its key is core's, which need not be the key the market
@@ -99,17 +103,21 @@ export type InstalledApplication = {
 };
 
 export function fetchApplications(signal?: AbortSignal): ResultAsync<Application[], AppError> {
-  return requestGraphQl<ApplicationsResult>(APPLICATIONS_ROOT, { signal }).map(({ applications }) =>
-    applications.map(toApplication),
-  );
+  return ResultAsync.combine([
+    requestGraphQl<ApplicationsResult>(APPLICATIONS_ROOT, { signal }),
+    fetchIconUrls(signal),
+  ]).map(([{ applications }, iconUrls]) => applications.map((dto) => toApplication(dto, iconUrls)));
 }
 
 export function fetchApplication(
   key: string,
   signal?: AbortSignal,
 ): ResultAsync<Application | undefined, AppError> {
-  return requestGraphQlDocument<ApplicationResult>(APPLICATION_DOCUMENT, { key }, signal).map(
-    ({ application }) => (application == null ? undefined : toApplication(application)),
+  return ResultAsync.combine([
+    requestGraphQlDocument<ApplicationResult>(APPLICATION_DOCUMENT, { key }, signal),
+    fetchIconUrls(signal),
+  ]).map(([{ application }, iconUrls]) =>
+    application == null ? undefined : toApplication(application, iconUrls),
   );
 }
 
@@ -165,7 +173,33 @@ function toInstalledApplication({
   return { key, version, displayName: title ?? key };
 }
 
-function toApplication(dto: ApplicationRowDto): Application {
+// ? An icon is decoration, so a core that cannot answer — a host tool that does not mount the api, an XP
+// ? older than the icon route — costs the icons and not the list. `server:app` has no read for one
+// ? application, so a single row's reload reads every hash as well.
+function fetchIconUrls(signal?: AbortSignal): ResultAsync<IconUrls, never> {
+  const list = serverAppUrl();
+  const icon = serverAppUrl('icon');
+
+  if (list == null || icon == null) {
+    return okAsync(new Map());
+  }
+
+  return requestJson<IconHashesDto>(`${list}/`, { signal })
+    .map(({ applications }) => {
+      const urls = new Map<string, string>();
+
+      for (const { key, iconHash } of applications) {
+        if (iconHash != null) {
+          urls.set(key, `${icon}?key=${encodeURIComponent(key)}&v=${encodeURIComponent(iconHash)}`);
+        }
+      }
+
+      return urls;
+    })
+    .orElse(() => okAsync(new Map()));
+}
+
+function toApplication(dto: ApplicationRowDto, iconUrls: IconUrls): Application {
   return {
     key: dto.key,
     displayName: dto.displayName,
@@ -174,7 +208,7 @@ function toApplication(dto: ApplicationRowDto): Application {
     state: dto.state,
     system: dto.system,
     local: dto.local,
-    icon: dto.icon ?? undefined,
+    icon: iconUrls.get(dto.key),
     modifiedTime: dto.modifiedTime ?? undefined,
     systemVersion: dto.systemVersion ?? undefined,
     vendorName: dto.vendorName ?? undefined,
