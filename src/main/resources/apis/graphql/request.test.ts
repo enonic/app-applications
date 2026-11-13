@@ -1,7 +1,8 @@
 import { execute } from '/lib/graphql';
+import { countAliases } from '/lib/graphql-aliases';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { handleGraphQlRequest, MAX_BODY_LENGTH } from './request';
+import { handleGraphQlRequest, MAX_ALIASES, MAX_BODY_LENGTH } from './request';
 
 /** A valid operation padded inside its query, so only the length differs between two of them. */
 function bodyOfLength(length: number): string {
@@ -13,6 +14,7 @@ function bodyOfLength(length: number): string {
 describe('handleGraphQlRequest', () => {
   beforeEach(() => {
     vi.mocked(execute).mockReturnValue({ data: { probe: { app: 'app-applications' } } });
+    vi.mocked(countAliases).mockReturnValue(0);
   });
 
   afterEach(() => {
@@ -82,6 +84,25 @@ describe('handleGraphQlRequest', () => {
     expect(handleGraphQlRequest({ body: '{"variables":{}}' }).body).toEqual({
       message: 'Request body carries no `query` string',
     });
+  });
+
+  it('rejects a query over the alias limit without reaching the schema', () => {
+    vi.mocked(countAliases).mockReturnValue(MAX_ALIASES + 1);
+
+    const response = handleGraphQlRequest({ body: '{"query":"{ a: probe b: probe }"}' });
+
+    expect(response).toEqual({
+      status: 400,
+      contentType: 'application/json',
+      body: { message: 'Query uses more aliases than this endpoint allows' },
+    });
+    expect(vi.mocked(execute)).not.toHaveBeenCalled();
+  });
+
+  it('answers a query exactly at the alias limit', () => {
+    vi.mocked(countAliases).mockReturnValue(MAX_ALIASES);
+
+    expect(handleGraphQlRequest({ body: '{"query":"{ probe }"}' }).status).toBe(200);
   });
 
   it('rejects an empty query string', () => {

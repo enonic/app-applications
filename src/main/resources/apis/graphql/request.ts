@@ -1,4 +1,5 @@
 import { execute, type ExecutionResult } from '/lib/graphql';
+import { countAliases } from '/lib/graphql-aliases';
 
 import { schema } from './schema';
 
@@ -16,6 +17,7 @@ type GraphQlOperation = {
 };
 
 export const MAX_BODY_LENGTH = 8192;
+export const MAX_ALIASES = 0;
 
 /**
  * The data plane, served from this app's own extension prefix: a `kind: API` descriptor would need the
@@ -39,6 +41,10 @@ export function handleGraphQlRequest(request: GraphQlRequest): GraphQlResponse {
 
   if (!isGraphQlOperation(operation)) {
     return badRequest('Request body carries no `query` string');
+  }
+
+  if (countAliases(operation.query) > MAX_ALIASES) {
+    return badRequest('Query uses more aliases than this endpoint allows');
   }
 
   // ! GraphQL answers 200 even when `errors` is populated — the client reads that array, not the

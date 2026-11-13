@@ -43,6 +43,10 @@ lib-graphql, `get /_static/*` to the assets, everything else 404.
 
 - **The controller serves text only.** GraalJS puts no bytes on the wire, so lib-static and any
   binary response are out; `.js` must be `text/javascript`.
+- **The endpoint refuses what the client never sends**: a body over `MAX_BODY_LENGTH` (413) and any
+  alias (`MAX_ALIASES`, 400), both in `apis/graphql/request.ts`. An alias is how one document repeats a
+  resolver, so a client document that needs one raises the constant on purpose — it is not a bug to
+  work around with a second endpoint.
 - Roots stay nullable, and no handler re-checks the role — the platform's gates and the descriptor's
   `allow` already ran.
 - A bean is the last resort, for data no XP JS lib exposes: handler in `src/main/java`, a `lib/*.ts`
