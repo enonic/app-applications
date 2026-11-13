@@ -264,14 +264,23 @@ class BrowsePage extends SectionPage {
     }
   }
 
+  // Types the text and presses Enter: the text becomes a tag and the list is narrowed to what
+  // matches it word by word. The dropdown that opened on the input is dismissed afterwards.
+  async searchByText(text) {
+    await this.typeTextInSearchInput(text);
+    await this.pressEnterKey();
+    await this.waitForFilterTerm(undefined, text);
+    return await this.closeFilterPopup();
+  }
+
   async clearSearchInput() {
     try {
       await this.clearInputText(this.css.searchInput);
     } catch (err) {
       await this.handleError(
-        `${this.pageName} - error after clearing the search input`,
-        'err_search_input',
-        err,
+          `${this.pageName} - error after clearing the search input`,
+          'err_search_input',
+          err,
       );
     }
   }
@@ -464,7 +473,7 @@ class BrowsePage extends SectionPage {
       for (const tag of tags) {
         const prefixes = await tag.$$(this.css.filterTagPrefix);
         const tagField =
-          prefixes.length === 0 ? undefined : (await prefixes[0].getText()).replace(/:\s*$/, '');
+            prefixes.length === 0 ? undefined : (await prefixes[0].getText()).replace(/:\s*$/, '');
         const tagValue = await tag.$(this.css.filterTagLabel).getText();
         if (tagField === field && tagValue === value) {
           await tag.$(this.css.filterTagRemove).click();
@@ -788,9 +797,9 @@ class BrowsePage extends SectionPage {
       await this.waitForElementDisplayed(this.css.rowByKey(key), ms);
     } catch (err) {
       await this.handleError(
-        `${this.pageName} - the row '${key}' should be displayed`,
-        'err_browse_row',
-        err,
+          `${this.pageName} - the row '${key}' should be displayed`,
+          'err_browse_row',
+          err,
       );
     }
   }
@@ -845,6 +854,12 @@ class BrowsePage extends SectionPage {
   async isRowChecked(key) {
     const checked = await this.getAttribute(this.css.rowCheckbox(key), 'aria-checked');
     return checked === 'true';
+  }
+
+  // A row that is not the operator's to act on keeps its checkbox, greyed: 'disabled' on the input.
+  async isRowCheckboxEnabled(key) {
+    await this.waitForRowDisplayed(key);
+    return await this.isElementEnabled(this.css.rowCheckbox(key));
   }
 
   // The row the user clicked on (aria-selected), not a ticked checkbox.
