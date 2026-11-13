@@ -191,10 +191,10 @@ class ApplicationsPage extends BrowsePage {
   }
 
   // 'Started' / 'Stopped' (appConst.APP_STATE.*) - the last cell of the row; a system application
-  // shows none.
+  // shows none: its cell is there, empty.
   async getApplicationState(key) {
     const cells = await this.getRowMetaCells(key);
-    return cells.length < 2 ? undefined : cells[1];
+    return cells.length < 2 || cells[1] === '' ? undefined : cells[1];
   }
 
   async waitForApplicationState(key, expected, ms = appConst.TIMEOUT.MEDIUM) {
@@ -218,6 +218,23 @@ class ApplicationsPage extends BrowsePage {
     const row = await this.findElement(this.css.rowByKey(key));
     const badges = await row.$$(IN_ROW.badge);
     return badges.length === 0 ? undefined : await badges[0].getAttribute('aria-label');
+  }
+
+  // The keys of the listed rows that carry the 'System application' badge, in display order - the
+  // applications XP ships, listed while the 'Show system applications' toggle is on.
+  async getSystemApplicationKeys() {
+    const rows = await this.getDisplayedElements(this.css.rows);
+    const keys = [];
+    for (const row of rows) {
+      const badges = await row.$$(IN_ROW.badge);
+      if (
+        badges.length > 0 &&
+        (await badges[0].getAttribute('aria-label')) === appConst.APP_BADGE.SYSTEM
+      ) {
+        keys.push((await row.getAttribute('id')).replace(/^.*-item-/, ''));
+      }
+    }
+    return keys;
   }
 
   // The bell beside the version: the market offers a newer one.

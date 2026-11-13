@@ -264,6 +264,15 @@ class BrowsePage extends SectionPage {
     }
   }
 
+  // Types the text and presses Enter: the text becomes a tag and the list is narrowed to what
+  // matches it word by word. The dropdown that opened on the input is dismissed afterwards.
+  async searchByText(text) {
+    await this.typeTextInSearchInput(text);
+    await this.pressEnterKey();
+    await this.waitForFilterTerm(undefined, text);
+    return await this.closeFilterPopup();
+  }
+
   async clearSearchInput() {
     try {
       await this.clearInputText(this.css.searchInput);
@@ -845,6 +854,12 @@ class BrowsePage extends SectionPage {
   async isRowChecked(key) {
     const checked = await this.getAttribute(this.css.rowCheckbox(key), 'aria-checked');
     return checked === 'true';
+  }
+
+  // A row that is not the operator's to act on keeps its checkbox, greyed: 'disabled' on the input.
+  async isRowCheckboxEnabled(key) {
+    await this.waitForRowDisplayed(key);
+    return await this.isElementEnabled(this.css.rowCheckbox(key));
   }
 
   // The row the user clicked on (aria-selected), not a ticked checkbox.
