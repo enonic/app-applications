@@ -278,9 +278,9 @@ class BrowsePage extends SectionPage {
       await this.clearInputText(this.css.searchInput);
     } catch (err) {
       await this.handleError(
-          `${this.pageName} - error after clearing the search input`,
-          'err_search_input',
-          err,
+        `${this.pageName} - error after clearing the search input`,
+        'err_search_input',
+        err,
       );
     }
   }
@@ -473,7 +473,7 @@ class BrowsePage extends SectionPage {
       for (const tag of tags) {
         const prefixes = await tag.$$(this.css.filterTagPrefix);
         const tagField =
-            prefixes.length === 0 ? undefined : (await prefixes[0].getText()).replace(/:\s*$/, '');
+          prefixes.length === 0 ? undefined : (await prefixes[0].getText()).replace(/:\s*$/, '');
         const tagValue = await tag.$(this.css.filterTagLabel).getText();
         if (tagField === field && tagValue === value) {
           await tag.$(this.css.filterTagRemove).click();
@@ -797,9 +797,9 @@ class BrowsePage extends SectionPage {
       await this.waitForElementDisplayed(this.css.rowByKey(key), ms);
     } catch (err) {
       await this.handleError(
-          `${this.pageName} - the row '${key}' should be displayed`,
-          'err_browse_row',
-          err,
+        `${this.pageName} - the row '${key}' should be displayed`,
+        'err_browse_row',
+        err,
       );
     }
   }

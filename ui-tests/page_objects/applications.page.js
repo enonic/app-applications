@@ -228,8 +228,8 @@ class ApplicationsPage extends BrowsePage {
     for (const row of rows) {
       const badges = await row.$$(IN_ROW.badge);
       if (
-          badges.length > 0 &&
-          (await badges[0].getAttribute('aria-label')) === appConst.APP_BADGE.SYSTEM
+        badges.length > 0 &&
+        (await badges[0].getAttribute('aria-label')) === appConst.APP_BADGE.SYSTEM
       ) {
         keys.push((await row.getAttribute('id')).replace(/^.*-item-/, ''));
       }
