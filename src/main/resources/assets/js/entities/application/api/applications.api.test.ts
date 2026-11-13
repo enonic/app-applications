@@ -48,7 +48,6 @@ describe('fetchApplications', () => {
             state: 'STARTED',
             system: false,
             local: false,
-            icon: 'data:image/svg+xml;base64,PHN2Zz48L3N2Zz4=',
             modifiedTime: '2026-05-07T12:42:39Z',
             systemVersion: '[7.15.0,8.0.0)',
             vendorName: 'Enonic AS',
@@ -70,7 +69,7 @@ describe('fetchApplications', () => {
         state: 'STARTED',
         system: false,
         local: false,
-        icon: 'data:image/svg+xml;base64,PHN2Zz48L3N2Zz4=',
+        icon: undefined,
         modifiedTime: '2026-05-07T12:42:39Z',
         systemVersion: '[7.15.0,8.0.0)',
         vendorName: 'Enonic AS',
@@ -91,7 +90,6 @@ describe('fetchApplications', () => {
             state: 'STOPPED',
             system: true,
             local: true,
-            icon: null,
             modifiedTime: null,
             systemVersion: null,
             vendorName: null,
@@ -119,6 +117,85 @@ describe('fetchApplications', () => {
         vendorUrl: undefined,
       },
     ]);
+  });
+
+  describe('with core reachable', () => {
+    const ROW = {
+      displayName: 'Booster',
+      description: null,
+      version: '1.2.0',
+      state: 'STARTED',
+      system: false,
+      local: false,
+      modifiedTime: null,
+      systemVersion: null,
+      vendorName: null,
+      vendorUrl: null,
+    };
+
+    function respondPerUrl(core: () => Promise<Response>): void {
+      globalThis.fetch = vi.fn((url: string | URL | Request) =>
+        String(url) === ENDPOINT
+          ? Promise.resolve(
+              new Response(
+                JSON.stringify({
+                  data: {
+                    applications: [
+                      { ...ROW, key: 'com.enonic.app.booster' },
+                      { ...ROW, key: 'com.enonic.app.plain' },
+                    ],
+                  },
+                }),
+              ),
+            )
+          : core(),
+      );
+    }
+
+    beforeEach(() => {
+      setConfig(CONFIG);
+    });
+
+    afterEach(() => {
+      $config.set(undefined);
+    });
+
+    it('addresses an icon by the hash core lists for the application', async () => {
+      respondPerUrl(() =>
+        Promise.resolve(
+          new Response(
+            JSON.stringify({
+              applications: [
+                { key: 'com.enonic.app.booster', iconHash: 'Xk3f_a-1' },
+                { key: 'com.enonic.app.plain' },
+              ],
+            }),
+          ),
+        ),
+      );
+
+      const result = await fetchApplications();
+
+      expect(globalThis.fetch).toHaveBeenCalledWith('/_/server:app/', expect.anything());
+      expect(result._unsafeUnwrap().map(({ key, icon }) => ({ key, icon }))).toEqual([
+        {
+          key: 'com.enonic.app.booster',
+          icon: '/_/server:app/icon?key=com.enonic.app.booster&v=Xk3f_a-1',
+        },
+        { key: 'com.enonic.app.plain', icon: undefined },
+      ]);
+    });
+
+    it('lists the applications without icons when core refuses', async () => {
+      respondPerUrl(() => Promise.resolve(new Response('', { status: 403 })));
+
+      const result = await fetchApplications();
+
+      expect(result._unsafeUnwrap().map(({ key, icon }) => ({ key, icon }))).toEqual([
+        { key: 'com.enonic.app.booster', icon: undefined },
+        { key: 'com.enonic.app.plain', icon: undefined },
+      ]);
+    });
   });
 
   it('fails with the message a GraphQL error carries', async () => {
@@ -150,7 +227,6 @@ describe('fetchApplication', () => {
           version: '1.2.0',
           state: 'STOPPED',
           system: false,
-          icon: null,
           modifiedTime: null,
           systemVersion: null,
         },
