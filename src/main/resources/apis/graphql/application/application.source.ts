@@ -9,6 +9,7 @@ import {
 
 export type ApplicationSource = Application & {
   descriptor: ApplicationDescriptor | null;
+  schema?: boolean;
 };
 
 export function displayNameOf(source: ApplicationSource): string {

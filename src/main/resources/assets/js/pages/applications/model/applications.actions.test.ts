@@ -33,8 +33,9 @@ function application(
   state: ApplicationState,
   system = false,
   local = false,
+  schema = false,
 ): Application {
-  return { key, displayName: key, version: '1.0.0', state, system, local };
+  return { key, displayName: key, version: '1.0.0', state, system, local, schema };
 }
 
 const booster = application('com.enonic.app.booster', 'STARTED');
@@ -42,6 +43,7 @@ const fathom = application('com.enonic.app.fathom', 'STOPPED');
 const systemApp = application('com.enonic.xp.app.system', 'STARTED', true);
 const ownApp = application(OWN_APP, 'STARTED');
 const localApp = application('com.enonic.app.features', 'STARTED', false, true);
+const schemaApp = application('com.enonic.app.schema', 'STARTED', false, false, true);
 
 function context(overrides: Partial<ActionContext<Application>> = {}): ActionContext<Application> {
   return { selected: [], active: undefined, ...overrides };
@@ -117,6 +119,10 @@ describe('uninstall application', () => {
     expect(action('uninstall').enabled(context({ selected: [booster, systemApp] }))).toBe(false);
   });
 
+  it('accepts a schema application, the one lifecycle action XP allows on it', () => {
+    expect(action('uninstall').enabled(context({ selected: [schemaApp] }))).toBe(true);
+  });
+
   it('asks before uninstalling anything', () => {
     const ctx = context({ selected: [booster, fathom] });
 
@@ -148,6 +154,14 @@ describe('start application', () => {
 
     expect(startApplications).toHaveBeenCalledWith([fathom], notify);
   });
+
+  // XP refuses to start a schema application, whatever state it reports.
+  it('refuses a schema application', () => {
+    expect(action('start').enabled(context({ selected: [schemaApp] }))).toBe(false);
+    expect(action('start').enabled(context({ active: { ...schemaApp, state: 'STOPPED' } }))).toBe(
+      false,
+    );
+  });
 });
 
 describe('stop application', () => {
@@ -164,12 +178,15 @@ describe('stop application', () => {
     expect(action('stop').enabled(context({ selected: [fathom] }))).toBe(false);
   });
 
-  it('refuses a selection of nothing but platform and own applications', () => {
-    expect(action('stop').enabled(context({ selected: [systemApp, ownApp] }))).toBe(false);
+  it('refuses a selection of nothing but platform, schema and own applications', () => {
+    expect(action('stop').enabled(context({ selected: [systemApp, schemaApp, ownApp] }))).toBe(
+      false,
+    );
+    expect(action('stop').enabled(context({ active: schemaApp }))).toBe(false);
   });
 
-  it('leaves the platform application and this section out of a mixed selection', () => {
-    const ctx = context({ selected: [booster, fathom, systemApp, ownApp] });
+  it('leaves the platform, schema and own applications out of a mixed selection', () => {
+    const ctx = context({ selected: [booster, fathom, systemApp, schemaApp, ownApp] });
 
     expect(action('stop').enabled(ctx)).toBe(true);
     void action('stop').run(ctx);
