@@ -681,6 +681,12 @@ class BrowsePage extends SectionPage {
     return checked === 'true';
   }
 
+  // 'mixed' on the input while some of the rows that can be ticked are, not all of them.
+  async isSelectAllCheckboxIndeterminate() {
+    const checked = await this.getAttribute(this.css.selectAllCheckbox, 'aria-checked');
+    return checked === 'mixed';
+  }
+
   isSelectAllCheckboxDisplayed() {
     return this.isElementDisplayed(this.css.selectAllCheckboxLabel);
   }

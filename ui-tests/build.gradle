@@ -31,6 +31,10 @@ configurations {
     apps {
         transitive false
     }
+    // Jars the specs upload through the Install dialog, so never copied into home/deploy.
+    uploadApps {
+        transitive false
+    }
 }
 
 def unpackDir = layout.buildDirectory.dir( 'install' ).get()
@@ -39,6 +43,7 @@ def distroDir = unpackDir.dir( "enonic-xp-generic-$xpVersion" )
 def xpHome = distroDir.dir('home')
 def testConfDir = "$projectDir/test-config"
 def deployDir = distroDir.dir( 'home/deploy' )
+def uploadAppsDir = layout.buildDirectory.dir( 'upload-apps' ).get()
 def configDir = "$xpHome/config"
 
 
@@ -47,8 +52,8 @@ dependencies {
     apps 'com.enonic.uitest:auth0-idprovider:2.0.0-SNAPSHOT'
     apps 'com.enonic.uitest:adfs-idprovider:2.0.0-SNAPSHOT'
     apps 'com.enonic.uitest:simple-page:2.0.0-SNAPSHOT'
-    apps 'com.enonic.uitest:test-application:2.0.0-SNAPSHOT'
     apps 'com.enonic.uitest:myfirstapp:2.0.0-SNAPSHOT'
+    uploadApps 'com.enonic.uitest:test-application:2.0.0-SNAPSHOT'
 }
 
 tasks.register( 'unpackDistro', Copy ) {
@@ -87,6 +92,16 @@ tasks.register( 'downloadApps', Copy ) {
         println 'Downloaded artifacts:'
         configurations.apps.files.each { file -> println "- ${file.name}" }
     }
+}
+
+tasks.register( 'downloadUploadApps', Copy ) {
+    description = 'Downloads the apps the specs upload through the Install dialog'
+    group = 'Test Setup'
+
+    from {
+        configurations.uploadApps
+    }
+    into uploadAppsDir
 }
 
 tasks.register( 'deployApp', DefaultTask ) {
@@ -224,6 +239,7 @@ tasks.register( 'testApplicationsApp', PnpmTask ) {
     dependsOn tasks.named( 'unpackDistro' )
     dependsOn tasks.named( 'copyConfig' )
     dependsOn tasks.named( 'downloadApps' )
+    dependsOn tasks.named( 'downloadUploadApps' )
     dependsOn tasks.named( 'deployApp' )
     dependsOn tasks.named( 'startServer' )
     dependsOn tasks.named( 'waitForServer' )

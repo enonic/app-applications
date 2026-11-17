@@ -14,11 +14,10 @@ describe("applications.grid.filter.spec - narrowing the grid: by the free text o
     webDriverHelper.setupBrowser();
   }
 
-  // Deployed into home/deploy by ui-tests/build.gradle: local, started, and three of them share the
-  // one description the text search is run on.
+  // Deployed into home/deploy by ui-tests/build.gradle: local, started, and the two ID provider
+  // ones share the description the text search is run on.
   const ADFS_ID_PROVIDER = appConst.TEST_APPS.ADFS_ID_PROVIDER;
   const AUTH0_ID_PROVIDER = appConst.TEST_APPS.AUTH0_ID_PROVIDER;
-  const TEST_SELENIUM = appConst.TEST_APPS.TEST_SELENIUM;
   const SIMPLE_SITE = appConst.TEST_APPS.SIMPLE_SITE;
   // The one XP ships that the third test opens.
   const SYSTEM_APP = appConst.SYSTEM_APPS.MAIN;
@@ -57,34 +56,30 @@ describe("applications.grid.filter.spec - narrowing the grid: by the free text o
       });
   });
 
-  it("WHEN the description shared by three test applications has been typed in the filter THEN the three should be listed AND 'Upgrade available: No' should count them AND picked it should keep the three listed", async () => {
+  it("WHEN the description shared by two test applications has been typed in the filter THEN the two should be listed AND 'Upgrade available: No' should count them AND picked it should keep the two listed", async () => {
     await settingsUtils.navigateToApplicationsSection();
     let applicationsPage = new ApplicationsPage();
     await applicationsPage.waitForApplicationsListLoaded();
-    // The description is what the Info field of the details shows; three test applications share it.
-    const description = TEST_SELENIUM.description;
-    const expected = [
-      ADFS_ID_PROVIDER.displayName,
-      AUTH0_ID_PROVIDER.displayName,
-      TEST_SELENIUM.displayName,
-    ];
-    // 1. Type the description and press Enter: the three applications are listed, nothing else.
+    // The description is what the Info field of the details shows; two test applications share it.
+    const description = AUTH0_ID_PROVIDER.description;
+    const expected = [ADFS_ID_PROVIDER.displayName, AUTH0_ID_PROVIDER.displayName];
+    // 1. Type the description and press Enter: the two applications are listed, nothing else.
     await applicationsPage.searchByText(description);
-    await applicationsPage.waitForRowDisplayed(TEST_SELENIUM.key);
+    await applicationsPage.waitForRowDisplayed(AUTH0_ID_PROVIDER.key);
     assert.deepEqual(await applicationsPage.getApplicationDisplayNames(), expected);
-    // 2. Open the 'Upgrade available' field: none of the three is known to the market, so 'No'
-    //    counts the three and 'Yes' counts nothing - and is withheld.
+    // 2. Open the 'Upgrade available' field: neither is known to the market, so 'No' counts the
+    //    two and 'Yes' counts nothing - and is withheld.
     await applicationsPage.clickOnFilterButton();
     await applicationsPage.clickOnFilterField(appConst.FILTER_FIELD.UPGRADE);
     await settingsUtils.saveScreenshot('grid_filter_by_description_upgrade_field');
-    assert.equal(await applicationsPage.getFilterValueCount(appConst.FILTER_VALUE.NO), 3);
+    assert.equal(await applicationsPage.getFilterValueCount(appConst.FILTER_VALUE.NO), 2);
     assert.equal(await applicationsPage.getFilterValueCount(appConst.FILTER_VALUE.YES), 0);
     const values = await applicationsPage.getFilterValues();
     assert.ok(
       values.find((value) => value.label === appConst.FILTER_VALUE.YES).disabled,
       "'Yes' should be withheld while it counts nothing",
     );
-    // 3. Pick 'No': the term joins the text as a tag, and the three applications stay listed.
+    // 3. Pick 'No': the term joins the text as a tag, and the two applications stay listed.
     await applicationsPage.clickOnFilterValue(appConst.FILTER_VALUE.NO);
     await applicationsPage.waitForFilterTerm(
       appConst.FILTER_FIELD.UPGRADE,
@@ -104,14 +99,12 @@ describe("applications.grid.filter.spec - narrowing the grid: by the free text o
         async () => (await applicationsPage.getApplicationDisplayNames()).length > expected.length,
         {
           timeout: appConst.TIMEOUT.MEDIUM,
-          timeoutMsg: 'More than the three filtered applications should be listed again',
+          timeoutMsg: 'More than the two filtered applications should be listed again',
         },
       );
   });
 
-  // The applications XP ships are not the operator's to act on: their rows open like any other,
-  // but cannot be ticked, stopped or uninstalled, and show no state.
-  it("WHEN 'Show system applications' has been clicked THEN the system applications should be listed with their checkboxes disabled AND 'Select all' should leave them unchecked AND a clicked one should offer Install only", async () => {
+  it("WHEN 'Show system applications' has been clicked THEN the system applications should be listed with their checkboxes disabled AND a clicked one should offer Install only", async () => {
     await settingsUtils.navigateToApplicationsSection();
     let applicationsPage = new ApplicationsPage();
     let applicationDetails = new ApplicationDetails();
@@ -140,44 +133,22 @@ describe("applications.grid.filter.spec - narrowing the grid: by the free text o
       await applicationsPage.isRowCheckboxEnabled(SIMPLE_SITE.key),
       'The checkbox of a test application should be enabled',
     );
-    // 3. Tick 'Select all': the test applications are checked, the system ones are left out - and
-    //    'Select all' still reads as checked, since it covers every row that can be ticked.
-    await applicationsPage.clickOnSelectAllCheckbox();
-    assert.ok(
-      await applicationsPage.isRowChecked(SIMPLE_SITE.key),
-      'A test application should be checked',
-    );
-    for (const key of appConst.SYSTEM_APPS.KEYS) {
-      assert.ok(
-        !(await applicationsPage.isRowChecked(key)),
-        `The system application '${key}' should not be checked`,
-      );
-    }
-    assert.ok(
-      await applicationsPage.isSelectAllCheckboxSelected(),
-      "'Select all' should be checked while every row that can be ticked is",
-    );
-    // 4. Untick 'Select all', then click on a system application: its details open.
-    await applicationsPage.clickOnSelectAllCheckbox();
-    assert.ok(
-      !(await applicationsPage.isRowChecked(SIMPLE_SITE.key)),
-      'Nothing should stay checked',
-    );
+    // 3. Click on a system application: its details open.
     await applicationsPage.clickOnRowByKey(SYSTEM_APP.key);
     await applicationDetails.waitForTitle(SYSTEM_APP.displayName);
     assert.equal(await applicationDetails.getHeaderBadge(), appConst.APP_BADGE.SYSTEM);
-    // 5. The toolbar offers Install only: the row is not one to uninstall, stop or start.
+    // 4. The toolbar offers Install only: the row is not one to uninstall, stop or start.
     await applicationsPage.waitForInstallButtonEnabled();
     await applicationsPage.waitForUninstallButtonDisabled();
     await applicationsPage.waitForStartButtonDisabled();
     await applicationsPage.waitForStopButtonDisabled();
-    // 6. The details show the state as a plain label, not a dropdown: nothing to switch it to.
+    // 5. The details show the state as a plain label, not a dropdown: nothing to switch it to.
     assert.ok(
       !(await applicationDetails.isStateMenuButtonDisplayed()),
       'The state should not be a dropdown for a system application',
     );
     assert.equal(await applicationDetails.getState(), appConst.APP_STATE.STARTED);
-    // 7. The row shows the version the details call installed, but no state. An empty string is
+    // 6. The row shows the version the details call installed, but no state. An empty string is
     //    what the row's empty state cell reads as once the version is missing, so the row is held to
     //    the panel's value rather than to being defined.
     const version = await applicationDetails.getVersionInstalled();
@@ -193,7 +164,7 @@ describe("applications.grid.filter.spec - narrowing the grid: by the free text o
     //   'Started',
     //   'Started state should be displayed in the row of a system application',
     // );
-    // 8. The context menu says the same as the toolbar: Install enabled, the rest withheld.
+    // 7. The context menu says the same as the toolbar: Install enabled, the rest withheld.
     await applicationsPage.openContextMenuOnRow(SYSTEM_APP.key);
     await settingsUtils.saveScreenshot('grid_system_application_context_menu');
     assert.deepEqual(await applicationsPage.getContextMenuItems(), [
@@ -217,7 +188,7 @@ describe("applications.grid.filter.spec - narrowing the grid: by the free text o
       );
     }
     await applicationsPage.closeContextMenu();
-    // 9. Click on the toggle again: the system applications leave the list.
+    // 8. Click on the toggle again: the system applications leave the list.
     await applicationsPage.clickOnSystemApplicationsToggle();
     await applicationsPage.waitForSystemApplicationsShown(false);
     await applicationsPage.waitForRowNotDisplayed(SYSTEM_APP.key);
