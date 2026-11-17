@@ -27,9 +27,10 @@ describe("applications.install.upload.spec - the 'Upload' tab of the 'Install ap
   // ! application on the XP, so a failed upload fails each of them too - read the first failure.
   const APP = appConst.TEST_APPS.TEST_SELENIUM;
   const JAR = path.join(__dirname, '..', 'build', 'upload-apps', APP.jarName);
-  // Set by `before` when the application was on the XP already: Mocha runs `after` even when
-  // `before` throws, and `after` must not uninstall what this run did not install.
-  let foundInstalled = false;
+  // Set once this run has uploaded the jar: Mocha runs `after` even when `before` throws, and
+  // `after` must uninstall only what this run installed - never an application that was on the XP
+  // already, whether `before` found it or failed before it could look.
+  let uploaded = false;
 
   it("GIVEN 'Install applications' dialog is opened WHEN the 'Upload' tab has been clicked THEN the drop zone should be shown in place of the market list", async () => {
     await settingsUtils.navigateToApplicationsSection();
@@ -67,6 +68,7 @@ describe("applications.install.upload.spec - the 'Upload' tab of the 'Install ap
     await installAppDialog.clickOnTab(appConst.INSTALL_DIALOG.TAB.UPLOAD);
     // 2. Upload the jar: the dialog closes on its own, the browse list is where the upload shows.
     await installAppDialog.uploadJar(JAR);
+    uploaded = true;
     // 3. The toast says the application was installed.
     await applicationsPage.waitForExpectedNotificationMessage(
       appConst.applicationInstalledMessage(APP.displayName),
@@ -173,10 +175,10 @@ describe("applications.install.upload.spec - the 'Upload' tab of the 'Install ap
   });
 
   // Leaves the XP as it was found: the application is uninstalled through the section itself
-  // whenever a failure left its row there, so the spec can run again. An application `before` found
-  // installed is not this run's and is left alone.
+  // whenever a failure left its row there, so the spec can run again. An application this run did
+  // not upload is not its to uninstall and is left alone.
   after(async () => {
-    if (foundInstalled) {
+    if (!uploaded) {
       return;
     }
     let applicationsPage = new ApplicationsPage();
@@ -214,7 +216,6 @@ describe("applications.install.upload.spec - the 'Upload' tab of the 'Install ap
     let applicationsPage = new ApplicationsPage();
     await applicationsPage.waitForApplicationsListLoaded();
     if (await applicationsPage.isRowDisplayed(APP.key)) {
-      foundInstalled = true;
       throw new Error(
         `'${APP.displayName}' is installed on this XP already: uninstall it before running the suite`,
       );

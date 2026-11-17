@@ -269,7 +269,10 @@ describe("applications.grid.select.all.checkbox.spec - 'Select all': the toolbar
   beforeEach(async () => {
     await settingsUtils.navigateToSettingsApp();
   });
+  // Every application is left 'Started' whatever the test did: a failure between Stop and Start
+  // over the whole selection must not reach the next test, nor the specs that run after this one.
   afterEach(async () => {
+    await settingsUtils.ensureApplicationsStarted();
     return await settingsUtils.doCloseAllWindowTabsAndNavigateToHome();
   });
   before(async () => {
@@ -278,6 +281,9 @@ describe("applications.grid.select.all.checkbox.spec - 'Select all': the toolbar
         .getBrowser()
         .setWindowSize(appConst.BROWSER_WIDTH, appConst.BROWSER_HEIGHT);
     }
+    // A run that was cut off may have left applications stopped: start them before the first test.
+    await settingsUtils.ensureApplicationsStarted();
+    await settingsUtils.doCloseAllWindowTabsAndNavigateToHome();
     return console.log('specification starting: ' + this.title);
   });
 });
