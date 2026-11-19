@@ -1,6 +1,12 @@
 [versions]
 enonic-defaults = "2.1.7"
 node-gradle = "7.1.0"
+junit = "6.1.3"
+
+[libraries]
+junit-bom = { module = "org.junit:junit-bom", version.ref = "junit" }
+junit-jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit" }
+junit-launcher = { module = "org.junit.platform:junit-platform-launcher" }
 
 [plugins]
 enonic-defaults = { id = "com.enonic.defaults", version.ref = "enonic-defaults" }

@@ -49,5 +49,6 @@ lib-graphql, `get /_static/*` to the assets, everything else 404.
   work around with a second endpoint.
 - Roots stay nullable, and no handler re-checks the role — the platform's gates and the descriptor's
   `allow` already ran.
-- A bean is the last resort, for data no XP JS lib exposes: handler in `src/main/java`, a `lib/*.ts`
-  wrapper over `__.newBean`, a double in `src/test/mocks/`, and an alias in `vite.config.ts`.
+- A bean is the last resort, for data or a capability no XP JS lib exposes: handler in
+  `src/main/java`, a `lib/*.ts` wrapper over `__.newBean`, a double in `src/test/mocks/`, and an
+  alias in `vite.config.ts`.
