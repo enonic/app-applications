@@ -6,10 +6,10 @@ paths:
 
 # Testing
 
-Mirrors app-settings' `testing.md`. One difference: **the script beans have no Java harness here** —
-no `src/test/java`, no golden fixtures, no JUnit in `build.gradle`. Adding one mirrors app-settings
-(`ScriptTestSupport` + `t.assertJsonEquals` fixtures, `dependsOn pnpmPack`) and is its own task, not a
-line in a feature PR.
+Mirrors app-settings' `testing.md`. One difference: **the script beans have no script harness here** —
+no `ScriptTestSupport`, no golden fixtures. Adding one mirrors app-settings (`ScriptTestSupport` +
+`t.assertJsonEquals` fixtures, `dependsOn pnpmPack`) and is its own task, not a line in a feature PR.
+A bean that needs no XP service gets plain JUnit in `src/test/java` instead, e.g, `CountAliasesHandlerTest`. `./gradlew test` runs it; `pnpm check` does not.
 
 - Vitest through `vp test`, config in the `test` block of `vite.config.ts`. Tests sit next to their
   subject. Client and server code are covered by the same run.

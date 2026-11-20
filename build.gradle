@@ -31,6 +31,8 @@ dependencies {
     implementation xplibs.api.portal
     implementation xplibs.api.script
     implementation xplibs.api.admin // AdminToolDescriptorService, AdminExtensionDescriptorService
+    // graphql-java for CountAliasesHandler: runtime-only in lib-graphql, so compile against what ships.
+    compileOnly files(configurations.include)
 
     include xplibs.admin
     include xplibs.portal
@@ -42,6 +44,19 @@ dependencies {
     include xplibs.vhost
     include 'com.enonic.lib:lib-graphql:3.0.0'
     include 'com.enonic.lib:lib-http-client:4.0.1' // the market lookup — no XP lib makes outbound calls
+
+    testImplementation platform(libs.junit.bom)
+    testImplementation libs.junit.jupiter
+    testRuntimeOnly libs.junit.launcher
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
+
+// pnpmBuild and pnpmPack write into build/resources/main, which the test classpath reads.
+tasks.matching { it.name in ['compileTestJava', 'test'] }.configureEach {
+    mustRunAfter 'pnpmBuild', 'pnpmPack'
 }
 
 repositories {
