@@ -76,7 +76,6 @@ export default defineConfig(({ mode }) => {
       '/lib/admin-tool': join(import.meta.dirname, 'src/test/mocks/lib-admin-tool.ts'),
       '/lib/api': join(import.meta.dirname, 'src/test/mocks/lib-api.ts'),
       '/lib/application': join(import.meta.dirname, 'src/test/mocks/lib-application.ts'),
-      '/lib/icon': join(import.meta.dirname, 'src/test/mocks/lib-icon.ts'),
       '/lib/idprovider': join(import.meta.dirname, 'src/test/mocks/lib-idprovider.ts'),
       '/lib/macro': join(import.meta.dirname, 'src/test/mocks/lib-macro.ts'),
       '/lib/task': join(import.meta.dirname, 'src/test/mocks/lib-task.ts'),

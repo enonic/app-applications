@@ -5,7 +5,7 @@ import { i18n } from '../../../shared/i18n';
 import { IconBadge } from '../../../shared/ui/IconBadge';
 
 export type ApplicationIconProps = {
-  /** The `data:` uri the schema resolves from the descriptor, or a market entry's remote `iconUrl`. */
+  /** The url core serves an installed application's icon at, or a market entry's remote `iconUrl`. */
   icon?: string;
   /** `sm` for a list row, `lg` for the details header. */
   size?: 'sm' | 'lg';
@@ -22,8 +22,8 @@ const PIXELS = { sm: 24, lg: 48 } as const;
 
 /** An application's own icon where it has one, a generic package glyph where it does not. */
 export function ApplicationIcon({ icon, size = 'sm', system, local }: ApplicationIconProps) {
-  // ! The failing url rather than a flag: a `data:` uri cannot fail, but a market icon is fetched
-  // ! from another host and may 404, and the same element is reused as rows are filtered in and out.
+  // ! The failing url rather than a flag: either icon is fetched and may 404, and the same element is
+  // ! reused as rows are filtered in and out.
   const [failedIcon, setFailedIcon] = useState<string>();
 
   const glyph =
