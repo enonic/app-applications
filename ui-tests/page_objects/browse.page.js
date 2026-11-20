@@ -676,6 +676,22 @@ class BrowsePage extends SectionPage {
     }
   }
 
+  // Toggles the checkbox from the keyboard, with the focus the click left on it, and waits for the
+  // state to change as the click helper does: the re-render may land after the key does.
+  async pressSpaceOnSelectAllCheckbox() {
+    try {
+      const before = await this.getAttribute(this.css.selectAllCheckbox, 'aria-checked');
+      await this.keys('Space');
+      return await this.waitForAttributeChanged(this.css.selectAllCheckbox, 'aria-checked', before);
+    } catch (err) {
+      await this.handleError(
+        `${this.pageName} - Space on the Select all checkbox`,
+        'err_select_all_space',
+        err,
+      );
+    }
+  }
+
   async isSelectAllCheckboxSelected() {
     const checked = await this.getAttribute(this.css.selectAllCheckbox, 'aria-checked');
     return checked === 'true';

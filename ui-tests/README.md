@@ -23,8 +23,9 @@ Mocha against a real XP with the app deployed, Chrome driven over WebDriver Clas
   toast, the row with no badge, the details and the toolbar offering Uninstall — then Select all
   withholding Uninstall while a local application is ticked, and the uninstall of the application at
   the end. The tests after the upload share it and run in order.
-- `specs/applications.grid.filter.spec.js` and `specs/applications.grid.select.all.checkbox.spec.js`
-  — the filter input and the fields, the system applications toggle, and 'Select all': what it
+- `specs/applications.grid.filter.spec.js`, `specs/applications.grid.sort.spec.js` and
+  `specs/applications.grid.select.all.checkbox.spec.js` — the filter input and the fields, the system
+  applications toggle, the sort order with the system applications shown, and 'Select all': what it
   ticks, the toolbar it enables, the row it puts on show, the Space key, and Stop and Start over the
   whole selection.
 

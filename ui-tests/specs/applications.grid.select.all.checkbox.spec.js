@@ -16,11 +16,19 @@ describe("applications.grid.select.all.checkbox.spec - 'Select all': the toolbar
 
   // Deployed into home/deploy by ui-tests/build.gradle: local, started, and the operator's to tick.
   const SIMPLE_SITE = appConst.TEST_APPS.SIMPLE_SITE;
-  // The last test application in the list order (display name A–Z, the default), so the row
-  // 'Select all' ticks last: the one the details column shows.
-  const LAST_APP = appConst.TEST_APPS.AUTH0_ID_PROVIDER;
+  const MY_FIRST_APP = appConst.TEST_APPS.MY_FIRST_APP;
   // The one XP ships that the test waits for.
   const SYSTEM_APP = appConst.SYSTEM_APPS.MAIN;
+
+  // The row the details column shows once 'Select all' is ticked: the browse framework puts the row
+  // ticked last on show (Content Studio's currentItem - shownRowKey in widgets/browse-list), and
+  // 'Select all' ticks the rows in list order, so that is the last row listed. Read off the list
+  // rather than pinned to an application: which row is last depends on what the XP has installed.
+  async function lastListedApplication(applicationsPage) {
+    const names = await applicationsPage.getApplicationDisplayNames();
+    const displayName = names[names.length - 1];
+    return { displayName, key: await applicationsPage.getApplicationKeyByDisplayName(displayName) };
+  }
 
   // Uninstall needs every selected row to be uninstallable, and a local application is not; Stop
   // needs one started row; Install is on offer whatever is selected.
@@ -40,8 +48,8 @@ describe("applications.grid.select.all.checkbox.spec - 'Select all': the toolbar
       await applicationsPage.isRowChecked(SIMPLE_SITE.key),
       'A test application should be checked',
     );
-    // 2. The toolbar: Install and Stop are enabled, Uninstall is not - a local application is in
-    //    the selection.
+    // 2. The toolbar: Stop is enabled, Uninstall is not - a local application is in the selection.
+    //    Install is on offer whatever the selection; it is checked only to pin that rule.
     await applicationsPage.waitForInstallButtonEnabled();
     await applicationsPage.waitForStopButtonEnabled();
     await applicationsPage.waitForUninstallButtonDisabled();
@@ -53,10 +61,11 @@ describe("applications.grid.select.all.checkbox.spec - 'Select all': the toolbar
     let applicationDetails = new ApplicationDetails();
     await applicationsPage.waitForApplicationsListLoaded();
     await applicationsPage.waitForRowDisplayed(SIMPLE_SITE.key);
+    const lastApp = await lastListedApplication(applicationsPage);
     // 1. Tick 'Select all': the details column shows the row ticked last. The row is not the active
     //    one - that is the keyboard's cursor, which the header's checkbox does not move.
     await applicationsPage.clickOnSelectAllCheckbox();
-    await applicationDetails.waitForTitle(LAST_APP.displayName);
+    await applicationDetails.waitForTitle(lastApp.displayName);
     // 2. Untick one row: it is the only one left out.
     await applicationsPage.clickOnCheckboxByKey(SIMPLE_SITE.key);
     await settingsUtils.saveScreenshot('grid_select_all_one_unticked');
@@ -65,7 +74,7 @@ describe("applications.grid.select.all.checkbox.spec - 'Select all': the toolbar
       'The unticked row should not be checked',
     );
     assert.ok(
-      await applicationsPage.isRowChecked(LAST_APP.key),
+      await applicationsPage.isRowChecked(lastApp.key),
       'The other rows should stay checked',
     );
     // 3. 'Select all' is neither checked nor unchecked while only some of the rows are.
@@ -77,9 +86,8 @@ describe("applications.grid.select.all.checkbox.spec - 'Select all': the toolbar
       !(await applicationsPage.isSelectAllCheckboxSelected()),
       "'Select all' should not read as checked",
     );
-    // 4. The details stay on the row ticked last: a local application, started, with its key and
-    //    info in the Details section.
-    assert.equal(await applicationDetails.getTitle(), LAST_APP.displayName);
+    // 4. The details stay on the row ticked last: a local application, started.
+    assert.equal(await applicationDetails.getTitle(), lastApp.displayName);
     assert.equal(await applicationDetails.getHeaderBadge(), appConst.APP_BADGE.LOCAL);
     assert.equal(await applicationDetails.getState(), appConst.APP_STATE.STARTED);
   });
@@ -104,7 +112,8 @@ describe("applications.grid.select.all.checkbox.spec - 'Select all': the toolbar
       );
     }
     // 3. The selection is as it was: the test applications are checked, 'Select all' still reads
-    //    as checked, and the toolbar has not moved.
+    //    as checked, and the toolbar has not moved (Install is checked only to pin that it never
+    //    depends on the selection).
     assert.ok(
       await applicationsPage.isRowChecked(SIMPLE_SITE.key),
       'A test application should stay checked',
@@ -143,7 +152,7 @@ describe("applications.grid.select.all.checkbox.spec - 'Select all': the toolbar
       'A test application should be checked',
     );
     // 2. Press Space: the focused checkbox is toggled, the selection is emptied.
-    await applicationsPage.keys('Space');
+    await applicationsPage.pressSpaceOnSelectAllCheckbox();
     await settingsUtils.saveScreenshot('grid_select_all_space_key');
     assert.ok(
       !(await applicationsPage.isSelectAllCheckboxSelected()),
@@ -158,22 +167,24 @@ describe("applications.grid.select.all.checkbox.spec - 'Select all': the toolbar
       'Nothing should stay checked',
     );
     assert.ok(
-      !(await applicationsPage.isRowChecked(LAST_APP.key)),
-      'The row ticked last should not stay checked either',
+      !(await applicationsPage.isRowChecked(MY_FIRST_APP.key)),
+      'No other row should stay checked either',
     );
   });
 
   // Stop and Start act on every selected row they can: Stop on the started ones, Start on the
-  // stopped ones. The applications are started again at the end, so they are left as found.
+  // stopped ones. The applications are started again at the end, so they are left as found - and
+  // by `after` whatever happens in between.
   it("GIVEN 'Select all' has been ticked WHEN 'Stop' has been clicked THEN every application should read 'Stopped' AND Stop should be disabled, AND once 'Start' has been clicked Stop should be enabled AND Start disabled again", async () => {
     await settingsUtils.navigateToApplicationsSection();
     let applicationsPage = new ApplicationsPage();
     let applicationDetails = new ApplicationDetails();
     await applicationsPage.waitForApplicationsListLoaded();
     await applicationsPage.waitForRowDisplayed(SIMPLE_SITE.key);
+    const lastApp = await lastListedApplication(applicationsPage);
     // 1. Tick 'Select all': the details show the row ticked last, started, and Stop is enabled.
     await applicationsPage.clickOnSelectAllCheckbox();
-    await applicationDetails.waitForTitle(LAST_APP.displayName);
+    await applicationDetails.waitForTitle(lastApp.displayName);
     await applicationDetails.waitForState(appConst.APP_STATE.STARTED);
     await applicationsPage.waitForStopButtonEnabled();
     await applicationsPage.waitForStartButtonDisabled();
@@ -182,7 +193,7 @@ describe("applications.grid.select.all.checkbox.spec - 'Select all': the toolbar
     await applicationsPage.clickOnStopButton();
     await applicationDetails.waitForState(appConst.APP_STATE.STOPPED, appConst.TIMEOUT.LONG);
     await applicationsPage.waitForApplicationState(
-      LAST_APP.key,
+      MY_FIRST_APP.key,
       appConst.APP_STATE.STOPPED,
       appConst.TIMEOUT.LONG,
     );
@@ -198,14 +209,14 @@ describe("applications.grid.select.all.checkbox.spec - 'Select all': the toolbar
       await applicationsPage.isSelectAllCheckboxSelected(),
       "'Select all' should stay checked across the stop",
     );
-    assert.equal(await applicationDetails.getTitle(), LAST_APP.displayName);
-    assert.equal(await applicationDetails.getKey(), LAST_APP.key);
+    assert.equal(await applicationDetails.getTitle(), lastApp.displayName);
+    assert.equal(await applicationDetails.getKey(), lastApp.key);
     // 3. Click on 'Start': every selected application is started again, and the toolbar is back
     //    to Stop enabled, Start disabled.
     await applicationsPage.clickOnStartButton();
     await applicationDetails.waitForState(appConst.APP_STATE.STARTED, appConst.TIMEOUT.LONG);
     await applicationsPage.waitForApplicationState(
-      LAST_APP.key,
+      MY_FIRST_APP.key,
       appConst.APP_STATE.STARTED,
       appConst.TIMEOUT.LONG,
     );
@@ -224,7 +235,9 @@ describe("applications.grid.select.all.checkbox.spec - 'Select all': the toolbar
   });
 
   // The applications XP ships are not the operator's to act on: 'Select all' covers every row that
-  // can be ticked and leaves them out.
+  // can be ticked and leaves them out. The toggle comes before the tick here, the other way round
+  // from the test above: 'Select all' is computed over a list that already holds rows it cannot
+  // tick, rather than keeping a selection made before they were listed.
   it("WHEN 'Show system applications' has been clicked AND 'Select all' has been ticked THEN the test applications should be checked AND the system ones should be left unchecked", async () => {
     await settingsUtils.navigateToApplicationsSection();
     let applicationsPage = new ApplicationsPage();
@@ -269,9 +282,14 @@ describe("applications.grid.select.all.checkbox.spec - 'Select all': the toolbar
   beforeEach(async () => {
     await settingsUtils.navigateToSettingsApp();
   });
-  // Every application is left 'Started' whatever the test did: a failure between Stop and Start
-  // over the whole selection must not reach the next test, nor the specs that run after this one.
   afterEach(async () => {
+    return await settingsUtils.doCloseAllWindowTabsAndNavigateToHome();
+  });
+  // Every application is left 'Started' whatever the Stop/Start test did: a failure between Stop
+  // and Start must not reach the specs that run after this one, nor a rerun. Once per spec rather
+  // than after every test: only that test stops anything, and a failing `afterEach` would skip
+  // the tests left in the spec.
+  after(async () => {
     await settingsUtils.ensureApplicationsStarted();
     return await settingsUtils.doCloseAllWindowTabsAndNavigateToHome();
   });
