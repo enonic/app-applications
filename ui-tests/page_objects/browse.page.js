@@ -264,6 +264,15 @@ class BrowsePage extends SectionPage {
     }
   }
 
+  // Types the text and presses Enter: the text becomes a tag and the list is narrowed to what
+  // matches it word by word. The dropdown that opened on the input is dismissed afterwards.
+  async searchByText(text) {
+    await this.typeTextInSearchInput(text);
+    await this.pressEnterKey();
+    await this.waitForFilterTerm(undefined, text);
+    return await this.closeFilterPopup();
+  }
+
   async clearSearchInput() {
     try {
       await this.clearInputText(this.css.searchInput);
@@ -667,9 +676,31 @@ class BrowsePage extends SectionPage {
     }
   }
 
+  // Toggles the checkbox from the keyboard, with the focus the click left on it, and waits for the
+  // state to change as the click helper does: the re-render may land after the key does.
+  async pressSpaceOnSelectAllCheckbox() {
+    try {
+      const before = await this.getAttribute(this.css.selectAllCheckbox, 'aria-checked');
+      await this.keys('Space');
+      return await this.waitForAttributeChanged(this.css.selectAllCheckbox, 'aria-checked', before);
+    } catch (err) {
+      await this.handleError(
+        `${this.pageName} - Space on the Select all checkbox`,
+        'err_select_all_space',
+        err,
+      );
+    }
+  }
+
   async isSelectAllCheckboxSelected() {
     const checked = await this.getAttribute(this.css.selectAllCheckbox, 'aria-checked');
     return checked === 'true';
+  }
+
+  // 'mixed' on the input while some of the rows that can be ticked are, not all of them.
+  async isSelectAllCheckboxIndeterminate() {
+    const checked = await this.getAttribute(this.css.selectAllCheckbox, 'aria-checked');
+    return checked === 'mixed';
   }
 
   isSelectAllCheckboxDisplayed() {
@@ -845,6 +876,12 @@ class BrowsePage extends SectionPage {
   async isRowChecked(key) {
     const checked = await this.getAttribute(this.css.rowCheckbox(key), 'aria-checked');
     return checked === 'true';
+  }
+
+  // A row that is not the operator's to act on keeps its checkbox, greyed: 'disabled' on the input.
+  async isRowCheckboxEnabled(key) {
+    await this.waitForRowDisplayed(key);
+    return await this.isElementEnabled(this.css.rowCheckbox(key));
   }
 
   // The row the user clicked on (aria-selected), not a ticked checkbox.

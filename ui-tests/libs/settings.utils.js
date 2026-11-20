@@ -246,6 +246,23 @@ module.exports = {
       appConst.TIMEOUT.LONG,
     );
   },
+  // Returns every application the specs may have stopped to 'Started', through 'Select all' and
+  // Start: a spec that stops the whole selection cannot name the rows, and a failed test may have
+  // left any of them stopped. Starts from the home page, like ensureApplicationStarted.
+  async ensureApplicationsStarted() {
+    await this.doCloseAllWindowTabsAndNavigateToHome();
+    await this.navigateToSettingsApp();
+    await this.navigateToApplicationsSection();
+    let applicationsPage = new ApplicationsPage();
+    await applicationsPage.waitForApplicationsListLoaded();
+    await applicationsPage.clickOnSelectAllCheckbox();
+    // Start is enabled only while a selected application is stopped.
+    if (await applicationsPage.isStartButtonEnabled()) {
+      await applicationsPage.clickOnStartButton();
+      await applicationsPage.waitForStartButtonDisabled(appConst.TIMEOUT.LONG);
+    }
+    await applicationsPage.clickOnSelectAllCheckbox();
+  },
   // The section's screen renders inside a shadow root, where Chrome cannot evaluate XPath
   // ("#document-fragment is not a valid context node type"), so it is located with CSS through
   // webdriverio's deep selector from the section's shadow host - the same way SectionPage scopes

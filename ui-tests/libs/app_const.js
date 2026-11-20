@@ -164,8 +164,13 @@ module.exports = Object.freeze({
       pages: ['country-list', 'country-region', 'first-page'],
       parts: ['city-creation', 'city-list', 'country'],
     },
+    // Not deployed: downloaded into ui-tests/build/upload-apps by `:ui-tests:downloadUploadApps` and
+    // uploaded through the Install dialog by applications.install.upload.spec, which uninstalls it
+    // again. Neither local nor system once installed that way: a row with no badge, uninstallable.
     TEST_SELENIUM: {
       key: 'com.enonic.uitest.test_application',
+      // The file in ui-tests/build/upload-apps, named by the artifact and its version.
+      jarName: 'test-application-2.0.0-SNAPSHOT.jar',
       displayName: 'Test Selenium App',
       description: 'Test application for ui-testing',
       contentTypes: ['article', 'checkbox'],
@@ -178,10 +183,16 @@ module.exports = Object.freeze({
     ADFS_ID_PROVIDER: {
       key: 'com.enonic.uitest.adfs_idprovider',
       displayName: 'Test ADFS ID Provider',
+      description: 'Test application for ui-testing',
     },
     AUTH0_ID_PROVIDER: {
       key: 'com.enonic.uitest.auth0_idprovider',
       displayName: 'Test Auth0 ID Provider',
+      description: 'Test application for ui-testing',
+      contentTypes: ['article', 'checkbox'],
+      formFragments: ['meta-data'],
+      // The mode of its ID provider descriptor, shown in the 'ID provider applications' section.
+      idProviderMode: 'MIXED',
     },
   },
   // Applications the specs install from Enonic Market, so the XP has to reach it. The latest version

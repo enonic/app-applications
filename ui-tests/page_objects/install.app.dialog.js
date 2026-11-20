@@ -24,6 +24,8 @@ const CSS = {
   tabs: `${DIALOG} [data-component='Tab.Trigger'][role='tab']`,
   activeTab: `${DIALOG} [data-component='Tab.Trigger'][role='tab'][aria-selected='true']`,
   dropZone: `${DIALOG} [data-component='DropZone']`,
+  // The drop zone's own file input, visually hidden: a local path set on it uploads the jar.
+  fileInput: `${DIALOG} [data-component='DropZone'] input[type='file']`,
   // Filter (the same markup as the browse screen's, see browse.page.js)
   filterInput: FILTER,
   filterButton: `${FILTER} button[aria-label='Filter']`,
@@ -156,6 +158,23 @@ class InstallAppDialog extends SectionPage {
 
   isDropZoneDisplayed() {
     return this.isElementDisplayed(this.css.dropZone);
+  }
+
+  // Uploads the jar at the local path through the drop zone's file input: the dialog closes as
+  // soon as the jar is accepted, and the upload shows as a row above the list.
+  async uploadJar(filePath) {
+    try {
+      await this.waitForElementDisplayed(this.css.dropZone);
+      const input = await this.findElement(this.css.fileInput);
+      await input.addValue(filePath);
+      return await this.waitForDialogClosed();
+    } catch (err) {
+      await this.handleError(
+        `${this.dialogName} - error after uploading '${filePath}'`,
+        'err_install_upload',
+        err,
+      );
+    }
   }
 
   // Search (the free text of the filter input)
