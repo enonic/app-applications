@@ -22,11 +22,12 @@ describe("applications.grid.select.all.checkbox.spec - 'Select all': the toolbar
 
   // The row the details column shows once 'Select all' is ticked: the browse framework puts the row
   // ticked last on show (Content Studio's currentItem - shownRowKey in widgets/browse-list), and
-  // 'Select all' ticks the rows in list order, so that is the last row listed. Read off the list
-  // rather than pinned to an application: which row is last depends on what the XP has installed.
-  async function lastListedApplication(applicationsPage) {
+  // 'Select all' ticks the rows in list order, so that is the last row listed - and the one before
+  // it once the last is unticked. Read off the list rather than pinned to an application: which
+  // row is last depends on what the XP has installed. `fromEnd` 0 is the last row, 1 the one before.
+  async function listedFromEnd(applicationsPage, fromEnd = 0) {
     const names = await applicationsPage.getApplicationDisplayNames();
-    const displayName = names[names.length - 1];
+    const displayName = names[names.length - 1 - fromEnd];
     return { displayName, key: await applicationsPage.getApplicationKeyByDisplayName(displayName) };
   }
 
@@ -55,26 +56,34 @@ describe("applications.grid.select.all.checkbox.spec - 'Select all': the toolbar
     await applicationsPage.waitForUninstallButtonDisabled();
   });
 
-  it("GIVEN 'Select all' has been ticked WHEN one application has been unticked THEN 'Select all' should be indeterminate AND the details should keep showing the row ticked last", async () => {
+  it("GIVEN 'Select all' has been ticked WHEN the row on show has been unticked THEN 'Select all' should be indeterminate AND the details should move to the row ticked before it", async () => {
     await settingsUtils.navigateToApplicationsSection();
     let applicationsPage = new ApplicationsPage();
     let applicationDetails = new ApplicationDetails();
     await applicationsPage.waitForApplicationsListLoaded();
     await applicationsPage.waitForRowDisplayed(SIMPLE_SITE.key);
-    const lastApp = await lastListedApplication(applicationsPage);
+    const lastApp = await listedFromEnd(applicationsPage);
+    const beforeLastApp = await listedFromEnd(applicationsPage, 1);
     // 1. Tick 'Select all': the details column shows the row ticked last. The row is not the active
     //    one - that is the keyboard's cursor, which the header's checkbox does not move.
     await applicationsPage.clickOnSelectAllCheckbox();
     await applicationDetails.waitForTitle(lastApp.displayName);
-    // 2. Untick one row: it is the only one left out.
-    await applicationsPage.clickOnCheckboxByKey(SIMPLE_SITE.key);
-    await settingsUtils.saveScreenshot('grid_select_all_one_unticked');
+    // 2. Untick the row on show: it is the only one left out, and the details move to the row
+    //    ticked before it - the rule is that the row ticked last is on show, so unticking the one
+    //    on show has to move them.
+    await applicationsPage.clickOnCheckboxByKey(lastApp.key);
+    await applicationDetails.waitForTitle(beforeLastApp.displayName);
+    await settingsUtils.saveScreenshot('grid_select_all_last_unticked');
     assert.ok(
-      !(await applicationsPage.isRowChecked(SIMPLE_SITE.key)),
+      !(await applicationsPage.isRowChecked(lastApp.key)),
       'The unticked row should not be checked',
     );
     assert.ok(
-      await applicationsPage.isRowChecked(lastApp.key),
+      await applicationsPage.isRowChecked(beforeLastApp.key),
+      'The row before it should stay checked',
+    );
+    assert.ok(
+      await applicationsPage.isRowChecked(SIMPLE_SITE.key),
       'The other rows should stay checked',
     );
     // 3. 'Select all' is neither checked nor unchecked while only some of the rows are.
@@ -86,8 +95,7 @@ describe("applications.grid.select.all.checkbox.spec - 'Select all': the toolbar
       !(await applicationsPage.isSelectAllCheckboxSelected()),
       "'Select all' should not read as checked",
     );
-    // 4. The details stay on the row ticked last: a local application, started.
-    assert.equal(await applicationDetails.getTitle(), lastApp.displayName);
+    // 4. The details are the row ticked before the unticked one: a local application, started.
     assert.equal(await applicationDetails.getHeaderBadge(), appConst.APP_BADGE.LOCAL);
     assert.equal(await applicationDetails.getState(), appConst.APP_STATE.STARTED);
   });
@@ -172,6 +180,105 @@ describe("applications.grid.select.all.checkbox.spec - 'Select all': the toolbar
     );
   });
 
+  // 'Select all' covers the rows listed, not the rows a filter hides: it ticks the listed ones only,
+  // and reads as indeterminate once the hidden ones are listed again, unticked.
+  it("GIVEN the list is narrowed by text WHEN 'Select all' has been ticked THEN only the listed row should be checked AND once the filter has been cleared 'Select all' should be indeterminate AND the other rows unchecked", async () => {
+    await settingsUtils.navigateToApplicationsSection();
+    let applicationsPage = new ApplicationsPage();
+    await applicationsPage.waitForApplicationsListLoaded();
+    await applicationsPage.waitForRowDisplayed(SIMPLE_SITE.key);
+    const lastApp = await listedFromEnd(applicationsPage);
+    // 1. Narrow the list by the key of one application: it is the one row listed.
+    await applicationsPage.searchByText(SIMPLE_SITE.key);
+    await applicationsPage.waitForApplicationDisplayNames([SIMPLE_SITE.displayName]);
+    // 2. Tick 'Select all': the one listed row is checked, and 'Select all' with it.
+    await applicationsPage.clickOnSelectAllCheckbox();
+    assert.ok(
+      await applicationsPage.isRowChecked(SIMPLE_SITE.key),
+      'The listed row should be checked',
+    );
+    assert.ok(
+      await applicationsPage.isSelectAllCheckboxSelected(),
+      "'Select all' should be checked while every listed row is",
+    );
+    // 3. Clear the filter: the hidden rows are listed again, unticked, and the selection no longer
+    //    covers the list.
+    await applicationsPage.clickOnClearFilterButton();
+    assert.deepEqual(await applicationsPage.getFilterTerms(), [], 'No term should be left');
+    await applicationsPage.waitForRowDisplayed(lastApp.key);
+    await settingsUtils.saveScreenshot('grid_select_all_under_filter_cleared');
+    assert.ok(
+      await applicationsPage.isSelectAllCheckboxIndeterminate(),
+      "'Select all' should be indeterminate while only the row ticked under the filter is checked",
+    );
+    assert.ok(
+      await applicationsPage.isRowChecked(SIMPLE_SITE.key),
+      'The row ticked under the filter should stay checked',
+    );
+    for (const key of [MY_FIRST_APP.key, lastApp.key]) {
+      assert.ok(
+        !(await applicationsPage.isRowChecked(key)),
+        `The row '${key}', hidden while 'Select all' was ticked, should not be checked`,
+      );
+    }
+  });
+
+  // https://github.com/enonic/app-applications/issues/2501
+  // TODO: enable once a hidden row keeps its tick. Today the tick is dropped as soon as the filter
+  it.skip("GIVEN two rows are ticked WHEN a text filter hides one of them AND 'Stop' has been clicked THEN only the listed row should be stopped AND the hidden one should stay started and ticked", async () => {
+    await settingsUtils.navigateToApplicationsSection();
+    let applicationsPage = new ApplicationsPage();
+    await applicationsPage.waitForApplicationsListLoaded();
+    // 1. Tick two rows: Stop is enabled.
+    await applicationsPage.clickOnCheckboxByKey(SIMPLE_SITE.key);
+    await applicationsPage.clickOnCheckboxByKey(MY_FIRST_APP.key);
+    await applicationsPage.waitForStopButtonEnabled();
+    // 2. Narrow the list to one of them: the other is hidden, still ticked, and 'Select all'
+    //    reads as checked - every listed row is.
+    await applicationsPage.searchByText(MY_FIRST_APP.key);
+    await applicationsPage.waitForApplicationDisplayNames([MY_FIRST_APP.displayName]);
+    assert.ok(
+      await applicationsPage.isSelectAllCheckboxSelected(),
+      "'Select all' should be checked while the one listed row is",
+    );
+    // 3. Click on 'Stop': the listed row is stopped, Stop is off - nothing listed is left to stop.
+    await applicationsPage.clickOnStopButton();
+    await applicationsPage.waitForApplicationState(
+      MY_FIRST_APP.key,
+      appConst.APP_STATE.STOPPED,
+      appConst.TIMEOUT.LONG,
+    );
+    await applicationsPage.waitForStopButtonDisabled(appConst.TIMEOUT.LONG);
+    // 4. Clear the filter: the hidden row is listed again, started and still ticked, and Stop is
+    //    back on for it.
+    await applicationsPage.clickOnClearFilterButton();
+    await applicationsPage.waitForRowDisplayed(SIMPLE_SITE.key);
+    await settingsUtils.saveScreenshot('grid_stop_under_filter_cleared');
+    assert.equal(
+      await applicationsPage.getApplicationState(SIMPLE_SITE.key),
+      appConst.APP_STATE.STARTED,
+      'The hidden row should not have been stopped',
+    );
+    assert.ok(
+      await applicationsPage.waitForRowChecked(SIMPLE_SITE.key),
+      'The hidden row should still be checked',
+    );
+    assert.equal(
+      await applicationsPage.getApplicationState(MY_FIRST_APP.key),
+      appConst.APP_STATE.STOPPED,
+    );
+    await applicationsPage.waitForStopButtonEnabled();
+    await applicationsPage.waitForStartButtonEnabled();
+    // 5. Click on 'Start': the stopped row is started again, so the application is left as found.
+    await applicationsPage.clickOnStartButton();
+    await applicationsPage.waitForApplicationState(
+      MY_FIRST_APP.key,
+      appConst.APP_STATE.STARTED,
+      appConst.TIMEOUT.LONG,
+    );
+    await applicationsPage.waitForStartButtonDisabled();
+  });
+
   // Stop and Start act on every selected row they can: Stop on the started ones, Start on the
   // stopped ones. The applications are started again at the end, so they are left as found - and
   // by `after` whatever happens in between.
@@ -181,7 +288,7 @@ describe("applications.grid.select.all.checkbox.spec - 'Select all': the toolbar
     let applicationDetails = new ApplicationDetails();
     await applicationsPage.waitForApplicationsListLoaded();
     await applicationsPage.waitForRowDisplayed(SIMPLE_SITE.key);
-    const lastApp = await lastListedApplication(applicationsPage);
+    const lastApp = await listedFromEnd(applicationsPage);
     // 1. Tick 'Select all': the details show the row ticked last, started, and Stop is enabled.
     await applicationsPage.clickOnSelectAllCheckbox();
     await applicationDetails.waitForTitle(lastApp.displayName);

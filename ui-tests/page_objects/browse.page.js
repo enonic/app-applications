@@ -878,6 +878,20 @@ class BrowsePage extends SectionPage {
     return checked === 'true';
   }
 
+  // Waits until the row's checkbox is ticked: a read right after a tick, or after the list has
+  // re-rendered, can see the checkbox before it reflects the selection.
+  async waitForRowChecked(key, ms = appConst.TIMEOUT.MEDIUM) {
+    try {
+      await this.waitForAttributeValue(this.css.rowCheckbox(key), 'aria-checked', 'true', ms);
+    } catch (err) {
+      await this.handleError(
+        `${this.pageName} - the row '${key}' should be checked`,
+        'err_browse_checkbox',
+        err,
+      );
+    }
+  }
+
   // A row that is not the operator's to act on keeps its checkbox, greyed: 'disabled' on the input.
   async isRowCheckboxEnabled(key) {
     await this.waitForRowDisplayed(key);

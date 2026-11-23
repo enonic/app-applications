@@ -190,10 +190,87 @@ describe("applications.grid.filter.spec - narrowing the grid: by the free text o
     assert.deepEqual(await applicationsPage.getSystemApplicationKeys(), []);
   });
 
+  // The text search runs over the rows the toggle lets in: a system application matches its key
+  // only while the applications XP ships are shown.
+  it("WHEN the key of a system application has been typed in the filter THEN nothing should match while the toggle is off AND the one row should be listed once 'Show system applications' has been clicked", async () => {
+    await settingsUtils.navigateToApplicationsSection();
+    let applicationsPage = new ApplicationsPage();
+    await applicationsPage.waitForApplicationsListLoaded();
+    await applicationsPage.waitForRowDisplayed(SIMPLE_SITE.key);
+    // 1. Type the key of a system application: with the toggle off nothing matches.
+    await applicationsPage.searchByText(SYSTEM_APP.key);
+    await applicationsPage.waitForRowNotDisplayed(SIMPLE_SITE.key);
+    assert.deepEqual(await applicationsPage.getApplicationDisplayNames(), []);
+    assert.equal(await applicationsPage.getListMessage(), appConst.LIST_MESSAGE.NOTHING_MATCHES);
+    // 2. Click on the toggle: the system application is the one row the text leaves.
+    await applicationsPage.clickOnSystemApplicationsToggle();
+    await applicationsPage.waitForSystemApplicationsShown(true);
+    await applicationsPage.waitForApplicationDisplayNames([SYSTEM_APP.displayName]);
+    await settingsUtils.saveScreenshot('grid_filter_by_system_key_shown');
+    assert.equal(await applicationsPage.getListMessage(), undefined);
+    // 3. Click on the toggle again: the row is gone, and the text still holds.
+    await applicationsPage.clickOnSystemApplicationsToggle();
+    await applicationsPage.waitForSystemApplicationsShown(false);
+    await applicationsPage.waitForRowNotDisplayed(SYSTEM_APP.key);
+    assert.deepEqual(await applicationsPage.getApplicationDisplayNames(), []);
+    assert.deepEqual(await applicationsPage.getFilterTerms(), [
+      { field: undefined, value: SYSTEM_APP.key },
+    ]);
+    // 4. Clear the filter: the whole list is back.
+    await applicationsPage.clickOnClearFilterButton();
+    await applicationsPage.waitForRowDisplayed(SIMPLE_SITE.key);
+  });
+
+  it("GIVEN 'Simple Site App' has been stopped WHEN 'State: Stopped' has been picked THEN only that application should be listed AND once the filter has been cleared and the application started the whole list should be back", async () => {
+    await settingsUtils.navigateToApplicationsSection();
+    let applicationsPage = new ApplicationsPage();
+    let applicationDetails = new ApplicationDetails();
+    await applicationsPage.waitForApplicationsListLoaded();
+    // 1. Click on the row and stop the application from the toolbar: the row reads 'Stopped'.
+    await applicationsPage.clickOnRowByKey(SIMPLE_SITE.key);
+    await applicationDetails.waitForTitle(SIMPLE_SITE.displayName);
+    await applicationsPage.clickOnStopButton();
+    await applicationDetails.waitForState(appConst.APP_STATE.STOPPED, appConst.TIMEOUT.LONG);
+    await applicationsPage.waitForApplicationState(
+      SIMPLE_SITE.key,
+      appConst.APP_STATE.STOPPED,
+      appConst.TIMEOUT.LONG,
+    );
+    // 2. Pick 'State: Stopped': the term shows as a tag and the list narrows to the one application.
+    await applicationsPage.filterByFieldValue(
+      appConst.FILTER_FIELD.STATE,
+      appConst.APP_STATE.STOPPED,
+    );
+    await applicationsPage.waitForFilterTerm(
+      appConst.FILTER_FIELD.STATE,
+      appConst.APP_STATE.STOPPED,
+    );
+    await applicationsPage.waitForApplicationDisplayNames([SIMPLE_SITE.displayName]);
+    await settingsUtils.saveScreenshot('grid_filter_by_state_stopped');
+    // 3. Clear the filter: every application is listed again.
+    await applicationsPage.clickOnClearFilterButton();
+    assert.deepEqual(await applicationsPage.getFilterTerms(), [], 'No term should be left');
+    await applicationsPage.waitForRowCountGreaterThan(1);
+    // 4. Start the application again from the toolbar: the row is the active one still.
+    await applicationsPage.clickOnStartButton();
+    await applicationDetails.waitForState(appConst.APP_STATE.STARTED, appConst.TIMEOUT.LONG);
+    await applicationsPage.waitForApplicationState(
+      SIMPLE_SITE.key,
+      appConst.APP_STATE.STARTED,
+      appConst.TIMEOUT.LONG,
+    );
+  });
+
   beforeEach(async () => {
     await settingsUtils.navigateToSettingsApp();
   });
   afterEach(async () => {
+    return await settingsUtils.doCloseAllWindowTabsAndNavigateToHome();
+  });
+  // The application the State test stops is left 'Started' whatever happened in between: once per
+  // spec, since only that test stops anything.
+  after(async () => {
+    await settingsUtils.ensureApplicationStarted(SIMPLE_SITE.key);
     return await settingsUtils.doCloseAllWindowTabsAndNavigateToHome();
   });
   before(async () => {
