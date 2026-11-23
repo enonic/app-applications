@@ -18,6 +18,16 @@ Mocha against a real XP with the app deployed, Chrome driven over WebDriver Clas
   the dialog is closed — and the Installed filter afterwards. The application is uninstalled again at
   the end, so the suite needs an XP that reaches Enonic Market. The tests after the install share it
   and run in order: when the install fails, they fail with it.
+- `specs/applications.install.upload.spec.js` — the 'Upload' tab of the dialog: the drop zone, a jar
+  (Test Selenium App, kept out of `home/deploy` for this) uploaded through its file input — the
+  toast, the row with no badge, the details and the toolbar offering Uninstall — then Select all
+  withholding Uninstall while a local application is ticked, and the uninstall of the application at
+  the end. The tests after the upload share it and run in order.
+- `specs/applications.grid.filter.spec.js`, `specs/applications.grid.sort.spec.js` and
+  `specs/applications.grid.select.all.checkbox.spec.js` — the filter input and the fields, the system
+  applications toggle, the sort order with the system applications shown, and 'Select all': what it
+  ticks, the toolbar it enables, the row it puts on show, the Space key, and Stop and Start over the
+  whole selection.
 
 `page_objects/` are the page objects, on three base classes: `section.page.js` (every lookup is CSS
 through the section's shadow root; XPath cannot cross one), `browse.page.js` (the browse screen:
@@ -44,6 +54,9 @@ The first command makes `build/libs/app-applications.jar`, which `:ui-tests:depl
 the distro in place of the bundled one; pass `-PappUrl=<url>` to deploy another build. The XP version
 comes from `xpVersion` in `gradle.properties`; the test applications (`com.enonic.uitest:*`) come
 from the `dev` repository.
+`:ui-tests:downloadApps` copies them into `home/deploy`, all but `test-application`, which
+`:ui-tests:downloadUploadApps` puts in `ui-tests/build/upload-apps` for the upload spec to send through
+the dialog.
 
 Against an XP that is already running at `base.url` of `browser.properties`:
 
@@ -52,7 +65,8 @@ pnpm install
 pnpm run test_applications:wdio_chrome
 ```
 
-both from `ui-tests/`. The report lands in `ui-tests/build/reports/allure-report`, screenshots of
+both from `ui-tests/`, after `./gradlew :ui-tests:downloadUploadApps` from the repository root once, so
+the upload spec finds its jar. The report lands in `ui-tests/build/reports/allure-report`, screenshots of
 failures in `ui-tests/build/reports/screenshots`.
 
 CI runs the suite as the `ui-tests` job of `.github/workflows/gradle.yml`, after `build`, the same
