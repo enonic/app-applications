@@ -17,6 +17,7 @@ the same shape app-users built for its four sections.
 | Verify changes                 | `pnpm check`                              |
 | Verify, fixing format and lint | `pnpm check:fix`                          |
 | Tests                          | `pnpm test` / `pnpm test:watch`           |
+| Java tests                     | `./gradlew test`                          |
 | Frontend watch build           | `pnpm dev`                                |
 | Server-side TS → CommonJS      | `pnpm pack:server`                        |
 | Build + deploy to local XP     | `./gradlew deploy -Penv=dev`              |
@@ -30,8 +31,8 @@ WebdriverIO specs against it, as CI does after `build`; `ui-tests/README.md` has
 ## Structure
 
 ```
-src/main/java/                  script beans for data no XP JS lib exposes, plus the OSGi
-                                component contributing the section's CSP source
+src/main/java/                  script beans for data or a capability no XP JS lib exposes, plus
+                                the OSGi component contributing the section's CSP source
 src/main/resources/
   admin/extensions/applications/ the descriptor, its icon, and the one controller for the prefix
   apis/graphql/                 the section's own data plane

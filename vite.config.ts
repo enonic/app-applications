@@ -75,6 +75,7 @@ export default defineConfig(({ mode }) => {
       '/lib/admin-extension': join(import.meta.dirname, 'src/test/mocks/lib-admin-extension.ts'),
       '/lib/admin-tool': join(import.meta.dirname, 'src/test/mocks/lib-admin-tool.ts'),
       '/lib/api': join(import.meta.dirname, 'src/test/mocks/lib-api.ts'),
+      '/lib/graphql-aliases': join(import.meta.dirname, 'src/test/mocks/lib-graphql-aliases.ts'),
       '/lib/application': join(import.meta.dirname, 'src/test/mocks/lib-application.ts'),
       '/lib/icon': join(import.meta.dirname, 'src/test/mocks/lib-icon.ts'),
       '/lib/idprovider': join(import.meta.dirname, 'src/test/mocks/lib-idprovider.ts'),
