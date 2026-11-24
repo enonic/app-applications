@@ -18,6 +18,7 @@ function application(overrides: Partial<Application> = {}): Application {
     state: 'STARTED',
     system: false,
     local: false,
+    schema: false,
     ...overrides,
   };
 }
@@ -58,6 +59,12 @@ describe('toApplicationRow', () => {
     expect(row.meta).toEqual(['1.2.0', '']);
   });
 
+  it('drops the state cell on a schema application, which is always started', () => {
+    const row = toApplicationRow(application({ schema: true }), undefined, 'Started', '1.2.0');
+
+    expect(row.meta).toEqual(['1.2.0', '']);
+  });
+
   it('dim a stopped application', () => {
     expect(toApplicationRow(application({ state: 'STOPPED' })).dimmed).toBe(true);
     expect(toApplicationRow(application({ state: 'STARTED' })).dimmed).toBe(false);
@@ -68,9 +75,11 @@ describe('toApplicationRow', () => {
     expect(toApplicationRow(application({ system: true })).selectable).toBe(false);
   });
 
-  it('leaves an installed application selectable, local or not', () => {
+  // A schema application cannot be started or stopped, but it can still be uninstalled.
+  it('leaves an installed application selectable, local or schema or not', () => {
     expect(toApplicationRow(application()).selectable).toBe(true);
     expect(toApplicationRow(application({ local: true })).selectable).toBe(true);
+    expect(toApplicationRow(application({ schema: true })).selectable).toBe(true);
   });
 
   it('carries no meta at all when there is nothing to put in it', () => {

@@ -6,6 +6,7 @@ function icon(): null {
 
 export const BellDot = icon;
 export const Box = icon;
+export const Braces = icon;
 export const Building2 = icon;
 export const Download = icon;
 export const Laptop = icon;

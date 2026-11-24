@@ -45,6 +45,12 @@ export const ApplicationType: GraphQLType = generator.createObjectType({
       resolve: (env: { source: ApplicationSource }) =>
         isLocalApplication({ application: env.source.key }),
     },
+    schema: {
+      type: nonNull(GraphQLBoolean),
+      description:
+        'True for an application whose schema is persisted on this instance. It is always started, and XP refuses to start or stop it.',
+      resolve: (env: { source: ApplicationSource }) => env.source.schema === true,
+    },
     modifiedTime: {
       type: GraphQLString,
       description: 'Closest thing XP records to an install date.',
