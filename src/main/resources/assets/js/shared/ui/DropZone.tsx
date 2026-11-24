@@ -1,7 +1,6 @@
 import { cn } from '@enonic/ui';
-import type { JSX } from 'preact';
 import { useId, useRef, useState } from 'preact/hooks';
-import type { ReactNode } from 'react';
+import type { DragEvent, ReactNode } from 'react';
 
 export type DropZoneProps = {
   onFiles: (files: readonly File[]) => void;
@@ -48,7 +47,7 @@ export function DropZone({
     input.value = '';
   };
 
-  const handleDrop = (event: JSX.TargetedDragEvent<HTMLDivElement>): void => {
+  const handleDrop = (event: DragEvent<HTMLDivElement>): void => {
     event.preventDefault();
     setDragging(false);
 
