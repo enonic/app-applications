@@ -34,62 +34,25 @@ module.exports = Object.freeze({
     INSTALL: 60000,
   },
 
-  PASSWORD: {
-    MEDIUM: 'AUserA567$',
-    STRONG: '1User%#567$=',
-    WEAK: 'test12345',
-  },
-  // Display names of the roles XP ships with.
-  SYSTEM_ROLES: {
-    ADMIN_CONSOLE: 'Administration Console Login',
-    ADMINISTRATOR: 'Administrator',
-    CM_ADMIN: 'Content Manager Administrator',
-    CM_EXPERT: 'Content Manager Expert',
-    USERS_APP: 'Users App',
-    USERS_ADMINISTRATOR: 'Users Administrator',
-    AUTHENTICATED: 'Authenticated',
-    EVERYONE: 'Everyone',
-  },
-
   BROWSER_WIDTH: 1950,
   BROWSER_HEIGHT: 1050,
 
-  // The sections the Settings rail offers: this app's one and the ones app-users adds.
+  // The one section the suite knows by name: this app's. The rail may list others; no spec names
+  // them.
   EXTENSIONS: {
     APPLICATIONS: 'Applications',
-    SERVICE_ACCOUNTS: 'Service Accounts',
-    USERS: 'Users',
-    GROUPS: 'Groups',
-    ROLES: 'Roles',
-    ID_PROVIDERS: 'ID Providers',
   },
   // 'data-section' of the SectionMount that hosts the extension's shadow root
   SECTION_ID: {
     APPLICATIONS: 'com.enonic.xp.app.applications:applications',
-    SERVICE_ACCOUNTS: 'com.enonic.xp.app.users:service-accounts',
-    USERS: 'com.enonic.xp.app.users:users',
-    GROUPS: 'com.enonic.xp.app.users:groups',
-    ROLES: 'com.enonic.xp.app.users:roles',
-    ID_PROVIDERS: 'com.enonic.xp.app.users:id-providers',
   },
   // The url segment a section answers to (`config.path` of its extension descriptor): the section
   // is at '<tool url>#/<path>'.
   SECTION_PATH: {
     APPLICATIONS: 'applications',
-    SERVICE_ACCOUNTS: 'service-accounts',
-    USERS: 'users',
-    GROUPS: 'groups',
-    ROLES: 'roles',
-    ID_PROVIDERS: 'id-providers',
   },
   // The Settings admin tool, relative to 'base.url'.
   SETTINGS_TOOL_PATH: 'com.enonic.xp.app.settings/main',
-  // The GraphQL endpoint of app-users' sections, relative to the admin origin: the accounts a spec
-  // logs in as are made through it.
-  GRAPHQL_API: {
-    USERS:
-      '/admin/com.enonic.xp.app.settings/main/_/admin:extension/com.enonic.xp.app.users:users/graphql',
-  },
   // The 'Actions' toolbar of the Applications section (phrases: applications.action.*). Each button
   // is located by its aria-label, which is the label itself.
   TOOLBAR: {
@@ -107,12 +70,6 @@ module.exports = Object.freeze({
   APP_BADGE: {
     SYSTEM: 'System application',
     LOCAL: 'Local application',
-  },
-  // What the shell shows in place of the sections to a visitor no section's access rules admit
-  // (phrases: sections.empty.*). The hint is shown to everyone but a system administrator.
-  SECTIONS_EMPTY: {
-    MESSAGE: 'No administration applications',
-    HINT: 'Install one, or check that its access rules include you',
   },
   LIST_MESSAGE: {
     EMPTY: 'No applications',

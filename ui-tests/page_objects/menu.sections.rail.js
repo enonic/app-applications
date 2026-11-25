@@ -51,54 +51,6 @@ class MenuSectionsRail extends Page {
       { timeout: ms, timeoutMsg: `Section '${label}' did not become active in ${ms} ms` },
     );
   }
-
-  // Returns aria-labels of all section links in the rail, in display order.
-  async getSectionNames() {
-    const elements = await this.findElements(XPATH.sectionButtons);
-    const names = [];
-    for (const el of elements) {
-      names.push(await el.getAttribute('aria-label'));
-    }
-    return names;
-  }
-
-  // Returns the `href` of the section link, e.g. '#/users'.
-  getSectionHref(label) {
-    return this.getAttribute(XPATH.sectionButtonByLabel(label), 'href');
-  }
-
-  // Waits until the section link's `href` is `expected`: the shell rewrites it when the section
-  // is left, after the url has already changed, so a read right after the click can be early.
-  async waitForSectionHref(label, expected, ms = appConst.TIMEOUT.MEDIUM) {
-    await this.getBrowser().waitUntil(async () => (await this.getSectionHref(label)) === expected, {
-      timeout: ms,
-      timeoutMsg: `Section '${label}' - the href should be '${expected}'`,
-    });
-  }
-
-  async waitForSectionButtonDisplayed(label, ms = appConst.TIMEOUT.MEDIUM) {
-    try {
-      await this.waitForElementDisplayed(XPATH.sectionButtonByLabel(label), ms);
-    } catch (err) {
-      await this.handleError(
-        `Sections rail - '${label}' button is not displayed`,
-        'err_rail_section_button',
-        err,
-      );
-    }
-  }
-
-  async waitForSectionButtonNotDisplayed(label, ms = appConst.TIMEOUT.MEDIUM) {
-    try {
-      await this.waitForElementNotDisplayed(XPATH.sectionButtonByLabel(label), ms);
-    } catch (err) {
-      await this.handleError(
-        `Sections rail - '${label}' button should not be displayed`,
-        'err_rail_section_button_hidden',
-        err,
-      );
-    }
-  }
 }
 
 module.exports = MenuSectionsRail;

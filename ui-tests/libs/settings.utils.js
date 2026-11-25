@@ -11,7 +11,6 @@ const appConst = require('./app_const');
 const webDriverHelper = require('./WebDriverHelper');
 const MenuSectionsRail = require('../page_objects/menu.sections.rail');
 const ApplicationsPage = require('../page_objects/applications.page');
-const userItemsBuilder = require('./users.items.builder');
 const fs = require('fs');
 const path = require('path');
 
@@ -75,7 +74,7 @@ module.exports = {
     return await loginPage.waitForPageLoaded();
   },
   // Logs in, opens the Settings app and, when a section is given, switches to it via the rail.
-  // `section` is one of appConst.EXTENSIONS.* ('Applications', 'Users', ...).
+  // `section` is one of appConst.EXTENSIONS.*.
   async navigateToSettingsApp(userName, password, section) {
     try {
       await this.doLogin(userName, password);
@@ -341,125 +340,5 @@ module.exports = {
       throw new Error(`Unknown section '${section}': not one of appConst.EXTENSIONS`);
     }
     return key;
-  },
-
-  // GraphQL API - the endpoint of app-users' sections, called from the page the browser is on with
-  // its session cookie: the accounts a spec logs in as are made there. The browser must be logged
-  // in (doLogin) and stay on the XP admin origin.
-
-  // Posts a GraphQL request from the current page and returns { status, text } without interpreting it.
-  // An async function under execute(): webdriverio awaits its promise (executeAsync is gone in v10).
-  async postGraphQl(url, query, variables) {
-    return await this.getBrowser().execute(
-      async function (url, query, variables) {
-        try {
-          const response = await fetch(url, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            credentials: 'same-origin',
-            body: JSON.stringify({ query: query, variables: variables }),
-          });
-          return { status: response.status, text: await response.text() };
-        } catch (err) {
-          return { status: 0, text: String(err) };
-        }
-      },
-      url,
-      query,
-      variables,
-    );
-  },
-
-  // Sends a GraphQL request to the API and returns its 'data'. Throws on HTTP or GraphQL errors.
-  async sendGraphQlRequest(query, variables, url = appConst.GRAPHQL_API.USERS) {
-    const result = await this.postGraphQl(url, query, variables);
-    let body;
-    try {
-      body = JSON.parse(result.text);
-    } catch {
-      throw new Error(`GraphQL: unexpected response (${result.status}): ${result.text}`);
-    }
-    if (result.status !== 200 || body.errors || body.error) {
-      throw new Error(`GraphQL request failed (${result.status}): ${result.text}`);
-    }
-    return body.data;
-  },
-
-  // The keys of roles from their display names ('Users App') - a principal key ('role:...') is
-  // taken as is. Read once for the whole list.
-  async resolveRoleKeys(roles) {
-    const names = roles.filter((role) => !role.startsWith('role:'));
-    if (names.length === 0) {
-      return [...roles];
-    }
-    const data = await this.sendGraphQlRequest('{ roles { key displayName } }', {});
-    return roles.map((role) => {
-      if (role.startsWith('role:')) {
-        return role;
-      }
-      const found = data.roles.find((item) => item.displayName === role);
-      if (found === undefined) {
-        throw new Error(
-          `Unknown role '${role}': use a display name from appConst.SYSTEM_ROLES or a key 'role:...'. ` +
-            'Existing: ' +
-            data.roles.map((item) => `${item.displayName} (${item.key})`).join(', '),
-        );
-      }
-      return found.key;
-    });
-  },
-
-  // Creates a service account - a user of the system ID provider - through the GraphQL API.
-  // `serviceAccount` is what users.items.builder.buildServiceAccount() returns: { displayName, id,
-  // email?, password?, roles?, groups? }. `roles` are display names or 'role:' keys; `groups` are
-  // group keys ('group:system:editors'). An empty or missing `password` leaves the account without
-  // one. Returns the service account with its 'key'.
-  createServiceAccountViaApi(serviceAccount) {
-    return this.createUserViaApi(
-      Object.assign({}, serviceAccount, { idProvider: userItemsBuilder.SYSTEM_ID_PROVIDER }),
-    );
-  },
-
-  // Creates a user through the GraphQL API. `user` is what users.items.builder.buildUser() returns:
-  // { idProvider, displayName, id, email?, password?, roles?, groups? }. `idProvider` is the key of
-  // the provider the user lives in ('system' makes it a service account); `roles` are display names
-  // or 'role:' keys; `groups` are group keys. Returns the user with its 'key'.
-  async createUserViaApi(user) {
-    if (!user.idProvider) {
-      throw new Error(`createUserViaApi: '${user.displayName}' names no ID provider`);
-    }
-    const query = `mutation ($idProvider: String!, $name: String!, $displayName: String!, $email: String, $password: String, $roles: [String!], $groups: [String!]) {
-      createUser(idProvider: $idProvider, name: $name, displayName: $displayName, email: $email, password: $password, roles: $roles, groups: $groups) {
-        key displayName
-      }
-    }`;
-    const data = await this.sendGraphQlRequest(query, {
-      idProvider: user.idProvider,
-      name: user.id ?? user.name ?? user.displayName,
-      displayName: user.displayName,
-      email: user.email,
-      password: user.password || undefined,
-      roles: await this.resolveRoleKeys(user.roles ?? []),
-      groups: user.groups ?? [],
-    });
-    console.log('User created via API: ' + data.createUser.key);
-    return Object.assign({}, user, { key: data.createUser.key });
-  },
-
-  // Deletes principals (users, groups, roles) through the GraphQL API. `keys` is a principal key, a
-  // list of them, or what a create*ViaApi() returned (its 'key' is taken). Throws when any was not
-  // deleted.
-  async deletePrincipalsViaApi(keys) {
-    const list = [].concat(keys).map((item) => (typeof item === 'string' ? item : item.key));
-    const query = `mutation ($keys: [String!]!) {
-      deletePrincipals(keys: $keys) { key deleted reason }
-    }`;
-    const data = await this.sendGraphQlRequest(query, { keys: list });
-    const failed = data.deletePrincipals.filter((item) => !item.deleted);
-    if (failed.length > 0) {
-      throw new Error('Principals were not deleted: ' + JSON.stringify(failed));
-    }
-    console.log('Principals deleted via API: ' + list.join(', '));
-    return data.deletePrincipals;
   },
 };
