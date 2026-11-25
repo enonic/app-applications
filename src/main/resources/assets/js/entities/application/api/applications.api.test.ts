@@ -27,6 +27,45 @@ const CONFIG = {
   vhostsEnabled: false,
 } satisfies Config;
 
+const ROW = {
+  displayName: 'Booster',
+  description: null,
+  version: '1.2.0',
+  state: 'STARTED',
+  system: false,
+  local: false,
+  modifiedTime: null,
+  systemVersion: null,
+  vendorName: null,
+  vendorUrl: null,
+};
+
+const ROWS = {
+  data: {
+    applications: [
+      { ...ROW, key: 'com.enonic.app.booster' },
+      { ...ROW, key: 'com.enonic.app.plain' },
+    ],
+  },
+};
+
+const HASHES = {
+  applications: [
+    { key: 'com.enonic.app.booster', iconHash: 'Xk3f_a-1' },
+    { key: 'com.enonic.app.plain' },
+  ],
+};
+
+function answer(body: unknown, status = 200): () => Promise<Response> {
+  return () => Promise.resolve(new Response(JSON.stringify(body), { status }));
+}
+
+function respondPerUrl(graphQl: () => Promise<Response>, core: () => Promise<Response>): void {
+  globalThis.fetch = vi.fn((url: string | URL | Request) =>
+    String(url) === ENDPOINT ? graphQl() : core(),
+  );
+}
+
 describe('fetchApplications', () => {
   beforeEach(() => {
     setGraphQlEndpoint(ENDPOINT);
@@ -48,7 +87,6 @@ describe('fetchApplications', () => {
             state: 'STARTED',
             system: false,
             local: false,
-            icon: 'data:image/svg+xml;base64,PHN2Zz48L3N2Zz4=',
             modifiedTime: '2026-05-07T12:42:39Z',
             systemVersion: '[7.15.0,8.0.0)',
             vendorName: 'Enonic AS',
@@ -70,7 +108,7 @@ describe('fetchApplications', () => {
         state: 'STARTED',
         system: false,
         local: false,
-        icon: 'data:image/svg+xml;base64,PHN2Zz48L3N2Zz4=',
+        icon: undefined,
         modifiedTime: '2026-05-07T12:42:39Z',
         systemVersion: '[7.15.0,8.0.0)',
         vendorName: 'Enonic AS',
@@ -91,7 +129,6 @@ describe('fetchApplications', () => {
             state: 'STOPPED',
             system: true,
             local: true,
-            icon: null,
             modifiedTime: null,
             systemVersion: null,
             vendorName: null,
@@ -119,6 +156,51 @@ describe('fetchApplications', () => {
         vendorUrl: undefined,
       },
     ]);
+  });
+
+  describe('with core reachable', () => {
+    beforeEach(() => {
+      setConfig(CONFIG);
+    });
+
+    afterEach(() => {
+      $config.set(undefined);
+    });
+
+    it('addresses an icon by the hash core lists for the application', async () => {
+      respondPerUrl(answer(ROWS), answer(HASHES));
+
+      const result = await fetchApplications();
+
+      expect(globalThis.fetch).toHaveBeenCalledWith('/_/server:app/', expect.anything());
+      expect(result._unsafeUnwrap().map(({ key, icon }) => ({ key, icon }))).toEqual([
+        {
+          key: 'com.enonic.app.booster',
+          icon: '/_/server:app/icon?key=com.enonic.app.booster&v=Xk3f_a-1',
+        },
+        { key: 'com.enonic.app.plain', icon: undefined },
+      ]);
+    });
+
+    it('lists the applications without icons when core refuses', async () => {
+      respondPerUrl(answer(ROWS), answer('', 403));
+
+      const result = await fetchApplications();
+
+      expect(result._unsafeUnwrap().map(({ key, icon }) => ({ key, icon }))).toEqual([
+        { key: 'com.enonic.app.booster', icon: undefined },
+        { key: 'com.enonic.app.plain', icon: undefined },
+      ]);
+    });
+
+    it('fails when the GraphQL request fails, though core answers', async () => {
+      respondPerUrl(answer({ errors: [{ message: 'No such field' }] }), answer(HASHES));
+
+      const result = await fetchApplications();
+
+      expect(result.isErr()).toBe(true);
+      expect(result._unsafeUnwrapErr().message).toBe('No such field');
+    });
   });
 
   it('fails with the message a GraphQL error carries', async () => {
@@ -150,7 +232,6 @@ describe('fetchApplication', () => {
           version: '1.2.0',
           state: 'STOPPED',
           system: false,
-          icon: null,
           modifiedTime: null,
           systemVersion: null,
         },
@@ -172,6 +253,67 @@ describe('fetchApplication', () => {
     const result = await fetchApplication('com.enonic.app.gone');
 
     expect(result._unsafeUnwrap()).toBeUndefined();
+  });
+
+  describe('with core reachable', () => {
+    const BOOSTER = { data: { application: { ...ROW, key: 'com.enonic.app.booster' } } };
+
+    beforeEach(() => {
+      setConfig(CONFIG);
+    });
+
+    afterEach(() => {
+      $config.set(undefined);
+    });
+
+    it('addresses the icon by the hash core lists for the application', async () => {
+      respondPerUrl(answer(BOOSTER), answer(HASHES));
+
+      const result = await fetchApplication('com.enonic.app.booster');
+
+      expect(globalThis.fetch).toHaveBeenCalledWith('/_/server:app/', expect.anything());
+      expect(result._unsafeUnwrap()?.icon).toBe(
+        '/_/server:app/icon?key=com.enonic.app.booster&v=Xk3f_a-1',
+      );
+    });
+
+    it('leaves out the icon of an application core lists no hash for', async () => {
+      respondPerUrl(
+        answer({ data: { application: { ...ROW, key: 'com.enonic.app.plain' } } }),
+        answer(HASHES),
+      );
+
+      const result = await fetchApplication('com.enonic.app.plain');
+
+      expect(result._unsafeUnwrap()).toMatchObject({ key: 'com.enonic.app.plain' });
+      expect(result._unsafeUnwrap()?.icon).toBeUndefined();
+    });
+
+    it('reloads the application without an icon when core refuses', async () => {
+      respondPerUrl(answer(BOOSTER), answer('', 403));
+
+      const result = await fetchApplication('com.enonic.app.booster');
+
+      expect(result._unsafeUnwrap()).toMatchObject({ key: 'com.enonic.app.booster' });
+      expect(result._unsafeUnwrap()?.icon).toBeUndefined();
+    });
+
+    it('resolves to undefined for an application that is not installed', async () => {
+      respondPerUrl(answer({ data: { application: null } }), answer(HASHES));
+
+      const result = await fetchApplication('com.enonic.app.gone');
+
+      expect(result._unsafeUnwrap()).toBeUndefined();
+    });
+
+    it('fails when the GraphQL request fails, though core answers', async () => {
+      respondPerUrl(answer({ errors: [{ message: 'No such field' }] }), answer(HASHES));
+
+      const result = await fetchApplication('com.enonic.app.booster');
+
+      expect(result.isErr()).toBe(true);
+      expect(result._unsafeUnwrapErr().message).toBe('No such field');
+    });
   });
 });
 
