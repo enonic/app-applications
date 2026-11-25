@@ -11,6 +11,7 @@ const appConst = require('./app_const');
 const webDriverHelper = require('./WebDriverHelper');
 const MenuSectionsRail = require('../page_objects/menu.sections.rail');
 const ApplicationsPage = require('../page_objects/applications.page');
+const userItemsBuilder = require('./users.items.builder');
 const fs = require('fs');
 const path = require('path');
 
@@ -65,6 +66,10 @@ module.exports = {
   async doLogout() {
     let loginPage = new LoginPage();
     let homePage = new HomePage();
+    await this.navigateToHomePage();
+    if (await loginPage.isLoaded()) {
+      return;
+    }
     await homePage.clickOnAvatarButton();
     await homePage.clickOnLogoutDropdownMenuItem();
     return await loginPage.waitForPageLoaded();
@@ -191,9 +196,6 @@ module.exports = {
       return console.log('screenshot was not saved ' + err);
     }
   },
-  generateRandomName(part) {
-    return part + Math.round(Math.random() * 1000000);
-  },
   async getDisplayedElements(selector) {
     let elements = await this.getBrowser().$$(selector);
     if (elements.length === 0) {
@@ -204,9 +206,6 @@ module.exports = {
       return elements.filter((el, i) => result[i]);
     });
   },
-  // Opens a section (extension) of the Settings app through the sections rail and waits until its
-  // browse screen is shown: the rail link is active, the app bar shows the section title and the
-  // 'Actions' toolbar is displayed. `section` is one of appConst.EXTENSIONS.*
   async navigateToExtension(section) {
     try {
       let menuSectionsRail = new MenuSectionsRail();
@@ -218,6 +217,36 @@ module.exports = {
       let screenshot = await this.saveScreenshotUniqueName('err_navigate_extension');
       throw new Error(`'${section}' section was not opened, screenshot: ${screenshot} ` + err);
     }
+  },
+  // The direct link to a section, e.g. 'http://localhost:8080/admin/com.enonic.xp.app.settings/main#/applications'.
+  getSectionUrl(section) {
+    const path = appConst.SECTION_PATH[this.getSectionName(section)];
+    return `${this.getBaseUrl()}${appConst.SETTINGS_TOOL_PATH}#/${path}`;
+  },
+  async openSectionByUrl(section) {
+    await this.getBrowser().url('about:blank');
+    await this.getBrowser().url(this.getSectionUrl(section));
+    let menuSectionsRail = new MenuSectionsRail();
+    await menuSectionsRail.waitForLoaded();
+    return menuSectionsRail;
+  },
+  // The Settings tool's own url, no section named: 'http://localhost:8080/admin/com.enonic.xp.app.settings/main'.
+  getSettingsUrl() {
+    return `${this.getBaseUrl()}${appConst.SETTINGS_TOOL_PATH}`;
+  },
+  // Loads the Settings app anew at `hash` ('#/applications/<key>?foo=bar') and waits for the rail.
+  async openSettingsByHash(hash) {
+    await this.getBrowser().url('about:blank');
+    await this.getBrowser().url(this.getSettingsUrl() + hash);
+    let menuSectionsRail = new MenuSectionsRail();
+    await menuSectionsRail.waitForLoaded();
+    return menuSectionsRail;
+  },
+  async waitForUrl(expected, ms = appConst.TIMEOUT.MEDIUM) {
+    await this.getBrowser().waitUntil(async () => (await this.getBrowser().getUrl()) === expected, {
+      timeout: ms,
+      timeoutMsg: `The url should be '${expected}'`,
+    });
   },
   // Opens the Applications section: the one this app adds, so the one most specs start in.
   //
@@ -293,14 +322,144 @@ module.exports = {
     );
   },
   // The 'data-section' of a section's mount (appConst.SECTION_ID.*) from its title
-  // (appConst.EXTENSIONS.*, what MenuSectionsRail.SECTION.* and the app bar show).
+  // (appConst.EXTENSIONS.*, what the rail's links and the app bar show).
   getSectionId(section) {
+    return appConst.SECTION_ID[this.getSectionName(section)];
+  },
+  // What the browser has logged since the last call, as [{ level, message, source }]: the console,
+  // failed requests and the security messages, a Content-Security-Policy violation among them.
+  // Reading empties the log.
+  getBrowserLogs() {
+    return this.getBrowser().getLogs('browser');
+  },
+  // The name a section goes by in appConst ('ID_PROVIDERS') from its title ('ID Providers').
+  getSectionName(section) {
     const key = Object.keys(appConst.EXTENSIONS).find(
       (name) => appConst.EXTENSIONS[name] === section,
     );
     if (key === undefined) {
       throw new Error(`Unknown section '${section}': not one of appConst.EXTENSIONS`);
     }
-    return appConst.SECTION_ID[key];
+    return key;
+  },
+
+  // GraphQL API - the endpoint of app-users' sections, called from the page the browser is on with
+  // its session cookie: the accounts a spec logs in as are made there. The browser must be logged
+  // in (doLogin) and stay on the XP admin origin.
+
+  // Posts a GraphQL request from the current page and returns { status, text } without interpreting it.
+  // An async function under execute(): webdriverio awaits its promise (executeAsync is gone in v10).
+  async postGraphQl(url, query, variables) {
+    return await this.getBrowser().execute(
+      async function (url, query, variables) {
+        try {
+          const response = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'same-origin',
+            body: JSON.stringify({ query: query, variables: variables }),
+          });
+          return { status: response.status, text: await response.text() };
+        } catch (err) {
+          return { status: 0, text: String(err) };
+        }
+      },
+      url,
+      query,
+      variables,
+    );
+  },
+
+  // Sends a GraphQL request to the API and returns its 'data'. Throws on HTTP or GraphQL errors.
+  async sendGraphQlRequest(query, variables, url = appConst.GRAPHQL_API.USERS) {
+    const result = await this.postGraphQl(url, query, variables);
+    let body;
+    try {
+      body = JSON.parse(result.text);
+    } catch {
+      throw new Error(`GraphQL: unexpected response (${result.status}): ${result.text}`);
+    }
+    if (result.status !== 200 || body.errors || body.error) {
+      throw new Error(`GraphQL request failed (${result.status}): ${result.text}`);
+    }
+    return body.data;
+  },
+
+  // The keys of roles from their display names ('Users App') - a principal key ('role:...') is
+  // taken as is. Read once for the whole list.
+  async resolveRoleKeys(roles) {
+    const names = roles.filter((role) => !role.startsWith('role:'));
+    if (names.length === 0) {
+      return [...roles];
+    }
+    const data = await this.sendGraphQlRequest('{ roles { key displayName } }', {});
+    return roles.map((role) => {
+      if (role.startsWith('role:')) {
+        return role;
+      }
+      const found = data.roles.find((item) => item.displayName === role);
+      if (found === undefined) {
+        throw new Error(
+          `Unknown role '${role}': use a display name from appConst.SYSTEM_ROLES or a key 'role:...'. ` +
+            'Existing: ' +
+            data.roles.map((item) => `${item.displayName} (${item.key})`).join(', '),
+        );
+      }
+      return found.key;
+    });
+  },
+
+  // Creates a service account - a user of the system ID provider - through the GraphQL API.
+  // `serviceAccount` is what users.items.builder.buildServiceAccount() returns: { displayName, id,
+  // email?, password?, roles?, groups? }. `roles` are display names or 'role:' keys; `groups` are
+  // group keys ('group:system:editors'). An empty or missing `password` leaves the account without
+  // one. Returns the service account with its 'key'.
+  createServiceAccountViaApi(serviceAccount) {
+    return this.createUserViaApi(
+      Object.assign({}, serviceAccount, { idProvider: userItemsBuilder.SYSTEM_ID_PROVIDER }),
+    );
+  },
+
+  // Creates a user through the GraphQL API. `user` is what users.items.builder.buildUser() returns:
+  // { idProvider, displayName, id, email?, password?, roles?, groups? }. `idProvider` is the key of
+  // the provider the user lives in ('system' makes it a service account); `roles` are display names
+  // or 'role:' keys; `groups` are group keys. Returns the user with its 'key'.
+  async createUserViaApi(user) {
+    if (!user.idProvider) {
+      throw new Error(`createUserViaApi: '${user.displayName}' names no ID provider`);
+    }
+    const query = `mutation ($idProvider: String!, $name: String!, $displayName: String!, $email: String, $password: String, $roles: [String!], $groups: [String!]) {
+      createUser(idProvider: $idProvider, name: $name, displayName: $displayName, email: $email, password: $password, roles: $roles, groups: $groups) {
+        key displayName
+      }
+    }`;
+    const data = await this.sendGraphQlRequest(query, {
+      idProvider: user.idProvider,
+      name: user.id ?? user.name ?? user.displayName,
+      displayName: user.displayName,
+      email: user.email,
+      password: user.password || undefined,
+      roles: await this.resolveRoleKeys(user.roles ?? []),
+      groups: user.groups ?? [],
+    });
+    console.log('User created via API: ' + data.createUser.key);
+    return Object.assign({}, user, { key: data.createUser.key });
+  },
+
+  // Deletes principals (users, groups, roles) through the GraphQL API. `keys` is a principal key, a
+  // list of them, or what a create*ViaApi() returned (its 'key' is taken). Throws when any was not
+  // deleted.
+  async deletePrincipalsViaApi(keys) {
+    const list = [].concat(keys).map((item) => (typeof item === 'string' ? item : item.key));
+    const query = `mutation ($keys: [String!]!) {
+      deletePrincipals(keys: $keys) { key deleted reason }
+    }`;
+    const data = await this.sendGraphQlRequest(query, { keys: list });
+    const failed = data.deletePrincipals.filter((item) => !item.deleted);
+    if (failed.length > 0) {
+      throw new Error('Principals were not deleted: ' + JSON.stringify(failed));
+    }
+    console.log('Principals deleted via API: ' + list.join(', '));
+    return data.deletePrincipals;
   },
 };

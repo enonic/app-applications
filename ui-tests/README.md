@@ -28,16 +28,33 @@ Mocha against a real XP with the app deployed, Chrome driven over WebDriver Clas
   applications toggle, the sort order with the system applications shown, and 'Select all': what it
   ticks, the toolbar it enables, the row it puts on show, the Space key, and Stop and Start over the
   whole selection.
+- `specs/content.security.policy.spec.js` — the section opened by its direct link, then the 'Install
+  applications' dialog listing Enonic Market, log no Content-Security-Policy violation, and the
+  market icons load from another origin - the one the section adds to `img-src`. A control shows
+  an image from an origin the policy does not name refused and logged, so the policy is enforced
+  and its violations reach the log the test reads. Needs an XP that reaches Enonic Market.
+- `specs/deep.link.query.string.spec.js` — a deep link with a query string: the application selected
+  and the url kept as typed, the rail item carrying the sub-path and the query string once the
+  section is left, and the section's root with a query string opened with nothing selected.
+- `specs/service.account.admin.role.spec.js` — a service account with 'Administrator', made through
+  app-users' GraphQL API and deleted at the end: 'Applications' listed in the rail, and its toolbar
+  by rail item and by direct link - Install enabled, the actions on a selection disabled.
+- `specs/service.account.cm.expert.role.spec.js` — a service account admitted by no section's access
+  rules ('Content Manager Expert' with 'Administration Console Login'): the Settings app opened at
+  the direct link to 'Applications' and from the XP menu shows 'No administration applications' and
+  an empty rail, with the url left as typed.
 
 `page_objects/` are the page objects, on three base classes: `section.page.js` (every lookup is CSS
 through the section's shadow root; XPath cannot cross one), `browse.page.js` (the browse screen:
 toolbar, filter, list header, rows) and `details.panel.js` (the details panel: sections, fields,
 subsections, lists). `applications.page.js` and `applications.details.js` name what is this
-section's own; `install.app.dialog.js` and `uninstall.app.dialog.js` are its two dialogs. `home.page.js`, `login.page.js` and `menu.sections.rail.js` are the shell's pages,
+section's own; `install.app.dialog.js` and `uninstall.app.dialog.js` are its two dialogs. `home.page.js`, `login.page.js`, `menu.sections.rail.js` and `app.shell.js` are the shell's pages,
 the same as app-users'.
 
 `libs/app_const.js` holds the labels the section renders and the test applications the specs read;
-`libs/settings.utils.js` the flows the specs share (log in, open the Settings app, open a section).
+`libs/settings.utils.js` the flows the specs share (log in, open the Settings app, open a section,
+make and delete the accounts a spec logs in as through app-users' GraphQL API);
+`libs/users.items.builder.js` builds those accounts.
 
 ## Running
 

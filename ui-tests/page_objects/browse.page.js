@@ -142,7 +142,11 @@ class BrowsePage extends SectionPage {
   // Returns aria-labels of the buttons currently rendered in the toolbar, in display order.
   async getToolbarButtonLabels() {
     const buttons = await this.findElements(this.css.toolbarButtons);
-    return await Promise.all(buttons.map((el) => el.getAttribute('aria-label')));
+    const labels = [];
+    for (const button of buttons) {
+      labels.push(await button.getAttribute('aria-label'));
+    }
+    return labels;
   }
 
   // Waits for the toolbar's 'role' attribute (accessibility check).
