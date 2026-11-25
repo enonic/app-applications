@@ -36,9 +36,9 @@ WebDriverHelper.prototype.setupBrowser = function setupBrowser(w, h) {
   before(async function () {
     let propertiesReaderModule = require('properties-reader');
     let propertiesReader =
-        propertiesReaderModule.propertiesReader ||
-        propertiesReaderModule.default ||
-        propertiesReaderModule;
+      propertiesReaderModule.propertiesReader ||
+      propertiesReaderModule.default ||
+      propertiesReaderModule;
     let path = require('path');
     let webdriverio = require('webdriverio');
     let file = path.join(__dirname, '/../browser.properties');
