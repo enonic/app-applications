@@ -1,9 +1,7 @@
 /**
  * Created on 09.11.2026
  *
- * The flows the specs share: log in, open the Settings app, open a section. The Applications section
- * is the one this app adds; the other sections are app-users', listed so a spec can leave and
- * return to this one.
+ * The flows the specs share: log in, open the Settings app, open the Applications section.
  */
 const HomePage = require('../page_objects/home.page');
 const LoginPage = require('../page_objects/login.page');
@@ -331,7 +329,7 @@ module.exports = {
   getBrowserLogs() {
     return this.getBrowser().getLogs('browser');
   },
-  // The name a section goes by in appConst ('ID_PROVIDERS') from its title ('ID Providers').
+  // The name a section goes by in appConst ('APPLICATIONS') from its title ('Applications').
   getSectionName(section) {
     const key = Object.keys(appConst.EXTENSIONS).find(
       (name) => appConst.EXTENSIONS[name] === section,

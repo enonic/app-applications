@@ -12,7 +12,7 @@ describe("content.security.policy.spec - the Applications section does not viola
   }
 
   // The section this app adds. The policy itself is the shell's, and its header is tested there
-  // (app-settings); the sections of Users are tested in app-users.
+  // (app-settings).
   const APPLICATIONS = appConst.EXTENSIONS.APPLICATIONS;
   // How Chrome words a violation in its log: "Refused to load the image '...' because it violates
   // the following Content Security Policy directive: ...".
