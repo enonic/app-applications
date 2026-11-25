@@ -1,9 +1,7 @@
 /**
  * Created on 09.11.2026
  *
- * The flows the specs share: log in, open the Settings app, open a section. The Applications section
- * is the one this app adds; the other sections are app-users', listed so a spec can leave and
- * return to this one.
+ * The flows the specs share: log in, open the Settings app, open the Applications section.
  */
 const HomePage = require('../page_objects/home.page');
 const LoginPage = require('../page_objects/login.page');
@@ -65,12 +63,16 @@ module.exports = {
   async doLogout() {
     let loginPage = new LoginPage();
     let homePage = new HomePage();
+    await this.navigateToHomePage();
+    if (await loginPage.isLoaded()) {
+      return;
+    }
     await homePage.clickOnAvatarButton();
     await homePage.clickOnLogoutDropdownMenuItem();
     return await loginPage.waitForPageLoaded();
   },
   // Logs in, opens the Settings app and, when a section is given, switches to it via the rail.
-  // `section` is one of appConst.EXTENSIONS.* ('Applications', 'Users', ...).
+  // `section` is one of appConst.EXTENSIONS.*.
   async navigateToSettingsApp(userName, password, section) {
     try {
       await this.doLogin(userName, password);
@@ -191,9 +193,6 @@ module.exports = {
       return console.log('screenshot was not saved ' + err);
     }
   },
-  generateRandomName(part) {
-    return part + Math.round(Math.random() * 1000000);
-  },
   async getDisplayedElements(selector) {
     let elements = await this.getBrowser().$$(selector);
     if (elements.length === 0) {
@@ -204,9 +203,6 @@ module.exports = {
       return elements.filter((el, i) => result[i]);
     });
   },
-  // Opens a section (extension) of the Settings app through the sections rail and waits until its
-  // browse screen is shown: the rail link is active, the app bar shows the section title and the
-  // 'Actions' toolbar is displayed. `section` is one of appConst.EXTENSIONS.*
   async navigateToExtension(section) {
     try {
       let menuSectionsRail = new MenuSectionsRail();
@@ -218,6 +214,36 @@ module.exports = {
       let screenshot = await this.saveScreenshotUniqueName('err_navigate_extension');
       throw new Error(`'${section}' section was not opened, screenshot: ${screenshot} ` + err);
     }
+  },
+  // The direct link to a section, e.g. 'http://localhost:8080/admin/com.enonic.xp.app.settings/main#/applications'.
+  getSectionUrl(section) {
+    const path = appConst.SECTION_PATH[this.getSectionName(section)];
+    return `${this.getBaseUrl()}${appConst.SETTINGS_TOOL_PATH}#/${path}`;
+  },
+  async openSectionByUrl(section) {
+    await this.getBrowser().url('about:blank');
+    await this.getBrowser().url(this.getSectionUrl(section));
+    let menuSectionsRail = new MenuSectionsRail();
+    await menuSectionsRail.waitForLoaded();
+    return menuSectionsRail;
+  },
+  // The Settings tool's own url, no section named: 'http://localhost:8080/admin/com.enonic.xp.app.settings/main'.
+  getSettingsUrl() {
+    return `${this.getBaseUrl()}${appConst.SETTINGS_TOOL_PATH}`;
+  },
+  // Loads the Settings app anew at `hash` ('#/applications/<key>?foo=bar') and waits for the rail.
+  async openSettingsByHash(hash) {
+    await this.getBrowser().url('about:blank');
+    await this.getBrowser().url(this.getSettingsUrl() + hash);
+    let menuSectionsRail = new MenuSectionsRail();
+    await menuSectionsRail.waitForLoaded();
+    return menuSectionsRail;
+  },
+  async waitForUrl(expected, ms = appConst.TIMEOUT.MEDIUM) {
+    await this.getBrowser().waitUntil(async () => (await this.getBrowser().getUrl()) === expected, {
+      timeout: ms,
+      timeoutMsg: `The url should be '${expected}'`,
+    });
   },
   // Opens the Applications section: the one this app adds, so the one most specs start in.
   //
@@ -293,14 +319,24 @@ module.exports = {
     );
   },
   // The 'data-section' of a section's mount (appConst.SECTION_ID.*) from its title
-  // (appConst.EXTENSIONS.*, what MenuSectionsRail.SECTION.* and the app bar show).
+  // (appConst.EXTENSIONS.*, what the rail's links and the app bar show).
   getSectionId(section) {
+    return appConst.SECTION_ID[this.getSectionName(section)];
+  },
+  // What the browser has logged since the last call, as [{ level, message, source }]: the console,
+  // failed requests and the security messages, a Content-Security-Policy violation among them.
+  // Reading empties the log.
+  getBrowserLogs() {
+    return this.getBrowser().getLogs('browser');
+  },
+  // The name a section goes by in appConst ('APPLICATIONS') from its title ('Applications').
+  getSectionName(section) {
     const key = Object.keys(appConst.EXTENSIONS).find(
       (name) => appConst.EXTENSIONS[name] === section,
     );
     if (key === undefined) {
       throw new Error(`Unknown section '${section}': not one of appConst.EXTENSIONS`);
     }
-    return appConst.SECTION_ID[key];
+    return key;
   },
 };

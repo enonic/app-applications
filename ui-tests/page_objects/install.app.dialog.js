@@ -53,6 +53,9 @@ const CSS = {
   // (a `span`, direct child of the row) and the action cell (the last `div`): a ProgressButton
   // ('Install' / 'Update', filling with the download while it runs) or the text 'Installed'.
   rowDisplayName: "[data-component='ItemLabel'] span.font-semibold",
+  // The icon of a row: an `img` fetched from Enonic Market, which the section's own 'img-src' source
+  // admits; a generic glyph with no `img` where the market lists none or the load failed.
+  rowIcons: `${ROW} [data-component='ItemLabel'] img`,
   rowDescription: "[data-component='ItemLabel'] small",
   rowVersion: ':scope > span',
   rowMarketLink: ':scope > span a',
@@ -430,6 +433,47 @@ class InstallAppDialog extends SectionPage {
       await this.handleError(
         `${this.dialogName} - the market list was not loaded`,
         'err_install_market_list',
+        err,
+      );
+    }
+  }
+
+  // The `src` of every row icon listed, in display order.
+  async getMarketIconUrls() {
+    const icons = await this.findElements(this.css.rowIcons);
+    const urls = [];
+    for (const icon of icons) {
+      urls.push(await icon.getAttribute('src'));
+    }
+    return urls;
+  }
+
+  // Waits until at least one icon is listed and every one has its pixels: a refused or failed
+  // image never completes with a width, and the row swaps it for the glyph.
+  async waitForMarketIconsLoaded(ms = appConst.TIMEOUT.LONG) {
+    try {
+      await this.getBrowser().waitUntil(
+        async () => {
+          const icons = await this.findElements(this.css.rowIcons);
+          if (icons.length === 0) {
+            return false;
+          }
+          for (const icon of icons) {
+            if (
+              !(await icon.getProperty('complete')) ||
+              (await icon.getProperty('naturalWidth')) === 0
+            ) {
+              return false;
+            }
+          }
+          return true;
+        },
+        { timeout: ms, timeoutMsg: 'the market icons are still not loaded' },
+      );
+    } catch (err) {
+      await this.handleError(
+        `${this.dialogName} - the market icons should be loaded`,
+        'err_install_market_icons',
         err,
       );
     }

@@ -28,6 +28,21 @@ Mocha against a real XP with the app deployed, Chrome driven over WebDriver Clas
   applications toggle, the sort order with the system applications shown, and 'Select all': what it
   ticks, the toolbar it enables, the row it puts on show, the Space key, and Stop and Start over the
   whole selection.
+- `specs/content.security.policy.spec.js` — the section opened by its direct link, then the 'Install
+  applications' dialog listing Enonic Market, log no Content-Security-Policy violation, and the
+  market icons load from another origin - the one the section adds to `img-src`. A control shows
+  an image from an origin the policy does not name refused and logged, so the policy is enforced
+  and its violations reach the log the test reads. Needs an XP that reaches Enonic Market.
+- `specs/deep.link.query.string.spec.js` — a deep link with a query string: the application selected
+  and the url kept as typed, and the section's root with a query string opened with nothing
+  selected.
+- `specs/applications.toolbar.initial.state.spec.js` — the section opened by its rail item and by its
+  direct link: the toolbar with Install enabled and the actions on a selection disabled until there
+  is one.
+
+The suite depends on two things only: this app and the test applications `ui-tests/build.gradle`
+deploys. The Settings shell is the page the section mounts in and nothing more, and no spec opens,
+names or calls a section of app-users.
 
 `page_objects/` are the page objects, on three base classes: `section.page.js` (every lookup is CSS
 through the section's shadow root; XPath cannot cross one), `browse.page.js` (the browse screen:

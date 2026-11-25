@@ -29,8 +29,6 @@ const COMMON = {
 const BUTTONS = {
   BUTTON_REMOVE_ICON: "//button[@aria-label='Remove']",
   BUTTON_EDIT_ICON: "//button[@aria-label='Edit']",
-  buttonByLabel: (label) => `//button[@type='button' and contains(.,'${label}')]`,
-  radioButtonByLabel: (label) => `//button[@role='radio' and contains(.,'${label}')]`,
   BUTTON_MENU_POPUP: "//button[@aria-haspopup='menu']",
   buttonAriaLabel: (ariaLabel) =>
     `//button[@type='button' and contains(@aria-label,'${ariaLabel}') and not(ancestor::*[@aria-hidden='true']) and not(ancestor::*[contains(@class,'sm:hidden')])]`,
@@ -57,16 +55,10 @@ const COMBOBOX = {
   TOGGLE: "[data-component='Combobox.Toggle']",
   APPLY: "[data-component='Combobox.Apply']",
   // The combobox whose search input has the placeholder, when a step holds several.
-  searchByPlaceholder: (placeholder) =>
-    `[data-component='Combobox.Search']:has(input[placeholder='${placeholder}'])`,
-  inputByPlaceholder: (placeholder) =>
-    `[data-component='Combobox.Input'][placeholder='${placeholder}']`,
   POPUP: COMBOBOX_POPUP,
   LIST: `${COMBOBOX_POPUP} [data-component='Combobox.ListContent']`,
   OPTIONS: `${COMBOBOX_POPUP} [data-component='Listbox.Item']`,
   SELECTED_OPTION: `${COMBOBOX_POPUP} [data-component='Listbox.Item'][aria-selected='true']`,
-  optionByValue: (value) =>
-    `${COMBOBOX_POPUP} [data-component='Listbox.Item'][data-value='${value}']`,
   // 'Searching…', 'Nothing matches the search', 'The search could not be run'
   POPUP_MESSAGE: `${COMBOBOX_POPUP} p`,
 };

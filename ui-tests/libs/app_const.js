@@ -37,24 +37,22 @@ module.exports = Object.freeze({
   BROWSER_WIDTH: 1950,
   BROWSER_HEIGHT: 1050,
 
-  // The sections the Settings rail offers: this app's one and the ones app-users adds.
+  // The one section the suite knows by name: this app's. The rail may list others; no spec names
+  // them.
   EXTENSIONS: {
     APPLICATIONS: 'Applications',
-    SERVICE_ACCOUNTS: 'Service Accounts',
-    USERS: 'Users',
-    GROUPS: 'Groups',
-    ROLES: 'Roles',
-    ID_PROVIDERS: 'ID Providers',
   },
   // 'data-section' of the SectionMount that hosts the extension's shadow root
   SECTION_ID: {
     APPLICATIONS: 'com.enonic.xp.app.applications:applications',
-    SERVICE_ACCOUNTS: 'com.enonic.xp.app.users:service-accounts',
-    USERS: 'com.enonic.xp.app.users:users',
-    GROUPS: 'com.enonic.xp.app.users:groups',
-    ROLES: 'com.enonic.xp.app.users:roles',
-    ID_PROVIDERS: 'com.enonic.xp.app.users:id-providers',
   },
+  // The url segment a section answers to (`config.path` of its extension descriptor): the section
+  // is at '<tool url>#/<path>'.
+  SECTION_PATH: {
+    APPLICATIONS: 'applications',
+  },
+  // The Settings admin tool, relative to 'base.url'.
+  SETTINGS_TOOL_PATH: 'com.enonic.xp.app.settings/main',
   // The 'Actions' toolbar of the Applications section (phrases: applications.action.*). Each button
   // is located by its aria-label, which is the label itself.
   TOOLBAR: {

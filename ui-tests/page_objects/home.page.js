@@ -8,8 +8,6 @@ const appConst = require('../libs/app_const');
 const selectors = {
   container: `div[class*='home-main-container visible']`,
   settingsLink: 'a[data-tool-id="com.enonic.xp.app.settings:main"] span.app-tile-name',
-  usersLink: 'a[data-tool-id="com.enonic.xp.app.users:main"] span.app-tile-name',
-  applicationsLink: 'a[data-tool-id="com.enonic.xp.app.applications:main"] span.app-tile-name',
   dashboardLink: 'a[data-tool-id="com.enonic.xp.app.main:dashboard"] span.app-tile-name',
   avatarButton: 'button#avatar-button',
   logoutMenuItem: 'a.avatar-dropdown-item',
@@ -18,12 +16,6 @@ const selectors = {
 class HomePage extends Page {
   async waitForLoaded() {
     return await this.waitForElementDisplayed(selectors.container);
-  }
-
-  async waitForUsersLinkNotDisplayed() {
-    const host = await this.getXpMenuShadowHost();
-    const span = await host.shadow$(selectors.usersLink);
-    await span.waitForDisplayed({ timeout: appConst.TIMEOUT.MEDIUM, reverse: true });
   }
 
   async waitForDashboardLinkDisplayed() {
@@ -52,17 +44,6 @@ class HomePage extends Page {
     await span.waitForDisplayed({ timeout: appConst.TIMEOUT.MEDIUM });
   }
 
-  async clickOnApplicationsLink() {
-    try {
-      const host = await this.getXpMenuShadowHost();
-      const span = await host.shadow$(selectors.applicationsLink);
-      await span.waitForDisplayed({ timeout: appConst.TIMEOUT.MEDIUM });
-      await span.click();
-    } catch (err) {
-      await this.handleError('Applications link was not found', 'err_applications_link', err);
-    }
-  }
-
   async clickOnDashboardLink() {
     try {
       const host = await this.getXpMenuShadowHost();
@@ -71,17 +52,6 @@ class HomePage extends Page {
       await span.click();
     } catch (err) {
       await this.handleError('Dashboard link was not found', 'err_dashboard_link', err);
-    }
-  }
-
-  async clickOnUsersLink() {
-    try {
-      const host = await this.getXpMenuShadowHost();
-      const span = await host.shadow$(selectors.usersLink);
-      await span.waitForDisplayed({ timeout: appConst.TIMEOUT.MEDIUM });
-      await span.click();
-    } catch (err) {
-      await this.handleError('Users link was not found', 'err_users_link', err);
     }
   }
 
