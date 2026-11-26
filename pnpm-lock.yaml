@@ -47,8 +47,8 @@ importers:
         specifier: ^8.1.3
         version: 8.1.3
       '@enonic-types/global':
-        specifier: ^8.1.2
-        version: 8.1.2
+        specifier: ^8.1.3
+        version: 8.1.3
       '@enonic-types/lib-admin':
         specifier: ^8.1.3
         version: 8.1.3
@@ -130,8 +130,8 @@ packages:
   '@enonic-types/core@8.1.3':
     resolution: {integrity: sha512-ndCP9zooVfPPIfUYE7pQHtd9Xxq6uWtczCo5zZ/MpHCcrYowm7Hm/AxOVWPSZXHnfC16V/CsNxWf9iudUhaFFg==}
 
-  '@enonic-types/global@8.1.2':
-    resolution: {integrity: sha512-ek5F757g4GkibjJvEOdcPngoEUrGPbCNcRfcPi53NYgnXJO3yHvoMdecmF07lLszKS+BM97xCRjNd2KJnoE68A==}
+  '@enonic-types/global@8.1.3':
+    resolution: {integrity: sha512-Vlm1Yl2sIhAZg7GbDZB4oG4VwiCB2i6hVi3RJR+MCKmZUqZcEF2soFWl72/9Iapcu+ObCKR+7kbRUyN5w2FgtQ==}
 
   '@enonic-types/lib-admin@8.1.3':
     resolution: {integrity: sha512-WKdJOsANRD1ZICGFmUtYdA+7PBvk1tk7WrwnYk+2eUvEL9hbSbRmxO28m8ZNE0qbs/tBxkZef4+hQDpl6KkGXQ==}
@@ -1440,10 +1440,12 @@ packages:
   yuku-core@0.19.0:
     resolution: {integrity: sha512-kYK9e1XdfirNhkipzW0wmMcSWcVF/CWnuugodfVYRCUwvoBefweL9HzB96OiKEhsx78V5WbUxbJqlizMX869Qg==}
     engines: {node: '>=14.18.0'}
+    deprecated: 'Yuku is now one package with one core. Use "yuku" instead: https://yuku.fyi/javascript/. Existing installs keep working but get no more fixes.'
 
   yuku-parser@0.19.0:
     resolution: {integrity: sha512-XrBh9ZiQK5mJVRxZBAvD6LwRyAYrK3MFtH3+onyuxFL5hFD44EC3QOmIC1FjTj6H2MMwq46/NAI+NZxLZPZgxg==}
     engines: {node: '>=14.18.0'}
+    deprecated: 'Yuku is now one package with one core. Use "yuku" instead: https://yuku.fyi/javascript/. Existing installs keep working but get no more fixes.'
 
 snapshots:
 
@@ -1463,9 +1465,9 @@ snapshots:
 
   '@enonic-types/core@8.1.3': {}
 
-  '@enonic-types/global@8.1.2':
+  '@enonic-types/global@8.1.3':
     dependencies:
-      '@enonic-types/core': 8.1.2
+      '@enonic-types/core': 8.1.3
 
   '@enonic-types/lib-admin@8.1.3':
     dependencies:
