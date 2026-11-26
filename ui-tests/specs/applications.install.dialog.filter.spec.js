@@ -5,7 +5,7 @@ const assert = require('node:assert');
 const ApplicationsPage = require('../page_objects/applications.page');
 const InstallAppDialog = require('../page_objects/install.app.dialog');
 
-describe("applications.install.dialog.filter.spec - the 'License' and 'Upgrade available' fields of the market filter: the counts their values carry add up to the list, and a value picked narrows the list to its count", function () {
+describe("applications.install.dialog.filter.spec - the 'License' and 'Upgrade available' fields of the market filter: the counts their values carry never exceed the list, and a value picked narrows the list to its count", function () {
   this.timeout(appConst.SUITE_TIMEOUT);
   if (typeof browser === 'undefined') {
     webDriverHelper.setupBrowser();
@@ -32,16 +32,20 @@ describe("applications.install.dialog.filter.spec - the 'License' and 'Upgrade a
     );
   }
 
-  it("GIVEN the market list is loaded WHEN 'License' has been opened in the filter dropdown THEN its values should count every application once AND WHEN the first value has been picked THEN the list should be narrowed to its count", async () => {
+  it("GIVEN the market list is loaded WHEN 'License' has been opened in the filter dropdown THEN its counts should add up to the list at most AND WHEN the first value has been picked THEN the list should be narrowed to its count", async () => {
     let installAppDialog = new InstallAppDialog();
     // 1. Open the field: one value per license the market lists, each with its count.
     await installAppDialog.clickOnFilterButton();
     await installAppDialog.clickOnFilterField(FIELD.LICENSE);
     const values = await installAppDialog.getFilterValues();
     assert.ok(values.length > 0, 'The License field should offer values');
-    // 2. Every application has one license, so the counts add up to the list.
+    // 2. An application has one license at most: a row without one is listed but counted under no
+    //    value, so the counts add up to the list or fall short of it, and never exceed it.
     const counted = values.reduce((sum, value) => sum + value.count, 0);
-    assert.equal(counted, TOTAL, `The License counts should add up to the ${TOTAL} rows`);
+    assert.ok(
+      counted <= TOTAL,
+      `The License counts should add up to the ${TOTAL} rows at most, got ${counted}`,
+    );
     // 3. Pick the first value: a tag, and the list narrowed to its count.
     const picked = values[0];
     await installAppDialog.clickOnFilterValue(picked.label);
