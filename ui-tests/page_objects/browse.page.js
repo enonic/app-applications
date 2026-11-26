@@ -293,8 +293,9 @@ class BrowsePage extends SectionPage {
     return this.getTextInInput(this.css.searchInput);
   }
 
-  isSearchInputDisplayed() {
-    return this.isElementDisplayed(this.css.searchInput);
+  async isRowHighlighted(key) {
+    const tone = await this.getAttribute(this.css.rowByKey(key), 'data-tone');
+    return tone === 'inverse';
   }
 
   // Filter by field (the 'Filter' button and the dropdown it opens)
