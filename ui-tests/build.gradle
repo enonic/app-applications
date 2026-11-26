@@ -21,7 +21,7 @@ repositories {
 node {
     download = true
     version = '24.18.0'
-    pnpmVersion = '10.33.4'
+    pnpmVersion = '10.34.9'
     workDir = rootProject.file( '.gradle/nodejs' )
     pnpmWorkDir = rootProject.file( '.gradle/pnpm' )
 }
