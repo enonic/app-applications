@@ -20,7 +20,7 @@ repositories {
 // Same Node + pnpm as the root build; share its download dirs so a checkout fetches Node once.
 node {
     download = true
-    version = '24.18.0'
+    version = '24.22.3'
     pnpmVersion = '10.33.4'
     workDir = rootProject.file( '.gradle/nodejs' )
     pnpmWorkDir = rootProject.file( '.gradle/pnpm' )

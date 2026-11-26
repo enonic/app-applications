@@ -68,7 +68,7 @@ repositories {
 // Download + pin Node + pnpm so the build is self-contained (clean checkout / CI).
 node {
     download = true
-    version = '24.18.0'
+    version = '24.22.3'
     pnpmVersion = '10.33.4' // match packageManager in package.json
 }
 
