@@ -68,8 +68,8 @@ repositories {
 // Download + pin Node + pnpm so the build is self-contained (clean checkout / CI).
 node {
     download = true
-    version = '24.18.0'
-    pnpmVersion = '10.33.4' // match packageManager in package.json
+    version = '24.22.3'
+    pnpmVersion = '10.34.9' // match packageManager in package.json
 }
 
 // Prod by default; `-Penv=dev` → development build (sourcemaps, no minify).
