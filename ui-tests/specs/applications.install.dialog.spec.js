@@ -122,6 +122,8 @@ describe("applications.install.dialog.spec - the 'Install applications' dialog: 
   });
 
   // The version of a market row links to the application's page on Enonic Market, in a new tab.
+  // Verifies Install Application dialog: app name links lead to 404
+  // https://github.com/enonic/app-applications/issues/2199
   it("GIVEN 'Install applications' dialog is narrowed to 'Chuck Norris' WHEN the version link has been clicked THEN the application's page on the Enonic Market should be loaded in a new tab", async () => {
     await settingsUtils.navigateToApplicationsSection();
     let applicationsPage = new ApplicationsPage();
