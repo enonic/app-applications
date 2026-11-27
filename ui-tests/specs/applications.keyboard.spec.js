@@ -6,7 +6,7 @@ const ApplicationsPage = require('../page_objects/applications.page');
 const ApplicationDetails = require('../page_objects/applications.details');
 const InstallAppDialog = require('../page_objects/install.app.dialog');
 
-describe('applications.keyboard.spec - the keyboard in the list: the arrows move the row on show, Space ticks it and Escape unticks, Enter does nothing since the section declares no row action, and Escape closes the row menu, the filter dropdown, the state menu and the Install dialog', function () {
+describe('applications.keyboard.spec - the keyboard in the list: the arrows move the row on show, Space ticks it and Escape unticks, and Escape closes the row menu, the filter dropdown, the state menu and the Install dialog', function () {
   this.timeout(appConst.SUITE_TIMEOUT);
   if (typeof browser === 'undefined') {
     webDriverHelper.setupBrowser();
@@ -38,21 +38,30 @@ describe('applications.keyboard.spec - the keyboard in the list: the arrows move
     await assertRowIsShown(FIRST);
   });
 
-  it('GIVEN the first row is on show WHEN Space has been pressed THEN the row should be ticked AND Stop should be enabled AND WHEN Space has been pressed again THEN the row should be unticked', async () => {
+  it('GIVEN the first row is on show WHEN Space has been pressed THEN the row should be ticked AND the select-all checkbox should turn mixed AND WHEN Space has been pressed again THEN the row should be unticked', async () => {
     let applicationsPage = new ApplicationsPage();
-    // 1. Space: the row is ticked, and the toolbar acts on the tick - a started, local test
-    //    application can be stopped.
+    // 1. Space: the row is ticked, and the list counts it as part of a selection.
     await applicationsPage.pressWhiteSpace();
     await applicationsPage.waitForRowChecked(FIRST.key);
-    await applicationsPage.waitForStopButtonEnabled();
-    // 2. Space again: the tick is gone.
+    await settingsUtils
+      .getBrowser()
+      .waitUntil(() => applicationsPage.isSelectAllCheckboxIndeterminate(), {
+        timeout: appConst.TIMEOUT.MEDIUM,
+        timeoutMsg: 'One ticked row of several should leave select-all mixed',
+      });
+    // 2. Space again: the tick is gone, and select-all with it.
     await applicationsPage.pressWhiteSpace();
     await settingsUtils
       .getBrowser()
-      .waitUntil(async () => !(await applicationsPage.isRowChecked(FIRST.key)), {
-        timeout: appConst.TIMEOUT.MEDIUM,
-        timeoutMsg: 'The row should be unticked by Space',
-      });
+      .waitUntil(
+        async () =>
+          !(await applicationsPage.isRowChecked(FIRST.key)) &&
+          !(await applicationsPage.isSelectAllCheckboxIndeterminate()),
+        {
+          timeout: appConst.TIMEOUT.MEDIUM,
+          timeoutMsg: 'The row should be unticked by Space',
+        },
+      );
   });
 
   it('GIVEN the first row is ticked WHEN Escape has been pressed THEN the tick should be dropped', async () => {
